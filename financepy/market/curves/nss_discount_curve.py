@@ -34,7 +34,7 @@ class NSSDiscountCurve(DiscountCurve):
         beta_3: float,
         tau_1: float,
         tau_2: float,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Create an NSSDiscountCurve object by passing in curve valuation
         date plus the 4 different beta values and the 2 tau values. The zero
@@ -58,15 +58,15 @@ class NSSDiscountCurve(DiscountCurve):
         self._tau_2 = tau_2
         self._interp_type = None
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
         # Set up an annual grid of times and discount factors for insight
         years = np.linspace(0.0, 10.0, 11)
         self._df_dates = self.anchor_dt.add_years(years)
-        self._times = times_from_dates(self.anchor_dt, self._df_dates, self.time_dc_type)
+        self._times = times_from_dates(self.anchor_dt, self._df_dates, self.curve_dc_type)
         self._dfs = self.df_t(self._times)
 
     ####################################################################################
@@ -113,7 +113,7 @@ class NSSDiscountCurve(DiscountCurve):
             self._beta_3,
             self._tau_1,
             self._tau_2,
-            time_dc_type=self.time_dc_type,
+            curve_dc_type=self.curve_dc_type,
         )
 
         return discount_curve

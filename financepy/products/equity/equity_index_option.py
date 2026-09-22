@@ -205,8 +205,7 @@ class EquityIndexOption:
             print("Expiry time is too close to zero.")
             return -999
 
-        df = discount_curve.df(self.expiry_dt) / discount_curve.df(value_dt)
-        r = -np.log(df) / t_exp
+        r = discount_curve.fwd_zero_rate_cc(value_dt, self.expiry_dt)
 
         if isinstance(model, Black):
             sigma = implied_volatility(

@@ -47,7 +47,7 @@ def test_european():
     values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert round(value, 3) == 4.606
-    assert round(values[0], 3) == 4.600
+    assert round(values[0], 3) == 4.602
 
     opt_type1 = OptionTypes.EUROPEAN_CALL
     opt_type2 = OptionTypes.EUROPEAN_PUT
@@ -57,7 +57,7 @@ def test_european():
     values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert round(value, 3) == 6.714
-    assert round(values[0], 3) == 6.702
+    assert round(values[0], 3) == 6.712
 
     opt_type1 = OptionTypes.EUROPEAN_PUT
     opt_type2 = OptionTypes.EUROPEAN_CALL
@@ -67,7 +67,7 @@ def test_european():
     values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
     assert_close(value, 2.016)
-    assert_close(values[0], 2.022)
+    assert_close(values[0], 2.014)
 
     opt_type1 = OptionTypes.EUROPEAN_PUT
     opt_type2 = OptionTypes.EUROPEAN_PUT
@@ -94,8 +94,8 @@ def test_american():
     value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
     values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
-    assert_close(value, 4.600)
-    assert_close(values[0], 4.600)
+    assert_close(value, 4.602)
+    assert_close(values[0], 4.602)
 
     opt_type1 = OptionTypes.AMERICAN_CALL
     opt_type2 = OptionTypes.AMERICAN_PUT
@@ -104,8 +104,8 @@ def test_american():
     value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
     values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
-    assert_close(value, 7.614)
-    assert_close(values[0], 7.614)
+    assert_close(value, 7.626)
+    assert_close(values[0], 7.626)
 
     opt_type1 = OptionTypes.AMERICAN_PUT
     opt_type2 = OptionTypes.AMERICAN_CALL
@@ -114,8 +114,8 @@ def test_american():
     value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
     values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
-    assert_close(value, 4.182)
-    assert_close(values[0], 4.182)
+    assert_close(value, 4.189)
+    assert_close(values[0], 4.189)
 
     opt_type1 = OptionTypes.AMERICAN_PUT
     opt_type2 = OptionTypes.AMERICAN_PUT
@@ -124,8 +124,8 @@ def test_american():
     value = cmpd_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
     values = cmpd_option.value_tree(value_dt, stock_price, discount_curve, dividend_curve, model, num_steps)
 
-    assert_close(value, 4.298)
-    assert_close(values[0], 4.298)
+    assert_close(value, 4.302)
+    assert_close(values[0], 4.302)
 
 
 ########################################################################################

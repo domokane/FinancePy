@@ -1,790 +1,1592 @@
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+# ============================================================================
+# FINANCEPY EXAMPLES - CDS
+# ============================================================================
+#
+# Copyright (C) 2018-2026 Dominic O'Kane
+#
+# This example demonstrates:
+#
+#   1. Construction of an interest-rate curve
+#   2. Construction of a CDS issuer curve
+#   3. CDS valuation
+#   4. Premium and protection legs
+#   5. Clean and dirty CDS values
+#   6. CDS payment schedule
+#   7. Spread DV01
+#   8. Interest-rate DV01
+#   9. Recovery DV01
+#  10. Independent bump-and-revalue verification of all three risk measures
+#  11. Graphs showing the sensitivity of CDS value to:
+#          - credit spreads
+#          - interest rates
+#          - recovery rates
+#
+# The important idea in the risk sections is:
+#
+#       Risk measure = Value(bumped market) - Value(base market)
+#
+# We compare this independently calculated result with the corresponding
+# FinancePy risk function.
+#
+# ============================================================================
 
-
-# Allow this example to run directly from its category folder.
-import time
+import matplotlib.pyplot as plt
 import numpy as np
 
-
-from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.calendar import CalendarTypes
-from financepy.utils.calendar import DateGenRuleTypes
-from financepy.utils.calendar import BusDayAdjustTypes
-from financepy.utils.global_vars import G_DAYS_IN_YEAR
-from financepy.market.curves.cds_curve import CDSCurve
-from financepy.market.curves.ibor_single_curve import IborSingleCurve
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import CLEAN, DIRTY
 from financepy.products.credit.cds import CDS
+from financepy.utils.format_graphs import set_plot_style
+
+from helpers import build_ibor_curve
+from helpers import build_issuer_curve
+from helpers import build_frozen_issuer_curve
 
 # ============================================================================
-# FINANCEPY EXAMPLES - Cds
+# GLOBAL FORMATTING
 # ============================================================================
 
-DIRTY = 0
-CLEAN = 1
+LINE = "=" * 100
+SUBLINE = "-" * 100
+set_plot_style()
 
-
-
-
-# TO DO
-
-########################################################################################
-
-
-
-
-########################################################################################
-
-
-
-
-########################################################################################
-
-
-
-
-########################################################################################
-
-
-def test_issuer_curve_build():
-    """Test issuer curve build with simple libor curve to isolate cds
-    curve building time cost."""
-
-    value_dt = Date(20, 6, 2018)
-
-    times = np.linspace(0.0, 10.0, 11)
-    r = 0.05
-    discount_factors = np.power((1.0 + r), -times)
-    dates = value_dt.add_years(times)
-    libor_curve = DiscountCurve(value_dt, dates, discount_factors, InterpTypes.FLAT_FWD_RATES)
-    recovery_rate = 0.40
-
-    cds_contracts = []
-
-    cds_cpn = 0.005  # 50 bps
-    maturity_dt = value_dt.add_months(12)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_contracts.append(cds)
-
-    cds_cpn = 0.0055
-    maturity_dt = value_dt.add_months(24)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_contracts.append(cds)
-
-    cds_cpn = 0.0060
-    maturity_dt = value_dt.add_months(36)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_contracts.append(cds)
-
-    cds_cpn = 0.0065
-    maturity_dt = value_dt.add_months(60)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_contracts.append(cds)
-
-    cds_cpn = 0.0070
-    maturity_dt = value_dt.add_months(84)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_contracts.append(cds)
-
-    cds_cpn = 0.0073
-    maturity_dt = value_dt.add_months(120)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_contracts.append(cds)
-
-    issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
-
-    return cds_contracts, issuer_curve
-
-
-########################################################################################
-
-
-def build_full_issuer_curve1(mkt_spd_bump, ir_bump):
-
-    # https://www.markit.com/markit.jsp?jsppage=pv.jsp
-    # YIELD CURVE 8-AUG-2019 SNAP AT 1600
-
-    trade_dt = Date(9, 8, 2019)
-    value_dt = trade_dt.add_days(1)
-
-    m = 1.0  # 0.00000000000
-
-    dc_type = DayCountTypes.ACT_360
-    depos = []
-    depo1 = IborDeposit(value_dt, "1D", m * 0.0220, dc_type)
-    depos.append(depo1)
-
-    spot_days = 2
-    settle_dt = value_dt.add_days(spot_days)
-
-    maturity_dt = settle_dt.add_months(1)
-    depo1 = IborDeposit(settle_dt, maturity_dt, m * 0.022009, dc_type)
-
-    maturity_dt = settle_dt.add_months(2)
-    depo2 = IborDeposit(settle_dt, maturity_dt, m * 0.022138, dc_type)
-
-    maturity_dt = settle_dt.add_months(3)
-    depo3 = IborDeposit(settle_dt, maturity_dt, m * 0.021810, dc_type)
-
-    maturity_dt = settle_dt.add_months(6)
-    depo4 = IborDeposit(settle_dt, maturity_dt, m * 0.020503, dc_type)
-
-    maturity_dt = settle_dt.add_months(12)
-    depo5 = IborDeposit(settle_dt, maturity_dt, m * 0.019930, dc_type)
-
-    depos.append(depo1)
-    depos.append(depo2)
-    depos.append(depo3)
-    depos.append(depo4)
-    depos.append(depo5)
-
-    fras = []
-
-    swaps = []
-    dc_type = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freq = FrequencyTypes.SEMI_ANNUAL
-
-    maturity_dt = settle_dt.add_months(24)
-    swap1 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.015910 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap1)
-
-    maturity_dt = settle_dt.add_months(36)
-    swap2 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.014990 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap2)
-
-    maturity_dt = settle_dt.add_months(48)
-    swap3 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.014725 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap3)
-
-    maturity_dt = settle_dt.add_months(60)
-    swap4 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.014640 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap4)
-
-    maturity_dt = settle_dt.add_months(72)
-    swap5 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.014800 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap5)
-
-    maturity_dt = settle_dt.add_months(84)
-    swap6 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.014995 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap6)
-
-    maturity_dt = settle_dt.add_months(96)
-    swap7 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.015180 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap7)
-
-    maturity_dt = settle_dt.add_months(108)
-    swap8 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.015610 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap8)
-
-    maturity_dt = settle_dt.add_months(120)
-    swap9 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.015880 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap9)
-
-    maturity_dt = settle_dt.add_months(144)
-    swap10 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.016430 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap10)
-
-    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
-
-    cds_mkt_contracts = []
-
-    cds_cpn = 0.04 + mkt_spd_bump
-
-    maturity_dt = value_dt.next_cds_date(6)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    maturity_dt = value_dt.next_cds_date(12)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    maturity_dt = value_dt.next_cds_date(24)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    maturity_dt = value_dt.next_cds_date(36)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    maturity_dt = value_dt.next_cds_date(48)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    maturity_dt = value_dt.next_cds_date(60)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    maturity_dt = value_dt.next_cds_date(84)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    maturity_dt = value_dt.next_cds_date(120)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    maturity_dt = value_dt.next_cds_date(180)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    recovery_rate = 0.40
-
-    issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
-
-    return libor_curve, issuer_curve
-
-
-########################################################################################
-
-
-
-
-########################################################################################
-
-
-def build_full_issuer_curve2(mkt_spd_bump, ir_bump):
-
-    # https://www.markit.com/markit.jsp?jsppage=pv.jsp
-    # YIELD CURVE 20 August 2020 SNAP AT 1600
-
-    m = 1.0
-
-    value_dt = Date(20, 8, 2020)
-    settle_dt = Date(20, 8, 2020)
-    dc_type = DayCountTypes.ACT_360
-    depos = []
-
-    maturity_dt = settle_dt.add_months(1)
-    depo1 = IborDeposit(settle_dt, maturity_dt, m * 0.001709, dc_type)
-
-    maturity_dt = settle_dt.add_months(2)
-    depo2 = IborDeposit(settle_dt, maturity_dt, m * 0.002123, dc_type)
-
-    maturity_dt = settle_dt.add_months(3)
-    depo3 = IborDeposit(settle_dt, maturity_dt, m * 0.002469, dc_type)
-
-    maturity_dt = settle_dt.add_months(6)
-    depo4 = IborDeposit(settle_dt, maturity_dt, m * 0.003045, dc_type)
-
-    maturity_dt = settle_dt.add_months(12)
-    depo5 = IborDeposit(settle_dt, maturity_dt, m * 0.004449, dc_type)
-
-    depos.append(depo1)
-    depos.append(depo2)
-    depos.append(depo3)
-    depos.append(depo4)
-    depos.append(depo5)
-
-    swaps = []
-    dc_type = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freq = FrequencyTypes.SEMI_ANNUAL
-
-    maturity_dt = settle_dt.add_months(24)
-    swap1 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.002155 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap1)
-
-    maturity_dt = settle_dt.add_months(36)
-    swap2 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.002305 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap2)
-
-    maturity_dt = settle_dt.add_months(48)
-    swap3 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.002665 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap3)
-
-    maturity_dt = settle_dt.add_months(60)
-    swap4 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        SwapTypes.PAY,
-        m * 0.003290 + ir_bump,
-        fixed_freq,
-        dc_type,
-    )
-    swaps.append(swap4)
-
-    libor_curve = IborSingleCurve(value_dt, depos, [], swaps)
-
-    cds_cpn = 0.01 + mkt_spd_bump
-
-    cds_mkt_contracts = []
-    effective_dt = Date(21, 8, 2020)
-    cds = CDS(effective_dt, "6M", cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    cds = CDS(effective_dt, "1Y", cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    cds = CDS(effective_dt, "2Y", cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    cds = CDS(effective_dt, "3Y", cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    cds = CDS(effective_dt, "4Y", cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    cds = CDS(effective_dt, "5Y", cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    cds = CDS(effective_dt, "7Y", cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    cds = CDS(effective_dt, "10Y", cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    recovery_rate = 0.40
-
-    issuer_curve = CDSCurve(settle_dt, cds_mkt_contracts, libor_curve, recovery_rate)
-
-    print("DATE", "DISCOUNT_FACTOR", "SURV_PROB")
-    years = np.linspace(0.0, 10.0, 20)
-    dates = settle_dt.add_years(years)
-    for dt in dates:
-        df = libor_curve.df(dt)
-        q = issuer_curve.survival_prob(dt)
-        print("%16s" % dt, "%12.8f" % df, "%12.8f" % q)
-
-    return libor_curve, issuer_curve
-
-
-########################################################################################
-
-
-
-
-########################################################################################
-
-
-
-
-########################################################################################
-
-
-
-
-########################################################################################
 
 # ============================================================================
-# 1. CDS CURVE BUILD TIMING
+# SUPPORTING FUNCTION - BUILD INTEREST-RATE CURVE
 # ============================================================================
-# What this section demonstrates:
-# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+#
+# The optional bump parameter allows us to move every swap rate by the same
+# amount.
+#
+# For example:
+#
+#       bump = 0.0001
+#
+# means that every interest rate is increased by one basis point.
+#
+# This is used later to independently test FinancePy's ir_dv01() function.
+# ============================================================================
 
-print("\n" + "=" * 78)
-print("1. CDS CURVE BUILD TIMING")
-print("=" * 78)
-
-num_curves = 1000
-
-start = time.time()
-for _ in range(0, num_curves):
-    test_issuer_curve_build()
-
-end = time.time()
-
-print("LABEL", "TIME")
-duration = (end - start) / num_curves
-print(str(num_curves) + " Libor curves", duration)
 
 # ============================================================================
-# 2. DIRTY PRICE CDS MODEL CHECK
+# SUPPORTING FUNCTION - EXTRACT CDS VALUE
 # ============================================================================
-# What this section demonstrates:
-# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
-# Calculates coupon interest earned since the previous coupon date and illustrates the clean/dirty price adjustment.
-
-print("\n" + "=" * 78)
-print("2. DIRTY PRICE CDS MODEL CHECK")
-print("=" * 78)
-
-print("Example", "MARKIT CHECK 19 Aug 2020")
-
-libor_curve, issuer_curve = build_full_issuer_curve2(0.0, 0.0)
-
-# This is the 10 year contract at an off market cpn
-maturity_dt = Date(20, 6, 2025)
-cds_cpn = 0.050
-notional = ONE_MILLION
-long_protection = True
-trade_dt = Date(20, 8, 2020)
-effective_dt = Date(21, 8, 2020)
-value_dt = trade_dt
-
-cds_contract = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
-
-cds_recovery = 0.40
-
-print("LABEL", "VALUE")
-spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
-print("PAR_SPREAD", spd)
-
-v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-print("DIRTY_VALUE", v[DIRTY])
-print("CLEAN_VALUE", v[CLEAN])
-
-p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
-print("CLEAN_PRICE", p)
-
-accrued_days = cds_contract.accrued_days(value_dt)
-print("ACCRUED_DAYS", accrued_days)
-
-accrued_interest = cds_contract.accrued_interest(value_dt)
-print("ACCRUED_COUPON", accrued_interest)
-
-prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
-print("prot_PV", prot_pv)
-
-prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
-print("PREMIUM_PV", prem_pv)
-
-rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
-print("FULL_RPV01", rpv01[DIRTY])
-print("CLEAN_RPV01", rpv01[CLEAN])
-
-credit_dv01 = cds_contract.spread_dv01(value_dt, issuer_curve, cds_recovery)
-print("CREDIT DV01", credit_dv01)
-
-interest_dv01 = cds_contract.ir_dv01(value_dt, issuer_curve, cds_recovery)
-print("INTEREST DV01", interest_dv01)
-
-recovery_dv01 = cds_contract.recovery_dv01(value_dt, issuer_curve, cds_recovery)
-print("RECOVERY DV01", recovery_dv01)
-
-#    csa = cds_contract.cash_settlement_amount(value_dt, value_dt, issuer_curve, cds_recovery)
-#    print("CSA", csa)
-
-# Consider fast approximation
-t = (maturity_dt - value_dt) / G_DAYS_IN_YEAR
-z = libor_curve.df(maturity_dt)
-r = -np.log(z) / t
-
-mkt_spd = 0.01
-v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cds_recovery)
-
-print("FAST VALUATIONS", "VALUE")
-
-print("DIRTY APPROX VALUE", v_approx[0])
-print("CLEAN APPROX VALUE", v_approx[1])
-print("APPROX CREDIT DV01", v_approx[2])
-print("APPROX INTEREST DV01", v_approx[3])
-
+#
+# CDS.value() returns clean and dirty values.
+#
+# This helper makes the later calculations easier to read.
 # ============================================================================
-# 3. CDS DATE GENERATION
-# ============================================================================
-# What this section demonstrates:
-# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
 
-print("\n" + "=" * 78)
-print("3. CDS DATE GENERATION")
-print("=" * 78)
 
-maturity_dt = Date(20, 6, 2029)
-cds_cpn = 0.0100
-
-trade_dt = Date(9, 8, 2019)
-value_dt = trade_dt.add_days(1)
-
-cds_contract = CDS(
+def dirty_value(
+    cds_contract,
     value_dt,
-    maturity_dt,
-    cds_cpn,
-    ONE_MILLION,
-    True,
-    FrequencyTypes.QUARTERLY,
-    DayCountTypes.ACT_360,
-    CalendarTypes.WEEKEND,
-    BusDayAdjustTypes.FOLLOWING,
-    DateGenRuleTypes.BACKWARD,
+    issuer_curve,
+    recovery_rate,
+):
+
+    value = cds_contract.value(
+        value_dt,
+        issuer_curve,
+        recovery_rate,
+    )
+
+    return value[DIRTY]
+
+
+# ============================================================================
+# SUPPORTING FUNCTION - SAFE PAYMENT SCHEDULE
+# ============================================================================
+#
+# We only print payments AFTER the valuation date.
+#
+# This avoids asking the discount curve for discount factors at negative
+# times, which would generate:
+#
+#       ValueError: Interpolation times must be non-negative.
+#
+# ============================================================================
+
+
+def print_cds_payments(
+    cds_contract,
+    value_dt,
+    issuer_curve,
+):
+
+    print(
+        f"{'PAYMENT_DT':>15}" f"{'YEAR_FRAC':>14}" f"{'PAYMENT':>14}" f"{'DF':>14}" f"{'SURV_PROB':>14}" f"{'NPV':>14}"
+    )
+
+    print("-" * 85)
+
+    num_flows = len(cds_contract.payment_dts)
+
+    for i in range(num_flows):
+
+        payment_dt = cds_contract.payment_dts[i]
+
+        # Only future cash flows should be discounted from value_dt.
+
+        if payment_dt > value_dt:
+
+            accrual_factor = cds_contract.accrual_factors[i]
+            flow = cds_contract.flows[i]
+
+            df = issuer_curve.df(
+                payment_dt,
+            )
+
+            survival_probability = issuer_curve.survival_prob(
+                payment_dt,
+            )
+
+            npv = flow * df * survival_probability
+
+            print(
+                f"{str(payment_dt):>15}"
+                f"{accrual_factor:14.6f}"
+                f"{flow:14.6f}"
+                f"{df:14.8f}"
+                f"{survival_probability:14.8f}"
+                f"{npv:14.6f}"
+            )
+
+
+# ============================================================================
+# 1. MARKET SETUP
+# ============================================================================
+
+print("\n" + LINE)
+print("1. MARKET SETUP")
+print(LINE)
+
+trade_dt = Date(
+    15,
+    8,
+    2022,
 )
 
-print("Flow Date", "AccrualFactor", "Flow")
-num_flows = len(cds_contract.payment_dts)
-for n in range(0, num_flows):
-    print(
-        str(cds_contract.payment_dts[n]),
-        cds_contract.accrual_factors[n],
-        cds_contract.flows[n],
+# In this example:
+#
+#       value date = trade date
+
+value_dt = trade_dt
+
+# CDS protection normally becomes effective after the trade date.
+
+step_in_dt = trade_dt.add_days(1)
+
+maturity_dt = Date(
+    20,
+    6,
+    2027,
+)
+
+cds_recovery = 0.40
+
+notional = 1_000_000.0
+
+cds_coupon = 0.005
+
+long_protection = True
+
+print(f"{'Trade Date':<40}: {trade_dt}")
+print(f"{'Value Date':<40}: {value_dt}")
+print(f"{'Step-In Date':<40}: {step_in_dt}")
+print(f"{'Maturity Date':<40}: {maturity_dt}")
+
+print(f"{'Notional':<40}: {notional:15,.2f}")
+print(f"{'CDS Coupon':<40}: {cds_coupon * 10000.0:15.4f} bp")
+print(f"{'Recovery Rate':<40}: {cds_recovery * 100.0:15.4f}%")
+
+
+# ============================================================================
+# 2. BUILD INTEREST-RATE CURVE
+# ============================================================================
+
+print("\n" + LINE)
+print("2. BUILD INTEREST-RATE CURVE")
+print(LINE)
+
+libor_curve = build_ibor_curve(
+    value_dt,
+)
+
+print("Interest-rate curve constructed.")
+
+
+# ============================================================================
+# 3. BUILD ISSUER CURVE
+# ============================================================================
+
+print("\n" + LINE)
+print("3. BUILD ISSUER CREDIT CURVE")
+print(LINE)
+
+issuer_curve = build_issuer_curve(
+    value_dt,
+    step_in_dt,
+    libor_curve,
+    cds_recovery,
+)
+
+print("Issuer CDS curve constructed.")
+
+
+# ============================================================================
+# 4. CREATE CDS CONTRACT
+# ============================================================================
+
+print("\n" + LINE)
+print("4. CREATE CDS CONTRACT")
+print(LINE)
+
+cds_contract = CDS(
+    step_in_dt,
+    maturity_dt,
+    cds_coupon,
+    notional,
+    long_protection,
+)
+
+print(f"{'Notional':<40}: {notional:15,.2f}")
+print(f"{'Coupon':<40}: {cds_coupon * 10000.0:15.6f} bp")
+print(f"{'Long Protection':<40}: {long_protection}")
+
+
+# ============================================================================
+# 5. CDS VALUATION
+# ============================================================================
+
+print("\n" + LINE)
+print("5. CDS VALUATION")
+print(LINE)
+
+value = cds_contract.value(
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+dirty_pv = value[DIRTY]
+clean_pv = value[CLEAN]
+
+par_spread = cds_contract.par_spread(
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+clean_price = cds_contract.clean_price(
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+print(f"{'Dirty Value':<40}: {dirty_pv:15.6f}")
+print(f"{'Clean Value':<40}: {clean_pv:15.6f}")
+print(f"{'Clean Price':<40}: {clean_price:15.6f}")
+
+print(f"{'Par Spread':<40}: " f"{par_spread * 10000.0:15.6f} bp")
+
+
+# ============================================================================
+# 6. CDS LEGS
+# ============================================================================
+
+print("\n" + LINE)
+print("6. CDS PREMIUM AND PROTECTION LEGS")
+print(LINE)
+
+protection_leg_pv = cds_contract.prot_leg_pv(
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+premium_leg_pv = cds_contract.premium_leg_pv(
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+dirty_rpv01, clean_rpv01 = cds_contract.rpv01(
+    value_dt,
+    issuer_curve,
+)
+
+print(f"{'Protection Leg PV':<40}: " f"{protection_leg_pv:15.6f}")
+
+print(f"{'Premium Leg PV':<40}: " f"{premium_leg_pv:15.6f}")
+
+print(f"{'Dirty RPV01':<40}: " f"{dirty_rpv01:15.8f}")
+
+print(f"{'Clean RPV01':<40}: " f"{clean_rpv01:15.8f}")
+
+
+# ============================================================================
+# 7. ACCRUED PREMIUM
+# ============================================================================
+
+print("\n" + LINE)
+print("7. CDS ACCRUED PREMIUM")
+print(LINE)
+
+accrued_days = cds_contract.accrued_days(
+    value_dt,
+)
+
+accrued_interest = cds_contract.accrued_interest(
+    value_dt,
+)
+
+print(f"{'Accrued Days':<40}: " f"{accrued_days}")
+
+print(f"{'Accrued Premium':<40}: " f"{accrued_interest:15.6f}")
+
+
+# ============================================================================
+# 8. PAYMENT SCHEDULE
+# ============================================================================
+#
+# Only future payments are shown.
+#
+# For each payment we display:
+#
+#       accrual fraction
+#       contractual premium payment
+#       discount factor
+#       survival probability
+#       discounted survival-weighted payment
+#
+# ============================================================================
+
+print("\n" + LINE)
+print("8. CDS PAYMENT SCHEDULE")
+print(LINE)
+
+print_cds_payments(
+    cds_contract,
+    value_dt,
+    issuer_curve,
+)
+
+
+# ============================================================================
+# 9. FINANCEPY RISK MEASURES
+# ============================================================================
+
+print("\n" + LINE)
+print("9. FINANCEPY CDS RISK MEASURES")
+print(LINE)
+
+spread_dv01_function = cds_contract.spread_dv01(
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+ir_dv01_function = cds_contract.ir_dv01(
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+recovery_dv01_function = cds_contract.recovery_dv01(
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+print(f"{'Spread DV01':<40}: " f"{spread_dv01_function:15.8f}")
+
+print(f"{'IR DV01':<40}: " f"{ir_dv01_function:15.8f}")
+
+print(f"{'Recovery DV01':<40}: " f"{recovery_dv01_function:15.8f}")
+
+
+# ============================================================================
+# 10. TEST SPREAD DV01 BY BUMP AND REVALUE
+# ============================================================================
+#
+# Spread DV01 measures the change in CDS value caused by a one basis point
+# increase in the market CDS spreads used to calibrate the issuer curve.
+#
+# We independently reproduce it:
+#
+#       1. Start with the base CDS value.
+#       2. Increase every calibration CDS spread by 1 bp.
+#       3. Rebuild the issuer curve.
+#       4. Revalue the CDS.
+#       5. Calculate:
+#
+#              bumped value - base value
+#
+# ============================================================================
+
+print("\n" + LINE)
+print("10. TEST SPREAD DV01 BY BUMP AND REVALUE")
+print(LINE)
+
+spread_bump = 1.0 / 10000.0
+
+base_value = dirty_value(
+    cds_contract,
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+issuer_curve_spread_up = build_issuer_curve(
+    value_dt,
+    step_in_dt,
+    libor_curve,
+    cds_recovery,
+    spd_bump=spread_bump,
+)
+
+spread_bumped_value = dirty_value(
+    cds_contract,
+    value_dt,
+    issuer_curve_spread_up,
+    cds_recovery,
+)
+
+spread_dv01_bump = spread_bumped_value - base_value
+
+spread_error = spread_dv01_function - spread_dv01_bump
+
+print(f"{'Base Value':<45}: {base_value:15.8f}")
+
+print(f"{'Value after +1 bp CDS spread bump':<45}: " f"{spread_bumped_value:15.8f}")
+
+print(f"{'Bump-and-Revalue Spread DV01':<45}: " f"{spread_dv01_bump:15.8f}")
+
+print(f"{'FinancePy spread_dv01()':<45}: " f"{spread_dv01_function:15.8f}")
+
+print(f"{'Difference':<45}: " f"{spread_error:15.10f}")
+
+
+# ============================================================================
+# 11. TEST IR DV01 BY BUMP AND REVALUE
+# ============================================================================
+#
+# Interest-rate DV01 measures the change in CDS value following a parallel
+# one basis point increase in the interest-rate curve.
+#
+# There are actually TWO mechanisms through which the rate bump can affect
+# the CDS value.
+#
+#
+# EFFECT 1 - DIRECT DISCOUNTING
+# -----------------------------
+#
+# Changing interest rates changes the discount factors:
+#
+#                       DF(t)
+#
+# used to present-value both:
+#
+#       - the premium leg
+#       - the protection leg
+#
+# To isolate this effect we:
+#
+#       1. bump the interest-rate curve
+#       2. keep the survival probabilities unchanged
+#       3. revalue the CDS
+#
+#
+# EFFECT 2 - ISSUER CURVE RECALIBRATION
+# -------------------------------------
+#
+# Market CDS spreads are calibration instruments.
+#
+# Once the discount curve changes, the original survival probabilities will
+# generally no longer reproduce exactly the same market CDS spreads.
+#
+# Therefore the issuer curve is recalibrated using the bumped discount curve.
+#
+#
+# We therefore calculate three values:
+#
+#
+#       V0 = PV(base rates, base survival curve)
+#
+#       V1 = PV(bumped rates, frozen survival curve)
+#
+#       V2 = PV(bumped rates, recalibrated survival curve)
+#
+#
+# This gives:
+#
+#
+#       Direct Discounting Effect
+#
+#           = V1 - V0
+#
+#
+#       Credit Recalibration Effect
+#
+#           = V2 - V1
+#
+#
+#       Total IR DV01
+#
+#           = V2 - V0
+#
+#
+# and therefore:
+#
+#
+#       Total IR DV01
+#
+#           = Direct Discounting Effect
+#             + Credit Recalibration Effect
+#
+#
+# The final total is compared with FinancePy's ir_dv01().
+# ============================================================================
+
+print("\n" + LINE)
+print("11. TEST IR DV01 BY BUMP AND REVALUE")
+print(LINE)
+
+
+# ============================================================================
+# 11.1 BASE VALUE
+# ============================================================================
+
+print("\n" + SUBLINE)
+print("11.1 BASE CDS VALUE")
+print(SUBLINE)
+
+ir_bump = 1.0 / 10000.0
+
+v0 = dirty_value(
+    cds_contract,
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+print(
+    f"{'V0 - Base CDS Value':<50}: "
+    f"{v0:15.8f}"
+)
+
+
+# ============================================================================
+# 11.2 BUMP THE INTEREST-RATE CURVE
+# ============================================================================
+
+print("\n" + SUBLINE)
+print("11.2 BUMP INTEREST-RATE CURVE BY +1 BP")
+print(SUBLINE)
+
+libor_curve_ir_up = build_ibor_curve(
+    value_dt,
+    bump=ir_bump,
+)
+
+print(
+    f"{'Parallel Interest-Rate Bump':<50}: "
+    f"{ir_bump * 10000.0:15.6f} bp"
+)
+
+
+# ============================================================================
+# 11.3 DIRECT DISCOUNTING EFFECT
+# ============================================================================
+#
+# Replace the discount curve but DO NOT recalibrate survival probabilities.
+#
+# This isolates the effect of changing discount factors.
+# ============================================================================
+
+print("\n" + SUBLINE)
+print("11.3 DIRECT DISCOUNTING EFFECT")
+print(SUBLINE)
+
+frozen_issuer_curve = build_frozen_issuer_curve(
+    issuer_curve,
+    libor_curve_ir_up,
+    value_dt,
+    cds_recovery,
+)
+
+v1 = dirty_value(
+    cds_contract,
+    value_dt,
+    frozen_issuer_curve,
+    cds_recovery,
+)
+
+direct_discounting_effect = (
+    v1
+    - v0
+)
+
+print(
+    f"{'V0 - Base Value':<50}: "
+    f"{v0:15.8f}"
+)
+
+print(
+    f"{'V1 - Bumped Rates / Frozen Credit':<50}: "
+    f"{v1:15.8f}"
+)
+
+print(
+    f"{'Direct Discounting Effect (V1 - V0)':<50}: "
+    f"{direct_discounting_effect:15.8f}"
+)
+
+
+# ============================================================================
+# 11.4 RECALIBRATE THE ISSUER CURVE
+# ============================================================================
+#
+# We now rebuild the issuer curve using:
+#
+#       - the same market CDS spreads
+#       - the bumped interest-rate curve
+#
+# FinancePy must adjust the survival probabilities so that the calibration
+# CDS instruments once again reproduce their market spreads.
+# ============================================================================
+
+print("\n" + SUBLINE)
+print("11.4 ISSUER CURVE RECALIBRATION EFFECT")
+print(SUBLINE)
+
+issuer_curve_ir_up = build_issuer_curve(
+    value_dt,
+    step_in_dt,
+    libor_curve_ir_up,
+    cds_recovery,
+)
+
+v2 = dirty_value(
+    cds_contract,
+    value_dt,
+    issuer_curve_ir_up,
+    cds_recovery,
+)
+
+credit_recalibration_effect = (
+    v2
+    - v1
+)
+
+print(
+    f"{'V1 - Bumped Rates / Frozen Credit':<50}: "
+    f"{v1:15.8f}"
+)
+
+print(
+    f"{'V2 - Bumped Rates / Recalibrated Credit':<50}: "
+    f"{v2:15.8f}"
+)
+
+print(
+    f"{'Credit Recalibration Effect (V2 - V1)':<50}: "
+    f"{credit_recalibration_effect:15.8f}"
+)
+
+
+# ============================================================================
+# 11.5 TOTAL BUMP-AND-REVALUE IR DV01
+# ============================================================================
+
+print("\n" + SUBLINE)
+print("11.5 TOTAL IR DV01")
+print(SUBLINE)
+
+ir_dv01_bump = (
+    v2
+    - v0
+)
+
+ir_effect_sum = (
+    direct_discounting_effect
+    + credit_recalibration_effect
+)
+
+print(
+    f"{'Direct Discounting Effect':<50}: "
+    f"{direct_discounting_effect:15.8f}"
+)
+
+print(
+    f"{'Credit Recalibration Effect':<50}: "
+    f"{credit_recalibration_effect:15.8f}"
+)
+
+print(SUBLINE)
+
+print(
+    f"{'Sum of Two Effects':<50}: "
+    f"{ir_effect_sum:15.8f}"
+)
+
+print(
+    f"{'Total Bump-and-Revalue IR DV01 (V2 - V0)':<50}: "
+    f"{ir_dv01_bump:15.8f}"
+)
+
+
+# ============================================================================
+# 11.6 COMPARE WITH FINANCEPY IR DV01
+# ============================================================================
+
+print("\n" + SUBLINE)
+print("11.6 COMPARE WITH FINANCEPY ir_dv01()")
+print(SUBLINE)
+
+ir_dv01_function = cds_contract.ir_dv01(
+    value_dt,
+    issuer_curve,
+    cds_recovery,
+)
+
+ir_error = (
+    ir_dv01_function
+    - ir_dv01_bump
+)
+
+print(
+    f"{'FinancePy ir_dv01()':<50}: "
+    f"{ir_dv01_function:15.8f}"
+)
+
+print(
+    f"{'Manual Bump-and-Revalue IR DV01':<50}: "
+    f"{ir_dv01_bump:15.8f}"
+)
+
+print(
+    f"{'Difference':<50}: "
+    f"{ir_error:15.10f}"
+)
+
+ir_test = np.isclose(
+    ir_dv01_function,
+    ir_dv01_bump,
+    rtol=1.0e-5,
+    atol=1.0e-6,
+)
+
+print(
+    f"{'IR DV01 TEST':<50}: "
+    f"{'PASS' if ir_test else 'FAIL'}"
+)
+
+
+# ============================================================================
+# 11.7 CHECK THE DECOMPOSITION
+# ============================================================================
+
+print("\n" + SUBLINE)
+print("11.7 CHECK IR DV01 DECOMPOSITION")
+print(SUBLINE)
+
+decomposition_error = (
+    ir_dv01_bump
+    - ir_effect_sum
+)
+
+print(
+    f"{'Total IR DV01':<50}: "
+    f"{ir_dv01_bump:15.8f}"
+)
+
+print(
+    f"{'Direct + Recalibration':<50}: "
+    f"{ir_effect_sum:15.8f}"
+)
+
+print(
+    f"{'Difference':<50}: "
+    f"{decomposition_error:15.10f}"
+)
+
+decomposition_test = np.isclose(
+    ir_dv01_bump,
+    ir_effect_sum,
+    rtol=1.0e-12,
+    atol=1.0e-12,
+)
+
+print(
+    f"{'DECOMPOSITION TEST':<50}: "
+    f"{'PASS' if decomposition_test else 'FAIL'}"
+)
+
+
+# ============================================================================
+# 11.8 SHOW HOW THE SURVIVAL CURVE CHANGES
+# ============================================================================
+#
+# Compare the original calibrated survival probabilities with those obtained
+# after the +1 bp interest-rate bump.
+#
+# The market CDS spreads themselves have NOT changed.
+#
+# Any change in Q(t) therefore comes from recalibration to the new discount
+# curve.
+# ============================================================================
+
+print("\n" + SUBLINE)
+print("11.8 SURVIVAL PROBABILITIES BEFORE AND AFTER RATE BUMP")
+print(SUBLINE)
+
+base_times = np.asarray(
+    issuer_curve._times,
+)
+
+base_qs = np.asarray(
+    issuer_curve._qs,
+)
+
+bumped_times = np.asarray(
+    issuer_curve_ir_up._times,
+)
+
+bumped_qs = np.asarray(
+    issuer_curve_ir_up._qs,
+)
+
+print(
+    f"{'TIME':>12}"
+    f"{'BASE Q(t)':>18}"
+    f"{'BUMPED Q(t)':>18}"
+    f"{'CHANGE':>18}"
+)
+
+print("-" * 66)
+
+for (
+    time,
+    base_q,
+    bumped_q,
+) in zip(
+    base_times,
+    base_qs,
+    bumped_qs,
+):
+
+    q_change = (
+        bumped_q
+        - base_q
     )
 
-# ============================================================================
-# 4. DIRTY PRICE CDS
-# ============================================================================
-# What this section demonstrates:
-# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
-# Calculates coupon interest earned since the previous coupon date and illustrates the clean/dirty price adjustment.
+    print(
+        f"{time:12.6f}"
+        f"{base_q:18.10f}"
+        f"{bumped_q:18.10f}"
+        f"{q_change:18.10f}"
+    )
 
-print("\n" + "=" * 78)
-print("4. DIRTY PRICE CDS")
-print("=" * 78)
-
-mkt_spd = 0.040
-
-print("Example", "Markit 9 Aug 2019")
-
-libor_curve, issuer_curve = build_full_issuer_curve1(0.0, 0.0)
-
-# This is the 10 year contract at an off market cpn
-maturity_dt = Date(20, 6, 2029)
-cds_cpn = 0.0150
-notional = ONE_MILLION
-long_protection = True
-trade_dt = Date(9, 8, 2019)
-value_dt = trade_dt.add_days(1)
-effective_dt = value_dt
-
-cds_contract = CDS(effective_dt, maturity_dt, cds_cpn, notional, long_protection)
-
-cds_recovery = 0.40
-
-print("LABEL", "VALUE")
-spd = cds_contract.par_spread(value_dt, issuer_curve, cds_recovery) * 10000.0
-print("PAR_SPREAD", spd)
-
-v = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-print("DIRTY_VALUE", v[DIRTY])
-print("CLEAN_VALUE", v[CLEAN])
-
-p = cds_contract.clean_price(value_dt, issuer_curve, cds_recovery)
-print("CLEAN_PRICE", p)
-
-# MARKIT PRICE IS 168517
-
-accrued_days = cds_contract.accrued_days(value_dt)
-print("ACCRUED_DAYS", accrued_days)
-
-accrued_interest = cds_contract.accrued_interest(value_dt)
-print("ACCRUED_COUPON", accrued_interest)
-
-prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
-print("prot_PV", prot_pv)
-
-prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
-print("PREMIUM_PV", prem_pv)
-
-dirty_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
-print("DIRTY_RPV01", dirty_rpv01)
-print("CLEAN_RPV01", clean_rpv01)
-
-# cds_contract.print_payments(issuer_curve)
-
-bump = 1.0 / 10000.0  # 1 bp
-
-libor_curve, issuer_curve = build_full_issuer_curve1(bump, 0)
-v_bump = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-dv = v_bump[DIRTY] - v[DIRTY]
-print("CREDIT_DV01", dv)
-
-# Interest Rate Bump
-libor_curve, issuer_curve = build_full_issuer_curve1(0, bump)
-v_bump = cds_contract.value(value_dt, issuer_curve, cds_recovery)
-dv = v_bump[DIRTY] - v[DIRTY]
-print("INTEREST_DV01", dv)
-
-t = (maturity_dt - value_dt) / G_DAYS_IN_YEAR
-z = libor_curve.df(maturity_dt)
-r = -np.log(z) / t
-
-v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_spd, cds_recovery)
-
-print("DIRTY APPROX VALUE", v_approx[0])
-print("CLEAN APPROX VALUE", v_approx[1])
-print("DIRTY RPV01 VALUE", v_approx[2])
-print("CLEAN RPV01 VALUE", v_approx[3])
-print("APPROX SPREAD DV01", v_approx[4])
-print("APPROX INTEREST DV01", v_approx[5])
-print("APPROX RECOVERY DV01", v_approx[6])
 
 # ============================================================================
-# 5. DIRTY PRICE CDS CONVERGENCE
+# 11.9 GRAPH - IR DV01 DECOMPOSITION
 # ============================================================================
-# What this section demonstrates:
-# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
-# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
 
-print("\n" + "=" * 78)
-print("5. DIRTY PRICE CDS CONVERGENCE")
-print("=" * 78)
+print("\n" + SUBLINE)
+print("11.9 PLOT IR DV01 DECOMPOSITION")
+print(SUBLINE)
 
-_, issuer_curve = build_full_issuer_curve1(0.0, 0.0)
+effect_names = [
+    "Direct\nDiscounting",
+    "Credit Curve\nRecalibration",
+    "Total\nIR DV01",
+]
 
-# This is the 10 year contract at an off market cpn
-maturity_dt = Date(20, 6, 2029)
-cds_cpn = 0.0150
-notional = ONE_MILLION
-long_protection = False
-trade_dt = Date(9, 8, 2019)
-value_dt = trade_dt.add_days(1)
+effect_values = [
+    direct_discounting_effect,
+    credit_recalibration_effect,
+    ir_dv01_bump,
+]
 
-cds_contract = CDS(value_dt, maturity_dt, cds_cpn, notional, long_protection)
+plt.figure(
+    figsize=(9, 6),
+)
 
-cds_recovery = 0.40
+plt.bar(
+    effect_names,
+    effect_values,
+)
 
-print("NumSteps", "Value")
-for n in [10, 50, 100, 500, 1000]:
-    v_dirty = cds_contract.value(value_dt, issuer_curve, cds_recovery, 0, 1, n)[DIRTY]
-    print(n, v_dirty)
+plt.axhline(
+    0.0,
+    linestyle="--",
+)
+
+plt.ylabel(
+    "Change in CDS Value"
+)
+
+plt.title(
+    "Decomposition of CDS Interest-Rate DV01"
+)
+
+plt.grid(
+    True,
+    axis="y",
+)
+
+plt.tight_layout()
+plt.show()
+
 
 # ============================================================================
-# 6. CDS CURVE REPRICING
+# 11.10 GRAPH - SURVIVAL CURVE BEFORE AND AFTER RATE BUMP
 # ============================================================================
-# What this section demonstrates:
-# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
 
-print("\n" + "=" * 78)
-print("6. CDS CURVE REPRICING")
-print("=" * 78)
+plt.figure(
+    figsize=(9, 6),
+)
 
-value_dt = Date(20, 6, 2018)
-recovery_rate = 0.40
+plt.plot(
+    base_times,
+    base_qs,
+    marker="o",
+    label="Base Interest Rates",
+)
 
-cds_contracts, issuer_curve = test_issuer_curve_build()
-print("CDS_MATURITY_dt", "PAR_SPREAD")
-for cds in cds_contracts:
-    spd = cds.par_spread(value_dt, issuer_curve, recovery_rate)
-    print(str(cds.maturity_dt), spd * 10000.0)
+plt.plot(
+    bumped_times,
+    bumped_qs,
+    marker="o",
+    label="Interest Rates +1 bp",
+)
+
+plt.xlabel(
+    "Time (years)"
+)
+
+plt.ylabel(
+    "Survival Probability"
+)
+
+plt.title(
+    "Effect of Interest-Rate Bump on Calibrated CDS Survival Curve"
+)
+
+plt.ylim(
+    0.0,
+    1.02,
+)
+
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
 
 # ============================================================================
-# 7. CDS FAST APPROXIMATION
+# 11.11 INTERPRETATION
 # ============================================================================
-# What this section demonstrates:
-# Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
-# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
 
-print("\n" + "=" * 78)
-print("7. CDS FAST APPROXIMATION")
-print("=" * 78)
+print("\n" + SUBLINE)
+print("11.11 INTERPRETATION")
+print(SUBLINE)
 
-value_dt = Date(20, 6, 2018)
-# I build a discount curve that requires no bootstrap
-times = np.linspace(0, 10.0, 11)
-r = 0.05
+print(
+    """
+The interest-rate sensitivity can now be understood as two separate effects.
 
-discount_factors = np.power((1.0 + r), -times)
-dates = value_dt.add_years(times)
+V0
+--
+The original CDS value using:
 
-libor_curve = DiscountCurve(value_dt, dates, discount_factors, InterpTypes.FLAT_FWD_RATES)
+    base interest-rate curve
+    base calibrated survival curve
 
-maturity_dt = value_dt.next_cds_date(120)
-t = (maturity_dt - value_dt) / 365.242
-z = libor_curve.df(maturity_dt)
-r = -np.log(z) / t
 
-recovery_rate = 0.40
+V1
+--
+The CDS value after increasing interest rates by one basis point while
+holding the survival probabilities fixed.
 
-contract_cpn = 0.010
+Therefore:
 
-print("MKT_SPD", "EXACT_VALUE", "APPROX_VALUE", "DIFF(%NOT)")
+    V1 - V0
 
-for mkt_cpn in np.linspace(0.000, 0.05, 21):
+is the DIRECT DISCOUNTING EFFECT.
 
-    cds_contracts = []
 
-    cds_mkt = CDS(value_dt, maturity_dt, mkt_cpn, ONE_MILLION)
+V2
+--
+The CDS value after increasing interest rates by one basis point and then
+recalibrating the issuer survival curve to the original market CDS spreads.
 
-    cds_contracts.append(cds_mkt)
+Therefore:
 
-    issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
+    V2 - V1
 
-    cds_contract = CDS(value_dt, maturity_dt, contract_cpn)
-    v_exact = cds_contract.value(value_dt, issuer_curve, recovery_rate)[DIRTY]
-    v_approx = cds_contract.value_fast_approx(value_dt, r, mkt_cpn, recovery_rate)[0]
-    pct_diff = (v_exact - v_approx) / ONE_MILLION * 100.0
-    print(mkt_cpn * 10000, v_exact, v_approx, pct_diff)
+is the ISSUER CURVE RECALIBRATION EFFECT.
 
+
+Finally:
+
+    V2 - V0
+
+is the complete bump-and-revalue IR DV01.
+
+By construction:
+
+    V2 - V0
+
+        = (V1 - V0) + (V2 - V1)
+
+so:
+
+    TOTAL IR DV01
+
+        = DIRECT DISCOUNTING EFFECT
+
+        + ISSUER RECALIBRATION EFFECT
+
+
+The FinancePy ir_dv01() result should agree with V2 - V0 if the manual bump
+uses the same bump size and recalibration convention as the library function.
+"""
+)
+
+# ============================================================================
+# 12. TEST RECOVERY DV01 BY BUMP AND REVALUE
+# ============================================================================
+#
+# Recovery DV01 measures the effect of changing the recovery assumption.
+#
+# Changing recovery changes:
+#
+#           Loss Given Default = 1 - Recovery
+#
+# and therefore changes the hazard rates implied by the CDS market spreads.
+#
+# Consequently the issuer curve MUST be rebuilt after changing recovery.
+#
+# ============================================================================
+
+print("\n" + LINE)
+print("12. TEST RECOVERY DV01 BY BUMP AND REVALUE")
+print(LINE)
+
+recovery_bump = 0.01
+
+recovery_rate_up = cds_recovery + recovery_bump
+
+issuer_curve_recovery_up = build_issuer_curve(
+    value_dt,
+    step_in_dt,
+    libor_curve,
+    recovery_rate_up,
+)
+
+recovery_bumped_value = dirty_value(
+    cds_contract,
+    value_dt,
+    issuer_curve_recovery_up,
+    recovery_rate_up,
+)
+
+recovery_dv01_bump = recovery_bumped_value - base_value
+
+recovery_error = recovery_dv01_function - recovery_dv01_bump
+
+print(f"{'Base Recovery Rate':<45}: " f"{cds_recovery * 100.0:14.6f}%")
+
+print(f"{'Bumped Recovery Rate':<45}: " f"{recovery_rate_up * 100.0:14.6f}%")
+
+print(f"{'Base Value':<45}: " f"{base_value:15.8f}")
+
+print(f"{'Value after recovery bump':<45}: " f"{recovery_bumped_value:15.8f}")
+
+print(f"{'Bump-and-Revalue Recovery DV01':<45}: " f"{recovery_dv01_bump:15.8f}")
+
+print(f"{'FinancePy recovery_dv01()':<45}: " f"{recovery_dv01_function:15.8f}")
+
+print(f"{'Difference':<45}: " f"{recovery_error:15.10f}")
+
+
+# ============================================================================
+# 13. RISK TEST SUMMARY
+# ============================================================================
+
+print("\n" + LINE)
+print("13. RISK MEASURE TEST SUMMARY")
+print(LINE)
+
+print(f"{'RISK':<20}" f"{'FINANCEPY':>20}" f"{'BUMP/REVALUE':>20}" f"{'DIFFERENCE':>20}")
+
+print(SUBLINE)
+
+risk_tests = [
+    (
+        "Spread DV01",
+        spread_dv01_function,
+        spread_dv01_bump,
+    ),
+    (
+        "IR DV01",
+        ir_dv01_function,
+        ir_dv01_bump,
+    ),
+    (
+        "Recovery DV01",
+        recovery_dv01_function,
+        recovery_dv01_bump,
+    ),
+]
+
+for (
+    risk_name,
+    function_value,
+    bump_value,
+) in risk_tests:
+
+    difference = function_value - bump_value
+
+    print(f"{risk_name:<20}" f"{function_value:20.8f}" f"{bump_value:20.8f}" f"{difference:20.10f}")
+
+
+# ============================================================================
+# 14. ASSERTION TESTS
+# ============================================================================
+#
+# The FinancePy functions and our manual bump calculations should agree.
+#
+# We use np.isclose rather than exact equality because these calculations
+# involve numerical curve calibration and interpolation.
+# ============================================================================
+
+print("\n" + LINE)
+print("14. AUTOMATED TESTS")
+print(LINE)
+
+spread_test = np.isclose(
+    spread_dv01_function,
+    spread_dv01_bump,
+    rtol=1.0e-5,
+    atol=1.0e-6,
+)
+
+ir_test = np.isclose(
+    ir_dv01_function,
+    ir_dv01_bump,
+    rtol=1.0e-5,
+    atol=1.0e-6,
+)
+
+recovery_test = np.isclose(
+    recovery_dv01_function,
+    recovery_dv01_bump,
+    rtol=1.0e-5,
+    atol=1.0e-6,
+)
+
+print(f"{'Spread DV01 test':<40}: " f"{'PASS' if spread_test else 'FAIL'}")
+
+print(f"{'IR DV01 test':<40}: " f"{'PASS' if ir_test else 'FAIL'}")
+
+print(f"{'Recovery DV01 test':<40}: " f"{'PASS' if recovery_test else 'FAIL'}")
+
+
+# ============================================================================
+# 15. CDS VALUE VERSUS ISSUER SPREAD
+# ============================================================================
+#
+# We now go beyond a single 1 bp bump and examine a range of parallel spread
+# movements.
+#
+# For a buyer of protection, increasing ISSUER spreads should generally make
+# an existing fixed-coupon protection position more valuable.
+#
+# ============================================================================
+
+print("\n" + LINE)
+print("15. CDS VALUE VERSUS ISSUER SPREAD")
+print(LINE)
+
+spread_bumps_bp = np.arange(
+    -5,
+    51,
+    5,
+)
+
+spread_values = []
+
+for bump_bp in spread_bumps_bp:
+
+    bump = bump_bp / 10000.0
+
+    bumped_curve = build_issuer_curve(
+        value_dt,
+        step_in_dt,
+        libor_curve,
+        cds_recovery,
+        spd_bump=bump,
+    )
+
+    bumped_value = dirty_value(
+        cds_contract,
+        value_dt,
+        bumped_curve,
+        cds_recovery,
+    )
+
+    spread_values.append(
+        bumped_value,
+    )
+
+spread_values = np.asarray(
+    spread_values,
+)
+
+plt.figure(
+    figsize=(9, 6),
+)
+
+plt.plot(
+    spread_bumps_bp,
+    spread_values,
+    marker="o",
+)
+
+plt.axvline(
+    0.0,
+    linestyle="--",
+)
+
+plt.axhline(
+    base_value,
+    linestyle="--",
+)
+
+plt.xlabel(
+    "Parallel CDS Spread Bump (bp)",
+)
+
+plt.ylabel(
+    "CDS Dirty Value",
+)
+
+plt.title("CDS Value versus ISSUER Spread")
+
+plt.grid(True)
+plt.show()
+
+
+# ============================================================================
+# 16. CDS VALUE VERSUS INTEREST RATES
+# ============================================================================
+#
+# Here every swap rate used to construct the discount curve is shifted by the
+# same amount.
+#
+# For every bumped interest-rate curve we recalibrate the issuer CDS curve.
+#
+# ============================================================================
+
+print("\n" + LINE)
+print("16. CDS VALUE VERSUS INTEREST RATES")
+print(LINE)
+
+rate_bumps_bp = np.arange(
+    -5,
+    51,
+    5,
+)
+
+rate_values = []
+
+for bump_bp in rate_bumps_bp:
+
+    bump = bump_bp / 10000.0
+
+    bumped_libor_curve = build_ibor_curve(
+        value_dt,
+        bump=bump,
+    )
+
+    bumped_issuer_curve = build_issuer_curve(
+        value_dt,
+        step_in_dt,
+        bumped_libor_curve,
+        cds_recovery
+    )
+
+    bumped_value = dirty_value(
+        cds_contract,
+        value_dt,
+        bumped_issuer_curve,
+        cds_recovery
+    )
+
+    rate_values.append(
+        bumped_value,
+    )
+
+rate_values = np.asarray(
+    rate_values,
+)
+
+plt.figure(
+    figsize=(9, 6),
+)
+
+plt.plot(
+    rate_bumps_bp,
+    rate_values,
+    marker="o",
+)
+
+plt.axvline(
+    0.0,
+    linestyle="--",
+)
+
+plt.axhline(
+    base_value,
+    linestyle="--",
+)
+
+plt.xlabel(
+    "Parallel Interest-Rate Bump (bp)",
+)
+
+plt.ylabel(
+    "CDS Dirty Value",
+)
+
+plt.title("CDS Value versus Interest Rates")
+
+plt.grid(True)
+plt.show()
+
+
+# ============================================================================
+# 17. CDS VALUE VERSUS RECOVERY RATE
+# ============================================================================
+#
+# Finally we vary the recovery assumption.
+#
+# At every recovery rate we rebuild the CDS issuer curve so that the original
+# market CDS spreads remain the calibration instruments.
+#
+# This is important because changing recovery without recalibrating the
+# hazard curve would represent a different risk experiment.
+#
+# ============================================================================
+
+print("\n" + LINE)
+print("17. CDS VALUE VERSUS RECOVERY RATE")
+print(LINE)
+
+recovery_rates = np.linspace(
+    0.10,
+    0.70,
+    25,
+)
+
+recovery_values = []
+
+for recovery_rate in recovery_rates:
+
+    bumped_issuer_curve = build_issuer_curve(
+        value_dt,
+        step_in_dt,
+        libor_curve,
+        recovery_rate,
+    )
+
+    bumped_value = dirty_value(
+        cds_contract,
+        value_dt,
+        bumped_issuer_curve,
+        recovery_rate,
+    )
+
+    recovery_values.append(
+        bumped_value,
+    )
+
+recovery_values = np.asarray(
+    recovery_values,
+)
+
+plt.figure(
+    figsize=(9, 6),
+)
+
+plt.plot(
+    recovery_rates * 100.0,
+    recovery_values,
+    marker="o",
+)
+
+plt.axvline(
+    cds_recovery * 100.0,
+    linestyle="--",
+)
+
+plt.axhline(
+    base_value,
+    linestyle="--",
+)
+
+plt.xlabel(
+    "Recovery Rate (%)",
+)
+
+plt.ylabel(
+    "CDS Dirty Value",
+)
+
+plt.title("CDS Value versus Recovery Rate")
+
+plt.grid(True)
+plt.show()
+
+
+# ============================================================================
+# 18. SURVIVAL PROBABILITY CURVE
+# ============================================================================
+#
+# The CDS calibration converts market CDS spreads into a term structure of
+# survival probabilities.
+#
+# Q(t) is the risk-neutral probability of surviving from today until time t.
+#
+# Therefore:
+#
+#       Q(0) = 1
+#
+# and Q(t) normally decreases as the horizon increases.
+#
+# ============================================================================
+
+print("\n" + LINE)
+print("18. CALIBRATED SURVIVAL PROBABILITY CURVE")
+print(LINE)
+
+survival_times = np.asarray(
+    issuer_curve._times,
+)
+
+survival_probabilities = np.asarray(
+    issuer_curve._qs,
+)
+
+print(f"{'TIME':>15}" f"{'SURVIVAL PROBABILITY':>25}")
+
+print("-" * 40)
+
+for (
+    time,
+    survival_probability,
+) in zip(
+    survival_times,
+    survival_probabilities,
+):
+
+    print(f"{time:15.6f}" f"{survival_probability:25.8f}")
+
+plt.figure(
+    figsize=(9, 6),
+)
+
+plt.plot(
+    survival_times,
+    survival_probabilities,
+    marker="o",
+)
+
+plt.xlabel(
+    "Time (years)",
+)
+
+plt.ylabel(
+    "Survival Probability",
+)
+
+plt.title("Calibrated CDS Survival Curve")
+
+plt.ylim(
+    0.0,
+    1.02,
+)
+
+plt.grid(True)
+plt.show()
+
+
+# ============================================================================
+# 19. INTERPRETATION
+# ============================================================================
+
+print("\n" + LINE)
+print("19. INTERPRETATION")
+print(LINE)
+
+print("""
+SPREAD DV01
+-----------
+Spread DV01 measures the change in CDS value caused by a one basis point
+parallel increase in the CDS spreads used to calibrate the issuer curve.
+
+The independent test is:
+
+    spread DV01
+        = PV(spreads + 1 bp)
+        - PV(base spreads)
+
+
+INTEREST-RATE DV01
+------------------
+IR DV01 measures the change in CDS value caused by a one basis point
+parallel increase in the interest-rate curve.
+
+Because the issuer hazard curve is calibrated using discount factors, the
+issuer curve must be rebuilt after the interest-rate curve is bumped.
+
+The independent test is:
+
+    IR DV01
+        = PV(rates + 1 bp, recalibrated issuer curve)
+        - PV(base rates)
+
+
+RECOVERY DV01
+-------------
+Recovery affects loss given default:
+
+    LGD = 1 - Recovery
+
+However, market CDS spreads are held fixed in the recovery sensitivity
+calculation. Consequently the issuer hazard curve must be recalibrated after
+the recovery assumption changes.
+
+The independent test is:
+
+    Recovery DV01
+        = PV(bumped recovery, recalibrated issuer curve)
+        - PV(base recovery)
+
+
+WHY THESE TESTS ARE USEFUL
+--------------------------
+The built-in FinancePy risk functions and the manual bump-and-revalue
+calculations are obtained through separate calculation paths.
+
+Agreement therefore provides a useful numerical check that:
+
+    1. the market input being bumped is the intended risk factor,
+    2. the appropriate curves are being recalibrated,
+    3. the CDS is being revalued consistently,
+    4. the sign and units of the reported sensitivity are understood.
+""")

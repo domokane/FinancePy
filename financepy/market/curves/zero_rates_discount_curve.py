@@ -40,7 +40,7 @@ class ZeroRatesDiscountCurve(DiscountCurve):
         zero_dts: list,
         zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-        dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
     ):
         """Create the discount curve from a vector of dates and zero rates
@@ -66,16 +66,16 @@ class ZeroRatesDiscountCurve(DiscountCurve):
         self.anchor_dt = anchor_dt
         self.freq_type = freq_type
 
-        if not isinstance(dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
         if zero_dts[0] < anchor_dt:
             raise FinError("Zero rate dates must be on or after the valuation date.")
 
-        self.dc_type = dc_type
+        self.curve_dc_type = curve_dc_type
         zero_rates = np.asarray(zero_rates, dtype=float)
 
-        zero_times = times_from_dates(anchor_dt, zero_dts, dc_type)
+        zero_times = times_from_dates(anchor_dt, zero_dts, self.curve_dc_type)
         zero_times = np.asarray(zero_times, dtype=float)
 
         if test_monotonicity(zero_times) is False:
@@ -97,8 +97,8 @@ class ZeroRatesDiscountCurve(DiscountCurve):
             self._zero_dts = list(zero_dts)
             self._zero_rates = zero_rates
 
-        # We do not need a time_dc_type as we have a rate dc_type but we specify it
-        self.time_dc_type = self.dc_type
+        # We do not need a curve_dc_type as we have a rate dc_type but we specify it
+        self.curve_dc_type = self.curve_dc_type
         self._interp_type = interp_type
         self._interpolator = Interpolator(self._interp_type)
         self.fit(self._times, self._dfs)
@@ -117,11 +117,11 @@ class ZeroRatesDiscountCurve(DiscountCurve):
         zero_dts = self._zero_dts[1:]
 
         return ZeroRatesDiscountCurve(
-            value_dt=self.anchor_dt,
+            anchor_dt=self.anchor_dt,
             zero_dts=zero_dts.copy(),
             zero_rates=bumped_zero_rates,
             freq_type=self.freq_type,
-            dc_type=self.dc_type,
+            curve_dc_type=self.curve_dc_type,
             interp_type=self._interp_type,
         )
 
@@ -204,7 +204,7 @@ class ZeroRatesDiscountCurve(DiscountCurve):
         for dt, rate in zip(self._zero_dts, self._zero_rates):
             s += label_to_string(str(dt), f"{rate:12.8f}")
 
-        s += label_to_string("ZERO RATE DC_TYPE", self.dc_type)
+        s += label_to_string("CURVE DC_TYPE", self.dc_type)
 
         s += "\n"
         s += super().__repr__()

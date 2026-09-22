@@ -1,63 +1,108 @@
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+# ============================================================================
+# FINANCEPY EXAMPLES - InflationBond
+# ============================================================================
+#
+# Copyright (C) 2018-2026 Dominic O'Kane
+#
+# This example demonstrates the valuation and risk analytics of
+# inflation-linked bonds.
+#
+# Two examples are considered:
+#
+#   1. Bloomberg US TIPS example
+#   2. Quant Finance US TIPS example
+#
+# The examples illustrate the distinction between:
+#
+#   - real yield
+#   - real clean and dirty prices
+#   - inflation-adjusted accrued interest
+#   - inflation-adjusted principal
+#   - CPI indexation
+#   - inflation zero curves
+#   - duration and convexity
+#
+# Inflation-linked bonds differ from conventional fixed-rate bonds because
+# their principal and coupon cash flows are linked to an inflation index.
+#
+# The ratio
+#
+#       Reference CPI / Base CPI
+#
+# determines the inflation adjustment applied to the bond.
+# ============================================================================
 
+import datetime as dt
 
-# Allow this example to run directly from its category folder.
-
-
+import matplotlib.pyplot as plt
 
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
+from financepy.utils.global_types import YTMCalcType
+from financepy.utils.format_graphs import set_plot_style
 
 from financepy.products.inflation.inflation_bond import InflationBond
-from financepy.utils.global_types import YTMCalcType
 from financepy.products.inflation.inflation_index_curve import (
     InflationIndexCurve,
 )
-from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
-from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+
+from financepy.market.curves.zero_rates_discount_curve import (
+    ZeroRatesDiscountCurve,
+)
+
+from financepy.market.curves.flat_discount_curve import (
+    FlatDiscountCurve,
+)
+
+set_plot_style()
+
 
 # ============================================================================
-# FINANCEPY EXAMPLES - InflationBond
+# GLOBAL OUTPUT FORMAT
 # ============================================================================
 
-########################################################################################
+LINE = "=" * 100
+SUBLINE = "-" * 100
 
-
-
-
-########################################################################################
-
-
-
-
-########################################################################################
 
 # ============================================================================
-# 1. FIN INFLATION BOND BBG
+# 1. BLOOMBERG US TIPS EXAMPLE
 # ============================================================================
-# What this section demonstrates:
-# Compares annual coupon income with the current clean market price; unlike YTM it ignores capital gain/loss to maturity.
-# Solves for the yield that reproduces the observed bond price. This checks the inverse relationship between price and yield.
-# Prices the bond from a yield including accrued interest. Compare it with clean price to see the effect of accrued coupon.
-# Prices the bond from a yield excluding accrued interest, which is the usual quoted bond price.
-# Measures first-order price sensitivity to yield changes in price units.
-# Measures approximate percentage price sensitivity to a small change in yield.
+#
+# Source example:
+#
+# Bloomberg US TIPS example used in the original FinancePy test suite.
+#
+# The example first calculates conventional bond analytics using real yield.
+# It then applies CPI indexation to calculate inflation-adjusted accrued
+# interest and principal.
+# ============================================================================
 
-print("\n" + "=" * 78)
-print("1. FIN INFLATION BOND BBG")
-print("=" * 78)
+print("\n" + LINE)
+print("1. BLOOMBERG US TIPS EXAMPLE")
+print(LINE)
 
-print("BLOOMBERG US TIPS EXAMPLE")
+
+# ============================================================================
+# 1.1 BOND DEFINITION
+# ============================================================================
+
 settle_dt = Date(21, 7, 2017)
 issue_dt = Date(15, 7, 2010)
 maturity_dt = Date(15, 7, 2020)
+
 coupon = 0.0125
+
 freq_type = FrequencyTypes.SEMI_ANNUAL
 dc_type = DayCountTypes.ACT_ACT_ICMA
+
 face = 100.0
+
 base_cpi_value = 218.08532
+
 ex_div_days = 0
+
 
 bond = InflationBond(
     issue_dt,
@@ -69,115 +114,399 @@ bond = InflationBond(
     base_cpi_value,
 )
 
-print("FIELD", "VALUE")
-clean_price = 104.03502
 
-yld = bond.current_yield(settle_dt, clean_price)
-print("Current Yield = ", yld)
+print(f"{'Issue Date':<40}: " f"{issue_dt}")
 
-# Inherited functions that just calculate real yield without CPI adjustments
+print(f"{'Maturity Date':<40}: " f"{maturity_dt}")
 
-ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.UK_DMO)
+print(f"{'Settlement Date':<40}: " f"{settle_dt}")
 
-print("UK DMO REAL Yield To Maturity = ", ytm)
+print(f"{'Coupon Rate':<40}: " f"{coupon * 100.0:12.6f}%")
 
-ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_STREET)
+print(f"{'Base CPI':<40}: " f"{base_cpi_value:12.6f}")
 
-print("US STREET REAL Yield To Maturity = ", ytm)
 
-ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.US_TREASURY)
+# ============================================================================
+# 1.2 CURRENT YIELD
+# ============================================================================
+#
+# Current yield compares annual coupon income with the clean market price.
+#
+# For an inflation-linked bond this is still based on the quoted real bond
+# price and does not capture the full inflation adjustment.
+# ============================================================================
 
-print("US TREASURY REAL Yield To Maturity = ", ytm)
+print("\n" + LINE)
+print("1.2 CURRENT YIELD")
+print(LINE)
 
-dirty_price = bond.dirty_price_from_ytm(settle_dt, ytm)
-print("Dirty Price from REAL YTM = ", dirty_price)
+market_clean_price = 104.03502
 
-clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
-print("Clean Price from Real YTM = ", clean_price)
+current_yield = bond.current_yield(
+    settle_dt,
+    market_clean_price,
+)
 
-accddays = bond.accrued_days
-print("Accrued Days = ", accddays)
+print(f"{'Clean Price':<40}: " f"{market_clean_price:12.6f}")
 
-accrued_interest = bond.accrued_int
-print("REAL Accrued Interest = ", accrued_interest)
+print(f"{'Current Yield':<40}: " f"{current_yield * 100.0:12.6f}%")
 
-# Inflation functions that calculate nominal yield with CPI adjustment
+
+# ============================================================================
+# 1.3 REAL YIELD TO MATURITY
+# ============================================================================
+#
+# Inflation-linked bonds are normally quoted in terms of real yield.
+#
+# FinancePy supports several bond-market yield conventions. The same clean
+# price is therefore converted into real YTM using:
+#
+#   - UK DMO
+#   - US Street
+#   - US Treasury
+#
+# Small differences can arise because the conventions treat coupon periods
+# and accrued interest differently.
+# ============================================================================
+
+print("\n" + LINE)
+print("1.3 REAL YIELD TO MATURITY")
+print(LINE)
+
+real_ytm_uk = bond.yield_to_maturity(
+    settle_dt,
+    market_clean_price,
+    YTMCalcType.UK_DMO,
+)
+
+real_ytm_street = bond.yield_to_maturity(
+    settle_dt,
+    market_clean_price,
+    YTMCalcType.US_STREET,
+)
+
+real_ytm_treasury = bond.yield_to_maturity(
+    settle_dt,
+    market_clean_price,
+    YTMCalcType.US_TREASURY,
+)
+
+
+print(f"{'YIELD CONVENTION':<30}" f"{'REAL YTM (%)':>20}")
+
+print(SUBLINE)
+
+print(f"{'UK DMO':<30}" f"{real_ytm_uk * 100.0:20.6f}")
+
+print(f"{'US STREET':<30}" f"{real_ytm_street * 100.0:20.6f}")
+
+print(f"{'US TREASURY':<30}" f"{real_ytm_treasury * 100.0:20.6f}")
+
+
+# Use the US Treasury convention for the remaining Bloomberg calculations.
+
+real_ytm = real_ytm_treasury
+
+
+# ============================================================================
+# 1.4 REAL CLEAN AND DIRTY PRICE
+# ============================================================================
+#
+# The real dirty price includes real accrued coupon interest.
+#
+# The real clean price removes accrued interest and corresponds to the
+# quoted bond price.
+# ============================================================================
+
+print("\n" + LINE)
+print("1.4 REAL CLEAN AND DIRTY PRICE")
+print(LINE)
+
+dirty_price = bond.dirty_price_from_ytm(
+    settle_dt,
+    real_ytm,
+)
+
+clean_price = bond.clean_price_from_ytm(
+    settle_dt,
+    real_ytm,
+)
+
+accrued_days = bond.accrued_days
+real_accrued_interest = bond.accrued_int
+
+
+print(f"{'Real Clean Price':<40}: " f"{clean_price:12.6f}")
+
+print(f"{'Real Accrued Interest':<40}: " f"{real_accrued_interest:12.6f}")
+
+print(f"{'Real Dirty Price':<40}: " f"{dirty_price:12.6f}")
+
+print(f"{'Accrued Days':<40}: " f"{accrued_days}")
+
+
+# ============================================================================
+# 1.5 CPI INDEX RATIO
+# ============================================================================
+#
+# The inflation index ratio compares the current reference CPI with the
+# base CPI established when the bond was issued.
+#
+#       Index Ratio = Reference CPI / Base CPI
+#
+# An index ratio greater than one indicates cumulative inflation since the
+# bond's base CPI date.
+# ============================================================================
+
+print("\n" + LINE)
+print("1.5 CPI INDEX RATIO")
+print(LINE)
 
 ref_cpi_value = 244.65884
 
-clean_price = bond.clean_price_from_ytm(settle_dt, ytm)
-print("Clean Price from Real YTM = ", clean_price)
+index_ratio = ref_cpi_value / base_cpi_value
 
-inflation_accd = bond.inflation_accrued_interest(settle_dt, face, ref_cpi_value)
+cumulative_inflation = index_ratio - 1.0
 
-print("Inflation Accrued = ", inflation_accd)
+print(f"{'Base CPI':<40}: " f"{base_cpi_value:12.6f}")
+
+print(f"{'Reference CPI':<40}: " f"{ref_cpi_value:12.6f}")
+
+print(f"{'Index Ratio':<40}: " f"{index_ratio:12.6f}")
+
+print(f"{'Cumulative Inflation':<40}: " f"{cumulative_inflation * 100.0:12.6f}%")
+
+
+# ============================================================================
+# 1.6 INFLATION-ADJUSTED ACCRUED INTEREST
+# ============================================================================
+#
+# Real accrued interest is scaled by the CPI index ratio to obtain the
+# inflation-adjusted accrued interest.
+# ============================================================================
+
+print("\n" + LINE)
+print("1.6 INFLATION-ADJUSTED ACCRUED INTEREST")
+print(LINE)
+
+inflation_accrued = bond.inflation_accrued_interest(
+    settle_dt,
+    face,
+    ref_cpi_value,
+)
+
+print(f"{'Real Accrued Interest':<40}: " f"{real_accrued_interest:12.6f}")
+
+print(f"{'Inflation Accrued Interest':<40}: " f"{inflation_accrued:12.6f}")
+
+
+# ============================================================================
+# 1.7 FLAT PRICE
+# ============================================================================
+#
+# The inflation-linked flat price uses the CPI value associated with the
+# previous coupon date.
+# ============================================================================
+
+print("\n" + LINE)
+print("1.7 FLAT PRICE")
+print(LINE)
 
 last_cpn_cpi_value = 244.61839
 
-clean_price = bond.flat_price_from_yield_to_maturity(settle_dt, ytm, last_cpn_cpi_value, YTMCalcType.US_TREASURY)
-
-print("Flat Price from Real YTM = ", clean_price)
-
-face = 100.0
-
-principal = bond.inflation_principal(settle_dt, face, ytm, ref_cpi_value, YTMCalcType.US_TREASURY)
-
-print("Inflation Principal = ", principal)
-
-duration = bond.dollar_duration(settle_dt, ytm)
-print("Dollar Duration = ", duration)
-
-modified_duration = bond.modified_duration(settle_dt, ytm)
-print("Modified Duration = ", modified_duration)
-
-macaulay_duration = bond.macaulay_duration(settle_dt, ytm)
-print("Macaulay Duration = ", macaulay_duration)
-
-conv = bond.convexity_from_ytm(settle_dt, ytm)
-print("Convexity = ", conv)
-
-# ============================================================================
-# 2. FIN INFLATION BOND STACK
-# ============================================================================
-# What this section demonstrates:
-# Compares annual coupon income with the current clean market price; unlike YTM it ignores capital gain/loss to maturity.
-# Solves for the yield that reproduces the observed bond price. This checks the inverse relationship between price and yield.
-# Values cash flows directly from discount factors and includes accrued interest.
-# Prices the bond from a yield excluding accrued interest, which is the usual quoted bond price.
-# Measures first-order price sensitivity to yield changes in price units.
-# Measures approximate percentage price sensitivity to a small change in yield.
-
-print("\n" + "=" * 78)
-print("2. FIN INFLATION BOND STACK")
-print("=" * 78)
-
-print("=============================")
-print("QUANT FINANCE US TIPS EXAMPLE")
-print("=============================")
-settle_dt = Date(23, 8, 2019)
-issue_dt = Date(25, 9, 2013)
-maturity_dt = Date(22, 3, 2068)
-coupon = 0.00125
-freq_type = FrequencyTypes.SEMI_ANNUAL
-dc_type = DayCountTypes.ACT_ACT_ICMA
-base_cpi_value = 249.70
-ref_cpi_value = 244.65884
-
-# Discount curve
-discount_curve = FlatDiscountCurve(
+flat_price = bond.flat_price_from_yield_to_maturity(
     settle_dt,
-    0.01033692,
+    real_ytm,
+    last_cpn_cpi_value,
+    YTMCalcType.US_TREASURY,
+)
+
+print(f"{'Last Coupon CPI':<40}: " f"{last_cpn_cpi_value:12.6f}")
+
+print(f"{'Flat Price':<40}: " f"{flat_price:12.6f}")
+
+
+# ============================================================================
+# 1.8 INFLATION-ADJUSTED PRINCIPAL
+# ============================================================================
+#
+# Inflation protection increases the effective principal value as the
+# reference CPI rises relative to the base CPI.
+# ============================================================================
+
+print("\n" + LINE)
+print("1.8 INFLATION-ADJUSTED PRINCIPAL")
+print(LINE)
+
+inflation_principal = bond.inflation_principal(
+    settle_dt,
+    face,
+    real_ytm,
+    ref_cpi_value,
+    YTMCalcType.US_TREASURY,
+)
+
+print(f"{'Face Amount':<40}: " f"{face:12.6f}")
+
+print(f"{'Inflation Principal':<40}: " f"{inflation_principal:12.6f}")
+
+
+# ============================================================================
+# 1.9 REAL-YIELD RISK MEASURES
+# ============================================================================
+#
+# These measures describe sensitivity to changes in real yield.
+# ============================================================================
+
+print("\n" + LINE)
+print("1.9 REAL-YIELD RISK MEASURES")
+print(LINE)
+
+dollar_duration = bond.dollar_duration(
+    settle_dt,
+    real_ytm,
+)
+
+modified_duration = bond.modified_duration(
+    settle_dt,
+    real_ytm,
+)
+
+macaulay_duration = bond.macaulay_duration(
+    settle_dt,
+    real_ytm,
+)
+
+convexity = bond.convexity_from_ytm(
+    settle_dt,
+    real_ytm,
+)
+
+
+print(f"{'MEASURE':<35}" f"{'VALUE':>20}")
+
+print(SUBLINE)
+
+print(f"{'Dollar Duration':<35}" f"{dollar_duration:20.6f}")
+
+print(f"{'Modified Duration':<35}" f"{modified_duration:20.6f}")
+
+print(f"{'Macaulay Duration':<35}" f"{macaulay_duration:20.6f}")
+
+print(f"{'Convexity':<35}" f"{convexity:20.6f}")
+
+
+# ============================================================================
+# 2. QUANT FINANCE US TIPS EXAMPLE
+# ============================================================================
+#
+# This example introduces explicit inflation-market data:
+#
+#   - historical CPI fixings
+#   - an inflation index curve
+#   - zero-coupon inflation swap rates
+#   - an inflation zero curve
+#   - a nominal discount curve
+#
+# These are the market-data components required for more complete
+# inflation-linked valuation.
+# ============================================================================
+
+print("\n" + LINE)
+print("2. QUANT FINANCE US TIPS EXAMPLE")
+print(LINE)
+
+
+# ============================================================================
+# 2.1 BOND DEFINITION
+# ============================================================================
+
+settle_dt_2 = Date(23, 8, 2019)
+issue_dt_2 = Date(25, 9, 2013)
+maturity_dt_2 = Date(22, 3, 2068)
+
+coupon_2 = 0.00125
+
+freq_type_2 = FrequencyTypes.SEMI_ANNUAL
+dc_type_2 = DayCountTypes.ACT_ACT_ICMA
+
+base_cpi_value_2 = 249.70
+ref_cpi_value_2 = 244.65884
+
+ex_div_days_2 = 0
+
+
+bond_2 = InflationBond(
+    issue_dt_2,
+    maturity_dt_2,
+    coupon_2,
+    freq_type_2,
+    dc_type_2,
+    ex_div_days_2,
+    base_cpi_value_2,
+)
+
+
+print(f"{'Issue Date':<40}: " f"{issue_dt_2}")
+
+print(f"{'Maturity Date':<40}: " f"{maturity_dt_2}")
+
+print(f"{'Settlement Date':<40}: " f"{settle_dt_2}")
+
+print(f"{'Coupon Rate':<40}: " f"{coupon_2 * 100.0:12.6f}%")
+
+print(f"{'Base CPI':<40}: " f"{base_cpi_value_2:12.6f}")
+
+
+# ============================================================================
+# 2.2 NOMINAL DISCOUNT CURVE
+# ============================================================================
+#
+# A flat nominal discount curve is used in the original example.
+# ============================================================================
+
+nominal_rate = 0.01033692
+
+discount_curve = FlatDiscountCurve(
+    settle_dt_2,
+    nominal_rate,
     FrequencyTypes.ANNUAL,
     DayCountTypes.ACT_ACT_ISDA,
 )
 
-lag = 3
-fixing_cpi = 244.65884
-fixing_date = settle_dt.add_months(-lag)
+print("\n" + LINE)
+print("2.2 NOMINAL DISCOUNT CURVE")
+print(LINE)
 
-# Create Index Curve
-months = range(0, 12, 1)
-fixing_dates = Date(31, 8, 2018).add_months(months)
+print(f"{'Nominal Rate':<40}: " f"{nominal_rate * 100.0:12.6f}%")
+
+
+# ============================================================================
+# 2.3 CPI FIXINGS
+# ============================================================================
+#
+# Inflation indices are published with a lag. The original example assumes
+# a three-month lag.
+# ============================================================================
+
+print("\n" + LINE)
+print("2.3 CPI FIXINGS")
+print(LINE)
+
+lag = 3
+
+months = range(
+    0,
+    12,
+    1,
+)
+
+fixing_dates = Date(
+    31,
+    8,
+    2018,
+).add_months(months)
+
 fixing_rates = [
     284.2,
     284.1,
@@ -192,8 +521,34 @@ fixing_rates = [
     289.6,
     289.5,
 ]
-inflation_index = InflationIndexCurve(fixing_dates, fixing_rates, lag)
-#    print(inflation_index)
+
+
+inflation_index = InflationIndexCurve(
+    fixing_dates,
+    fixing_rates,
+    lag,
+)
+
+
+print(f"{'FIXING DATE':<20}" f"{'CPI':>15}")
+
+print(SUBLINE)
+
+for fixing_dt, fixing_rate in zip(
+    fixing_dates,
+    fixing_rates,
+):
+
+    print(f"{str(fixing_dt):<20}" f"{fixing_rate:15.4f}")
+
+
+# ============================================================================
+# 2.4 ZERO-COUPON INFLATION SWAP DATA
+# ============================================================================
+
+print("\n" + LINE)
+print("2.4 ZERO-COUPON INFLATION SWAP DATA")
+print(LINE)
 
 zciis_data = [
     (Date(31, 7, 2020), 3.1500000000137085),
@@ -253,36 +608,192 @@ zciis_data = [
     (Date(31, 7, 2074), 3.1641636543027207),
 ]
 
+
 zc_dates = []
 zc_rates = []
-for i in range(0, len(zciis_data)):
-    zc_dates.append(zciis_data[i][0])
-    zc_rates.append(zciis_data[i][1] / 100.0)
+
+for zc_dt, zc_rate in zciis_data:
+
+    zc_dates.append(zc_dt)
+
+    zc_rates.append(zc_rate / 100.0)
+
 
 inflation_zero_curve = ZeroRatesDiscountCurve(
-    settle_dt,
+    settle_dt_2,
     zc_dates,
     zc_rates,
     FrequencyTypes.ANNUAL,
 )
 
-#    print(inflation_zero_curve)
 
-ex_div_days = 0
+print(f"{'MATURITY':<20}" f"{'ZERO INFLATION (%)':>22}")
 
-bond = InflationBond(
-    issue_dt,
-    maturity_dt,
-    coupon,
-    freq_type,
-    dc_type,
-    ex_div_days,
-    base_cpi_value,
+print(SUBLINE)
+
+for zc_dt, zc_rate in zciis_data:
+
+    print(f"{str(zc_dt):<20}" f"{zc_rate:22.6f}")
+
+
+# ============================================================================
+# 2.5 CURRENT YIELD
+# ============================================================================
+
+print("\n" + LINE)
+print("2.5 CURRENT YIELD")
+print(LINE)
+
+market_clean_price_2 = 104.03502
+
+current_yield_2 = bond_2.current_yield(
+    settle_dt_2,
+    market_clean_price_2,
 )
 
-print("FIELD", "VALUE")
-clean_price = 104.03502
+print(f"{'Clean Price':<40}: " f"{market_clean_price_2:12.6f}")
 
-yld = bond.current_yield(settle_dt, clean_price)
-print("Current Yield = ", yld)
+print(f"{'Current Yield':<40}: " f"{current_yield_2 * 100.0:12.6f}%")
 
+
+# ============================================================================
+# 3. VISUALISE CPI FIXINGS
+# ============================================================================
+#
+# Historical CPI fixings show the observed inflation index used by the
+# inflation index curve.
+# ============================================================================
+
+print("\n" + LINE)
+print("3. VISUALISE CPI FIXINGS")
+print(LINE)
+
+plot_fixing_dates = [
+    dt.datetime(
+        fixing_dt.y,
+        fixing_dt.m,
+        fixing_dt.d,
+    )
+    for fixing_dt in fixing_dates
+]
+
+plt.figure()
+
+plt.plot(
+    plot_fixing_dates,
+    fixing_rates,
+    marker="o",
+)
+
+plt.xlabel("Fixing Date")
+
+plt.ylabel("CPI Index")
+
+plt.title("Historical CPI Fixings")
+
+plt.grid(True)
+
+
+# ============================================================================
+# 4. VISUALISE ZERO INFLATION TERM STRUCTURE
+# ============================================================================
+#
+# The ZCIIS rates describe the market's zero-coupon inflation term structure.
+#
+# The shape of the curve shows how the inflation rate implied by the supplied
+# market data varies by maturity.
+# ============================================================================
+
+print("\n" + LINE)
+print("4. VISUALISE ZERO INFLATION TERM STRUCTURE")
+print(LINE)
+
+plot_zc_dates = [
+    dt.datetime(
+        zc_dt.y,
+        zc_dt.m,
+        zc_dt.d,
+    )
+    for zc_dt in zc_dates
+]
+
+plot_zc_rates = [rate * 100.0 for rate in zc_rates]
+
+plt.figure()
+
+plt.plot(
+    plot_zc_dates,
+    plot_zc_rates,
+)
+
+plt.xlabel("Maturity")
+
+plt.ylabel("Zero Inflation Rate (%)")
+
+plt.title("Zero-Coupon Inflation Term Structure")
+
+plt.grid(True)
+
+
+# ============================================================================
+# 5. CPI INDEXATION EFFECT
+# ============================================================================
+#
+# Show how a nominal face amount of 100 changes as the CPI index ratio changes.
+#
+# This isolates the central economic mechanism of an inflation-linked bond:
+#
+#       Indexed Principal = Face × CPI / Base CPI
+# ============================================================================
+
+print("\n" + LINE)
+print("5. CPI INDEXATION EFFECT")
+print(LINE)
+
+indexed_principal = face * ref_cpi_value / base_cpi_value
+
+print(f"{'Base CPI':<40}: " f"{base_cpi_value:12.6f}")
+
+print(f"{'Reference CPI':<40}: " f"{ref_cpi_value:12.6f}")
+
+print(f"{'Face Amount':<40}: " f"{face:12.6f}")
+
+print(f"{'Simple CPI-Indexed Principal':<40}: " f"{indexed_principal:12.6f}")
+
+
+# ============================================================================
+# 6. SUMMARY
+# ============================================================================
+
+print("\n" + LINE)
+print("6. SUMMARY")
+print(LINE)
+
+print(f"{'Bloomberg Clean Price':<40}: " f"{market_clean_price:12.6f}")
+
+print(f"{'US Treasury Real YTM':<40}: " f"{real_ytm * 100.0:12.6f}%")
+
+print(f"{'Real Dirty Price':<40}: " f"{dirty_price:12.6f}")
+
+print(f"{'Real Accrued Interest':<40}: " f"{real_accrued_interest:12.6f}")
+
+print(f"{'CPI Index Ratio':<40}: " f"{index_ratio:12.6f}")
+
+print(f"{'Inflation Accrued Interest':<40}: " f"{inflation_accrued:12.6f}")
+
+print(f"{'Inflation Principal':<40}: " f"{inflation_principal:12.6f}")
+
+print(f"{'Modified Duration':<40}: " f"{modified_duration:12.6f}")
+
+print(f"{'Convexity':<40}: " f"{convexity:12.6f}")
+
+print("\n" + LINE)
+print("END OF INFLATION BOND DEMONSTRATION")
+print(LINE)
+
+
+# ============================================================================
+# DISPLAY ALL PLOTS
+# ============================================================================
+
+plt.show()

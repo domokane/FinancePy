@@ -64,7 +64,7 @@ class CDSCurve:
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         if anchor_dt != libor_curve.anchor_dt:
-            raise FinError("Curve does not have same anchor date as Issuer curve.")
+            raise FinError("Ibor curve does not have same anchor date as Issuer curve.")
 
         self.anchor_dt = anchor_dt
         self.cds_contracts = cds_contracts

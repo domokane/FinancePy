@@ -118,6 +118,67 @@ def check_strike_price(strike_price):
 
 ########################################################################################
 
+def check_corr_matrix(
+    corr_matrix,
+    num_assets,
+    tol=1e-12,
+    positive_definite=False,
+):
+    """Check that an array is a valid correlation matrix."""
+
+    if not isinstance(corr_matrix, np.ndarray):
+        raise FinError("Correlation matrix must be a NumPy array.")
+
+    if corr_matrix.ndim != 2:
+        raise FinError("Correlation matrix must be two-dimensional.")
+
+    num_rows, num_cols = corr_matrix.shape
+
+    if num_rows != num_cols:
+        raise FinError("Correlation matrix must be square.")
+
+    if num_rows != num_assets:
+        raise FinError("Correlation matrix incorrect size.")
+
+    if not np.all(np.isfinite(corr_matrix)):
+        raise FinError("Correlation matrix contains non-finite values.")
+
+    if not np.allclose(
+        corr_matrix,
+        corr_matrix.T,
+        atol=tol,
+        rtol=0.0,
+    ):
+        raise FinError("Correlation matrix must be symmetric.")
+
+    if not np.allclose(
+        np.diag(corr_matrix),
+        1.0,
+        atol=tol,
+        rtol=0.0,
+    ):
+        raise FinError("Correlation matrix diagonal must equal one.")
+
+    if np.any(np.abs(corr_matrix) > 1.0 + tol):
+        raise FinError(
+            "Correlation matrix entries must be between -1 and 1."
+        )
+
+    eigenvalues = np.linalg.eigvalsh(corr_matrix)
+    min_eigenvalue = np.min(eigenvalues)
+
+    if positive_definite:
+        if min_eigenvalue <= tol:
+            raise FinError(
+                "Correlation matrix must be positive definite."
+            )
+    elif min_eigenvalue < -tol:
+        raise FinError(
+            "Correlation matrix must be positive semi-definite."
+        )
+
+
+########################################################################################
 
 def check_shapes(*args):
     """Allow scalars and equal-length vectors."""

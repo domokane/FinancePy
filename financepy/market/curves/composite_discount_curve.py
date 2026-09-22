@@ -5,8 +5,11 @@ from typing import List, Union
 
 import numpy as np
 
+from ...utils.error import FinError
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
+from ...utils.day_count import DayCountTypes
+
 from ...market.curves.discount_curve import DiscountCurve
 
 ###############################################################################
@@ -20,23 +23,34 @@ class CompositeDiscountCurve(DiscountCurve):
     ###########################################################################
 
     def __init__(self, child_curves: List[DiscountCurve]):
-        """
-        Create a discount curve that is a sum (in rates) of other
-        discount curves
+        """Create a discount curve that is a sum (in rates) of other
+        discount curves.
         """
 
         check_argument_types(self.__init__, locals())
-        assert len(child_curves) > 0, "Empty list of child curves is not supported"
+
+        if len(child_curves) == 0:
+            raise FinError(
+                "Empty list of child curves is not supported."
+            )
 
         self._children = child_curves
 
+        # All child curves must have the same anchor date and
+        # use the same curve day-count convention.
         self.anchor_dt = self._children[0].anchor_dt
-        assert all(
-            c.anchor_dt == self.anchor_dt for c in self._children
-        ), "Child curves must all have the same valuation date"
+        self.curve_dc_type = self._children[0].curve_dc_type
 
-        # Read off the first child
-        self.time_dc_type = self._children[0].time_dc_type
+        for curve in self._children:
+            if curve.anchor_dt != self.anchor_dt:
+                raise FinError(
+                    "Child curves must have the same anchor date."
+                )
+
+            if curve.curve_dc_type != self.curve_dc_type:
+                raise FinError(
+                    "Child curves must have the same curve day count type."
+                )
 
     ###########################################################################
 

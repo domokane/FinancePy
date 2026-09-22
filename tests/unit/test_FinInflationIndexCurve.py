@@ -1,6 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from financepy.products.inflation.inflation_index_curve import InflationIndexCurve
+from financepy.market.curves.inflation_index_curve import InflationIndexCurve
 
 from financepy.utils.date import Date
 

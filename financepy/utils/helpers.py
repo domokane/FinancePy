@@ -112,7 +112,7 @@ def pv01_times(t: float, f: float):
 def times_from_dates(
     value_dt: Date,
     dt: Union[Date, list],
-    time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+    curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
 ):
     """Return year fractions from value_dt to dt.
 
@@ -132,10 +132,10 @@ def times_from_dates(
         if value_dt_int > dt_int:
             raise FinError("Negative time period")
 
-        if time_dc_type is None:
+        if curve_dc_type is None:
             return (dt_int - value_dt_int) / G_DAYS_IN_YEAR
 
-        return DayCount(time_dc_type).year_frac(value_dt, dt)[0]
+        return DayCount(curve_dc_type).year_frac(value_dt, dt)[0]
 
     # Reject ndarray explicitly
     if isinstance(dt, np.ndarray):
@@ -154,7 +154,7 @@ def times_from_dates(
 
     times = np.empty(num_dts, dtype=np.float64)
 
-    if time_dc_type is None:
+    if curve_dc_type is None:
         inv_days = 1.0 / G_DAYS_IN_YEAR
         for i, d in enumerate(dt):
             d_int = d.excel_dt
@@ -163,7 +163,7 @@ def times_from_dates(
             times[i] = (d_int - value_dt_int) * inv_days
         return times
 
-    dc_counter = DayCount(time_dc_type)
+    dc_counter = DayCount(curve_dc_type)
 
     for i, d in enumerate(dt):
         if value_dt_int > d.excel_dt:

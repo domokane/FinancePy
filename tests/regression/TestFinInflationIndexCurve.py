@@ -3,7 +3,7 @@
 import add_fp_to_path
 
 from financepy.utils.date import Date
-from financepy.products.inflation.inflation_index_curve import InflationIndexCurve
+from financepy.market.curves.inflation_index_curve import InflationIndexCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
 

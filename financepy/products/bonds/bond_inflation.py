@@ -19,7 +19,7 @@ from ..bonds.bond import Bond, YTMCalcType
 ########################################################################################
 
 
-class InflationBond(Bond):
+class BondInflation(Bond):
     """Class for inflation-linked bonds like TIPS and related analytics. These
     are bonds with coupon and principal adjusted by an index such as the CPI.
     We inherit from the Bond class."""

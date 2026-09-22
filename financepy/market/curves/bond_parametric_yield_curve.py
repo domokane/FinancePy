@@ -37,7 +37,7 @@ class BondParametricYieldCurve:
         bonds: list,
         ylds: Union[np.ndarray, list],
         curve_fit_type: CurveFitTypes,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
 
         self.settle_dt = settle_dt
@@ -79,10 +79,10 @@ class BondParametricYieldCurve:
 
         ######################################################################
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
         ######################################################################
         # Calculate times to maturity
@@ -95,7 +95,7 @@ class BondParametricYieldCurve:
             t = times_from_dates(
                 settle_dt,
                 bond.maturity_dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
 
             years_to_maturities.append(t)
@@ -212,7 +212,7 @@ class BondParametricYieldCurve:
             t = times_from_dates(
                 self.settle_dt,
                 maturity_dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
 
         elif isinstance(

@@ -16,10 +16,14 @@ from ...utils.helpers import times_from_dates
 
 
 class FlatDiscountCurve(DiscountCurve):
-    """A simple discount curve based on a single zero rate with a specified
-    compounding method. The zero curve is flat, so no interpolation is.
-    required. This class is useful for quick testing, simple analysis, and
-    cases where only limited market information is available.
+    """A flat discount curve defined by a single zero rate.
+
+    The zero rate is expressed using the specified compounding frequency.
+    The curve day-count convention determines how dates are converted to
+    year fractions from the curve anchor date.
+
+    The input rate is a zero rate, not a money-market or deposit rate.
+    As the zero curve is flat, no interpolation scheme is required.
     """
 
     ###########################################################################
@@ -29,7 +33,7 @@ class FlatDiscountCurve(DiscountCurve):
         anchor_dt: Date,
         flat_zero_rate: float,
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Create a discount curve which is flat. This is very useful for
         quick testing and simply requires a curve date a rate and a compound
@@ -44,10 +48,10 @@ class FlatDiscountCurve(DiscountCurve):
         self.flat_zero_rate = flat_zero_rate
         self.freq_type = freq_type
 
-        if not isinstance(time_dc_type, DayCountTypes):
-            raise FinError("Invalid time day count type.")
+        if not isinstance(curve_dc_type, DayCountTypes):
+            raise FinError("Invalid curve day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
         # This is used by some inherited functions, so we choose the simplest
         self._interp_type = None
@@ -55,7 +59,9 @@ class FlatDiscountCurve(DiscountCurve):
         # Set up an annual grid of times and discount factors for insight
         years = np.linspace(0.0, 5.0, 6)
         self._df_dates = self.anchor_dt.add_years(years)
-        self._times = times_from_dates(self.anchor_dt, self._df_dates, self.time_dc_type)
+        self._times = times_from_dates(self.anchor_dt,
+                                       self._df_dates,
+                                       self.curve_dc_type)
         self._dfs = self.df_t(self._times)
 
     ###########################################################################
@@ -66,7 +72,9 @@ class FlatDiscountCurve(DiscountCurve):
         times, scalar_input = self._to_time_array(t)
         times = np.maximum(times, 0.0)
 
-        dfs = self._zero_to_df(self.flat_zero_rate, times, self.freq_type)
+        dfs = self._zero_to_df(self.flat_zero_rate,
+                               times,
+                               self.freq_type)
 
         if scalar_input:
             return float(dfs[0])
@@ -76,14 +84,14 @@ class FlatDiscountCurve(DiscountCurve):
     ###########################################################################
 
     def bump_parallel(self, bump_size: float):
-        """Create a new FinFlatDiscountCurve object with the entire curve
+        """Create a new FlatDiscountCurve object with the entire curve
         bumped up by the bumpsize. All other parameters are preserved."""
 
         disc_curve = FlatDiscountCurve(
             self.anchor_dt,
             self.flat_zero_rate + bump_size,
             freq_type=self.freq_type,
-            time_dc_type=self.time_dc_type,
+            curve_dc_type=self.curve_dc_type,
         )
         return disc_curve
 
@@ -94,6 +102,7 @@ class FlatDiscountCurve(DiscountCurve):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("FLAT ZERO RATE", self.flat_zero_rate)
         s += label_to_string("FREQUENCY TYPE", self.freq_type)
+        s += label_to_string("CURVE DC TYPE", self.curve_dc_type)
 
         # Then generic DiscountCurve info
         s += "\n"

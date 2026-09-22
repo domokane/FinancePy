@@ -82,7 +82,7 @@ class IborDualCurve(DiscountCurve):
         ibor_fras: list,
         ibor_swaps: list,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         check_refit_flag: bool = False,
     ):  # Set to True to test it works
         """Create an instance of a Ibor curve given a valuation date and
@@ -101,10 +101,10 @@ class IborDualCurve(DiscountCurve):
 
         self.anchor_dt = anchor_dt
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
         self.discount_curve = discount_curve
         self._validate_inputs(ibor_deposits, ibor_fras, ibor_swaps)
@@ -320,7 +320,7 @@ class IborDualCurve(DiscountCurve):
 
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
-            t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, self.time_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, self.curve_dc_type)
 
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
@@ -330,9 +330,9 @@ class IborDualCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = times_from_dates(self.anchor_dt, fra.start_dt, self.time_dc_type)
+            t_set = times_from_dates(self.anchor_dt, fra.start_dt, self.curve_dc_type)
 
-            t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, self.time_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, self.curve_dc_type)
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -360,7 +360,7 @@ class IborDualCurve(DiscountCurve):
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.fixed_leg.payment_dts[-1]
 
-            t_mat = times_from_dates(self.anchor_dt, maturity_dt, self.time_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, maturity_dt, self.curve_dc_type)
 
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)

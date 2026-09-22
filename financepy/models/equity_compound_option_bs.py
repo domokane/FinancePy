@@ -1,3 +1,4 @@
+from typing import Any
 from math import exp, log, sqrt
 
 import numpy as np
@@ -14,30 +15,170 @@ from .black_scholes_analytic import european_value
 ########################################################################################
 
 
-def _f(s0, *args) -> float:
-    opt2_int = args[0]
-    t2: float = args[1]
-    k2: float = args[2]
-    t1: float = args[3]
-    r: float = args[4]
-    q: float = args[5]
-    vol: float = args[6]
-    k1: float = args[7]  # Target
+def _f(
+    stock_price,
+    opt_type_u,
+    t1,
+    t2,
+    strike_u,
+    r,
+    q,
+    vol,
+    strike_c,
+):
+    """Root function for the critical stock price.
 
-    if s0 <= 0.0:
-        raise FinError("Unable to solve for stock price that fits k_1")
+    The critical stock price S* is defined by
 
-    tau: float = t2 - t1
-    opt_value: float = european_value(s0, tau, k2, r, q, vol, opt2_int)
-    obj_fn: float = opt_value - k1
+        V_underlying(S*, T1) = K1
 
-    return obj_fn
+    where V_underlying is the value, at the compound-option expiry,
+    of the underlying European option.
+    """
+
+    if stock_price <= 0.0:
+        raise FinError(
+            "Stock price must be positive when solving "
+            "for the compound-option exercise boundary."
+        )
+
+    tau = t2 - t1
+
+    opt_value = european_value(
+        stock_price,
+        tau,
+        strike_u,
+        r,
+        q,
+        vol,
+        opt_type_u,
+    )
+
+    return opt_value - strike_c
+
+
+def implied_stock_price(
+    tc,
+    tu,
+    kc,
+    ku,
+    opt_type_u,
+    r,
+    q,
+    vol,
+):
+    """Calculate the critical stock price for a compound option.
+
+    The critical stock price S* satisfies
+
+        V_underlying(S*, tu - tc) = kc.
+
+    It depends on the compound strike, underlying strike, remaining
+    maturity, rates, dividend yield, volatility and underlying option
+    type. It does not depend on today's stock price.
+
+    A bracketed Brent solver is used because the critical stock price
+    must remain positive.
+    """
+
+    if tu <= tc:
+        raise FinError(
+            "Underlying option expiry must be after "
+            "compound option expiry."
+        )
+
+    if kc <= 0.0:
+        raise FinError(
+            "Compound option strike must be positive."
+        )
+
+    if ku <= 0.0:
+        raise FinError(
+            "Underlying option strike must be positive."
+        )
+
+    args = (
+        opt_type_u,
+        tc,
+        tu,
+        ku,
+        r,
+        q,
+        vol,
+        kc,
+    )
+
+    # The stock price must be strictly positive.
+    lower = 1.0e-12
+
+    # Start with an economically sensible upper bound and expand it
+    # until the root is bracketed.
+    upper = max(
+        2.0 * ku,
+        2.0 * kc,
+        1.0,
+    )
+
+    f_lower = _f(
+        lower,
+        *args,
+    )
+
+    f_upper = _f(
+        upper,
+        *args,
+    )
+
+    max_upper = 1.0e12
+
+    while f_lower * f_upper > 0.0:
+
+        upper *= 2.0
+
+        if upper > max_upper:
+            raise FinError(
+                "Unable to bracket critical stock price "
+                "for compound option."
+            )
+
+        f_upper = _f(
+            upper,
+            *args,
+        )
+
+    sstar = optimize.brentq(
+        _f,
+        lower,
+        upper,
+        args=args,
+        xtol=1.0e-12,
+        rtol=1.0e-12,
+        maxiter=100,
+    )
+
+    return sstar
+
+# def _f(s0, *args) -> float:
+#     opt2_int = args[0]
+#     t2: float = args[1]
+#     k2: float = args[2]
+#     t1: float = args[3]
+#     r: float = args[4]
+#     q: float = args[5]
+#     vol: float = args[6]
+#     k1: float = args[7]  # Target
+
+#     if s0 <= 0.0:
+#         raise FinError("Unable to solve for stock price that fits k_1")
+
+#     tau: float = t2 - t1
+#     opt_value: float = european_value(s0, tau, k2, r, q, vol, opt2_int)
+#     obj_fn: float = opt_value - k1
+
+#     return obj_fn
 
 
 ########################################################################################
-
-
-from typing import Any
 
 
 @njit(fastmath=True, cache=True)
@@ -63,12 +204,16 @@ def value_cmpd_once(
     # Need equally spaced time intervals for a recombining tree
     # Downside is that we may not measure periods exactly
     dt = t2 / num_steps
-    num_steps1 = int(t1 / dt)
+
+    # Map the compound-option expiry to the nearest tree time.
+    # Using int() would systematically place the compound expiry
+    # before its actual date and introduce a pricing bias.
+    num_steps1 = int(round(t1 / dt))
+    num_steps1 = max(1, min(num_steps1, num_steps - 1))
     num_steps2 = num_steps - num_steps1
+
     dt1 = dt
     dt2 = dt
-
-    # print("T1:",t1,"T2:",t2,"dt:",dt,"N1*dt",num_steps1*dt,"N*dt",num_steps*dt)
 
     # the number of nodes on the tree
     num_nodes = (num_steps + 1) * (num_steps + 2) // 2
@@ -130,7 +275,7 @@ def value_cmpd_once(
             option_vals[index + i_node] = max(k2 - s, 0.0)
 
     # begin backward steps from expiry at t2 to first expiry at time t1
-    for i_time in range(num_steps - 1, num_steps1, -1):
+    for i_time in range(num_steps - 1, num_steps1 - 1, -1):
         index = i_time * (i_time + 1) // 2
         for i_node in range(0, i_time + 1):
             s = stock_vals[index + i_node]
@@ -157,26 +302,28 @@ def value_cmpd_once(
     index = i_time * (i_time + 1) // 2
 
     for i_node in range(0, i_time + 1):
-        s = stock_vals[index + i_node]
-        next_index = (i_time + 1) * (i_time + 2) // 2
-        next_node_dn = next_index + i_node
-        next_node_up = next_index + i_node + 1
-        v_up = option_vals[next_node_up]
-        v_dn = option_vals[next_node_dn]
-        future_exp_val = probs[i_time] * v_up
-        future_exp_val += (1.0 - probs[i_time]) * v_dn
-        hold_value = period_dfs[i_time] * future_exp_val
+        #     s = stock_vals[index + i_node]
+        #     next_index = (i_time + 1) * (i_time + 2) // 2
+        #     next_node_dn = next_index + i_node
+        #     next_node_up = next_index + i_node + 1
+        #     v_up = option_vals[next_node_up]
+        #     v_dn = option_vals[next_node_dn]
+        #     future_exp_val = probs[i_time] * v_up
+        #     future_exp_val += (1.0 - probs[i_time]) * v_dn
+        #     hold_value = period_dfs[i_time] * future_exp_val
+
+        underlying_value = option_vals[index + i_node]
 
         if (
             opt_type1 == OptionTypes.EUROPEAN_CALL.value
             or opt_type1 == OptionTypes.AMERICAN_CALL.value
         ):
-            option_vals[index + i_node] = max(hold_value - k1, 0.0)
+            option_vals[index + i_node] = max(underlying_value - k1, 0.0)
         elif (
             opt_type1 == OptionTypes.EUROPEAN_PUT.value
             or opt_type1 == OptionTypes.AMERICAN_PUT.value
         ):
-            option_vals[index + i_node] = max(k1 - hold_value, 0.0)
+            option_vals[index + i_node] = max(k1 - underlying_value, 0.0)
 
     # begin backward steps from t1 expiry to value date
     for i_time in range(num_steps1 - 1, -1, -1):
@@ -237,39 +384,38 @@ def value_cmpd_once(
 ########################################################################################
 
 
-def implied_stock_price(
-    s0: float,
-    tc: float,
-    tu: float,
-    kc: float,
-    ku: float,
-    opt_type_u: int,
-    r: float,
-    q: float,
-    vol: float,
-) -> float:
+# def implied_stock_price(
+#     tc: float,
+#     tu: float,
+#     kc: float,
+#     ku: float,
+#     opt_type_u: int,
+#     r: float,
+#     q: float,
+#     vol: float,
+# ) -> float:
 
-    argtuple = (
-        opt_type_u,
-        tu,
-        ku,
-        tc,
-        r,
-        q,
-        vol,
-        kc,
-    )
+#     argtuple = (
+#         opt_type_u,
+#         tu,
+#         ku,
+#         tc,
+#         r,
+#         q,
+#         vol,
+#         kc,
+#     )
 
-    sigma = optimize.newton(
-        _f,
-        x0=s0,
-        args=argtuple,
-        tol=1e-8,
-        maxiter=50,
-        fprime2=None,
-    )
+#     sigma = optimize.newton(
+#         _f,
+#         x0=s0,
+#         args=argtuple,
+#         tol=1e-8,
+#         maxiter=50,
+#         fprime2=None,
+#     )
 
-    return sigma
+#     return sigma
 
 
 ########################################################################################
@@ -307,12 +453,20 @@ def equity_compound_option_bs(
 
         return v[0]
 
-    # CHECK INTEREST RATES AND IF THERE SHOULD BE TWO RU AND RC ?????
     tc = np.maximum(tc, G_SMALL)
     tu = np.maximum(tc, tu)
     v = np.maximum(volatility, G_SMALL)
 
-    sstar = implied_stock_price(s0, tc, tu, kc, ku, u_opt_type, ru, qu, volatility)
+    sstar = implied_stock_price(
+        tc,
+        tu,
+        kc,
+        ku,
+        u_opt_type,
+        ru,
+        qu,
+        volatility,
+    )
 
     a1 = (log(s0 / sstar) + (ru - qu + (v**2) / 2.0) * tc) / v / sqrt(tc)
     a2 = a1 - v * sqrt(tc)
@@ -391,4 +545,20 @@ def equity_compound_option_value_tree(
         num_steps,
     )
 
-    return v1
+    v2 = value_cmpd_once(
+        s0,
+        ru,
+        qu,
+        volatility,
+        tc,
+        tu,
+        c_opt_type,
+        u_opt_type,
+        kc,
+        ku,
+        num_steps+1,
+    )
+
+    v = 0.5*(v1+v2)
+
+    return v

@@ -266,9 +266,9 @@ class Bond:
 
     ############################################################################
 
-    def times(self, settle_dt, time_dc_type: DayCountTypes = DayCountTypes.ACT_365F):
+    def times(self, settle_dt, curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F):
         """Years from settlement to payments using day count convention"""
-        times = times_from_dates(settle_dt, self.payment_dts, time_dc_type)
+        times = times_from_dates(settle_dt, self.payment_dts, curve_dc_type)
 
         print("TIMES")
         print(times)
@@ -1443,7 +1443,7 @@ class Bond:
         f = self.freq
         cpn_flow = self.cpn / f
         pv = 0.0
-        time_dc_type = discount_curve.time_dc_type
+        curve_dc_type = discount_curve.curve_dc_type
 
         # We need the settle DF to re-base the price to the settlement date
         df_settle = discount_curve.df(settle_dt)
@@ -1456,7 +1456,7 @@ class Bond:
 
             if cpn_dt > settle_dt:
 
-                t = times_from_dates(settle_dt, pmt_dt, time_dc_type)
+                t = times_from_dates(settle_dt, pmt_dt, curve_dc_type)
                 t = np.maximum(t, G_SMALL)
 
                 # Get base discount factor from curve

@@ -76,7 +76,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
         bonds: list,
         clean_prices: list | np.ndarray,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         check_refit_flag: bool = False,  # Set to True to test it works
         do_build: bool = True,
     ):
@@ -86,10 +86,10 @@ class BondBootstrapDiscountCurve(DiscountCurve):
         if len(bonds) != len(clean_prices):
             raise FinError("Num bonds does not equal number of prices.")
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
         self.check_refit_flag = check_refit_flag
         self._interp_type = interp_type
@@ -112,7 +112,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
 
         self._t_mats = []
         for bond in bonds:
-            t_mat = times_from_dates(self.anchor_dt, bond.maturity_dt, self.time_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, bond.maturity_dt, self.curve_dc_type)
             self._t_mats.append(t_mat)
 
         if do_build:
@@ -187,7 +187,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
                     t = times_from_dates(
                         self.anchor_dt,
                         pmt_dt,
-                        self.time_dc_type,
+                        self.curve_dc_type,
                     )
                     times.append(t)
                     amounts.append(amt)
@@ -222,7 +222,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
             t_mat = times_from_dates(
                 self.anchor_dt,
                 maturity_dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
 
             if FAST:

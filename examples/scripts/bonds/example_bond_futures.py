@@ -1,157 +1,186 @@
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-
-
-# Allow this example to run directly from its category folder.
-
+# ============================================================================
+# FINANCEPY EXAMPLES - Bond Futures
+# ============================================================================
+#
+# Copyright (C) 2018-2026 Dominic O'Kane
+#
+#
+# This module demonstrates the main analytics associated with bond futures
+# and their deliverable bond baskets.
+#
+# The examples cover:
+#
+#   1. Conversion factors
+#   2. Principal and total invoice amounts
+#   3. Deliverable-basket analysis
+#   4. Yield-to-maturity calculations
+#   5. Gross and net basis
+#   6. Implied repo rates
+#   7. Cheapest-to-deliver (CTD) bond selection
+#
+# The calculations include examples from published CME material together
+# with a comparison using Bloomberg market data.
+# ============================================================================
 
 import pandas as pd
 
-
+from financepy.products.bonds.bond import Bond, YTMCalcType
+from financepy.products.bonds.bond_future import BondFuture
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.products.bonds.bond import Bond, YTMCalcType
-from financepy.products.bonds.bond_future import BondFuture
+from financepy.utils.format_graphs import set_plot_style
+
+set_plot_style()
 
 # ============================================================================
-# FINANCEPY EXAMPLES - Bond
+# 1. CONVERSION FACTORS - MARTELLINI AND PRIAULET
+# ============================================================================
+#
+# Reproduce the bond-futures conversion-factor example from Martellini
+# and Priaulet (p. 360).
+#
+# A conversion factor adjusts for differences between the coupon and
+# maturity of a deliverable bond and the notional bond underlying the
+# futures contract.
 # ============================================================================
 
-########################################################################################
+freq = FrequencyTypes.SEMI_ANNUAL
+basis = DayCountTypes.ACT_ACT_ICMA
+issue_dt = Date(15, 2, 2004)
 
+bond1 = Bond(issue_dt, Date(15, 8, 2011), 0.0500, freq, basis)
+bond2 = Bond(issue_dt, Date(15, 2, 2011), 0.0500, freq, basis)
+bond3 = Bond(issue_dt, Date(15, 8, 2010), 0.0575, freq, basis)
+bond4 = Bond(issue_dt, Date(15, 2, 2010), 0.0650, freq, basis)
+bond5 = Bond(issue_dt, Date(15, 8, 2009), 0.0600, freq, basis)
+bond6 = Bond(issue_dt, Date(15, 5, 2009), 0.0550, freq, basis)
+bond7 = Bond(issue_dt, Date(15, 11, 2008), 0.0475, freq, basis)
 
-def test_bond_futures():
+bonds = [
+    bond1,
+    bond2,
+    bond3,
+    bond4,
+    bond5,
+    bond6,
+    bond7,
+]
 
-    # Example taken from Martellini and Priaulet page 360
-    freq = FrequencyTypes.SEMI_ANNUAL
-    basis = DayCountTypes.ACT_ACT_ICMA
-    issue_dt = Date(15, 2, 2004)
+first_delivery_dt = Date(1, 3, 2002)
+last_delivery_dt = Date(28, 3, 2002)
+contract_size = 100000
+contract_cpn = 0.06
 
-    bond1 = Bond(issue_dt, Date(15, 8, 2011), 0.0500, freq, basis)
-    bond2 = Bond(issue_dt, Date(15, 2, 2011), 0.0500, freq, basis)
-    bond3 = Bond(issue_dt, Date(15, 8, 2010), 0.0575, freq, basis)
-    bond4 = Bond(issue_dt, Date(15, 2, 2010), 0.0650, freq, basis)
-    bond5 = Bond(issue_dt, Date(15, 8, 2009), 0.0600, freq, basis)
-    bond6 = Bond(issue_dt, Date(15, 5, 2009), 0.0550, freq, basis)
-    bond7 = Bond(issue_dt, Date(15, 11, 2008), 0.0475, freq, basis)
+bfut = BondFuture(
+    "TYH2",
+    first_delivery_dt,
+    last_delivery_dt,
+    contract_size,
+    contract_cpn,
+)
 
-    bonds = []
-    bonds.append(bond1)
-    bonds.append(bond2)
-    bonds.append(bond3)
-    bonds.append(bond4)
-    bonds.append(bond5)
-    bonds.append(bond6)
-    bonds.append(bond7)
+settle_dt = Date(10, 12, 2001)
 
-    first_delivery_dt = Date(1, 3, 2002)
-    last_delivery_dt = Date(28, 3, 2002)
-    contract_size = 100000
-    contract_cpn = 0.06
+# Calculate the exchange conversion factor for each deliverable bond.
+print("Bond Maturity", "Coupon", "Conversion Factor")
+for bond in bonds:
+    cf = bfut.conversion_factor(bond)
+    print(bond.maturity_dt, bond.cpn * 100, cf)
 
-    bfut = BondFuture(
-        "TYH2",
-        first_delivery_dt,
-        last_delivery_dt,
-        contract_size,
-        contract_cpn,
-    )
-
-    settle_dt = Date(10, 12, 2001)
-
-    # Get the Conversion Factors
-    print("Bond Maturity", "Coupon", "Conversion Factor")
-    for bond in bonds:
-        cf = bfut.conversion_factor(bond)
-        print(bond.maturity_dt, bond.cpn * 100, cf)
-
-
-########################################################################################
-
-
-def test_bond_futures_cme_two_bond_examples():
-
-    # Example from
-    # https://www.cmegroup.com/education/files/understanding-treasury-futures.pdf
-
-    freq = FrequencyTypes.SEMI_ANNUAL
-    basis = DayCountTypes.ACT_ACT_ICMA
-    issue_dt = Date(15, 2, 2004)
-
-    print("EXAMPLE FROM CME")
-    print("================")
-    settle_dt = Date(10, 10, 2017)
-
-    first_del_dt = Date(1, 12, 2017)
-    last_del_dt = Date(29, 12, 2017)
-
-    fut_size = 100000
-    fut_coupon = 0.06
-
-    bfut = BondFuture("TYZ7", first_del_dt, last_del_dt, fut_size, fut_coupon)
-
-    # Get the Invoice Prices
-    fut_price = 125.265625
-
-    # REPRODUCING EXAMPLES IN REPORT TABLE PAGE 6
-    bond1 = Bond(issue_dt, Date(15, 8, 2024), 0.02375, freq, basis)
-    bond2 = Bond(issue_dt, Date(15, 8, 2024), 0.01875, freq, basis)
-
-    print("Futures Price       %12.6f %12.6f" % (fut_price, fut_price))
-
-    cf1 = bfut.conversion_factor(bond1)
-    cf2 = bfut.conversion_factor(bond2)
-    print("x CF                %12.4f %12.4f" % (cf1, cf2))
-    print("x 1000              %12.2f %12.2f" % (1000, 1000))
-
-    pip1 = bfut.principal_invoice(bond1, fut_price)
-    pip2 = bfut.principal_invoice(bond2, fut_price)
-    print("Principal invoice   %12.2f %12.2f " % (pip1, pip2))
-
-    price1 = 101 + 7 / 32 + 1 / 64
-    price2 = 98 + 1 / 32 + 0 / 64
-    cash1 = price1 * 1000
-    cash2 = price2 * 1000
-    print("Cash Price          %12.2f %12.2f" % (-cash1, -cash2))
-
-    tia1 = bfut.total_invoice_amount(settle_dt, bond1, fut_price)
-    tia2 = bfut.total_invoice_amount(settle_dt, bond2, fut_price)
-    print("Total Invoice price %12.2f %12.2f" % (tia1, tia2))
-
-    # delgainloss1 = bfut.delivery_gain_loss(bond1, price1, fut_price)
-    # delgainloss2 = bfut.delivery_gain_loss(bond2, price2, fut_price)
-    # print("Delivery Gain/Loss  %12.2f %12.2f" % (delgainloss1, delgainloss2))
-
-    # basis1 = bfut.net_basis(bond1, fut_price, price1)
-    # basis2 = bfut.net_basis(bond2, fut_price, price2)
-    # print("Basis (32nds)       %12.2f %12.2f" % (basis1 * 32, basis2 * 32))
-
-    # basis1 = bfut.net_basis(bond1, settle_dt, fut_price, price1)
-    # basis2 = bfut.net_basis(bond2, settle_dt, fut_price, price2)
-    # print("Basis (32nds)       %12.2f %12.2f" % (basis1, basis2))
-
-
-########################################################################################
-
-
-
-
-########################################################################################
-
-
-
-
-########################################################################################
-
-# test_bond_futures()
-# test_bond_futures_cme_two_bond_examples()
 
 # ============================================================================
-# 1. BOND FUTURES CME TABLE
+# 2. CME TREASURY FUTURES INVOICE EXAMPLE
 # ============================================================================
-# What this section demonstrates:
-# Solves for the yield that reproduces the observed bond price. This checks the inverse relationship between price and yield.
-# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+#
+# Reproduce the Treasury-futures invoice calculations from the CME
+# "Understanding Treasury Futures" material:
+#
+# https://www.cmegroup.com/education/files/understanding-treasury-futures.pdf
+#
+# The futures price is multiplied by the conversion factor to obtain the
+# principal invoice amount. Accrued interest is subsequently included in
+# the total invoice amount.
+# ============================================================================
+
+freq = FrequencyTypes.SEMI_ANNUAL
+basis = DayCountTypes.ACT_ACT_ICMA
+issue_dt = Date(15, 2, 2004)
+
+print("EXAMPLE FROM CME")
+print("================")
+
+settle_dt = Date(10, 10, 2017)
+
+first_del_dt = Date(1, 12, 2017)
+last_del_dt = Date(29, 12, 2017)
+
+fut_size = 100000
+fut_coupon = 0.06
+
+bfut = BondFuture(
+    "TYZ7",
+    first_del_dt,
+    last_del_dt,
+    fut_size,
+    fut_coupon,
+)
+
+fut_price = 125.265625
+
+# Bonds used in the CME invoice-price example.
+bond1 = Bond(issue_dt, Date(15, 8, 2024), 0.02375, freq, basis)
+bond2 = Bond(issue_dt, Date(15, 8, 2024), 0.01875, freq, basis)
+
+print("Futures Price       %12.6f %12.6f" % (fut_price, fut_price))
+
+cf1 = bfut.conversion_factor(bond1)
+cf2 = bfut.conversion_factor(bond2)
+
+print("x CF                %12.4f %12.4f" % (cf1, cf2))
+print("x 1000              %12.2f %12.2f" % (1000, 1000))
+
+pip1 = bfut.principal_invoice(bond1, fut_price)
+pip2 = bfut.principal_invoice(bond2, fut_price)
+
+print("Principal invoice   %12.2f %12.2f " % (pip1, pip2))
+
+# Convert Treasury price quotations into cash values.
+price1 = 101 + 7 / 32 + 1 / 64
+price2 = 98 + 1 / 32 + 0 / 64
+
+cash1 = price1 * 1000
+cash2 = price2 * 1000
+
+print("Cash Price          %12.2f %12.2f" % (-cash1, -cash2))
+
+# Total invoice amount includes accrued interest on the delivered bond.
+tia1 = bfut.total_invoice_amount(settle_dt, bond1, fut_price)
+tia2 = bfut.total_invoice_amount(settle_dt, bond2, fut_price)
+
+print("Total Invoice price %12.2f %12.2f" % (tia1, tia2))
+
+
+# ============================================================================
+# 3. CME DELIVERABLE-BASKET ANALYSIS
+# ============================================================================
+#
+# Analyse the bonds eligible for delivery into the TYZ7 Treasury futures
+# contract using prices from the CME example.
+#
+# For each deliverable bond the example calculates:
+#
+#   - yield to maturity
+#   - conversion factor
+#   - principal invoice price
+#   - total invoice amount
+#   - gross basis
+#   - net basis
+#   - implied repo rate
+#
+# These measures allow the relative economics of delivering each bond
+# against the futures contract to be compared.
+# ============================================================================
 
 print("\n" + "=" * 78)
 print("1. BOND FUTURES CME TABLE")
@@ -164,123 +193,126 @@ yield_convention = YTMCalcType.US_TREASURY
 
 print("TABLE 3 EXAMPLE FROM CME")
 print("========================")
+
 settle_dt = Date(10, 10, 2017)
 
 bonds = []
 prices = []
 clean_prices = []
 
-if 1 == 1:
-    # bond 1
-    bond = Bond(issue_dt, Date(15, 8, 2027), 0.0225, freq, basis)
-    bonds.append(bond)
-    prices.append(99 + 1 / 32)
-    clean_prices.append(99.0391)
+# Construct the CME deliverable basket and corresponding observed prices.
 
-    # bond 2
-    bond = Bond(issue_dt, Date(15, 5, 2027), 0.02375, freq, basis)
-    bonds.append(bond)
-    prices.append(100 + 5 / 32 + 1 / 64)
-    clean_prices.append(100.168)
+# Bond 1
+bond = Bond(issue_dt, Date(15, 8, 2027), 0.0225, freq, basis)
+bonds.append(bond)
+prices.append(99 + 1 / 32)
+clean_prices.append(99.0391)
 
-    # bond 3
-    bond = Bond(issue_dt, Date(15, 2, 2027), 0.0225, freq, basis)
-    bonds.append(bond)
-    prices.append(99 + 5 / 32 + 1 / 64)
-    clean_prices.append(99.1641)
+# Bond 2
+bond = Bond(issue_dt, Date(15, 5, 2027), 0.02375, freq, basis)
+bonds.append(bond)
+prices.append(100 + 5 / 32 + 1 / 64)
+clean_prices.append(100.168)
 
-    # bond 4
-    bond = Bond(issue_dt, Date(15, 11, 2026), 0.02, freq, basis)
-    bonds.append(bond)
-    prices.append(97 + 7 / 32 + 1 / 64)
-    clean_prices.append(97.2305)
+# Bond 3
+bond = Bond(issue_dt, Date(15, 2, 2027), 0.0225, freq, basis)
+bonds.append(bond)
+prices.append(99 + 5 / 32 + 1 / 64)
+clean_prices.append(99.1641)
 
-    # bond 5
-    bond = Bond(issue_dt, Date(15, 8, 2026), 0.015, freq, basis)
-    bonds.append(bond)
-    prices.append(93 + 14 / 32)
-    clean_prices.append(93.4414)
+# Bond 4
+bond = Bond(issue_dt, Date(15, 11, 2026), 0.02, freq, basis)
+bonds.append(bond)
+prices.append(97 + 7 / 32 + 1 / 64)
+clean_prices.append(97.2305)
 
-    # bond 6
-    bond = Bond(issue_dt, Date(15, 5, 2026), 0.01625, freq, basis)
-    bonds.append(bond)
-    prices.append(94 + 21 / 32 + 1 / 64)
-    clean_prices.append(94.6641)
+# Bond 5
+bond = Bond(issue_dt, Date(15, 8, 2026), 0.015, freq, basis)
+bonds.append(bond)
+prices.append(93 + 14 / 32)
+clean_prices.append(93.4414)
 
-    # bond 7
-    bond = Bond(issue_dt, Date(15, 2, 2026), 0.01625, freq, basis)
-    bonds.append(bond)
-    prices.append(94 + 29 / 32)
-    clean_prices.append(94.9063)
+# Bond 6
+bond = Bond(issue_dt, Date(15, 5, 2026), 0.01625, freq, basis)
+bonds.append(bond)
+prices.append(94 + 21 / 32 + 1 / 64)
+clean_prices.append(94.6641)
 
-    # bond 8
-    bond = Bond(issue_dt, Date(15, 11, 2025), 0.0225, freq, basis)
-    bonds.append(bond)
-    prices.append(99 + 25 / 32)
-    clean_prices.append(99.7813)
+# Bond 7
+bond = Bond(issue_dt, Date(15, 2, 2026), 0.01625, freq, basis)
+bonds.append(bond)
+prices.append(94 + 29 / 32)
+clean_prices.append(94.9063)
 
-    # bond 9
-    bond = Bond(issue_dt, Date(15, 8, 2025), 0.02, freq, basis)
-    bonds.append(bond)
-    prices.append(98 + 3 / 32)
-    clean_prices.append(98.0938)
+# Bond 8
+bond = Bond(issue_dt, Date(15, 11, 2025), 0.0225, freq, basis)
+bonds.append(bond)
+prices.append(99 + 25 / 32)
+clean_prices.append(99.7813)
 
-    # bond 10
-    bond = Bond(issue_dt, Date(15, 5, 2025), 0.02125, freq, basis)
-    bonds.append(bond)
-    prices.append(99 + 5 / 32 + 1 / 64)
-    clean_prices.append(99.1719)
+# Bond 9
+bond = Bond(issue_dt, Date(15, 8, 2025), 0.02, freq, basis)
+bonds.append(bond)
+prices.append(98 + 3 / 32)
+clean_prices.append(98.0938)
 
-    # bond 11
-    bond = Bond(issue_dt, Date(15, 2, 2025), 0.02, freq, basis)
-    bonds.append(bond)
-    prices.append(98 + 14 / 32 + 1 / 64)
-    clean_prices.append(98.4531)
+# Bond 10
+bond = Bond(issue_dt, Date(15, 5, 2025), 0.02125, freq, basis)
+bonds.append(bond)
+prices.append(99 + 5 / 32 + 1 / 64)
+clean_prices.append(99.1719)
 
-    # bond 12
-    bond = Bond(issue_dt, Date(15, 11, 2024), 0.0225, freq, basis)
-    bonds.append(bond)
-    prices.append(100 + 9 / 32 + 1 / 64)
-    clean_prices.append(100.3008)
+# Bond 11
+bond = Bond(issue_dt, Date(15, 2, 2025), 0.02, freq, basis)
+bonds.append(bond)
+prices.append(98 + 14 / 32 + 1 / 64)
+clean_prices.append(98.4531)
 
-    # bond 13
-    bond = Bond(issue_dt, Date(30, 9, 2024), 0.02125, freq, basis)
-    bonds.append(bond)
-    prices.append(99.6016)
-    clean_prices.append(99.6016)
+# Bond 12
+bond = Bond(issue_dt, Date(15, 11, 2024), 0.0225, freq, basis)
+bonds.append(bond)
+prices.append(100 + 9 / 32 + 1 / 64)
+clean_prices.append(100.3008)
 
-    # bond 14
-    bond = Bond(issue_dt, Date(31, 8, 2024), 0.01875, freq, basis)
-    bonds.append(bond)
-    prices.append(98 + 1 / 32)
-    clean_prices.append(98.0508)
+# Bond 13
+bond = Bond(issue_dt, Date(30, 9, 2024), 0.02125, freq, basis)
+bonds.append(bond)
+prices.append(99.6016)
+clean_prices.append(99.6016)
 
-    # bond 15
-    bond = Bond(issue_dt, Date(15, 8, 2024), 0.02375, freq, basis)
-    bonds.append(bond)
-    prices.append(101 + 7 / 32 + 1 / 64)
-    clean_prices.append(101.2266)
+# Bond 14
+bond = Bond(issue_dt, Date(31, 8, 2024), 0.01875, freq, basis)
+bonds.append(bond)
+prices.append(98 + 1 / 32)
+clean_prices.append(98.0508)
 
-    # bond 16
-    bond = Bond(issue_dt, Date(31, 7, 2024), 0.02125, freq, basis)
-    bonds.append(bond)
-    prices.append(99.6758)
-    clean_prices.append(99.6758)
+# Bond 15
+bond = Bond(issue_dt, Date(15, 8, 2024), 0.02375, freq, basis)
+bonds.append(bond)
+prices.append(101 + 7 / 32 + 1 / 64)
+clean_prices.append(101.2266)
 
-    # bond 17
-    bond = Bond(issue_dt, Date(30, 6, 2024), 0.02, freq, basis)
-    bonds.append(bond)
-    prices.append(98.9336)
-    clean_prices.append(98.9336)
+# Bond 16
+bond = Bond(issue_dt, Date(31, 7, 2024), 0.02125, freq, basis)
+bonds.append(bond)
+prices.append(99.6758)
+clean_prices.append(99.6758)
 
-# bonds.reverse()
-# prices.reverse()
-# new_prices.reverse()
+# Bond 17
+bond = Bond(issue_dt, Date(30, 6, 2024), 0.02, freq, basis)
+bonds.append(bond)
+prices.append(98.9336)
+clean_prices.append(98.9336)
+
+bonds.reverse()
+prices.reverse()
+clean_prices.reverse()
 
 print("BOND MATURITY", "COUPON", "PRICE")
 for bond, clean_price in zip(bonds, clean_prices):
     print(str(bond.maturity_dt), str(bond.cpn), clean_price)
 
+# Recover the yield corresponding to each observed clean price.
 print("BOND MATURITY", "COUPON", "YIELD")
 for bond, clean_price in zip(bonds, clean_prices):
     yld = bond.yield_to_maturity(settle_dt, clean_price)
@@ -300,100 +332,156 @@ bfut = BondFuture(
     contract_cpn,
 )
 
+# Conversion factors standardise the bonds in the delivery basket against
+# the notional coupon of the futures contract.
 print("BOND MATURITY", "COUPON", "CF")
 for bond in bonds:
     cf = bfut.conversion_factor(bond)
     print(str(bond.maturity_dt), str(bond.cpn), cf)
 
-# Get the Invoice Prices
 futures_price = 125.265625
 
+# Principal invoice price before accrued interest.
 print("BOND MATURITY", "PRINCIPAL INVOICE PRICE")
 for bond in bonds:
     pip = bfut.principal_invoice(bond, futures_price)
     print(str(bond.maturity_dt), pip)
 
+# Total invoice amount includes the accrued interest payable on delivery.
 print("BOND MATURITY", "TOTAL INVOICE AMOUNT")
 for bond in bonds:
     tia = bfut.total_invoice_amount(settle_dt, bond, futures_price)
     print(str(bond.maturity_dt), tia)
 
+# Implied repo measures the return from the cash-and-carry trade in which
+# the bond is purchased, financed and subsequently delivered into futures.
 print("BOND MATURITY", "IMPLIED REPO RATE")
 for bond, clean_price in zip(bonds, clean_prices):
-    repo_rate = bfut.implied_repo_rate(bond, settle_dt, clean_price, futures_price)
+    repo_rate = bfut.implied_repo_rate(
+        bond,
+        settle_dt,
+        clean_price,
+        futures_price,
+    )
     print(str(bond.maturity_dt), repo_rate)
 
+# Identify the cheapest-to-deliver bond from the delivery basket.
 ctd = bfut.ctd(bonds, prices, futures_price)
+
 print("CTD MATURITY", "CTD COUPON")
 print(str(ctd.maturity_dt), ctd.cpn)
 
-# Prepare list of dicts to collect results
 results = []
+
+# Financing rate used when calculating the net basis.
 repo_rate = 0.015
 
-if 1 == 0:
-    for bond, clean_price in zip(bonds, clean_prices):
+for bond, clean_price in zip(bonds, clean_prices):
 
-        cf = bfut.conversion_factor(bond)
+    cf = bfut.conversion_factor(bond)
 
-        yld = bond.yield_to_maturity(settle_dt, clean_price, yield_convention)
+    yld = bond.yield_to_maturity(
+        settle_dt,
+        clean_price,
+        yield_convention,
+    )
 
-        del_years = bfut.delivery_years(bond)
+    del_years = bfut.delivery_years(bond)
 
-        pip = bfut.principal_invoice(bond, futures_price)
+    pip = bfut.principal_invoice(
+        bond,
+        futures_price,
+    )
 
-        tia = bfut.total_invoice_amount(settle_dt, bond, futures_price)
+    tia = bfut.total_invoice_amount(
+        settle_dt,
+        bond,
+        futures_price,
+    )
 
-        gross_basis = bfut.gross_basis(bond, clean_price, futures_price)
+    gross_basis = bfut.gross_basis(
+        bond,
+        clean_price,
+        futures_price,
+    )
 
-        net_basis = bfut.net_basis(bond, settle_dt, clean_price, futures_price, repo_rate)
+    net_basis = bfut.net_basis(
+        bond,
+        settle_dt,
+        clean_price,
+        futures_price,
+        repo_rate,
+    )
 
-        irr = bfut.implied_repo_rate(bond, settle_dt, clean_price, futures_price)
+    irr = bfut.implied_repo_rate(
+        bond,
+        settle_dt,
+        clean_price,
+        futures_price,
+    )
 
-        fut_dv01 = 0.0
+    # Placeholder retained from the original example.
+    fut_dv01 = 0.0
 
-        # Append dictionary for each bond
-        results.append(
-            {
-                "Coupon": bond.cpn * 100,
-                "Maturity": bond.maturity_dt,
-                "Clean": clean_price,
-                "DelYrs": del_years,
-                "TCF": cf,
-                "PIP": pip,
-                "TIA": tia,
-                "GROSS_BASIS": gross_basis,
-                "NET_BASIS": net_basis,
-                "FUT_DV01": fut_dv01,
-                "Yield (%)": yld * 100,
-                "IRR (%)": irr * 100,
-            }
-        )
+    results.append(
+        {
+            "Coupon": bond.cpn * 100,
+            "Maturity": bond.maturity_dt,
+            "Clean": clean_price,
+            "DelYrs": del_years,
+            "TCF": cf,
+            "PIP": pip,
+            "TIA": tia,
+            "GROSS_BASIS": gross_basis,
+            "NET_BASIS": net_basis,
+            "FUT_DV01": fut_dv01,
+            "Yield (%)": yld * 100,
+            "IRR (%)": irr * 100,
+        }
+    )
 
-    # Create DataFrame
-    df = pd.DataFrame(results)
-    df = df.sort_values(by="IRR (%)", ascending=False).reset_index(drop=True)
+# Present the delivery basket ranked by implied repo rate.
+df = pd.DataFrame(results)
+df = df.sort_values(
+    by="IRR (%)",
+    ascending=False,
+).reset_index(drop=True)
 
-    formatted_df = df.copy()
-    formatted_df["Coupon"] = formatted_df["Coupon"].map("{:.3f}".format)
-    formatted_df["DelYrs"] = formatted_df["DelYrs"].map("{:.2f}".format)
-    formatted_df["TCF"] = formatted_df["TCF"].map("{:.4f}".format)
-    formatted_df["PIP"] = formatted_df["PIP"].map("{:.2f}".format)
-    formatted_df["TIA"] = formatted_df["TIA"].map("{:.2f}".format)
-    formatted_df["GROSS_BASIS"] = formatted_df["GROSS_BASIS"].map("{:.3f}".format)
-    formatted_df["NET_BASIS"] = formatted_df["NET_BASIS"].map("{:.3f}".format)
-    formatted_df["FUT_DV01"] = formatted_df["FUT_DV01"].map("{:.3f}".format)
-    formatted_df["IRR (%)"] = formatted_df["IRR (%)"].map("{:.3f}".format)
-    formatted_df["Yield (%)"] = formatted_df["Yield (%)"].map("{:.3f}".format)
+formatted_df = df.copy()
 
-    print(formatted_df.to_string(index=False))
+formatted_df["Coupon"] = formatted_df["Coupon"].map("{:.3f}".format)
+formatted_df["DelYrs"] = formatted_df["DelYrs"].map("{:.2f}".format)
+formatted_df["TCF"] = formatted_df["TCF"].map("{:.4f}".format)
+formatted_df["PIP"] = formatted_df["PIP"].map("{:.2f}".format)
+formatted_df["TIA"] = formatted_df["TIA"].map("{:.2f}".format)
+formatted_df["GROSS_BASIS"] = formatted_df["GROSS_BASIS"].map("{:.3f}".format)
+formatted_df["NET_BASIS"] = formatted_df["NET_BASIS"].map("{:.3f}".format)
+formatted_df["FUT_DV01"] = formatted_df["FUT_DV01"].map("{:.3f}".format)
+formatted_df["IRR (%)"] = formatted_df["IRR (%)"].map("{:.3f}".format)
+formatted_df["Yield (%)"] = formatted_df["Yield (%)"].map("{:.3f}".format)
+
+print(formatted_df.to_string(index=False))
+
 
 # ============================================================================
-# 2. BOND FUTURES BBG TABLE
+# 4. BLOOMBERG DELIVERABLE-BASKET ANALYSIS
 # ============================================================================
-# What this section demonstrates:
-# Solves for the yield that reproduces the observed bond price. This checks the inverse relationship between price and yield.
-# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
+#
+# Repeat the TYZ7 deliverable-basket analysis using the Bloomberg prices
+# supplied in the original example.
+#
+# The same bond-futures measures are calculated so that the observed cash
+# prices can be compared on a consistent basis:
+#
+#   - yield to maturity
+#   - conversion factor
+#   - principal invoice price
+#   - total invoice amount
+#   - gross basis
+#   - net basis
+#   - implied repo rate
+#   - cheapest-to-deliver bond
+# ============================================================================
 
 print("\n" + "=" * 78)
 print("2. BOND FUTURES BBG TABLE")
@@ -406,11 +494,14 @@ yield_convention = YTMCalcType.US_TREASURY
 
 print("TABLE 3 EXAMPLE FROM CME")
 print("========================")
+
 settle_dt = Date(10, 10, 2017)
 
 bonds = []
 prices = []
 new_prices = []
+
+# Bloomberg clean prices for the deliverable bonds.
 
 bond = Bond(issue_dt, Date(31, 7, 2024), 0.02125, freq, basis)
 bonds.append(bond)
@@ -444,17 +535,18 @@ bond = Bond(issue_dt, Date(15, 8, 2024), 0.02375, freq, basis)
 bonds.append(bond)
 new_prices.append(101.2266)
 
-# bonds.reverse()
-# prices.reverse()
-# new_prices.reverse()
-
 print("BOND MATURITY", "COUPON", "PRICE")
 for bond, clean_price in zip(bonds, new_prices):
     print(str(bond.maturity_dt), str(bond.cpn), clean_price)
 
+# Convert each observed clean price into its corresponding Treasury yield.
 print("BOND MATURITY", "COUPON", "YIELD")
 for bond, clean_price in zip(bonds, new_prices):
-    yld = bond.yield_to_maturity(settle_dt, clean_price, yield_convention)
+    yld = bond.yield_to_maturity(
+        settle_dt,
+        clean_price,
+        yield_convention,
+    )
     print(str(bond.maturity_dt), str(bond.cpn), yld)
 
 first_delivery_dt = Date(1, 12, 2017)
@@ -471,84 +563,122 @@ bfut = BondFuture(
     contract_cpn,
 )
 
+# Calculate the conversion factor for each deliverable bond.
 print("BOND MATURITY", "COUPON", "CF")
 for bond in bonds:
     cf = bfut.conversion_factor(bond)
     print(str(bond.maturity_dt), str(bond.cpn), cf)
 
-# Get the Invoice Prices
 futures_price = 125.265625
 
+# Calculate principal invoice prices at the observed futures price.
 print("BOND MATURITY", "PRINCIPAL INVOICE PRICE")
 for bond in bonds:
-    pip = bfut.principal_invoice(bond, futures_price)
+    pip = bfut.principal_invoice(
+        bond,
+        futures_price,
+    )
     print(str(bond.maturity_dt), pip)
 
+# Add accrued interest to obtain the total invoice amount.
 print("BOND MATURITY", "TOTAL INVOICE AMOUNT")
 for bond in bonds:
-    tia = bfut.total_invoice_amount(settle_dt, bond, futures_price)
+    tia = bfut.total_invoice_amount(
+        settle_dt,
+        bond,
+        futures_price,
+    )
     print(str(bond.maturity_dt), tia)
 
-ctd = bfut.ctd(bonds, new_prices, futures_price)
+# Determine the cheapest-to-deliver bond using the observed cash prices.
+ctd = bfut.ctd(
+    bonds,
+    new_prices,
+    futures_price,
+)
+
 print("CTD MATURITY", "CTD COUPON")
 print(str(ctd.maturity_dt), ctd.cpn)
 
-# Prepare list of dicts to collect results
 results = []
+
+# Repo rate used in the net-basis calculation.
 repo_rate = 0.01499
 
-if 1 == 0:
-    for bond, clean_price in zip(bonds, new_prices):
+for bond, clean_price in zip(bonds, new_prices):
 
-        mid_price = clean_price
+    mid_price = clean_price
 
-        cf = bfut.conversion_factor(bond)
+    cf = bfut.conversion_factor(bond)
 
-        yld = bond.yield_to_maturity(settle_dt, mid_price, yield_convention)
+    yld = bond.yield_to_maturity(
+        settle_dt,
+        mid_price,
+        yield_convention,
+    )
 
-        del_years = bfut.delivery_years(bond)
+    del_years = bfut.delivery_years(bond)
 
-        pip = bfut.principal_invoice(bond, futures_price)
+    pip = bfut.principal_invoice(
+        bond,
+        futures_price,
+    )
 
-        tia = bfut.total_invoice_amount(settle_dt, bond, futures_price)
+    tia = bfut.total_invoice_amount(
+        settle_dt,
+        bond,
+        futures_price,
+    )
 
-        gross_basis = bfut.gross_basis(bond, mid_price, futures_price)
+    gross_basis = bfut.gross_basis(
+        bond,
+        mid_price,
+        futures_price,
+    )
 
-        irr = bfut.implied_repo_rate(bond, settle_dt, mid_price, futures_price)
+    irr = bfut.implied_repo_rate(
+        bond,
+        settle_dt,
+        mid_price,
+        futures_price,
+    )
 
-        net_basis = bfut.net_basis(bond, settle_dt, clean_price, futures_price, repo_rate)
+    net_basis = bfut.net_basis(
+        bond,
+        settle_dt,
+        clean_price,
+        futures_price,
+        repo_rate,
+    )
 
-        # Append dictionary for each bond
-        results.append(
-            {
-                "Coupon": bond.cpn * 100,
-                "Maturity": bond.maturity_dt,
-                "Mid": mid_price,
-                "DelYrs": del_years,
-                "TCF": cf,
-                "PIP": pip,
-                "TIA": tia,
-                "GROSS_BASIS": gross_basis,
-                "NET_BASIS": net_basis,
-                "Yield (%)": yld * 100,
-                "IRR (%)": irr * 100,
-            }
-        )
+    results.append(
+        {
+            "Coupon": bond.cpn * 100,
+            "Maturity": bond.maturity_dt,
+            "Mid": mid_price,
+            "DelYrs": del_years,
+            "TCF": cf,
+            "PIP": pip,
+            "TIA": tia,
+            "GROSS_BASIS": gross_basis,
+            "NET_BASIS": net_basis,
+            "Yield (%)": yld * 100,
+            "IRR (%)": irr * 100,
+        }
+    )
 
-    # Create DataFrame
-    df = pd.DataFrame(results)
-    #    df = df.sort_values(by="IRR (%)", ascending=False).reset_index(drop=True)
+# Format the final comparison table without modifying the underlying values.
+df = pd.DataFrame(results)
+formatted_df = df.copy()
 
-    formatted_df = df.copy()
-    formatted_df["Coupon"] = formatted_df["Coupon"].map("{:.3f}".format)
-    formatted_df["DelYrs"] = formatted_df["DelYrs"].map("{:.2f}".format)
-    formatted_df["TCF"] = formatted_df["TCF"].map("{:.4f}".format)
-    formatted_df["PIP"] = formatted_df["PIP"].map("{:.2f}".format)
-    formatted_df["TIA"] = formatted_df["TIA"].map("{:.2f}".format)
-    formatted_df["GROSS_BASIS"] = formatted_df["GROSS_BASIS"].map("{:.3f}".format)
-    formatted_df["NET_BASIS"] = formatted_df["NET_BASIS"].map("{:.3f}".format)
-    formatted_df["IRR (%)"] = formatted_df["IRR (%)"].map("{:.3f}".format)
-    formatted_df["Yield (%)"] = formatted_df["Yield (%)"].map("{:.6f}".format)
+formatted_df["Coupon"] = formatted_df["Coupon"].map("{:.3f}".format)
+formatted_df["DelYrs"] = formatted_df["DelYrs"].map("{:.2f}".format)
+formatted_df["TCF"] = formatted_df["TCF"].map("{:.4f}".format)
+formatted_df["PIP"] = formatted_df["PIP"].map("{:.2f}".format)
+formatted_df["TIA"] = formatted_df["TIA"].map("{:.2f}".format)
+formatted_df["GROSS_BASIS"] = formatted_df["GROSS_BASIS"].map("{:.3f}".format)
+formatted_df["NET_BASIS"] = formatted_df["NET_BASIS"].map("{:.3f}".format)
+formatted_df["IRR (%)"] = formatted_df["IRR (%)"].map("{:.3f}".format)
+formatted_df["Yield (%)"] = formatted_df["Yield (%)"].map("{:.6f}".format)
 
-    print(formatted_df.to_string(index=False))
-
+print(formatted_df.to_string(index=False))

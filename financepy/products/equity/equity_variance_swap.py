@@ -128,11 +128,8 @@ class EquityVarianceSwap:
 
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
-        df = discount_curve.df_t(t_mat)
-        r = -np.log(df) / t_mat
-
-        dq = dividend_curve.df_t(t_mat)
-        q = -np.log(dq) / t_mat
+        r = discount_curve.zero_rate_cc(self.maturity_dt)
+        q = dividend_curve.zero_rate_cc(self.maturity_dt)
 
         s0 = stock_price
         g = np.exp((r - q) * t_mat)

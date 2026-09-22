@@ -178,7 +178,7 @@ class IborSingleCurve(DiscountCurve):
         ibor_fras: list,
         ibor_swaps: list,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         check_refit_flag: bool = False,  # Set to True to test it works
         do_build: bool = True,
         **kwargs,
@@ -200,10 +200,10 @@ class IborSingleCurve(DiscountCurve):
         self.anchor_dt = anchor_dt
         self._interp_type = interp_type
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
         self.check_refit_flag = check_refit_flag
         self._interpolator = Interpolator(self._interp_type, **kwargs)
@@ -449,7 +449,7 @@ class IborSingleCurve(DiscountCurve):
                     t = times_from_dates(
                         self.anchor_dt,
                         pmt_dt,
-                        self.time_dc_type,
+                        self.curve_dc_type,
                     )
                     times.append(t)
                     amounts.append(amt)
@@ -485,7 +485,7 @@ class IborSingleCurve(DiscountCurve):
             t_mat = times_from_dates(
                 self.anchor_dt,
                 depo.maturity_dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
@@ -498,13 +498,13 @@ class IborSingleCurve(DiscountCurve):
             t_set = times_from_dates(
                 self.anchor_dt,
                 fra.start_dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
 
             t_mat = times_from_dates(
                 self.anchor_dt,
                 fra.maturity_dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
 
             # if both dates are after the previous FRA/FUT then need to
@@ -537,7 +537,7 @@ class IborSingleCurve(DiscountCurve):
             t_mat = times_from_dates(
                 self.anchor_dt,
                 maturity_dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
 
             if FAST:
@@ -640,15 +640,15 @@ class IborSingleCurve(DiscountCurve):
             self._interpolator = Interpolator(self._interp_type, **kwargs)
 
             for depo in self.used_deposits:
-                t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, self.time_dc_type)
+                t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, self.curve_dc_type)
                 grid_times.append(t_mat)
 
             for fra in self.used_fras:
-                t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, self.time_dc_type)
+                t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, self.curve_dc_type)
                 grid_times.append(t_mat)
 
             for swap in self.used_swaps:
-                t_mat = times_from_dates(self.anchor_dt, swap.maturity_dt, self.time_dc_type)
+                t_mat = times_from_dates(self.anchor_dt, swap.maturity_dt, self.curve_dc_type)
                 grid_times.append(t_mat)
 
             self._times = np.array(grid_times)
@@ -693,7 +693,7 @@ class IborSingleCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle_dt = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle_dt
-            t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, self.time_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, self.curve_dc_type)
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
             self.fit(self._times, self._dfs)
@@ -702,8 +702,8 @@ class IborSingleCurve(DiscountCurve):
 
         for fra in self.used_fras:
 
-            t_set = times_from_dates(self.anchor_dt, fra.start_dt, self.time_dc_type)
-            t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, self.time_dc_type)
+            t_set = times_from_dates(self.anchor_dt, fra.start_dt, self.curve_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, self.curve_dc_type)
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -782,7 +782,7 @@ class IborSingleCurve(DiscountCurve):
             t_swap = times_from_dates(
                 self.anchor_dt,
                 maturity_dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
 
             swap_times.append(t_swap)
@@ -796,7 +796,7 @@ class IborSingleCurve(DiscountCurve):
             swap_years = times_from_dates(
                 self.anchor_dt,
                 dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
 
             swap_rate = np.interp(swap_years, swap_times, swap_rates)
@@ -825,7 +825,7 @@ class IborSingleCurve(DiscountCurve):
             t_mat = times_from_dates(
                 self.anchor_dt,
                 dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
             swap_rate = interpolated_swap_rates[i]
             acc = accrual_factors[i - 1]
@@ -888,7 +888,7 @@ class IborSingleCurve(DiscountCurve):
         for fra in self.used_fras:
             v = fra.value(self.anchor_dt, self, self) / fra.notional
             if abs(v) > fra_tol:
-                raise FinError(f"FRA not repriced, error = {abs(v) } vs tol={fra_tol}")
+                raise FinError(f"FRA not repriced, error = {abs(v)} vs tol={fra_tol}")
 
         for swap in self.used_swaps:
             v = swap.value(self.anchor_dt, self, self, None)

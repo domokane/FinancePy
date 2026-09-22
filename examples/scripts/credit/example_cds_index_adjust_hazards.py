@@ -1,182 +1,260 @@
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+# ============================================================================
+# FINANCEPY EXAMPLES - CDSIndexPortfolio
+# ============================================================================
+#
+# Copyright (C) 2018-2026 Dominic O'Kane
+#
+# This example demonstrates the relationship between a CDS index and the
+# constituent single-name CDS curves used to represent the index portfolio.
+#
+# It shows:
+#
+#   1. Construction of single-name issuer curves from CDS market spreads
+#   2. Calculation of average single-name CDS spreads
+#   3. Calculation of intrinsic index spreads
+#   4. Hazard-rate adjustment of the constituent curves to index quotes
+#   5. Comparison of intrinsic spreads before and after the adjustment
+#
+# The hazard-rate adjustment changes the constituent credit curves so that
+# the intrinsic value of the portfolio is consistent with the supplied index
+# market quotes.
+#
+# This is useful because the CDS index and its underlying single-name CDS
+# contracts do not necessarily trade at exactly the same aggregate level.
+# The difference is commonly associated with the index basis.
+# ============================================================================
 
+import matplotlib.pyplot as plt
+import time
 
-# Allow this example to run directly from its category folder.
-
-
-from os.path import dirname, join
-
-
-from financepy.utils.global_types import SwapTypes
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.cds_curve import CDSCurve
-from financepy.market.curves.ibor_single_curve import IborSingleCurve
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+from financepy.utils.date import Date
+from financepy.utils.format_graphs import set_plot_style
 
-# TO DO
-
-########################################################################################
-
-
-def build_ibor_curve(trade_dt):
-
-    value_dt = trade_dt.add_days(1)
-    dc_type = DayCountTypes.ACT_360
-
-    depos = []
-    fras = []
-    swaps = []
-
-    dc_type = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freq = FrequencyTypes.SEMI_ANNUAL
-    settle_dt = value_dt
-
-    maturity_dt = settle_dt.add_months(12)
-    swap1 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
-    swaps.append(swap1)
-
-    maturity_dt = settle_dt.add_months(24)
-    swap2 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
-    swaps.append(swap2)
-
-    maturity_dt = settle_dt.add_months(36)
-    swap3 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
-    swaps.append(swap3)
-
-    maturity_dt = settle_dt.add_months(48)
-    swap4 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
-    swaps.append(swap4)
-
-    maturity_dt = settle_dt.add_months(60)
-    swap5 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
-    swaps.append(swap5)
-
-    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
-
-    return libor_curve
-
-
-########################################################################################
-
-
-def build_issuer_curve(trade_dt, libor_curve):
-
-    value_dt = trade_dt.add_days(1)
-
-    cds_mkt_contracts = []
-
-    cds_cpn = 0.0048375
-    maturity_dt = Date(29, 6, 2010)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    recovery_rate = 0.40
-
-    issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
-
-    return issuer_curve
-
-
-########################################################################################
-
-
-
-
-########################################################################################
+from helpers import build_ibor_curve
+from helpers import load_heterogeneous_spread_curves
 
 # ============================================================================
-# 1. PERFORM CDS INDEX HAZARD RATE ADJUSTMENT
+# OUTPUT FORMAT
 # ============================================================================
-# What this section demonstrates:
-# The loop varies dates, parameters, instruments or conventions so their effect can be compared rather than relying on one isolated result.
 
-print("\n" + "=" * 78)
-print("1. PERFORM CDS INDEX HAZARD RATE ADJUSTMENT")
-print("=" * 78)
+LINE = "=" * 100
+SUBLINE = "-" * 100
+set_plot_style()
 
-trade_dt = Date(1, 8, 2007)
+
+# ============================================================================
+# 1. MARKET DATES AND INTEREST-RATE CURVE
+# ============================================================================
+
+print("\n" + LINE)
+print("1. CDS INDEX PORTFOLIO")
+print(LINE)
+
+trade_dt = Date(
+    1,
+    8,
+    2007,
+)
+
 step_in_dt = trade_dt.add_days(1)
-value_dt = step_in_dt
+
+value_dt = trade_dt
 
 libor_curve = build_ibor_curve(trade_dt)
+
+
+print(f"{'Trade Date':<30}: " f"{trade_dt}")
+
+print(f"{'Step-In Date':<30}: " f"{step_in_dt}")
+
+print(f"{'Value Date':<30}: " f"{value_dt}")
+
+
+# ============================================================================
+# 2. SINGLE-NAME CDS MATURITIES
+# ============================================================================
+#
+# Determine standard CDS maturity dates for 3Y, 5Y, 7Y and 10Y contracts.
+# ============================================================================
 
 maturity_3yr = trade_dt.next_cds_date(36)
 maturity_5yr = trade_dt.next_cds_date(60)
 maturity_7yr = trade_dt.next_cds_date(84)
 maturity_10yr = trade_dt.next_cds_date(120)
 
-path = dirname(__file__)
-filename = "CDX_NA_IG_S7_SPREADS.csv"
-full_filename_path = join(path, "data", filename)
-f = open(full_filename_path, "r")
+single_name_maturities = [
+    maturity_3yr,
+    maturity_5yr,
+    maturity_7yr,
+    maturity_10yr,
+]
 
-data = f.readlines()
-issuer_curves = []
 
-for row in data[1:]:
+print("\n" + SUBLINE)
 
-    split_row = row.split(",")
-    spd_3yr = float(split_row[1]) / 10000.0
-    spd_5yr = float(split_row[2]) / 10000.0
-    spd_7yr = float(split_row[3]) / 10000.0
-    spd_10yr = float(split_row[4]) / 10000.0
-    recovery_rate = float(split_row[5])
+print(f"{'TENOR':>12}" f"{'MATURITY':>20}")
 
-    cds_3yr = CDS(step_in_dt, maturity_3yr, spd_3yr)
-    cds_5yr = CDS(step_in_dt, maturity_5yr, spd_5yr)
-    cds_7yr = CDS(step_in_dt, maturity_7yr, spd_7yr)
-    cds_10yr = CDS(step_in_dt, maturity_10yr, spd_10yr)
-    cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
+print(SUBLINE)
 
-    issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
+for tenor, maturity_dt in zip(
+    ["3Y", "5Y", "7Y", "10Y"],
+    single_name_maturities,
+):
+    print(f"{tenor:>12}" f"{str(maturity_dt):>20}")
 
-    issuer_curves.append(issuer_curve)
 
-# Now determine the average spread of the index
+# ============================================================================
+# 3. LOAD SINGLE-NAME CDS MARKET DATA
+# ============================================================================
+#
+# The input file contains CDS spreads for the constituents of CDX.NA.IG
+# Series 7.
+#
+# Each row contains:
+#
+#       3Y spread
+#       5Y spread
+#       7Y spread
+#       10Y spread
+#       recovery rate
+#
+# CDS spreads in the file are expressed in basis points and are converted
+# here to decimal form before constructing the CDS contracts.
+# ============================================================================
+
+print("\n" + LINE)
+print("2. LOAD SINGLE-NAME CDS CURVES")
+print(LINE)
+
+issuer_curves = load_heterogeneous_spread_curves(value_dt, step_in_dt, libor_curve)
+
+
+num_credits = len(issuer_curves)
+
+print(f"{'Number of issuer curves':<30}: " f"{num_credits}")
+
+
+# ============================================================================
+# 4. AVERAGE SINGLE-NAME CDS SPREADS
+# ============================================================================
+#
+# average_spread() calculates the average spread across the constituent
+# single-name credit curves for a given maturity.
+#
+# This is a simple average of the individual credit spread levels and is
+# distinct from the intrinsic spread of the CDS index portfolio.
+# ============================================================================
+
+print("\n" + LINE)
+print("3. AVERAGE SINGLE-NAME CDS SPREADS")
+print(LINE)
 
 cds_index = CDSIndexPortfolio()
 
-avg_spd_3yr = cds_index.average_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves) * 10000.0
 
-avg_spd_5yr = cds_index.average_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves) * 10000.0
+average_spreads = []
 
-avg_spd_7yr = cds_index.average_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves) * 10000.0
+for maturity_dt in single_name_maturities:
 
-avg_spd_10yr = cds_index.average_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves) * 10000.0
+    spread = cds_index.average_spread(
+        value_dt,
+        step_in_dt,
+        maturity_dt,
+        issuer_curves,
+    )
 
-print("LABEL", "VALUE")
-print("AVERAGE SPD 3Y", avg_spd_3yr)
-print("AVERAGE SPD 5Y", avg_spd_5yr)
-print("AVERAGE SPD 7Y", avg_spd_7yr)
-print("AVERAGE SPD 10Y", avg_spd_10yr)
-print("===================================================================")
+    average_spreads.append(spread * 10000.0)
 
-# Now determine the intrinsic spread of the index to same maturity dates
-# As the single name CDS contracts
 
-cds_index = CDSIndexPortfolio()
+print(f"{'TENOR':>12}" f"{'AVERAGE SPREAD (bp)':>24}")
 
-intrinsic_spd_3yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_3yr, issuer_curves) * 10000.0
+print(SUBLINE)
 
-intrinsic_spd_5yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_5yr, issuer_curves) * 10000.0
 
-intrinsic_spd_7yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_7yr, issuer_curves) * 10000.0
+for tenor, spread in zip(
+    ["3Y", "5Y", "7Y", "10Y"],
+    average_spreads,
+):
 
-intrinsic_spd_10yr = cds_index.intrinsic_spread(value_dt, step_in_dt, maturity_10yr, issuer_curves) * 10000.0
+    print(f"{tenor:>12}" f"{spread:24.6f}")
 
-print("LABEL", "VALUE")
-print("INTRINSIC SPD 3Y", intrinsic_spd_3yr)
-print("INTRINSIC SPD 5Y", intrinsic_spd_5yr)
-print("INTRINSIC SPD 7Y", intrinsic_spd_7yr)
-print("INTRINSIC SPD 10Y", intrinsic_spd_10yr)
-print("===================================================================")
 
-index_cpns = [0.002, 0.0037, 0.0050, 0.0063]
-index_upfronts = [0.0, 0.0, 0.0, 0.0]
+# ============================================================================
+# 5. INTRINSIC CDS INDEX SPREADS
+# ============================================================================
+#
+# The intrinsic spread is calculated from the complete portfolio of
+# constituent credit curves.
+#
+# Unlike a simple arithmetic average, the intrinsic spread reflects the
+# premium and protection legs of the index portfolio.
+# ============================================================================
+
+print("\n" + LINE)
+print("4. INTRINSIC CDS INDEX SPREADS")
+print(LINE)
+
+
+intrinsic_spreads = []
+
+for maturity_dt in single_name_maturities:
+
+    spread = cds_index.intrinsic_spread(
+        value_dt,
+        step_in_dt,
+        maturity_dt,
+        issuer_curves,
+    )
+
+    intrinsic_spreads.append(spread * 10000.0)
+
+
+print(f"{'TENOR':>12}" f"{'AVERAGE (bp)':>20}" f"{'INTRINSIC (bp)':>20}" f"{'DIFFERENCE (bp)':>20}")
+
+print(SUBLINE)
+
+
+for tenor, average, intrinsic in zip(
+    ["3Y", "5Y", "7Y", "10Y"],
+    average_spreads,
+    intrinsic_spreads,
+):
+
+    difference = intrinsic - average
+
+    print(f"{tenor:>12}" f"{average:20.6f}" f"{intrinsic:20.6f}" f"{difference:20.6f}")
+
+
+# ============================================================================
+# 6. INDEX MARKET QUOTES
+# ============================================================================
+#
+# These are the market index coupons and upfront payments to which the
+# constituent curves will be adjusted.
+#
+# In this example the upfront payments are all zero. Consequently, the
+# supplied index coupons represent the target index spread levels.
+# ============================================================================
+
+print("\n" + LINE)
+print("5. INDEX MARKET QUOTES")
+print(LINE)
+
+
+index_cpns = [
+    0.0020,
+    0.0037,
+    0.0050,
+    0.0063,
+]
+
+index_upfronts = [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+]
 
 index_maturity_dts = [
     Date(20, 12, 2009),
@@ -187,18 +265,92 @@ index_maturity_dts = [
 
 index_recovery_rate = 0.40
 
-tolerance = 1e-4  # should be smaller
 
-import time
+print(f"{'MATURITY':>20}" f"{'COUPON (bp)':>20}" f"{'UPFRONT':>20}")
+
+print(SUBLINE)
+
+
+for maturity_dt, coupon, upfront in zip(
+    index_maturity_dts,
+    index_cpns,
+    index_upfronts,
+):
+
+    print(f"{str(maturity_dt):>20}" f"{coupon * 10000.0:20.6f}" f"{upfront:20.6f}")
+
 
 # ============================================================================
-# FINANCEPY EXAMPLES - CDSIndexPortfolio
+# 7. UNADJUSTED INTRINSIC SPREADS AT INDEX MATURITIES
+# ============================================================================
+#
+# Before performing the hazard-rate adjustment, calculate the intrinsic
+# spreads of the original constituent curves at exactly the same maturity
+# dates as the index market quotes.
+#
+# This gives the starting point against which the adjustment can be judged.
 # ============================================================================
 
-start = time.time()
+print("\n" + LINE)
+print("6. UNADJUSTED INTRINSIC SPREADS AT INDEX MATURITIES")
+print(LINE)
 
-index_portfolio = CDSIndexPortfolio()
-adjusted_issuer_curves = index_portfolio.hazard_rate_adjust_intrinsic(
+
+unadjusted_intrinsic_spreads = []
+
+for maturity_dt in index_maturity_dts:
+
+    spread = cds_index.intrinsic_spread(
+        value_dt,
+        step_in_dt,
+        maturity_dt,
+        issuer_curves,
+    )
+
+    unadjusted_intrinsic_spreads.append(spread * 10000.0)
+
+
+print(f"{'MATURITY':>20}" f"{'INDEX QUOTE (bp)':>22}" f"{'INTRINSIC (bp)':>22}" f"{'BASIS (bp)':>18}")
+
+print(SUBLINE)
+
+
+for maturity_dt, coupon, intrinsic in zip(
+    index_maturity_dts,
+    index_cpns,
+    unadjusted_intrinsic_spreads,
+):
+
+    index_quote = coupon * 10000.0
+
+    basis = intrinsic - index_quote
+
+    print(f"{str(maturity_dt):>20}" f"{index_quote:22.6f}" f"{intrinsic:22.6f}" f"{basis:18.6f}")
+
+
+# ============================================================================
+# 8. HAZARD-RATE ADJUSTMENT
+# ============================================================================
+#
+# hazard_rate_adjust_intrinsic() adjusts the constituent issuer curves so
+# that the intrinsic CDS index valuation is consistent with the supplied
+# index market quotes.
+#
+# The individual single-name curves therefore retain their role as the
+# building blocks of the portfolio, but their hazard rates are adjusted to
+# reconcile the portfolio with the observed index market.
+# ============================================================================
+
+print("\n" + LINE)
+print("7. PERFORM CDS INDEX HAZARD-RATE ADJUSTMENT")
+print(LINE)
+
+
+tolerance = 1e-4
+
+start = time.perf_counter()
+
+adjusted_issuer_curves = cds_index.hazard_rate_adjust_intrinsic(
     value_dt,
     issuer_curves,
     index_cpns,
@@ -208,40 +360,205 @@ adjusted_issuer_curves = index_portfolio.hazard_rate_adjust_intrinsic(
     tolerance,
 )
 
-end = time.time()
-print("TIME")
-print(end - start)
+elapsed = time.perf_counter() - start
 
-#    num_credits = len(issuer_curves)
-#    print("#","MATURITY","CDS_UNADJ","CDS_ADJ")
-#    for m in range(0,num_credits):
-#        for cds in cds_contracts:
-#            unadjustedSpread = cds.par_spread(value_dt,issuer_curves[m])
-#            adjustedSpread = cds.par_spread(value_dt,adjusted_issuer_curves[m])
-#            print(m,str(cds.maturity_dt),"%10.3f"%(unadjustedSpread*10000),"%10.3f" %(adjustedSpread*10000))
 
-cds_index = CDSIndexPortfolio()
+print(f"{'Number of issuer curves':<30}: " f"{len(adjusted_issuer_curves)}")
+print(f"{'Tolerance':<30}: " f"{tolerance:.8f}")
+print(f"{'Calculation time (seconds)':<30}: " f"{elapsed:.6f}")
 
-intrinsic_spd_3yr = (
-    cds_index.intrinsic_spread(value_dt, step_in_dt, index_maturity_dts[0], adjusted_issuer_curves) * 10000.0
+
+# ============================================================================
+# 9. ADJUSTED INTRINSIC SPREADS
+# ============================================================================
+#
+# Recalculate the intrinsic index spreads using the adjusted issuer curves.
+#
+# If the adjustment has worked correctly, the adjusted intrinsic spreads
+# should be close to the index market quotes.
+# ============================================================================
+
+print("\n" + LINE)
+print("8. ADJUSTED INTRINSIC CDS INDEX SPREADS")
+print(LINE)
+
+
+adjusted_intrinsic_spreads = []
+
+for maturity_dt in index_maturity_dts:
+
+    spread = cds_index.intrinsic_spread(
+        value_dt,
+        step_in_dt,
+        maturity_dt,
+        adjusted_issuer_curves,
+    )
+
+    adjusted_intrinsic_spreads.append(spread * 10000.0)
+
+
+print(f"{'MATURITY':>20}" f"{'INDEX QUOTE (bp)':>22}" f"{'ADJUSTED (bp)':>22}" f"{'ERROR (bp)':>18}")
+
+print(SUBLINE)
+
+
+for maturity_dt, coupon, adjusted in zip(
+    index_maturity_dts,
+    index_cpns,
+    adjusted_intrinsic_spreads,
+):
+
+    index_quote = coupon * 10000.0
+
+    error = adjusted - index_quote
+
+    print(f"{str(maturity_dt):>20}" f"{index_quote:22.6f}" f"{adjusted:22.6f}" f"{error:18.6f}")
+
+
+# ============================================================================
+# 10. BEFORE AND AFTER HAZARD-RATE ADJUSTMENT
+# ============================================================================
+#
+# Compare:
+#
+#       index market quote
+#       original intrinsic spread
+#       adjusted intrinsic spread
+#
+# The final column shows the residual difference between the adjusted
+# intrinsic spread and the index quote.
+# ============================================================================
+
+print("\n" + LINE)
+print("9. BEFORE AND AFTER HAZARD-RATE ADJUSTMENT")
+print(LINE)
+
+
+print(f"{'MATURITY':>20}" f"{'INDEX (bp)':>18}" f"{'BEFORE (bp)':>18}" f"{'AFTER (bp)':>18}" f"{'ERROR (bp)':>18}")
+
+print(SUBLINE)
+
+
+for (
+    maturity_dt,
+    coupon,
+    before,
+    after,
+) in zip(
+    index_maturity_dts,
+    index_cpns,
+    unadjusted_intrinsic_spreads,
+    adjusted_intrinsic_spreads,
+):
+
+    index_quote = coupon * 10000.0
+
+    error = after - index_quote
+
+    print(f"{str(maturity_dt):>20}" f"{index_quote:18.6f}" f"{before:18.6f}" f"{after:18.6f}" f"{error:18.6f}")
+
+
+# ============================================================================
+# PLOT INDEX QUOTES VERSUS INTRINSIC SPREADS
+# ============================================================================
+
+
+index_quotes = [coupon * 10000.0 for coupon in index_cpns]
+
+maturity_labels = [str(maturity_dt) for maturity_dt in index_maturity_dts]
+
+plt.figure(figsize=(10, 6))
+
+plt.plot(
+    maturity_labels,
+    index_quotes,
+    marker="o",
+    linewidth=2,
+    label="Index Market Quote",
 )
 
-intrinsic_spd_5yr = (
-    cds_index.intrinsic_spread(value_dt, step_in_dt, index_maturity_dts[1], adjusted_issuer_curves) * 10000.0
+plt.plot(
+    maturity_labels,
+    unadjusted_intrinsic_spreads,
+    marker="o",
+    linewidth=2,
+    label="Intrinsic Before Adjustment",
 )
 
-intrinsic_spd_7yr = (
-    cds_index.intrinsic_spread(value_dt, step_in_dt, index_maturity_dts[2], adjusted_issuer_curves) * 10000.0
+plt.plot(
+    maturity_labels,
+    adjusted_intrinsic_spreads,
+    marker="o",
+    linewidth=2,
+    label="Intrinsic After Adjustment",
 )
 
-intrinsic_spd_10yr = (
-    cds_index.intrinsic_spread(value_dt, step_in_dt, index_maturity_dts[3], adjusted_issuer_curves) * 10000.0
+plt.xlabel("Index Maturity")
+plt.ylabel("Spread (bp)")
+plt.title("CDS Index Hazard-Rate Adjustment")
+
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+# ============================================================================
+# 11. ADJUSTMENT APPLIED TO THE INTRINSIC SPREAD
+# ============================================================================
+#
+# This table shows how far the intrinsic portfolio spread moved as a result
+# of the hazard-rate adjustment.
+#
+# A positive change means the adjustment increased the intrinsic spread.
+# A negative change means it reduced the intrinsic spread.
+# ============================================================================
+
+print("\n" + LINE)
+print("10. CHANGE IN INTRINSIC SPREAD")
+print(LINE)
+
+
+print(f"{'MATURITY':>20}" f"{'BEFORE (bp)':>20}" f"{'AFTER (bp)':>20}" f"{'CHANGE (bp)':>20}")
+
+print(SUBLINE)
+
+
+for maturity_dt, before, after in zip(
+    index_maturity_dts,
+    unadjusted_intrinsic_spreads,
+    adjusted_intrinsic_spreads,
+):
+
+    change = after - before
+
+    print(f"{str(maturity_dt):>20}" f"{before:20.6f}" f"{after:20.6f}" f"{change:20.6f}")
+
+
+# ============================================================================
+# 12. SUMMARY
+# ============================================================================
+
+print("\n" + LINE)
+print("11. SUMMARY")
+print(LINE)
+
+print("The constituent single-name CDS spreads are first converted into " "individual issuer survival curves.")
+
+print("Those issuer curves are then combined to calculate the intrinsic " "spread of the CDS index portfolio.")
+
+print("The intrinsic spread need not equal the observed index market quote.")
+
+print(
+    "The hazard-rate adjustment modifies the constituent credit curves "
+    "so that the intrinsic portfolio valuation is consistent with the "
+    "supplied index quotes."
 )
 
-# If the adjustment works then this should equal the index spreads
-print("LABEL", "VALUE")
-print("ADJUSTED INTRINSIC SPD 3Y", intrinsic_spd_3yr)
-print("ADJUSTED INTRINSIC SPD 5Y", intrinsic_spd_5yr)
-print("ADJUSTED INTRINSIC SPD 7Y", intrinsic_spd_7yr)
-print("ADJUSTED INTRINSIC SPD 10Y", intrinsic_spd_10yr)
+print(
+    "The final comparison shows the original intrinsic spread, the "
+    "adjusted intrinsic spread and the residual calibration error."
+)
 
+print("\n" + LINE)
+print("END OF CDS INDEX PORTFOLIO EXAMPLE")
+print(LINE)

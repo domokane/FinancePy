@@ -81,7 +81,7 @@ class IborDualCurve(DiscountCurve):
         ibor_fras: list,
         ibor_swaps: list,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         check_refit_flag: bool = False,
     ):  # Set to True to test it works
         """Create an instance of a Ibor curve given a valuation date and
@@ -96,10 +96,10 @@ class IborDualCurve(DiscountCurve):
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
         self.anchor_dt = anchor_dt
         self.discount_curve = discount_curve

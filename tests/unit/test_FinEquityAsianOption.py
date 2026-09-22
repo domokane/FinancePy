@@ -48,7 +48,7 @@ def test_geometric():
         accrued_avg,
     )
 
-    assert round(value_geometric, 4) == 12.3380
+    assert round(value_geometric, 4) == 12.4123
 
 
 ########################################################################################
@@ -84,7 +84,7 @@ def test_curran():
         accrued_avg,
     )
 
-    assert round(value_curran, 4) == 12.5368
+    assert round(value_curran, 4) == 12.6092
 
 
 ########################################################################################
@@ -103,4 +103,4 @@ def test_mc():
         accrued_avg,
     )
 
-    assert round(value_mc, 3) == 12.515
+    assert round(value_mc, 3) == 12.608

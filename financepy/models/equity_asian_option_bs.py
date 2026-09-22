@@ -9,9 +9,6 @@ from ..utils.error import FinError
 from ..utils.global_types import OptionTypes
 from ..utils.math import normcdf
 
-from .equity_asian_option_mc import equity_asian_value_mc_fast_cv_numba
-from .equity_asian_option_mc import equity_asian_value_mc_fast_numba
-from .equity_asian_option_mc import equity_asian_value_mc_numba
 from .equity_asian_option_mc import error_str
 
 
@@ -19,7 +16,7 @@ def value_geometric(
     t_avg,
     t_exp,
     k,
-    num_obs,
+    num_obs_per_year,
     opt_type_value,
     stock_price,
     r,
@@ -35,12 +32,9 @@ def value_geometric(
 
     # the years to the start of the averaging period
     tau = t_exp - t_avg
-
     volatility = model.volatility
-
-    n = num_obs
+    vol2 = volatility**2
     s0 = stock_price
-
     multiplier = 1.0
 
     if t_avg < 0:  # we are in the averaging period
@@ -54,12 +48,23 @@ def value_geometric(
         multiplier = t_exp / tau
         # there is no pre-averaging time
         t_avg = 0.0
-        # the number of observations is scaled
-        n = n * t_exp / tau
 
-    sig_sq = volatility**2
-    mean_geo = (r - q - sig_sq / 2.0) * (t_avg + (t_exp - t_avg) / 2.0)
-    var_geo = sig_sq * (t_avg + (t_exp - t_avg) * (2 * n - 1) / (6 * n))
+    averaging_time = t_exp - t_avg
+    n = max(1, int(averaging_time * num_obs_per_year + 0.5))
+    dt = averaging_time / n
+
+    mean_time = t_avg + dt * (n + 1) / 2.0
+
+    variance_time = (
+        t_avg
+        + dt * (n + 1) * (2 * n + 1) / (6.0 * n)
+    )
+
+    mean_geo = (
+        r - q - vol2 / 2.0
+    ) * mean_time
+
+    var_geo = vol2 * variance_time
     eg = s0 * np.exp(mean_geo + var_geo / 2.0)
 
     if np.abs(var_geo) < 1e-10:
@@ -90,7 +95,7 @@ def value_curran(
     t_avg,
     t_exp,
     k,
-    num_obs,
+    num_obs_per_year,
     opt_type_value,
     stock_price,
     r,
@@ -101,15 +106,12 @@ def value_curran(
     """Valuation of an Asian option using the result by Vorst."""
 
     tau = t_exp - t_avg
-
     multiplier = 1.0
-
     volatility = model.volatility
 
     s0 = stock_price
     b = r - q
     sigma2 = volatility**2
-    n = num_obs
 
     if t_avg < 0:  # we are in the averaging period
 
@@ -122,20 +124,59 @@ def value_curran(
         multiplier = t_exp / tau
         # there is no pre-averaging time
         t_avg = 0.0
-        # the number of observations is scaled and floored at 1
-        n = int(n * t_exp / tau + 0.5) + 1
 
-    h = (t_exp - t_avg) / (n - 1)
-    u = (1.0 - np.exp(b * h * n)) / (1.0 - np.exp(b * h))
-    w = (1.0 - np.exp((2 * b + sigma2) * h * n)) / (1.0 - np.exp((2 * b + sigma2) * h))
+    averaging_time = t_exp - t_avg
 
-    fa = (s0 / n) * np.exp(b * t_avg) * u
-    ea2 = (s0 * s0 / n / n) * np.exp((2.0 * b + sigma2) * t_avg)
-    ea2 = ea2 * (w + 2.0 / (1.0 - np.exp((b + sigma2) * h)) * (u - w))
-    sigma_aa = np.sqrt((np.log(ea2) - 2.0 * np.log(fa)) / t_exp)
+    n = max(
+        1,
+        int(averaging_time * num_obs_per_year + 0.5),
+    )
 
-    d1 = (np.log(fa / k) + sigma_aa * sigma_aa * t_exp / 2.0) / (sigma_aa * np.sqrt(t_exp))
-    d2 = d1 - sigma_aa * np.sqrt(t_exp)
+    # Observation times are:
+    #
+    #     t_avg + h, ..., t_avg + n*h = t_exp
+    #
+    # so the first observation occurs one time step after t_avg.
+
+    h = averaging_time / n
+    t0 = t_avg + h
+
+    bh = b * h
+    bsh = (b + sigma2) * h
+    b2sh = (2.0 * b + sigma2) * h
+
+    exp_bh = np.exp(bh)
+    exp_bhn = np.exp(bh * n)
+
+    exp_bsh = np.exp(bsh)
+
+    exp_b2sh = np.exp(b2sh)
+    exp_b2shn = np.exp(b2sh * n)
+
+    u = (1.0 - exp_bhn) / (1.0 - exp_bh)
+    w = (1.0 - exp_b2shn) / (1.0 - exp_b2sh)
+
+    fa = (s0 / n) * np.exp(b * t0) * u
+
+    ea2 = (
+        (s0 * s0 / (n * n))
+        * np.exp((2.0 * b + sigma2) * t0)
+        * (
+            w
+            + 2.0 / (1.0 - exp_bsh) * (u - w)
+        )
+    )
+
+    if ea2 < fa * fa:
+        raise FinError(
+            "Curran second moment is less than squared first moment."
+        )
+
+    var_aa = np.log(ea2 / (fa * fa))
+    sqrt_var_aa = np.sqrt(var_aa)
+
+    d1 = (np.log(fa / k) + 0.5 * var_aa) / sqrt_var_aa
+    d2 = d1 - sqrt_var_aa
 
     if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         v = np.exp(-r * t_exp) * (fa * normcdf(d1) - k * normcdf(d2))
@@ -147,7 +188,6 @@ def value_curran(
     v = v * multiplier
     return v
 
-
 ####################################################################################
 
 
@@ -155,7 +195,7 @@ def value_turnbull_wakeman(
     t_avg,
     t_exp,
     k,
-    num_obs,
+    num_obs_per_year,
     opt_type_value,
     stock_price,
     r,
@@ -197,7 +237,7 @@ def value_turnbull_wakeman(
     dt = t_exp - t_avg
 
     if b == 0:
-        m1 = 1.0
+        m1 = s0
         m2 = 2.0 * np.exp(sigma2 * t_exp) - 2.0 * np.exp(sigma2 * t_avg) * (1.0 + sigma2 * dt)
         m2 = m2 / sigma2 / sigma2 / dt / dt
     else:
@@ -209,10 +249,15 @@ def value_turnbull_wakeman(
 
     f0 = m1
     sigma2 = (1.0 / t_exp) * np.log(m2 / m1 / m1)
-    sigma = np.sqrt(sigma2)
+    var_a = np.log(m2 / (m1 * m1))
+    sqrt_var_a = np.sqrt(var_a)
 
-    d1 = (np.log(f0 / k) + sigma2 * t_exp / 2) / sigma / np.sqrt(t_exp)
-    d2 = d1 - sigma * np.sqrt(t_exp)
+    d1 = (
+        np.log(f0 / k)
+        + 0.5 * var_a
+    ) / sqrt_var_a
+
+    d2 = d1 - sqrt_var_a
 
     if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         call = np.exp(-r * t_exp) * (f0 * normcdf(d1) - k * normcdf(d2))
@@ -230,141 +275,133 @@ def value_turnbull_wakeman(
 ####################################################################################
 
 
-def value_mc(
-    t_avg,
-    t_exp,
-    k,
-    num_obs,
-    opt_type_value,
-    stock_price: float,
-    r: float,
-    q: float,
-    model,
-    num_paths: int,
-    seed: int,
-    accrued_average: float,
-):
-    """Monte Carlo valuation of the Asian Average option using standard
-    Monte Carlo code enhanced by Numba. I have discontinued the use of this
-    as it is both slow and has limited variance reduction."""
+# def value_mc(
+#     t_avg,
+#     t_exp,
+#     k,
+#     num_obs_per_year,
+#     opt_type_value,
+#     stock_price: float,
+#     r: float,
+#     q: float,
+#     model,
+#     num_paths: int,
+#     seed: int,
+#     accrued_average: float,
+# ):
+#     """Monte Carlo valuation of the Asian Average option using standard
+#     Monte Carlo code enhanced by Numba. I have discontinued the use of this
+#     as it is both slow and has limited variance reduction."""
 
-    volatility = model.volatility
+#     volatility = model.volatility
 
-    v = equity_asian_value_mc_numba(
-        t_avg,
-        t_exp,
-        k,
-        num_obs,
-        opt_type_value,
-        stock_price,
-        r,
-        q,
-        volatility,
-        num_paths,
-        seed,
-        accrued_average,
-    )
+#     v = equity_asian_value_mc_numba(
+#         t_avg,
+#         t_exp,
+#         k,
+#         num_obs_per_year,
+#         opt_type_value,
+#         stock_price,
+#         r,
+#         q,
+#         volatility,
+#         num_paths,
+#         seed,
+#         accrued_average,
+#     )
 
-    return v
-
-
-####################################################################################
+#     return v
 
 
-def value_mc_fast(
-    t_avg,
-    t_exp,
-    k,
-    num_obs,
-    opt_type_value,
-    stock_price,
-    r: float,
-    q: float,
-    model,  # Model
-    num_paths,  # Numpaths integer
-    seed,
-    accrued_average,
-):
-    """Monte Carlo valuation of the Asian Average option. This method uses
-    a lot of Numpy vectorisation. It is also helped by Numba."""
-
-    tau = t_exp - t_avg
-
-    n = num_obs
-
-    volatility = model.volatility
-
-    v = equity_asian_value_mc_fast_numba(
-        t_avg,
-        t_exp,
-        tau,
-        k,
-        n,
-        opt_type_value,
-        stock_price,
-        r,
-        q,
-        volatility,
-        num_paths,
-        seed,
-        accrued_average,
-    )
-
-    return v
+# ####################################################################################
 
 
-####################################################################################
+# def value_mc_fast(
+#     t_avg,
+#     t_exp,
+#     k,
+#     num_obs_per_year,
+#     opt_type_value,
+#     stock_price,
+#     r: float,
+#     q: float,
+#     volatility,  # Model
+#     num_paths,  # Numpaths integer
+#     seed,
+#     accrued_average,
+# ):
+#     """Monte Carlo valuation of the Asian Average option. This method uses
+#     a lot of Numpy vectorisation. It is also helped by Numba."""
+
+#     v = equity_asian_value_mc_fast_numba(
+#         t_avg,
+#         t_exp,
+#         k,
+#         num_obs_per_year,
+#         opt_type_value,
+#         stock_price,
+#         r,
+#         q,
+#         volatility,
+#         num_paths,
+#         seed,
+#         accrued_average,
+#     )
+
+#     return v
 
 
-def value_mc_fast_vc_numba(
-    t_avg,
-    t_exp,
-    k,
-    num_obs,
-    opt_type_value,
-    stock_price: float,
-    r: float,
-    q: float,
-    model,
-    num_paths: int,
-    seed: int,
-    accrued_average: float,
-):
-    """Monte Carlo valuation of the Asian Average option using a control
-    variate method that improves accuracy and reduces the variance of the
-    price. This uses Numpy and Numba. This is the standard MC pricer."""
+# ####################################################################################
 
-    tau = t_exp - t_avg
-    n = num_obs
 
-    volatility = model.volatility
+# def value_mc_fast_vc_numba(
+#     t_avg,
+#     t_exp,
+#     k,
+#     num_obs_per_year,
+#     opt_type_value,
+#     stock_price: float,
+#     r: float,
+#     q: float,
+#     model,
+#     num_paths: int,
+#     seed: int,
+#     accrued_average: float,
+# ):
+#     """Monte Carlo valuation of the Asian Average option using a control
+#     variate method that improves accuracy and reduces the variance of the
+#     price. This uses Numpy and Numba. This is the standard MC pricer."""
 
-    # For control variate we price a Geometric average option exactly
-    v_g_exact = value_geometric(
-        t_avg,
-        t_exp,
-        stock_price,
-        r,
-        q,
-        model,
-        accrued_average,
-    )
+#     volatility = model.volatility
 
-    v = equity_asian_value_mc_fast_cv_numba(
-        t_avg,
-        t_exp,
-        tau,
-        k,
-        n,
-        opt_type_value,
-        stock_price,
-        r,
-        q,
-        volatility,
-        num_paths,
-        seed,
-        accrued_average,
-        v_g_exact,
-    )
+#     # For control variate we price a Geometric average option exactly
+#     v_g_exact = value_geometric(
+#         t_avg,
+#         t_exp,
+#         k,
+#         num_obs_per_year,
+#         opt_type_value,
+#         stock_price,
+#         r,
+#         q,
+#         model,
+#         accrued_average,
+#     )
 
-    return v
+#     v = equity_asian_value_mc_fast_cv_numba(
+#         t_avg,
+#         t_exp,
+#         k,
+#         num_obs_per_year,
+#         opt_type_value,
+#         stock_price,
+#         r,
+#         q,
+#         volatility,
+#         num_paths,
+#         seed,
+#         accrued_average,
+#         v_g_exact,
+#     )
+
+#     return v

@@ -228,7 +228,7 @@ class EquityBinomialTree:
 
         # do some validation
         t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        r = discount_curve.zero_rate(expiry_dt)
+        r = discount_curve.zero_rate_cc(expiry_dt)
 
         dq = dividend_curve.df(expiry_dt)
         q = -np.log(dq) / t_exp

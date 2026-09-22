@@ -215,8 +215,8 @@ class IborCapFloor:
 
         check_curve_dt(value_dt, libor_curve)
 
-        time_dc_type = libor_curve.time_dc_type
-        t_exp = times_from_dates(self.start_dt, caplet_start_dt, time_dc_type)
+        curve_dc_type = libor_curve.curve_dc_type
+        t_exp = times_from_dates(self.start_dt, caplet_start_dt, curve_dc_type)
         #        t_exp = (caplet_start_dt - self.start_dt) / G_DAYS_IN_YEAR
 
         dc_counter = DayCount(self.accrual_dc_type)
@@ -269,8 +269,8 @@ class IborCapFloor:
 
         elif isinstance(model, HWTree):
 
-            time_dc_type = libor_curve.time_dc_type
-            t_mat = times_from_dates(value_dt, caplet_end_dt, time_dc_type)
+            curve_dc_type = libor_curve.curve_dc_type
+            t_mat = times_from_dates(value_dt, caplet_end_dt, curve_dc_type)
             #            t_mat = (caplet_end_dt - value_dt) / G_DAYS_IN_YEAR
             alpha = dc_counter.year_frac(caplet_start_dt, caplet_end_dt)[0]
             strike_price = 1.0 / (1.0 + alpha * self.strike_rate)

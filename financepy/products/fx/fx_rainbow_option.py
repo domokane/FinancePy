@@ -14,6 +14,7 @@ from ...models.gbm_process_simulator import get_assets_paths_times
 from ...products.fx.fx_option import FXOption
 
 from ...utils.helpers import check_argument_types
+from ...utils.check_values import check_curve_dt
 
 ########################################################################################
 
@@ -67,8 +68,8 @@ def payoff_value(s, payoff_type_value, payoff_params):
 def value_mc_fast(
     t,
     stock_prices,
-    discount_curve,
-    dividend_yields,
+    r,
+    foreign_rates,
     volatilities,
     betas,
     num_assets,
@@ -78,13 +79,9 @@ def value_mc_fast(
     seed=4242,
 ):
 
-    check_curve_dt(value_dt, domestic_curve)
-    check_curve_dt(value_dt, foreign_curve)
-
     np.random.seed(seed)
-    df = discount_curve.df(t)
-    r = -np.log(df) / t
-    mus = r - dividend_yields
+
+    mus = r - foreign_rates
 
     num_time_steps = 2
     s_all = get_assets_paths_times(
@@ -129,12 +126,12 @@ class FXRainbowOption(FXOption):
 
     ###########################################################################
 
-    def validate(self, stock_prices, dividend_yields, volatilities, betas):
+    def validate(self, stock_prices, foreign_rates, volatilities, betas):
 
         if len(stock_prices) != self.num_assets:
             raise FinError("Stock prices must be a vector of length " + str(self.num_assets))
 
-        if len(dividend_yields) != self.num_assets:
+        if len(foreign_rates) != self.num_assets:
             raise FinError("Dividend yields must be a vector of length " + str(self.num_assets))
 
         if len(volatilities) != self.num_assets:
@@ -179,7 +176,7 @@ class FXRainbowOption(FXOption):
         value_dt,
         stock_prices,
         domestic_curve,
-        foreign_curve,
+        foreign_rates,
         volatilities,
         betas,
     ):
@@ -191,7 +188,6 @@ class FXRainbowOption(FXOption):
             raise FinError("Valuation date after expiry date.")
 
         check_curve_dt(value_dt, domestic_curve)
-        check_curve_dt(value_dt, foreign_curve)
 
         if self.num_assets != 2:
             raise FinError("Analytical results for two assets only.")
@@ -199,16 +195,16 @@ class FXRainbowOption(FXOption):
         if value_dt > self.expiry_dt:
             raise FinError("Value date after expiry date.")
 
-        self.validate(stock_prices, foreign_curve, volatilities, betas)
+        self.validate(stock_prices, foreign_rates, volatilities, betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
-        df = domestic_curve.df(t)
-        r = -np.log(df) / t
+        r = domestic_curve.zero_rate_cc(self.maturity_dt)
 
-        q1 = foreign_curve[0]
-        q2 = foreign_curve[1]
+        q1 = foreign_rates[0]
+        q2 = foreign_rates[1]
+
         rho = betas[0] ** 2
         s1 = stock_prices[0]
         s2 = stock_prices[1]
@@ -270,28 +266,29 @@ class FXRainbowOption(FXOption):
         expiry_dt,
         stock_prices,
         discount_curve,
-        dividend_yields,
+        foreign_rates,
         volatilities,
         betas,
         num_paths=10000,
         seed=4242,
     ):
 
-        check_curve_dt(value_dt, domestic_curve)
-        check_curve_dt(value_dt, foreign_curve)
+        check_curve_dt(value_dt, discount_curve)
 
-        self.validate(stock_prices, dividend_yields, volatilities, betas)
+        self.validate(stock_prices, foreign_rates, volatilities, betas)
 
         if value_dt > expiry_dt:
             raise FinError("Value date after expiry date.")
 
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
+        r = discount_curve.zero_rate_cc(expiry_dt)
+
         v = value_mc_fast(
             t,
             stock_prices,
-            discount_curve,
-            dividend_yields,
+            r,
+            foreign_rates,
             volatilities,
             betas,
             self.num_assets,

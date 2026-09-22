@@ -8,3 +8,4 @@ from .bond_future import *
 from .bond_market import *
 from .bond_option import *
 from .bond_mortgage import *
+from .bond_inflation import *

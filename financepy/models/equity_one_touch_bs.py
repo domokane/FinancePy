@@ -67,7 +67,7 @@ def barrier_pay_one_at_hit_pv_up(s, hh, r, dt):
 
 @njit(fastmath=True, cache=True)
 def barrier_pay_asset_at_expiry_down_out(s, hh):
-    """Pay $1 if the stock crosses the barrier hh from above. PV payment."""
+    """Pay S(T) at expiry if the down barrier has not been touched."""
     num_paths, num_time_steps = s.shape
     pv = 0.0
 
@@ -90,7 +90,7 @@ def barrier_pay_asset_at_expiry_down_out(s, hh):
 
 @njit(fastmath=True, cache=True)
 def barrier_pay_asset_at_expiry_up_out(s, hh):
-    """Pay $1 if the stock crosses the barrier hh from below. PV payment."""
+    """Pay S(T) at expiry if the up barrier has not been touched."""
 
     num_paths, num_time_steps = s.shape
     pv = 0.0
@@ -110,3 +110,47 @@ def barrier_pay_asset_at_expiry_up_out(s, hh):
 
 
 ########################################################################################
+
+@njit(fastmath=True, cache=True)
+def barrier_pay_asset_at_expiry_down(s, hh):
+    """Pay S(T) at expiry if a down barrier has been touched."""
+
+    num_paths, num_time_steps = s.shape
+    payoff = 0.0
+
+    for ip in nb.prange(num_paths):
+        hit_flag = 0
+
+        for it in range(num_time_steps):
+            if s[ip, it] <= hh:
+                hit_flag = 1
+                break
+
+        payoff += hit_flag * s[ip, num_time_steps - 1]
+
+    payoff = payoff / num_paths
+    return payoff
+
+
+########################################################################################
+
+
+@njit(fastmath=True, cache=True)
+def barrier_pay_asset_at_expiry_up(s, hh):
+    """Pay S(T) at expiry if an up barrier has been touched."""
+
+    num_paths, num_time_steps = s.shape
+    payoff = 0.0
+
+    for ip in nb.prange(num_paths):
+        hit_flag = 0
+
+        for it in range(num_time_steps):
+            if s[ip, it] >= hh:
+                hit_flag = 1
+                break
+
+        payoff += hit_flag * s[ip, num_time_steps - 1]
+
+    payoff = payoff / num_paths
+    return payoff

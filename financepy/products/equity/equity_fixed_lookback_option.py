@@ -61,7 +61,7 @@ class EquityFixedLookbackOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        volatility: float,
+        model,
         stock_min_max: float,
     ):
         """Valuation of the Fixed Lookback option using Black-Scholes using
@@ -86,7 +86,7 @@ class EquityFixedLookbackOption(EquityOption):
 
         t_exp = option_years(value_dt, self.expiry_dt)
 
-        v = volatility
+        v = model.volatility
         s0 = stock_price
         k = self.strike_price
         s_min = 0.0
@@ -186,7 +186,7 @@ class EquityFixedLookbackOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        volatility: float,
+        model,
         stock_min_max: float,
         num_paths: int = 10000,
         num_steps_per_year: int = 252,
@@ -203,6 +203,8 @@ class EquityFixedLookbackOption(EquityOption):
         df = discount_curve.df(self.expiry_dt)
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
+
+        volatility = model.volatility
 
         mu = r - q
         num_time_steps = int(t_exp * num_steps_per_year)

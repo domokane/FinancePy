@@ -32,7 +32,7 @@ class PWLDiscountCurve(DiscountCurve):
         zero_dts: Union[Date, list],
         zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Curve is defined by a vector of increasing times and zero rates."""
 
@@ -57,12 +57,12 @@ class PWLDiscountCurve(DiscountCurve):
         self._df_dates = self._zero_dts
         self.freq_type = freq_type
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
-        dc_times = times_from_dates(self.anchor_dt, zero_dts, self.time_dc_type)
+        dc_times = times_from_dates(self.anchor_dt, zero_dts, self.curve_dc_type)
         self._times = np.array(dc_times)
         if test_monotonicity(self._times) is False:
             raise FinError("Times are not sorted in increasing order")
@@ -144,7 +144,7 @@ class PWLDiscountCurve(DiscountCurve):
             self._zero_dts.copy(),
             self._cc_zero_rates + bump_size,
             freq_type=FrequencyTypes.CONTINUOUS,
-            time_dc_type=self.time_dc_type,
+            curve_dc_type=self.curve_dc_type,
         )
 
     ###########################################################################

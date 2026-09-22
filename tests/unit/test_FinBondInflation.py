@@ -4,9 +4,9 @@ import numpy as np
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
-from financepy.products.inflation.inflation_index_curve import InflationIndexCurve
+from financepy.market.curves.inflation_index_curve import InflationIndexCurve
 from financepy.products.bonds import YTMCalcType
-from financepy.products.inflation.inflation_bond import InflationBond
+from financepy.products.bonds.bond_inflation import BondInflation
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
@@ -28,7 +28,7 @@ def test_fin_inflation_bond_bbg():
     base_cpi_value = 218.08532
     ex_dividend_days = 0
 
-    bond = InflationBond(
+    bond = BondInflation(
         issue_dt,
         maturity_dt,
         coupon,
@@ -107,7 +107,7 @@ def test_fin_inflation_bond_bbg():
 
 def test_inflation_bond_principal_scales_with_face():
     settle_dt = Date(21, 7, 2017)
-    bond = InflationBond(
+    bond = BondInflation(
         Date(15, 7, 2010),
         Date(15, 7, 2020),
         0.0125,
@@ -149,7 +149,7 @@ def test_fin_inflation_bond_stack():
     base_cpi_value = 249.70
     ex_dividend_days = 0
 
-    bond = InflationBond(
+    bond = BondInflation(
         issue_dt,
         maturity_dt,
         coupon,
@@ -164,3 +164,6 @@ def test_fin_inflation_bond_stack():
 
     yld = bond.current_yield(settle_dt, clean_price)
     assert round(yld * 1000, 4) == 1.2015
+
+
+test_fin_inflation_bond_stack()

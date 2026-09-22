@@ -7,7 +7,7 @@ import numpy as np
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
-from ...utils.global_vars import G_DAYS_IN_YEAR, G_SMALL
+from ...utils.global_vars import G_SMALL
 
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.flat_discount_curve import DiscountCurve
@@ -73,45 +73,6 @@ class EquityCompoundOption(EquityOption):
 
     ####################################################################################
 
-    def _preprocess_inputs(
-        self,
-        value_dt: Date,
-        stock_price: float,
-        discount_curve: DiscountCurve,
-        dividend_curve: DiscountCurve,
-        model,
-    ):
-        """Validate inputs and compute (tc, tu, kc, ku, ru, qu, vol)."""
-
-        if stock_price < 0:
-            raise FinError("Stock price must be positive.")
-
-        if not isinstance(value_dt, Date):
-            raise FinError("Valuation date is not a Date")
-
-        if value_dt > self.c_expiry_dt:
-            raise FinError("Valuation date after compound expiry date.")
-
-        if value_dt > self.u_expiry_dt:
-            raise FinError("Valuation date after underlying expiry date.")
-
-        tc = (self.c_expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        tu = (self.u_expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        kc = self.c_strike_price
-        ku = self.u_strike_price
-
-        tc = option_years(value_dt, self.c_expiry_dt)
-        tu = option_years(value_dt, self.u_expiry_dt)
-
-        ru = discount_curve.zero_rate_cc(self.u_expiry_dt)
-        qu = dividend_curve.zero_rate_cc(self.u_expiry_dt)
-
-        vol = np.maximum(model.volatility, G_SMALL)
-
-        return tc, tu, kc, ku, ru, qu, vol
-
-    ####################################################################################
-
     def value(
         self,
         value_dt: Date,
@@ -173,10 +134,6 @@ class EquityCompoundOption(EquityOption):
 
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
-
-        tc, tu, kc, ku, ru, qu, vol = self._preprocess_inputs(
-            value_dt, stock_price, discount_curve, dividend_curve, model
-        )
 
         ru = discount_curve.zero_rate_cc(self.u_expiry_dt)
         qu = dividend_curve.zero_rate_cc(self.u_expiry_dt)

@@ -1,329 +1,452 @@
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-
-
-# Allow this example to run directly from its category folder.
-
-
-
-from financepy.utils.global_types import SwapTypes
-from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.products.bonds.bond_frn import BondFRN
-from financepy.market.curves.ibor_single_curve import IborSingleCurve
-from financepy.utils.date import Date
-
 # ============================================================================
 # FINANCEPY EXAMPLES - BondFRN
 # ============================================================================
+#
+# Copyright (C) 2018-2026 Dominic O'Kane
+#
+# This example demonstrates the pricing and risk analytics of floating-rate
+# notes (FRNs).
+#
+# An FRN pays a floating reference rate plus a quoted margin. Its market
+# price can differ from par when the required discount margin differs from
+# the contractual quoted margin.
+#
+# The examples calculate:
+#
+#   1. Discount margin
+#   2. Dirty price
+#   3. Accrued interest
+#   4. Principal value
+#   5. Interest-rate duration
+#   6. Macaulay and modified duration
+#   7. Convexity
+#   8. Credit-spread duration
+#
+# Two market examples are considered using different coupon frequencies
+# and day-count conventions.
+# ============================================================================
 
-########################################################################################
+from financepy.products.bonds.bond_frn import BondFRN
+from financepy.utils.date import Date
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.format_graphs import set_plot_style
 
-
-def build_ibor_curve(value_dt):
-
-    depo_dcc_type = DayCountTypes.THIRTY_E_360_ISDA
-    depos = []
-
-    pay_fixed = SwapTypes.PAY
-
-    spot_days = 2
-    settle_dt = value_dt.add_weekdays(spot_days)
-
-    deposit_rate = 0.050
-    maturity_dt = settle_dt.add_months(1)
-    depo1 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
-
-    maturity_dt = settle_dt.add_months(3)
-    depo2 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
-
-    maturity_dt = settle_dt.add_months(6)
-    depo3 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
-
-    maturity_dt = settle_dt.add_months(9)
-    depo4 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
-
-    maturity_dt = settle_dt.add_months(12)
-    depo5 = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
-
-    depos.append(depo1)
-    depos.append(depo2)
-    depos.append(depo3)
-    depos.append(depo4)
-    depos.append(depo5)
-
-    fras = []
-    fixed_dcc_type = DayCountTypes.ACT_365F
-    fixed_freq_type = FrequencyTypes.SEMI_ANNUAL
-
-    swaps = []
-
-    swap_rate = 0.05
-    maturity_dt = settle_dt.add_months(24)
-    swap1 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        swap_rate,
-        pay_fixed,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap1)
-
-    maturity_dt = settle_dt.add_months(36)
-    swap2 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        swap_rate,
-        pay_fixed,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap2)
-
-    maturity_dt = settle_dt.add_months(48)
-    swap3 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        swap_rate,
-        pay_fixed,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap3)
-
-    maturity_dt = settle_dt.add_months(60)
-    swap4 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        swap_rate,
-        pay_fixed,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap4)
-
-    maturity_dt = settle_dt.add_months(72)
-    swap5 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        swap_rate,
-        pay_fixed,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap5)
-
-    maturity_dt = settle_dt.add_months(84)
-    swap6 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        swap_rate,
-        pay_fixed,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap6)
-
-    maturity_dt = settle_dt.add_months(96)
-    swap7 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        swap_rate,
-        pay_fixed,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap7)
-
-    maturity_dt = settle_dt.add_months(108)
-    swap8 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        swap_rate,
-        pay_fixed,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap8)
-
-    maturity_dt = settle_dt.add_months(120)
-    swap9 = IborSwap(
-        settle_dt,
-        maturity_dt,
-        swap_rate,
-        pay_fixed,
-        fixed_freq_type,
-        fixed_dcc_type,
-    )
-    swaps.append(swap9)
-
-    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
-
-    if 1 == 0:
-        import numpy as np
-
-        num_steps = 40
-        dt = 10 / num_steps
-        times = np.linspace(0.0, 10.0, num_steps + 1)
-
-        df0 = 1.0
-        for t in times[1:]:
-            df1 = libor_curve.df_t(t)
-            fwd = (df0 / df1 - 1.0) / dt
-            print(t, df1, fwd)
-            df0 = df1
-
-    return libor_curve
-
-
-########################################################################################
-
-
-
-
-########################################################################################
+set_plot_style()
 
 # ============================================================================
-# 1. BOND FRN
+# RESULT FORMATTING
 # ============================================================================
-# What this section demonstrates:
-# Measures first-order price sensitivity to yield changes in price units.
-# Measures approximate percentage price sensitivity to a small change in yield.
-# Measures the present-value-weighted average timing of the bond cash flows.
+
+
+def print_results(
+    dm,
+    dirty_price,
+    last_coupon_dt,
+    accrued_days,
+    accrued_amount,
+    principal,
+    dollar_duration,
+    modified_duration,
+    macaulay_duration,
+    convexity,
+    dollar_credit_duration,
+    modified_credit_duration,
+):
+    """Print the principal FRN pricing and risk measures."""
+
+    print("-" * 62)
+    print(f"{'MEASURE':<32}{'VALUE':>30}")
+    print("-" * 62)
+
+    print(f"{'Discount Margin (bp)':<32}" f"{dm * 10000:>30.6f}")
+
+    print(f"{'Dirty Price':<32}" f"{dirty_price:>30.6f}")
+
+    print(f"{'Last Coupon Date':<32}" f"{str(last_coupon_dt):>30}")
+
+    print(f"{'Accrued Days':<32}" f"{accrued_days:>30}")
+
+    print(f"{'Accrued Amount':<32}" f"{accrued_amount:>30.6f}")
+
+    print(f"{'Principal':<32}" f"{principal:>30.6f}")
+
+    print(f"{'Dollar Rate Duration':<32}" f"{dollar_duration:>30.6f}")
+
+    print(f"{'Modified Rate Duration':<32}" f"{modified_duration:>30.6f}")
+
+    print(f"{'Macaulay Duration':<32}" f"{macaulay_duration:>30.6f}")
+
+    print(f"{'Convexity':<32}" f"{convexity:>30.6f}")
+
+    print(f"{'Dollar Credit Duration':<32}" f"{dollar_credit_duration:>30.6f}")
+
+    print(f"{'Modified Credit Duration':<32}" f"{modified_credit_duration:>30.6f}")
+
+    print("-" * 62)
+
+
+# ============================================================================
+# 1. CITIGROUP FRN - BLOOMBERG EXAMPLE
+# ============================================================================
+#
+# Value a Citigroup floating-rate note using quoted market inputs.
+#
+# The contractual coupon is the reference IBOR rate plus the quoted margin.
+# The discount margin is solved so that the model price reproduces the
+# observed clean market price.
+#
+# Once the discount margin has been determined, the example calculates
+# price, accrued interest and a collection of interest-rate and credit-risk
+# sensitivity measures.
+# ============================================================================
 
 print("\n" + "=" * 78)
-print("1. BOND FRN")
+print("1. CITIGROUP FRN - BLOOMBERG EXAMPLE")
 print("=" * 78)
 
-print("BLOOMBERG CITIGROUP FRN EXAMPLE")
+
+# ============================================================================
+# 1.1 CONTRACT TERMS
+# ============================================================================
+
 issue_dt = Date(10, 11, 2010)
 maturity_dt = Date(10, 11, 2021)
+
 quoted_margin = 0.0025
+
 freq_type = FrequencyTypes.QUARTERLY
 dc_type = DayCountTypes.THIRTY_E_360
 
-bond = BondFRN(issue_dt, maturity_dt, quoted_margin, freq_type, dc_type)
+bond = BondFRN(
+    issue_dt,
+    maturity_dt,
+    quoted_margin,
+    freq_type,
+    dc_type,
+)
 
-print("FIELD", "VALUE")
+
+# ============================================================================
+# 1.2 MARKET INPUTS
+# ============================================================================
+#
+# reset_ibor is the reference rate associated with the current coupon.
+#
+# current_ibor and future_ibors provide the reference-rate assumptions used
+# to value the remaining floating cash flows.
+# ============================================================================
+
+settle_dt = Date(21, 7, 2017)
+
 clean_price = 96.793
+
 reset_ibor = 0.0143456 - quoted_margin
 current_ibor = 0.0120534
 future_ibors = 0.0130522
 
-settle_dt = Date(21, 7, 2017)
 
-dm = bond.discount_margin(settle_dt, reset_ibor, current_ibor, future_ibors, clean_price)
+# ============================================================================
+# 1.3 DISCOUNT MARGIN
+# ============================================================================
+#
+# Solve for the discount margin that reproduces the observed clean price.
+# The result is reported in basis points.
+# ============================================================================
 
-print("Discount Margin (bp) = ", dm * 10000)
+dm = bond.discount_margin(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    clean_price,
+)
 
-dirty_price = bond.dirty_price_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
-print("Dirty Price = ", dirty_price)
+# ============================================================================
+# 1.4 PRICE AND ACCRUED INTEREST
+# ============================================================================
+
+dirty_price = bond.dirty_price_from_dm(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
 last_coupon_dt = bond._pcd
-print("Last Coupon Date = ", str(last_coupon_dt))
+accrued_days = bond.accrued_days
+accrued_amount = bond.accrued_int
 
-accddays = bond.accrued_days
-print("Accrued Days = ", accddays)
 
-accd_amount = bond.accrued_int
-print("Accrued Amount = ", accd_amount)
+# ============================================================================
+# 1.5 PRINCIPAL AND INTEREST-RATE RISK
+# ============================================================================
+#
+# Dollar duration measures the first-order price sensitivity to changes in
+# the reference interest rate in price units.
+#
+# Modified duration expresses the corresponding sensitivity on a relative
+# price basis.
+#
+# Macaulay duration measures the present-value-weighted timing of the
+# instrument's cash flows.
+#
+# Convexity captures the second-order curvature of the price response.
+# ============================================================================
 
-principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+principal = bond.principal(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-print("Dollar Principal = ", principal)
+dollar_duration = bond.dollar_duration(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-duration = bond.dollar_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+modified_duration = bond.modified_duration(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-print("Dollar Rate Duration = ", duration)
+macaulay_duration = bond.macaulay_duration(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-modified_duration = bond.modified_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+convexity = bond.convexity_from_dm(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-print("Modified Rate Duration = ", modified_duration)
 
-macaulay_duration = bond.macaulay_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+# ============================================================================
+# 1.6 CREDIT-SPREAD RISK
+# ============================================================================
+#
+# Credit duration measures the sensitivity of the FRN price to a change in
+# discount margin while holding the reference-rate assumptions unchanged.
+# ============================================================================
 
-print("Macaulay Duration = ", macaulay_duration)
+dollar_credit_duration = bond.dollar_credit_duration(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-convexity = bond.convexity_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+modified_credit_duration = bond.modified_credit_duration(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-print("Convexity = ", convexity)
 
-duration = bond.dollar_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+# ============================================================================
+# 1.7 RESULTS
+# ============================================================================
 
-print("Dollar Credit Duration = ", duration)
+print_results(
+    dm,
+    dirty_price,
+    last_coupon_dt,
+    accrued_days,
+    accrued_amount,
+    principal,
+    dollar_duration,
+    modified_duration,
+    macaulay_duration,
+    convexity,
+    dollar_credit_duration,
+    modified_credit_duration,
+)
 
-modified_duration = bond.modified_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
 
-print("Modified Credit Duration = ", modified_duration)
+# ============================================================================
+# 2. CITIGROUP FRN - SECOND MARKET EXAMPLE
+# ============================================================================
+#
+# Repeat the analysis using a second Citigroup FRN example.
+#
+# This instrument differs from the first example in its issue and maturity
+# dates, quoted margin, coupon frequency, day-count convention and market
+# assumptions.
+#
+# Reference:
+#
+#   https://ebrary.net/14293/economics/actual_floater
+# ============================================================================
 
-# EXAMPLE
-# https://ebrary.net/14293/economics/actual_floater
+print("\n" + "=" * 78)
+print("2. CITIGROUP FRN - SECOND MARKET EXAMPLE")
+print("=" * 78)
 
-print("BLOOMBERG CITIGROUP FRN EXAMPLE II")
+
+# ============================================================================
+# 2.1 CONTRACT TERMS
+# ============================================================================
+
 issue_dt = Date(28, 3, 2000)
-settle_dt = Date(28, 3, 2014)
 maturity_dt = Date(3, 2, 2021)
+
 quoted_margin = 0.0020
+
 freq_type = FrequencyTypes.SEMI_ANNUAL
 dc_type = DayCountTypes.THIRTY_E_360_ISDA
 
-bond = BondFRN(issue_dt, maturity_dt, quoted_margin, freq_type, dc_type)
+bond = BondFRN(
+    issue_dt,
+    maturity_dt,
+    quoted_margin,
+    freq_type,
+    dc_type,
+)
 
-print("FIELD", "VALUE")
+
+# ============================================================================
+# 2.2 MARKET INPUTS
+# ============================================================================
+
+settle_dt = Date(28, 3, 2014)
+
 clean_price = 93.08
+
 reset_ibor = 0.00537 - quoted_margin
 current_ibor = 0.027558
 future_ibors = 0.03295
 
-dm = bond.discount_margin(settle_dt, reset_ibor, current_ibor, future_ibors, clean_price)
 
-print("Discount Margin (bp) = ", dm * 10000)
+# ============================================================================
+# 2.3 DISCOUNT MARGIN
+# ============================================================================
 
-dirty_price = bond.dirty_price_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+dm = bond.discount_margin(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    clean_price,
+)
 
-print("Dirty Price = ", dirty_price)
+
+# ============================================================================
+# 2.4 PRICE AND ACCRUED INTEREST
+# ============================================================================
+
+dirty_price = bond.dirty_price_from_dm(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
 last_coupon_dt = bond._pcd
-print("Last Coupon Date = ", str(last_coupon_dt))
+accrued_days = bond.accrued_days
+accrued_amount = bond.accrued_int
 
-accddays = bond.accrued_days
-print("Accrued Days = ", accddays)
 
-accd_amount = bond.accrued_int
-print("Accrued Amount = ", accd_amount)
+# ============================================================================
+# 2.5 PRINCIPAL AND INTEREST-RATE RISK
+# ============================================================================
 
-principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+principal = bond.principal(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-print("Dollar Principal = ", principal)
+dollar_duration = bond.dollar_duration(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-duration = bond.dollar_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+modified_duration = bond.modified_duration(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-print("Dollar Rate Duration = ", duration)
+macaulay_duration = bond.macaulay_duration(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-modified_duration = bond.modified_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+convexity = bond.convexity_from_dm(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-print("Modified Rate Duration = ", modified_duration)
 
-macaulay_duration = bond.macaulay_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+# ============================================================================
+# 2.6 CREDIT-SPREAD RISK
+# ============================================================================
 
-print("Macaulay Duration = ", macaulay_duration)
+dollar_credit_duration = bond.dollar_credit_duration(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-convexity = bond.convexity_from_dm(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+modified_credit_duration = bond.modified_credit_duration(
+    settle_dt,
+    reset_ibor,
+    current_ibor,
+    future_ibors,
+    dm,
+)
 
-print("Convexity = ", convexity)
 
-principal = bond.principal(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
+# ============================================================================
+# 2.7 RESULTS
+# ============================================================================
 
-print("Principal = ", principal)
-
-duration = bond.dollar_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-print("Dollar Credit Duration = ", duration)
-
-modified_duration = bond.modified_credit_duration(settle_dt, reset_ibor, current_ibor, future_ibors, dm)
-
-print("Modified Credit Duration = ", modified_duration)
-
+print_results(
+    dm,
+    dirty_price,
+    last_coupon_dt,
+    accrued_days,
+    accrued_amount,
+    principal,
+    dollar_duration,
+    modified_duration,
+    macaulay_duration,
+    convexity,
+    dollar_credit_duration,
+    modified_credit_duration,
+)

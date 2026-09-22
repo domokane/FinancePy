@@ -19,7 +19,7 @@
 # 12. Add stress tests for inverted skews, high vol regimes and premium-adjusted deltas.
 
 
-from typing import Union, Any, Sequence, Optional, Tuple, List
+from typing import Union, Any, Sequence, Tuple, List
 
 import numpy as np
 

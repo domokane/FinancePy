@@ -1,5 +1,26 @@
 ## CHANGE LOG
+22 Sep 2026
+List of changes
+- Added example scripts for all bonds, credit and most equity products
+- Renamed value_dt in all discount curves to anchor date as value date is ambiuguous
+- Renamed time_dc_type to curve_dc_type in all discount curves to make clear it is a curve property
+- In composite curves I check all curves have same curve_dc_type
+- Renamed InflationBond to BondInflation and move to bond products folder
+- Moved Inflation curves to market.curves folder
+- Asian option changed num_obs to num_obs_per_year
+- Asian option changed num_obs to num_obs_per_year
+- Fixed failure to solve root in EquityCompoundOption
+- Fixed bug in equity_one_touch_bs.py
+- Fixed minor bug in equity_binomial_tree was not using cc zero rate
+- Move all calculation of r and q to use curve method zero_rate_cc and dates
+- Moved equity_fixed_lookback_option to use model input not vol
+- Moved equity_float_lookback_option to use model input not vol
+- Added correlation matrix checker to utils.check_values
+- Added CV pricing of equity rainbow option
+- Centralised graph formatting to format_graphs set_plot_style() function
+
 19 Sep 2026
+List of changes
 - Split tests into multiple types - unit, regression and validation
 - created examples folder with scripts and notebooks
 
@@ -12,7 +33,7 @@ List of changes
 
 18 Sep 2026 Part 3
 List of changes
-- Global renaming of curve value date to anchor date for better clarity
+- *** Global renaming of curve value date to anchor date for better clarity
 
 18 Sep 2026 Part 2
 List of changes

@@ -31,7 +31,7 @@ class PWFONFDiscountCurve(DiscountCurve):
         value_dt: Date,
         knot_dts: list,
         onfwd_rates: Union[list, np.ndarray],
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """
         Creates a discount curve using a vector of times and ON fwd rates
@@ -56,12 +56,12 @@ class PWFONFDiscountCurve(DiscountCurve):
 
         self.freq_type = FrequencyTypes.CONTINUOUS
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
-        dc_times = times_from_dates(self.anchor_dt, self._knot_dts, self.time_dc_type)
+        dc_times = times_from_dates(self.anchor_dt, self._knot_dts, self.curve_dc_type)
 
         self._times = np.atleast_1d(dc_times)
         if test_monotonicity(self._times) is False:
@@ -165,7 +165,7 @@ class PWFONFDiscountCurve(DiscountCurve):
             self.anchor_dt,
             self._knot_dts.copy(),
             self._onfwd_rates + bump_size,
-            self.time_dc_type,
+            self.curve_dc_type,
         )
 
     ####################################################################################

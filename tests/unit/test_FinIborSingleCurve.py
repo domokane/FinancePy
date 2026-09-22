@@ -248,10 +248,7 @@ def test_bloomberg_pricing_example():
 
 
 @pytest.mark.parametrize("interp_type", InterpTypes)
-
 ########################################################################################
-
-
 def test_reprice_inputs_for_all_interp_choices(interp_type):
 
     value_dt = Date(6, 10, 2001)
@@ -394,11 +391,12 @@ def test_reprice_inputs_for_all_interp_choices(interp_type):
 #####################################################################################
 
 
-def test_df_uses_ibor_single_curve_time_day_count():
+def test_df_uses_ibor_single_curve_day_count():
     """Regression test for inherited DiscountCurve.df date conversion."""
 
     value_dt = Date(1, 1, 2024)
     maturity_dt = Date(1, 1, 2025)
+
     depo = IborDeposit(
         value_dt,
         maturity_dt,
@@ -412,20 +410,27 @@ def test_df_uses_ibor_single_curve_time_day_count():
         [],
         [],
         InterpTypes.FLAT_FWD_RATES,
-        time_dc_type=DayCountTypes.ACT_360,
+        curve_dc_type=DayCountTypes.ACT_360,
     )
 
     curve_df = curve.df(maturity_dt)
+
     act_360_time = times_from_dates(
         value_dt,
         maturity_dt,
         DayCountTypes.ACT_360,
     )
+
     act_365f_time = times_from_dates(
         value_dt,
         maturity_dt,
         DayCountTypes.ACT_365F,
     )
 
-    assert curve_df == pytest.approx(curve.df_t(act_360_time))
-    assert curve_df != pytest.approx(curve.df_t(act_365f_time))
+    assert curve_df == pytest.approx(
+        curve.df_t(act_360_time)
+    )
+
+    assert curve_df != pytest.approx(
+        curve.df_t(act_365f_time)
+    )

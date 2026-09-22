@@ -56,7 +56,7 @@ def test_european_put():
         params,
     )
 
-    assert [round(x, 3) for x in value] == [7.033, -0.384, 0.019, -2.873]
+    assert [round(x, 3) for x in value] == [7.081, -0.386, 0.019, -2.921]
 
 
 ########################################################################################
@@ -82,7 +82,7 @@ def test_american_put():
         params,
     )
 
-    assert [round(x, 3) for x in value] == [7.219, -0.400, 0.020, -3.128]
+    assert [round(x, 3) for x in value] == [7.257, -0.400, 0.020, -3.163]
 
 
 ########################################################################################
@@ -108,7 +108,7 @@ def test_european_call():
         params,
     )
 
-    assert [round(x, 3) for x in value] == [8.073, 0.577, 0.019, -3.859]
+    assert [round(x, 3) for x in value] == [8.035, 0.575, 0.019, -3.826]
 
 
 ########################################################################################
@@ -134,4 +134,4 @@ def test_american_call():
         params,
     )
 
-    assert [round(x, 3) for x in value] == [8.091, 0.580, 0.019, -3.909]
+    assert [round(x, 3) for x in value] == [8.056, 0.578, 0.019, -3.88]

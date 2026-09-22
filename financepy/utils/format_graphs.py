@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
 """
-Created on Mon Sep 14 18:42:20 2026
-
-@author: Dominic
+Standard graph formatting for FinancePy examples.
 """
 
-import matplotlib.pyplot as plt
+import matplotlib as mpl
 from cycler import cycler
 
-cc = [
+
+COLORS = [
     "#4477AA",
     "#EE6677",
     "#228833",
@@ -18,33 +16,48 @@ cc = [
     "#BBBBBB",
 ]
 
-plt.rcParams.update(
-    {
-        "font.size": 16,
-        "figure.figsize": (12, 6),
-        "figure.dpi": 150,
-        "axes.spines.top": False,
-        "axes.spines.right": False,
-        "axes.linewidth": 0.7,
-        "axes.labelsize": 18,
-        "axes.titlesize": 16,
-        "xtick.labelsize": 16,
-        "ytick.labelsize": 16,
-        "xtick.major.width": 0.7,
-        "ytick.major.width": 0.7,
-        "grid.linewidth": 0.6,
-        "grid.alpha": 0.3,
-        "legend.frameon": False,
-        "legend.fontsize": 16,
-        "lines.linewidth": 3,
-        "lines.markersize": 10,
-        "savefig.dpi": 300,
-        "savefig.bbox": "tight",
-        "savefig.pad_inches": 0.03,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-        "svg.fonttype": "none",
-        "figure.constrained_layout.use": True,
-        "axes.prop_cycle": cycler(color=cc),
-    }
-)
+
+def set_plot_style():
+    """Apply the standard FinancePy plotting style."""
+
+    mpl.rcParams.update(
+        {
+            "font.family": "DejaVu Sans",
+            "mathtext.fontset": "dejavusans",
+            "font.size": 16,
+
+            "figure.figsize": (12, 6),
+            "figure.dpi": 150,
+            "figure.constrained_layout.use": True,
+
+            "axes.spines.top": False,
+            "axes.spines.right": False,
+            "axes.linewidth": 0.7,
+            "axes.labelsize": 18,
+            "axes.titlesize": 18,
+            "axes.titlepad": 12,
+            "axes.prop_cycle": cycler(color=COLORS),
+
+            "xtick.labelsize": 16,
+            "ytick.labelsize": 16,
+            "xtick.major.width": 0.7,
+            "ytick.major.width": 0.7,
+
+            "grid.linewidth": 0.6,
+            "grid.alpha": 0.3,
+
+            "legend.frameon": False,
+            "legend.fontsize": 16,
+
+            "lines.linewidth": 3,
+            "lines.markersize": 10,
+
+            "savefig.dpi": 300,
+            "savefig.bbox": "tight",
+            "savefig.pad_inches": 0.03,
+
+            "pdf.fonttype": 42,
+            "ps.fonttype": 42,
+            "svg.fonttype": "none",
+        }
+    )

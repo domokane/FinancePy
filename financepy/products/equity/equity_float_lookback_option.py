@@ -65,22 +65,24 @@ class EquityFloatLookbackOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        volatility: float,
+        model,
         stock_min_max: float,
     ):
         """Valuation of the Floating Lookback option using Black-Scholes using
         the formulae derived by Goldman, Sosin and Gatto (1979)."""
 
-        if isinstance(value_dt, Date) is False:
-            raise FinError("Valuation date is not a Date")
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
+        volatility = model.volatility
+
+        if volatility < 0.0:
+            raise FinError("Volatility must be non-negative.")
+
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
-
-        t_exp = option_years(value_dt, self.expiry_dt)
 
         v = volatility
         s0 = stock_price
@@ -138,6 +140,22 @@ class EquityFloatLookbackOption(EquityOption):
         else:
             raise FinError("Unknown lookback OPTION_TYPE:" + str(self.opt_type))
 
+        if 1 == 0:
+            print("\nLOOKBACK DEBUG")
+            print("t_exp :", t_exp, type(t_exp), np.shape(t_exp))
+            print("r     :", r, type(r), np.shape(r))
+            print("q     :", q, type(q), np.shape(q))
+            print("dq    :", dq, type(dq), np.shape(dq))
+            print("df    :", df, type(df), np.shape(df))
+            print("b     :", b, type(b), np.shape(b))
+            print("u     :", u, type(u), np.shape(u))
+            print("w     :", w, type(w), np.shape(w))
+            print("expbt :", expbt, type(expbt), np.shape(expbt))
+            print("a1    :", a1, type(a1), np.shape(a1))
+            print("a2    :", a2, type(a2), np.shape(a2))
+            print("term  :", term, type(term), np.shape(term))
+            print("v     :", v, type(v), np.shape(v))
+
         return v
 
     ###########################################################################
@@ -148,7 +166,7 @@ class EquityFloatLookbackOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        volatility: float,
+        model,
         stock_min_max: float,
         num_paths: int = 10000,
         num_steps_per_year: int = 252,
@@ -157,44 +175,60 @@ class EquityFloatLookbackOption(EquityOption):
         """Monte Carlo valuation of a floating strike lookback option using a
         Black-Scholes model that assumes the stock follows a GBM process."""
 
+        t_exp = option_years(value_dt, self.expiry_dt)
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
+
+        if model.volatility < 0.0:
+            raise FinError("Volatility must be non-negative.")
 
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
         df = discount_curve.df(self.expiry_dt)
 
-        t_exp = option_years(value_dt, self.expiry_dt)
-        num_time_steps = int(t_exp * num_steps_per_year)
+        num_time_steps = max(
+            1,
+            int(np.ceil(t_exp * num_steps_per_year)),
+        )
 
         mu = r - q
 
+        _, s_all = get_paths_times(
+            num_paths,
+            num_time_steps,
+            t_exp,
+            mu,
+            stock_price,
+            model.volatility,
+            seed,
+        )
+
         opt_type = self.opt_type
-        smin = 0.0
-        smax = 0.0
-
-        if self.opt_type == OptionTypes.EUROPEAN_CALL:
-            smin = stock_min_max
-            if smin > stock_price:
-                raise FinError("Smin must be less than or equal to the stock price.")
-        elif self.opt_type == OptionTypes.EUROPEAN_PUT:
-            smax = stock_min_max
-            if smax < stock_price:
-                raise FinError("Smax must be greater than or equal to the stock price.")
-
-        t_all, s_all = get_paths_times(num_paths, num_time_steps, t_exp, mu, stock_price, volatility, seed)
-
-        # Due to antithetics we have doubled the number of paths
-        payoff = np.zeros(num_paths)
 
         if opt_type == OptionTypes.EUROPEAN_CALL:
-            s_min = np.min(s_all, axis=1)
-            s_min = np.minimum(s_min, smin)
-            payoff = np.maximum(s_all[:, -1] - s_min, 0.0)
+
+            s_min_vector = np.minimum(
+                np.min(s_all, axis=1),
+                stock_min_max,
+            )
+
+            payoff = np.maximum(
+                s_all[:, -1] - s_min_vector,
+                0.0,
+            )
+
         elif opt_type == OptionTypes.EUROPEAN_PUT:
-            s_max = np.max(s_all, axis=1)
-            s_max = np.maximum(s_max, smax)
-            payoff = np.maximum(s_max - s_all[:, -1], 0.0)
+
+            s_max_vector = np.maximum(
+                np.max(s_all, axis=1),
+                stock_min_max,
+            )
+
+            payoff = np.maximum(
+                s_max_vector - s_all[:, -1],
+                0.0,
+            )
         else:
             raise FinError("Unknown lookback OPTION_TYPE:" + str(opt_type))
 

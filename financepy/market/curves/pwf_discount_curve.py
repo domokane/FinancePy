@@ -31,7 +31,7 @@ class PWFDiscountCurve(DiscountCurve):
         zero_dts: list[Date],
         zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Creates a discount curve using a vector of times and zero rates
         that assumes that the zero rates are piecewise flat."""
@@ -56,14 +56,14 @@ class PWFDiscountCurve(DiscountCurve):
             f = annual_frequency(freq_type)
             self._cc_zero_rates = f * np.log(1.0 + np.array(zero_rates) / f)
 
-        self.input_freq_type = freq_type
+        self.freq_type = freq_type
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
-        dc_times = times_from_dates(self.anchor_dt, zero_dts, self.time_dc_type)
+        dc_times = times_from_dates(self.anchor_dt, zero_dts, self.curve_dc_type)
 
         self._times = np.array(dc_times)
         self._dfs = self.df_t(self._times)
@@ -131,7 +131,7 @@ class PWFDiscountCurve(DiscountCurve):
             self._zero_dts.copy(),
             self._cc_zero_rates + bump_size,
             freq_type=FrequencyTypes.CONTINUOUS,
-            time_dc_type=self.time_dc_type,
+            curve_dc_type=self.curve_dc_type,
         )
 
     ###########################################################################

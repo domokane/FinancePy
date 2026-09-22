@@ -39,7 +39,7 @@ class BondZero:
         issue_dt: Date,
         maturity_dt: Date,
         issue_price: float,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,  # ONLY NEEDED FOR YIELD CALCULATIONS
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,  # ONLY NEEDED FOR YIELD CALCULATIONS
     ):
         """Create BondZero object by providing the issue date, maturity Date,
         face amount and issue price."""
@@ -54,7 +54,7 @@ class BondZero:
         self.issue_price = issue_price
         self.par = 100.0  # This is how price is quoted and amount at maturity
         self.freq_type = FrequencyTypes.ZERO
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
         self.accrued_int = None
         self.accrued_days = None
@@ -79,7 +79,7 @@ class BondZero:
         validate_yield(ytm)
 
         # year fraction from settlement to maturity
-        dc = DayCount(self.time_dc_type)
+        dc = DayCount(self.curve_dc_type)
         T, _, _ = dc.year_frac(settle_dt, self.maturity_dt, self.maturity_dt, FrequencyTypes.ZERO)
 
         ytm = np.asarray(ytm)  # keep vectorisation
@@ -119,7 +119,7 @@ class BondZero:
 
         clean_price = np.asarray(clean_price)
 
-        dc = DayCount(self.time_dc_type)
+        dc = DayCount(self.curve_dc_type)
         T, _, _ = dc.year_frac(
             settle_dt,
             self.maturity_dt,
@@ -184,7 +184,7 @@ class BondZero:
         dirty_price = clean_price + accrued
 
         # time to maturity
-        dc = DayCount(self.time_dc_type)
+        dc = DayCount(self.curve_dc_type)
         T, _, _ = dc.year_frac(
             settle_dt,
             self.maturity_dt,
@@ -228,7 +228,7 @@ class BondZero:
         dirty_price = clean_price + accrued
 
         # time to maturity
-        dc = DayCount(self.time_dc_type)
+        dc = DayCount(self.curve_dc_type)
         T, _, _ = dc.year_frac(
             settle_dt,
             self.maturity_dt,
@@ -339,7 +339,7 @@ class BondZero:
         """Return Macaulay duration of a zero coupon bond."""
         validate_yield(ytm)
 
-        dc = DayCount(self.time_dc_type)
+        dc = DayCount(self.curve_dc_type)
         T, _, _ = dc.year_frac(
             settle_dt,
             self.maturity_dt,
@@ -565,7 +565,7 @@ class BondZero:
         s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("COUPON (%)", 0)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("TIME DAY COUNT TYPE", self.time_dc_type)
+        s += label_to_string("TIME DAY COUNT TYPE", self.curve_dc_type)
         return s
 
     ###########################################################################

@@ -1,96 +1,20 @@
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
-
-
-# Allow this example to run directly from its category folder.
-import os
-
-
-from financepy.utils.global_types import SwapTypes
-from financepy.utils.date import Date
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.frequency import FrequencyTypes
-from financepy.market.curves.cds_curve import CDSCurve
-from financepy.market.curves.ibor_single_curve import IborSingleCurve
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.credit.cds import CDS
-from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-
 # ============================================================================
 # FINANCEPY EXAMPLES - CDSIndexPortfolio
 # ============================================================================
+#
+# Copyright (C) 2018-2026 Dominic O'Kane
+#
 
+import matplotlib.pyplot as plt
+import numpy as np
 
+from financepy.utils.date import Date
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+from financepy.utils.format_graphs import set_plot_style
 
-# TO DO
-
-########################################################################################
-
-
-def build_ibor_curve(trade_dt):
-
-    value_dt = trade_dt.add_days(1)
-    dc_type = DayCountTypes.ACT_360
-    depos = []
-
-    depos = []
-    fras = []
-    swaps = []
-
-    dc_type = DayCountTypes.THIRTY_E_360_ISDA
-    fixed_freq = FrequencyTypes.SEMI_ANNUAL
-    settle_dt = value_dt
-
-    maturity_dt = settle_dt.add_months(12)
-    swap1 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
-    swaps.append(swap1)
-
-    maturity_dt = settle_dt.add_months(24)
-    swap2 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
-    swaps.append(swap2)
-
-    maturity_dt = settle_dt.add_months(36)
-    swap3 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
-    swaps.append(swap3)
-
-    maturity_dt = settle_dt.add_months(48)
-    swap4 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0502, fixed_freq, dc_type)
-    swaps.append(swap4)
-
-    maturity_dt = settle_dt.add_months(60)
-    swap5 = IborSwap(settle_dt, maturity_dt, SwapTypes.PAY, 0.0501, fixed_freq, dc_type)
-    swaps.append(swap5)
-
-    libor_curve = IborSingleCurve(value_dt, depos, fras, swaps)
-    return libor_curve
-
-
-########################################################################################
-
-
-def build_issuer_curve(trade_dt, libor_curve):
-
-    value_dt = trade_dt.add_days(1)
-
-    cds_mkt_contracts = []
-
-    cds_cpn = 0.0048375
-    maturity_dt = Date(29, 6, 2010)
-    cds = CDS(value_dt, maturity_dt, cds_cpn)
-    cds_mkt_contracts.append(cds)
-
-    recovery_rate = 0.40
-
-    issuer_curve = CDSCurve(value_dt, cds_mkt_contracts, libor_curve, recovery_rate)
-
-    return issuer_curve
-
-
-########################################################################################
-
-
-
-
-########################################################################################
+from helpers import build_ibor_curve
+from helpers import load_heterogeneous_spread_curves
+set_plot_style()
 
 # ============================================================================
 # 1. CDS INDEX PORTFOLIO
@@ -104,7 +28,8 @@ print("=" * 78)
 
 trade_dt = Date(1, 8, 2007)
 step_in_dt = trade_dt.add_days(1)
-value_dt = step_in_dt
+value_dt = trade_dt
+
 
 libor_curve = build_ibor_curve(trade_dt)
 
@@ -113,30 +38,9 @@ maturity_5yr = trade_dt.next_cds_date(60)
 maturity_7yr = trade_dt.next_cds_date(84)
 maturity_10yr = trade_dt.next_cds_date(120)
 
-path = os.path.join(os.path.dirname(__file__), ".//data//CDX_NA_IG_S7_SPREADS.csv")
-f = open(path, "r")
-data = f.readlines()
-f.close()
-issuer_curves = []
+issuer_curves = load_heterogeneous_spread_curves(value_dt, step_in_dt, libor_curve)
 
-for row in data[1:]:
-
-    split_row = row.split(",")
-    spd_3yr = float(split_row[1]) / 10000.0
-    spd_5yr = float(split_row[2]) / 10000.0
-    spd_7yr = float(split_row[3]) / 10000.0
-    spd_10yr = float(split_row[4]) / 10000.0
-    recovery_rate = float(split_row[5])
-
-    cds_3yr = CDS(step_in_dt, maturity_3yr, spd_3yr)
-    cds_5yr = CDS(step_in_dt, maturity_5yr, spd_5yr)
-    cds_7yr = CDS(step_in_dt, maturity_7yr, spd_7yr)
-    cds_10yr = CDS(step_in_dt, maturity_10yr, spd_10yr)
-    cds_contracts = [cds_3yr, cds_5yr, cds_7yr, cds_10yr]
-
-    issuer_curve = CDSCurve(value_dt, cds_contracts, libor_curve, recovery_rate)
-
-    issuer_curves.append(issuer_curve)
+print(f"{'Number of Issuers':<30}: {len(issuer_curves)}")
 
 # Now determine the average spread of the index
 
@@ -175,3 +79,141 @@ print("INTRINSIC SPD 5Y", intrinsic_spd_5yr)
 print("INTRINSIC SPD 7Y", intrinsic_spd_7yr)
 print("INTRINSIC SPD 10Y", intrinsic_spd_10yr)
 
+# ============================================================================
+# 2. COMPARE AVERAGE AND INTRINSIC INDEX SPREADS
+# ============================================================================
+#
+# The average spread is the simple average of the constituent CDS spreads.
+#
+# The intrinsic spread is obtained from the aggregate protection and premium
+# legs of the portfolio. It therefore reflects the valuation mechanics of the
+# CDS index portfolio rather than simply averaging constituent spreads.
+#
+# Comparing the two across maturity illustrates the difference between these
+# two measures of index credit spread.
+# ============================================================================
+
+print("\n" + "=" * 78)
+print("2. AVERAGE VERSUS INTRINSIC INDEX SPREAD")
+print("=" * 78)
+
+tenors = np.array(
+    [
+        3,
+        5,
+        7,
+        10,
+    ]
+)
+
+average_spreads = np.array(
+    [
+        avg_spd_3yr,
+        avg_spd_5yr,
+        avg_spd_7yr,
+        avg_spd_10yr,
+    ]
+)
+
+intrinsic_spreads = np.array(
+    [
+        intrinsic_spd_3yr,
+        intrinsic_spd_5yr,
+        intrinsic_spd_7yr,
+        intrinsic_spd_10yr,
+    ]
+)
+
+print(f"{'TENOR':>10}" f"{'AVERAGE (bp)':>20}" f"{'INTRINSIC (bp)':>20}" f"{'DIFFERENCE (bp)':>20}")
+
+print("-" * 70)
+
+for tenor, average_spread, intrinsic_spread in zip(
+    tenors,
+    average_spreads,
+    intrinsic_spreads,
+):
+
+    difference = intrinsic_spread - average_spread
+
+    print(f"{tenor:10d}" f"{average_spread:20.6f}" f"{intrinsic_spread:20.6f}" f"{difference:20.6f}")
+
+
+# ============================================================================
+# 3. PLOT AVERAGE AND INTRINSIC INDEX SPREADS
+# ============================================================================
+#
+# Plot both spread measures against maturity. This makes it easy to see
+# whether the portfolio-based intrinsic spread differs materially from the
+# simple average of the constituent CDS spreads.
+# ============================================================================
+
+print("\n" + "=" * 78)
+print("3. AVERAGE AND INTRINSIC SPREAD TERM STRUCTURE")
+print("=" * 78)
+
+plt.figure(figsize=(9, 6))
+
+plt.plot(
+    tenors,
+    average_spreads,
+    marker="o",
+    label="Average Spread",
+)
+
+plt.plot(
+    tenors,
+    intrinsic_spreads,
+    marker="o",
+    label="Intrinsic Spread",
+)
+
+plt.xlabel("Maturity (years)")
+plt.ylabel("Spread (bp)")
+
+plt.title("CDS Index Average and Intrinsic Spread")
+
+plt.xticks(tenors)
+
+plt.grid(True)
+plt.legend()
+plt.show()
+
+
+# ============================================================================
+# 4. PLOT INTRINSIC MINUS AVERAGE SPREAD
+# ============================================================================
+#
+# The difference isolates the effect of calculating the index spread from
+# aggregate CDS portfolio valuation rather than taking a simple arithmetic
+# average of the constituent spreads.
+# ============================================================================
+
+print("\n" + "=" * 78)
+print("4. INTRINSIC MINUS AVERAGE SPREAD")
+print("=" * 78)
+
+spread_difference = intrinsic_spreads - average_spreads
+
+plt.figure(figsize=(9, 6))
+
+plt.plot(
+    tenors,
+    spread_difference,
+    marker="o",
+)
+
+plt.axhline(
+    0.0,
+    linestyle="--",
+)
+
+plt.xlabel("Maturity (years)")
+plt.ylabel("Intrinsic - Average Spread (bp)")
+
+plt.title("CDS Index Spread Difference")
+
+plt.xticks(tenors)
+
+plt.grid(True)
+plt.show()

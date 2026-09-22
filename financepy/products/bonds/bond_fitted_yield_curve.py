@@ -36,7 +36,7 @@ class BondFittedYieldCurve:
         bonds: list,
         ylds: Union[np.ndarray, list],
         curve_fit,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Fit the curve to a set of bond yields using the type of curve
         specified. Bounds can be provided if you wish to enforce lower and
@@ -52,10 +52,10 @@ class BondFittedYieldCurve:
 
         fit_type = type(self.curve_fit)
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
         years_to_maturities = []
 
@@ -64,7 +64,7 @@ class BondFittedYieldCurve:
             years_to_maturity = times_from_dates(
                 settle_dt,
                 bond.maturity_dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
             years_to_maturities.append(years_to_maturity)
 
@@ -122,7 +122,7 @@ class BondFittedYieldCurve:
     def interp_yield(self, maturity_dt: Date):
         """Interpolate yield"""
         if isinstance(maturity_dt, Date):
-            t = times_from_dates(self.settle_dt, maturity_dt, self.time_dc_type)
+            t = times_from_dates(self.settle_dt, maturity_dt, self.curve_dc_type)
         elif isinstance(maturity_dt, list):
             t = maturity_dt
         elif isinstance(maturity_dt, np.ndarray):

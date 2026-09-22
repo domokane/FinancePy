@@ -22,6 +22,8 @@ from ...models.equity_one_touch_bs import barrier_pay_one_at_hit_pv_down
 from ...models.equity_one_touch_bs import barrier_pay_one_at_hit_pv_up
 from ...models.equity_one_touch_bs import barrier_pay_asset_at_expiry_down_out
 from ...models.equity_one_touch_bs import barrier_pay_asset_at_expiry_up_out
+from ...models.equity_one_touch_bs import barrier_pay_asset_at_expiry_down
+from ...models.equity_one_touch_bs import barrier_pay_asset_at_expiry_up
 
 ########################################################################################
 # TODO: Implement Sobol random numbers
@@ -322,7 +324,7 @@ class EquityOneTouchOption(EquityOption):
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        num_time_steps = int(t_exp * num_steps_per_year) + 1
+        num_time_steps = max(1, int(t_exp * num_steps_per_year))
         dt = t_exp / num_time_steps
 
         v = model.volatility
@@ -369,7 +371,7 @@ class EquityOneTouchOption(EquityOption):
             # HAUG 4
 
             if s0 >= hh:
-                raise FinError("Stock price is currently below barrier.")
+                raise FinError("Stock price is currently above barrier.")
 
             v = barrier_pay_one_at_hit_pv_up(s, hh, r, dt) * hh
             return v
@@ -400,16 +402,26 @@ class EquityOneTouchOption(EquityOption):
             if s0 <= hh:
                 raise FinError("Stock price is currently below barrier.")
 
-            v = barrier_pay_one_at_hit_pv_down(s, hh, 0.0, dt) * hh
+            v = barrier_pay_asset_at_expiry_down(
+                s,
+                hh,
+            )
+            v = v * np.exp(-r * t_exp)
+
             return v
 
         elif self.opt_type == TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY:
             # HAUG 8
 
             if s0 >= hh:
-                raise FinError("Stock price is currently below barrier.")
+                raise FinError("Stock price is currently above barrier.")
 
-            v = barrier_pay_one_at_hit_pv_up(s, hh, 0.0, dt) * hh
+            v = barrier_pay_asset_at_expiry_up(
+                s,
+                hh,
+            )
+            v = v * np.exp(-r * t_exp)
+
             return v
 
         elif self.opt_type == TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING:
@@ -446,7 +458,7 @@ class EquityOneTouchOption(EquityOption):
             # HAUG 12
 
             if s0 >= hh:
-                raise FinError("Stock price is currently below barrier.")
+                raise FinError("Stock price is currently above barrier.")
 
             v = barrier_pay_asset_at_expiry_up_out(s, hh)
             v = v * np.exp(-r * t_exp)

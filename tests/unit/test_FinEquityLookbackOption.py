@@ -6,6 +6,7 @@ from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_fixed_lookback_option import (
     EquityFixedLookbackOption,
 )
+from financepy.models.black_scholes import BlackScholes
 
 
 value_dt = Date(1, 1, 2015)
@@ -17,7 +18,7 @@ dividend_yield = 0.01
 num_paths = 10000
 stock_price_range = range(90, 110, 10)
 num_steps_per_year = 252
-
+model = BlackScholes(volatility)
 discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
@@ -36,7 +37,7 @@ def test_european_call():
         stock_price,
         discount_curve,
         dividend_curve,
-        volatility,
+        model,
         stock_max,
     )
     value_mc = option.value_mc(
@@ -44,7 +45,7 @@ def test_european_call():
         stock_price,
         discount_curve,
         dividend_curve,
-        volatility,
+        model,
         stock_max,
         num_paths,
         num_steps_per_year,
@@ -69,7 +70,7 @@ def test_european_put():
         stock_price,
         discount_curve,
         dividend_curve,
-        volatility,
+        model,
         stock_min,
     )
     value_mc = option.value_mc(
@@ -77,7 +78,7 @@ def test_european_put():
         stock_price,
         discount_curve,
         dividend_curve,
-        volatility,
+        model,
         stock_min,
         num_paths,
         num_steps_per_year,

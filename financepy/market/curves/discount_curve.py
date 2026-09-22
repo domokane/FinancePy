@@ -37,7 +37,7 @@ class DiscountCurve:
         df_dates: list = None,
         df_values: Union[list, np.ndarray] = None,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):
         """Create the discount curve from a vector of times and discount
         factors with an anchor date and specify an interpolation scheme. As we
@@ -49,10 +49,10 @@ class DiscountCurve:
 
         self.anchor_dt = anchor_dt
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
 
         # Validate curve
         if df_dates is None:
@@ -85,7 +85,7 @@ class DiscountCurve:
             start_index = 1
 
         for i in range(start_index, num_points):
-            t = times_from_dates(anchor_dt, df_dates[i], time_dc_type)
+            t = times_from_dates(anchor_dt, df_dates[i], curve_dc_type)
             self._times.append(t)
             self._dfs.append(df_values[i])
             self._df_dates.append(df_dates[i])
@@ -153,7 +153,7 @@ class DiscountCurve:
         """Simple-compounded forward rate between dates.
 
         accrual_dc_type is used for the forward accrual denominator.
-        self.time_dc_type is used for curve time conversion / interpolation.
+        self.curve_dc_type is used for curve time conversion / interpolation.
         """
 
         if not isinstance(accrual_dc_type, DayCountTypes):
@@ -205,8 +205,8 @@ class DiscountCurve:
         if np.any(accruals <= 0.0):
             raise FinError("Forward end date must be after start date.")
 
-        t1 = times_from_dates(self.anchor_dt, start_dts, self.time_dc_type)
-        t2 = times_from_dates(self.anchor_dt, end_dts, self.time_dc_type)
+        t1 = times_from_dates(self.anchor_dt, start_dts, self.curve_dc_type)
+        t2 = times_from_dates(self.anchor_dt, end_dts, self.curve_dc_type)
 
         rates = self.fwd_rate_t(t1, t2, accruals, comp_type, freq_type)
 
@@ -282,7 +282,7 @@ class DiscountCurve:
 
     def fwd_rate_inst(self, dts: Union[Date, list], dt: float = 1.0e-6):
         """Instantaneous continuously compounded forward rate at date(s)."""
-        times = times_from_dates(self.anchor_dt, dts, self.time_dc_type)
+        times = times_from_dates(self.anchor_dt, dts, self.curve_dc_type)
         return self.fwd_rate_inst_t(times, dt)
 
     ###########################################################################
@@ -326,7 +326,7 @@ class DiscountCurve:
         if not isinstance(freq_type, FrequencyTypes):
             raise FinError("Invalid Frequency type.")
 
-        times = times_from_dates(self.anchor_dt, maturity_dt, self.time_dc_type)
+        times = times_from_dates(self.anchor_dt, maturity_dt, self.curve_dc_type)
         zero_rates = self.zero_rate_t(times, freq_type)
         return zero_rates
 
@@ -335,7 +335,7 @@ class DiscountCurve:
     def curve_years(self, maturity_dt: Union[list, Date]):
         """Calculate zero rates with continuous compounding."""
 
-        times = times_from_dates(self.anchor_dt, maturity_dt, self.time_dc_type)
+        times = times_from_dates(self.anchor_dt, maturity_dt, self.curve_dc_type)
         return times
 
     ###########################################################################
@@ -347,8 +347,8 @@ class DiscountCurve:
         df_end = self.df(end_dt)
         df_fwd = df_end / df_start
 
-        start_t = times_from_dates(self.anchor_dt, start_dt, self.time_dc_type)
-        end_t = times_from_dates(self.anchor_dt, end_dt, self.time_dc_type)
+        start_t = times_from_dates(self.anchor_dt, start_dt, self.curve_dc_type)
+        end_t = times_from_dates(self.anchor_dt, end_dt, self.curve_dc_type)
         t_fwd = end_t - start_t
 
         fwd_zero_cc = -np.log(df_fwd) / t_fwd
@@ -359,7 +359,7 @@ class DiscountCurve:
     def zero_rate_cc(self, maturity_dt: Union[list, Date]):
         """Calculate zero rates with continuous compounding."""
 
-        times = times_from_dates(self.anchor_dt, maturity_dt, self.time_dc_type)
+        times = times_from_dates(self.anchor_dt, maturity_dt, self.curve_dc_type)
         zero_rates_cc = self.zero_rate_t(times, FrequencyTypes.CONTINUOUS)
         return zero_rates_cc
 
@@ -525,7 +525,9 @@ class DiscountCurve:
 
         acc_day_counter = DayCount(accrual_dc_type)
 
-        t_start = times_from_dates(self.anchor_dt, effective_dt, self.time_dc_type)
+        t_start = times_from_dates(self.anchor_dt,
+                                   effective_dt,
+                                   self.curve_dc_type)
 
         par_rates = []
 
@@ -537,7 +539,14 @@ class DiscountCurve:
             schedule = Schedule(effective_dt, mat_dt, freq_type)
             flow_dts = schedule.generate()
 
-            payment_times = np.array([times_from_dates(self.anchor_dt, dt, self.time_dc_type) for dt in flow_dts[1:]])
+            payment_times = times_from_dates(
+                self.anchor_dt,
+                flow_dts[1:],
+                self.curve_dc_type,
+            )
+
+#            payment_times = np.array([times_from_dates(self.anchor_dt, dt, self.curve_dc_type)
+#                                      for dt in flow_dts[1:]])
 
             accrual_factors = []
             for prev_dt, next_dt in zip(flow_dts[:-1], flow_dts[1:]):
@@ -612,7 +621,10 @@ class DiscountCurve:
         vector of dates. The time day count determines how dates get converted
         to years."""
 
-        times = times_from_dates(self.anchor_dt, dt, self.time_dc_type)
+        times = times_from_dates(self.anchor_dt,
+                                 dt,
+                                 self.curve_dc_type)
+
         dfs = self.df_t(times)
 
         if isinstance(dt, Date):
@@ -660,7 +672,7 @@ class DiscountCurve:
             self._df_dates,
             bumped_dfs,
             self._interp_type,
-            self.time_dc_type,
+            self.curve_dc_type,
         )
 
         return bumped_disc_curve
@@ -701,7 +713,7 @@ class DiscountCurve:
             df_dates=self._df_dates,
             df_values=dfs,
             interp_type=interp_type,
-            time_dc_type=self.time_dc_type,
+            curve_dc_type=self.curve_dc_type,
         )
 
         return bumped_curve
@@ -840,7 +852,7 @@ class DiscountCurve:
         else:
             s += label_to_string("INTERPOLATION TYPE", "N/A")
 
-        s += label_to_string("TIME DAY COUNT TYPE", (self.time_dc_type.name))
+        s += label_to_string("CURVE DAY COUNT TYPE", (self.curve_dc_type.name))
 
         return s
 

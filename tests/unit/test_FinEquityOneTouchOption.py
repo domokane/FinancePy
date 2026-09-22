@@ -223,7 +223,7 @@ def test_down_and_in_asset_at_expiry():
     )
 
     assert_close(v, 66.91760)
-    assert_close(v_mc, 66.66667)
+    assert_close(v_mc, 64.864)
 
 
 ########################################################################################
@@ -295,7 +295,7 @@ def test_up_and_in_asset_at_expiry():
     )
 
     assert_close(v, 74.38596)
-    assert_close(v_mc, 75.00000)
+    assert_close(v_mc, 73.66127)
 
 
 ########################################################################################

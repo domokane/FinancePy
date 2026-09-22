@@ -109,7 +109,7 @@ class BondParametricDiscountCurve(DiscountCurve):
         bonds: list,
         clean_prices: list | np.ndarray,
         curve_fit_type: CurveFitTypes,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         do_build: bool = True,
     ):
 
@@ -121,11 +121,11 @@ class BondParametricDiscountCurve(DiscountCurve):
         if not isinstance(curve_fit_type, CurveFitTypes):
             raise FinError("Invalid curve fit type.")
 
-        if not isinstance(time_dc_type, DayCountTypes):
+        if not isinstance(curve_dc_type, DayCountTypes):
             raise FinError("Invalid time day count type.")
 
         self.anchor_dt = anchor_dt
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
         self.curve_fit_type = curve_fit_type
 
         #######################################################################
@@ -181,7 +181,7 @@ class BondParametricDiscountCurve(DiscountCurve):
             t_mat = times_from_dates(
                 self.anchor_dt,
                 bond.maturity_dt,
-                self.time_dc_type,
+                self.curve_dc_type,
             )
 
             self._t_mats.append(t_mat)
@@ -336,7 +336,7 @@ class BondParametricDiscountCurve(DiscountCurve):
                     t = times_from_dates(
                         self.anchor_dt,
                         pmt_dt,
-                        self.time_dc_type,
+                        self.curve_dc_type,
                     )
 
                     times.append(t)

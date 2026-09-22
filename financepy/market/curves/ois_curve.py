@@ -112,7 +112,7 @@ class OISCurve(DiscountCurve):
         ois_swaps: list,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
         check_refit_flag: bool = False,
-        time_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
+        curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
     ):  # Set to True to test it works
         """Create an instance of an overnight index rate swap curve given a
         valuation date and a set of OIS rates. Some of these may
@@ -131,7 +131,7 @@ class OISCurve(DiscountCurve):
         self._interp_type = interp_type
         self.check_refit_flag = check_refit_flag
         self._interpolator = None
-        self.time_dc_type = time_dc_type
+        self.curve_dc_type = curve_dc_type
         self.build_curve()
 
     ####################################################################################
@@ -347,7 +347,7 @@ class OISCurve(DiscountCurve):
         self._interpolator = Interpolator(self._interp_type)
         self._times = np.array([])
         self._dfs = np.array([])
-        time_dc_type = self.time_dc_type
+        curve_dc_type = self.curve_dc_type
 
         # time zero is now.
         t_mat = 0.0
@@ -359,7 +359,7 @@ class OISCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
-            t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, time_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, curve_dc_type)
             #            t_mat = (depo.maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
@@ -372,8 +372,8 @@ class OISCurve(DiscountCurve):
             #            t_set = (fra.start_dt - self.anchor_dt) / G_DAYS_IN_YEAR
             #            t_mat = (fra.maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
-            t_set = times_from_dates(self.anchor_dt, fra.start_dt, time_dc_type)
-            t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, time_dc_type)
+            t_set = times_from_dates(self.anchor_dt, fra.start_dt, curve_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, curve_dc_type)
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -401,7 +401,7 @@ class OISCurve(DiscountCurve):
             # over a holiday as the maturity date is usually not adjusted CHECK
             maturity_dt = swap.fixed_leg.payment_dts[-1]
             #            t_mat = (maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
-            t_mat = times_from_dates(self.anchor_dt, maturity_dt, time_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, maturity_dt, curve_dc_type)
 
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
@@ -432,7 +432,7 @@ class OISCurve(DiscountCurve):
         self._interpolator = Interpolator(self._interp_type)
         self._times = np.array([])
         self._dfs = np.array([])
-        time_dc_type = self.time_dc_type
+        curve_dc_type = self.curve_dc_type
 
         # time zero is now.
         t_mat = 0.0
@@ -443,7 +443,7 @@ class OISCurve(DiscountCurve):
         for depo in self.used_deposits:
             df_settle = self.df(depo.start_dt)
             df_mat = depo.maturity_df() * df_settle
-            t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, time_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, curve_dc_type)
             #            t_mat = (depo.maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
@@ -456,8 +456,8 @@ class OISCurve(DiscountCurve):
             #            t_set = (fra.start_dt - self.anchor_dt) / G_DAYS_IN_YEAR
             #            t_mat = (fra.maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
-            t_set = times_from_dates(self.anchor_dt, fra.start_dt, time_dc_type)
-            t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, time_dc_type)
+            t_set = times_from_dates(self.anchor_dt, fra.start_dt, curve_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, curve_dc_type)
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -528,7 +528,7 @@ class OISCurve(DiscountCurve):
             swap_rate = swap.fixed_cpn
             maturity_dt = swap.adjusted_fixed_dts[-1]
             #            t_swap = (maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
-            t_swap = times_from_dates(self.anchor_dt, maturity_dt, time_dc_type)
+            t_swap = times_from_dates(self.anchor_dt, maturity_dt, curve_dc_type)
             swap_times.append(t_swap)
             swap_rates.append(swap_rate)
 
@@ -537,7 +537,7 @@ class OISCurve(DiscountCurve):
 
         for dt in cpn_dts[1:]:
             #            swap_time = (dt - self.anchor_dt) / G_DAYS_IN_YEAR
-            swap_time = times_from_dates(self.anchor_dt, dt, time_dc_type)
+            swap_time = times_from_dates(self.anchor_dt, dt, curve_dc_type)
             swap_rate = np.interp(swap_time, swap_times, swap_rates)
             interpolated_swap_rates.append(swap_rate)
             interpolated_swap_times.append(swap_time)
@@ -560,7 +560,7 @@ class OISCurve(DiscountCurve):
         for i in range(start_index, num_flows):
 
             dt = cpn_dts[i]
-            t_mat = times_from_dates(self.anchor_dt, dt, time_dc_type)
+            t_mat = times_from_dates(self.anchor_dt, dt, curve_dc_type)
             #            t_mat = (dt - self.anchor_dt) / G_DAYS_IN_YEAR
             swap_rate = interpolated_swap_rates[i]
             acc = accrual_factors[i - 1]

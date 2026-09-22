@@ -49,12 +49,12 @@ class InflationIndexCurve:
         if lag_in_months < 0:
             raise FinError("Lag must be positive.")
 
-        self.time_dc_type = DayCountTypes.ACT_365F
+        self.curve_dc_type = DayCountTypes.ACT_365F
         self.index_dts = np.array(index_dts)
         self.index_values = np.array(index_values)
         self.lag_in_months = lag_in_months
         self.base_dt = index_dts[0]
-        self.index_times = times_from_dates(self.base_dt, index_dts, self.time_dc_type)
+        self.index_times = times_from_dates(self.base_dt, index_dts, self.curve_dc_type)
 
         if test_monotonicity(self.index_times) is False:
             raise FinError("Times or dates are not sorted in increasing order")

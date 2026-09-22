@@ -26,7 +26,12 @@ from ...models.equity_asian_option_bs import value_curran
 from ...models.equity_asian_option_bs import value_turnbull_wakeman
 from ...models.equity_asian_option_bs import value_geometric
 
-########################################################################################
+from ...utils.check_values import check_curve_dt
+from ...utils.check_values import check_corr_matrix
+from ...utils.check_values import check_volatility
+from ...utils.check_values import check_stock_price
+from ...utils.check_values import check_strike_price
+from ...utils.helpers import option_years
 
 
 ########################################################################################
@@ -78,13 +83,15 @@ class EquityAsianOption:
         expiry_dt: Date,
         strike_price: float,
         opt_type: OptionTypes,
-        num_obs: int = 100,
+        num_obs_per_year: int = 100,
     ):
         """Create an EquityAsian option object which takes a start date for
         the averaging, an expiry date, a strike price, an OPTION_TYPE and a
         number of observations."""
 
         check_argument_types(self.__init__, locals())
+
+        check_strike_price(strike_price)
 
         if start_averaging_dt > expiry_dt:
             raise FinError("Averaging starts after expiry date")
@@ -93,7 +100,7 @@ class EquityAsianOption:
         self.expiry_dt = expiry_dt
         self.strike_price = float(strike_price)
         self.opt_type = opt_type
-        self.num_observations = num_obs
+        self.num_obs_per_year = num_obs_per_year
 
     ####################################################################################
 
@@ -124,6 +131,7 @@ class EquityAsianOption:
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
         check_stock_price(stock_price)
+        check_volatility(model.volatility)
 
         t_exp = option_years(value_dt, self.expiry_dt)
         t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
@@ -132,7 +140,7 @@ class EquityAsianOption:
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
         k = self.strike_price
-        n = self.num_observations
+        n = self.num_obs_per_year
         opt_type_value = self.opt_type.value
 
         if method == AsianOptionValuationTypes.GEOMETRIC:
@@ -168,6 +176,7 @@ class EquityAsianOption:
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
         check_stock_price(stock_price)
+        check_volatility(model.volatility)
 
         t_exp = option_years(value_dt, self.expiry_dt)
         t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
@@ -175,17 +184,14 @@ class EquityAsianOption:
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        tau = t_exp - t_avg
-
         volatility = model.volatility
 
         k = self.strike_price
-        n = self.num_observations
+        n = self.num_obs_per_year
 
         v = equity_asian_value_mc_numba(
             t_avg,
             t_exp,
-            tau,
             k,
             n,
             self.opt_type.value,
@@ -226,17 +232,14 @@ class EquityAsianOption:
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        tau = t_exp - t_avg
-
         k = self.strike_price
-        n = self.num_observations
+        n = self.num_obs_per_year
 
         volatility = model.volatility
 
         v = equity_asian_value_mc_fast_numba(
             t_avg,
             t_exp,
-            tau,
             k,
             n,
             self.opt_type.value,
@@ -253,33 +256,43 @@ class EquityAsianOption:
 
     ####################################################################################
 
-    def value_mc_fast_vc_numba(
+    def value_mc_fast_cv(
         self,
-        t_avg,
-        t_exp,
+        value_dt: Date,
         stock_price: float,
-        r: float,
-        q: float,
-        model,
-        num_paths: int,
-        seed: int,
-        accrued_average: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model,  # Model
+        num_paths,  # Numpaths integer
+        seed,
+        accrued_average,
     ):
         """Monte Carlo valuation of the Asian Average option using a control
         variate method that improves accuracy and reduces the variance of the
         price. This uses Numpy and Numba. This is the standard MC pricer."""
 
-        tau = t_exp - t_avg
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+        check_stock_price(stock_price)
+
+        t_exp = option_years(value_dt, self.expiry_dt)
+        t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
+
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
         k = self.strike_price
-        n = self.num_observations
+        n = self.num_obs_per_year
 
         volatility = model.volatility
 
         # For control variate we price a Geometric average option exactly
-        v_g_exact = self.value_geometric(
+        v_g_exact = value_geometric(
             t_avg,
             t_exp,
+            k,
+            n,
+            self.opt_type.value,
             stock_price,
             r,
             q,
@@ -290,7 +303,6 @@ class EquityAsianOption:
         v = equity_asian_value_mc_fast_cv_numba(
             t_avg,
             t_exp,
-            tau,
             k,
             n,
             self.opt_type.value,
@@ -314,7 +326,7 @@ class EquityAsianOption:
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
         s += label_to_string("OPTION_TYPE", self.opt_type)
-        s += label_to_string("NUM OBSERVATIONS", self.num_observations, "")
+        s += label_to_string("NUM OBSERVATIONS PER YEAR ", self.num_obs_per_year, "")
         return s
 
     ####################################################################################

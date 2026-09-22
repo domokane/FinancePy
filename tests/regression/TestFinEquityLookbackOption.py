@@ -14,6 +14,7 @@ from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from FinTestCases import FinTestCases, global_test_case_mode
 
+from financepy.models.black_scholes import BlackScholes
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -26,6 +27,7 @@ def test_equity_look_back_option():
     expiry_dt = Date(1, 1, 2016)
     stock_price = 100.0
     volatility = 0.3
+    model = BlackScholes(volatility)
     interest_rate = 0.05
     dividend_yield = 0.01
     num_paths_range = [10000]
@@ -56,7 +58,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_min,
             )
             start = time.time()
@@ -65,7 +67,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_min,
                 num_paths,
                 num_steps_per_year,
@@ -105,7 +107,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_min,
             )
             start = time.time()
@@ -114,7 +116,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_min,
                 num_paths,
                 num_steps_per_year,
@@ -154,7 +156,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_max,
             )
             start = time.time()
@@ -163,7 +165,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_max,
                 num_paths,
                 num_steps_per_year,
@@ -203,7 +205,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_max,
             )
             start = time.time()
@@ -212,7 +214,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_max,
                 num_paths,
                 num_steps_per_year,
@@ -257,7 +259,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_max,
             )
             start = time.time()
@@ -266,7 +268,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_max,
                 num_paths,
                 num_steps_per_year,
@@ -309,7 +311,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_max,
             )
             start = time.time()
@@ -318,7 +320,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_max,
                 num_paths,
                 num_steps_per_year,
@@ -361,7 +363,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_max,
             )
             start = time.time()
@@ -370,7 +372,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_max,
                 num_paths,
                 num_steps_per_year,
@@ -413,7 +415,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_min,
             )
             start = time.time()
@@ -422,7 +424,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_min,
                 num_paths,
                 num_steps_per_year,
@@ -465,7 +467,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_min,
             )
             start = time.time()
@@ -474,7 +476,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_min,
                 num_paths,
                 num_steps_per_year,
@@ -517,7 +519,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_min,
             )
             start = time.time()
@@ -526,7 +528,7 @@ def test_equity_look_back_option():
                 stock_price,
                 discount_curve,
                 dividend_curve,
-                volatility,
+                model,
                 stock_min,
                 num_paths,
                 num_steps_per_year,
@@ -566,23 +568,24 @@ def test_example():
     discount_curve = FlatDiscountCurve(value_dt, interest_rate)
     dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
-    volatilities = [0.30]
+    volatility = 0.30
+    model = BlackScholes(volatility)
 
     test_cases.header("VALUE")
-    for vol in volatilities:
-        v = lookback_call.value(
-            value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
-            vol,
-            stock_min_max,
-        )
-        test_cases.print(v)
+
+    v = lookback_call.value(
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        model,
+        stock_min_max,
+    )
+    test_cases.print(v)
 
 
 ########################################################################################
 
 test_example()
-# test_equity_look_back_option()
+test_equity_look_back_option()
 test_cases.compare_test_cases()

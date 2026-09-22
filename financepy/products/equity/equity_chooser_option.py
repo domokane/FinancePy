@@ -124,6 +124,8 @@ class EquityChooserOption(EquityOption):
         if value_dt > self.put_expiry_dt:
             raise FinError("Valuation date after put expiry date.")
 
+        scalar_input = np.isscalar(stock_price)
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
@@ -232,6 +234,9 @@ class EquityChooserOption(EquityOption):
 
         #        print(v, w)
 
+        if scalar_input:
+            return float(v[0])
+
         return v
 
     ###########################################################################
@@ -263,24 +268,39 @@ class EquityChooserOption(EquityOption):
         vol = max(vol, 1e-6)
 
         df_t_choose = discount_curve.df(self.choose_dt)
-        df_c = discount_curve.df(self.call_expiry_dt)
-        df_p = discount_curve.df(self.put_expiry_dt)
-
         dq_t_choose = dividend_curve.df(self.choose_dt)
-        dq_c = dividend_curve.df(self.call_expiry_dt)
-        dq_p = dividend_curve.df(self.put_expiry_dt)
 
         if t_c > t_choose:
-            rfc = -np.log(df_c / df_t_choose) / (t_c - t_choose)
-            qfc = -np.log(dq_c / dq_t_choose) / (t_c - t_choose)
+
+            rfc = discount_curve.fwd_zero_rate_cc(
+                self.choose_dt,
+                self.call_expiry_dt,
+            )
+
+            qfc = dividend_curve.fwd_zero_rate_cc(
+                self.choose_dt,
+                self.call_expiry_dt,
+            )
+
         else:
+
             rfc = 0.0
             qfc = 0.0
 
         if t_p > t_choose:
-            rfp = -np.log(df_p / df_t_choose) / (t_p - t_choose)
-            qfp = -np.log(dq_p / dq_t_choose) / (t_p - t_choose)
+
+            rfp = discount_curve.fwd_zero_rate_cc(
+                self.choose_dt,
+                self.put_expiry_dt,
+            )
+
+            qfp = dividend_curve.fwd_zero_rate_cc(
+                self.choose_dt,
+                self.put_expiry_dt,
+            )
+
         else:
+
             rfp = 0.0
             qfp = 0.0
 
