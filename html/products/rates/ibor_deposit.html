@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Ibor Deposit - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Rates</a> &rsaquo; Ibor Deposit</nav>
+<h1>Ibor Deposit</h1>
+
+<p class="source-name">
+financepy.products.rates.ibor_deposit
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>IborDeposit</h2>
+
+<div class="signature">
+
+<code>
+IborDeposit(start_dt: financepy.utils.date.Date, maturity_dt_or_tenor: financepy.utils.date.Date | str, deposit_rate: float, accrual_dc_type: financepy.utils.day_count.DayCountTypes, notional: float = 100.0, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type: financepy.utils.calendar.BusDayAdjustTypes = &lt;BusDayAdjustTypes.MODIFIED_FOLLOWING: 3&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">An Ibor deposit is an agreement to borrow money interbank at the Ibor
+fixing rate starting on the start date and repaid on the maturity date
+with the interest amount calculated according to a day count convention and
+dates calculated according to a calendar and business day adjustment rule.
+
+Care must be taken to calculate the correct start (settlement) date. Start
+with the trade (value) date which is typically today, we may need to add on
+a number of business days (spot days) to get to the settlement date. The
+maturity date is then calculated by adding on the deposit tenor/term to the
+settlement date and adjusting for weekends and holidays according to the
+calendar and adjustment type.
+
+Note that for over-night (ON) depos the settlement date is
+today with maturity in one business day. For tomorrow-next (TN) depos the
+settlement is in one business day with maturity on the following business
+day. For later maturity deposits, settlement is usually in 1-3 business
+days. The number of days depends on the currency and jurisdiction of the
+deposit contract.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>maturity_df</h4>
+
+
+<div class="signature">
+
+<code>
+maturity_df(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Returns the maturity date discount factor that would allow the
+Libor curve to reprice the contractual market deposit rate. Note that
+this is a forward discount factor that starts on settlement date.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(self, value_dt: financepy.utils.date.Date, libor_curve)
+</code>
+
+</div>
+
+
+<div class="docstring">Determine the value of an existing Libor Deposit contract given a
+valuation date and a Libor curve. This is simply the PV of the future
+repayment plus interest discounted on the current Libor curve.</div>
+
+</div>
+
+<div class="member">
+
+<h4>valuation_details</h4>
+
+
+<div class="signature">
+
+<code>
+valuation_details(self, value_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, index_curve: financepy.market.curves.discount_curve.DiscountCurve = None)
+</code>
+
+</div>
+
+
+<div class="docstring">A long-hand method that returns various details relevant to valuation
+in a dictionary. Slower than value(...) so should not be used when
+performance is important
+
+We want thre output dictionary to have  the same labels for different
+benchmarks (depos, fras, swaps) because we want to present them
+together so please do not stick new outputs into one of them only
+
+TODO: make a test of this</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_payments</h4>
+
+
+<div class="signature">
+
+<code>
+print_payments(self, value_dt: financepy.utils.date.Date)
+</code>
+
+</div>
+
+
+<div class="docstring">Print the date and size of the future repayment.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

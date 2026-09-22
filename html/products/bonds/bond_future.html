@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Bond Future - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Bonds</a> &rsaquo; Bond Future</nav>
+<h1>Bond Future</h1>
+
+<p class="source-name">
+financepy.products.bonds.bond_future
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>BondFuture</h2>
+
+<div class="signature">
+
+<code>
+BondFuture(ticker_name: str, first_delivery_dt: financepy.utils.date.Date, last_delivery_dt: financepy.utils.date.Date, contract_size: int, cpn: float)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class for managing futures contracts on government bonds that follows
+CME conventions and related analytics.
+
+Attributes
+----------
+ticker_name : str
+    Identifier name of the futures contract.
+first_delivery_dt : Date
+    The first delivery date of the futures contract (usually IMM date).
+last_delivery_dt : Date
+    The last delivery date of the futures contract.
+contract_size : int
+    Contract size in currency units (e.g. \$100,000).
+cpn : float
+    Contract standard coupon rate, used for conversion factor calculations.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>conversion_factor</h4>
+
+
+<div class="signature">
+
+<code>
+conversion_factor(self, bond: financepy.products.bonds.bond.Bond)
+</code>
+
+</div>
+
+
+<div class="docstring">Compute the CME-style conversion factor for a given bond.
+
+The conversion factor normalizes bonds with different coupons and
+maturities to a standard contract coupon and maturity schedule.
+
+Steps:
+- Calculate years to maturity from 1st delivery date to bond maturity.
+- Round this maturity to the nearest 3-month (quarter year) multiple.
+- Construct a hypothetical bond starting on the first delivery date
+with the standard contract coupon and rounded maturity.
+- Calculate the clean price of this hypothetical bond yielding the
+contract coupon.
+- Normalize and round to 4 decimal places.
+
+Parameters
+----------
+bond : Bond
+    The deliverable bond for which conversion factor is calculated.
+
+Returns
+-------
+float
+    Conversion factor rounded to 4 decimals.</div>
+
+</div>
+
+<div class="member">
+
+<h4>principal_invoice</h4>
+
+
+<div class="signature">
+
+<code>
+principal_invoice(self, bond: financepy.products.bonds.bond.Bond, futures_price: float) -&gt; float
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the principal invoice amount for delivering a bond.
+
+CME defines this as contract size × futures price × conversion factor / 100.
+
+Parameters
+----------
+bond : Bond
+    The deliverable bond.
+futures_price : float
+    The quoted futures price (in percentage points).
+
+Returns
+-------
+float
+    Principal invoice amount in currency units.</div>
+
+</div>
+
+<div class="member">
+
+<h4>total_invoice_amount</h4>
+
+
+<div class="signature">
+
+<code>
+total_invoice_amount(self, settle_dt: financepy.utils.date.Date, bond: financepy.products.bonds.bond.Bond, futures_price: float) -&gt; float
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate total invoice amount paid on delivery, including
+accrued interest.
+
+Parameters
+----------
+settle_dt : Date
+    Settlement date when the invoice is paid.
+bond : Bond
+    The deliverable bond.
+futures_price : float
+    Quoted futures price.
+
+Returns
+-------
+float
+    Total invoice amount including accrued interest.</div>
+
+</div>
+
+<div class="member">
+
+<h4>delivery_years</h4>
+
+
+<div class="signature">
+
+<code>
+delivery_years(self, bond: financepy.products.bonds.bond.Bond) -&gt; float
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the fractional years from the first delivery date to the
+bond maturity.
+
+Uses ACT/ACT ISDA day count convention.
+
+Parameters
+----------
+bond : Bond
+    The deliverable bond.
+
+Returns
+-------
+float
+    Fractional years (e.g., 5.25 years).</div>
+
+</div>
+
+<div class="member">
+
+<h4>gross_basis</h4>
+
+
+<div class="signature">
+
+<code>
+gross_basis(self, bond: financepy.products.bonds.bond.Bond, clean_price: float, futures_price: float) -&gt; float
+</code>
+
+</div>
+
+
+<div class="docstring">Compute the gross basis: what is received on delivery vs. bond price.
+
+gross_basis = clean_price - (conversion_factor × futures_price)
+
+Parameters
+----------
+bond : Bond
+    The deliverable bond.
+clean_price : float
+    The current clean price of the bond.
+futures_price : float
+    The quoted futures price.
+
+Returns
+-------
+float
+    Gross basis value.</div>
+
+</div>
+
+<div class="member">
+
+<h4>net_basis</h4>
+
+
+<div class="signature">
+
+<code>
+net_basis(self, bond, settle_dt: financepy.utils.date.Date, clean_price: float, futures_price: float, repo_rate: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Compute net basis, adjusting for financing cost (repo rate).
+
+net_basis = forward_price - (conversion_factor × futures_price)
+
+Parameters
+----------
+bond : Bond
+    Deliverable bond.
+settle_dt : Date
+    Settlement date.
+clean_price : float
+    Current bond clean price.
+futures_price : float
+    Futures contract price.
+repo_rate : float
+    Repo financing rate (annualized decimal, e.g. 0.02 for 2%).
+
+Returns
+-------
+float
+    Net basis value.
+
+Raises
+------
+ValueError
+    If any price or repo_rate is negative.</div>
+
+</div>
+
+<div class="member">
+
+<h4>implied_repo_rate</h4>
+
+
+<div class="signature">
+
+<code>
+implied_repo_rate(self, bond: financepy.products.bonds.bond.Bond, settle_dt: financepy.utils.date.Date, clean_price: float, futures_price: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate implied repo rate consistent with futures price.
+
+This is the IRR of financing the bond purchase and delivering at
+futures price, accounting for accrued interest and coupon payments
+between settle and delivery.
+
+Parameters
+----------
+bond : Bond
+    Deliverable bond.
+settle_dt : Date
+    Settlement date.
+clean_price : float
+    Current clean price of bond.
+futures_price : float
+    Futures price.
+
+Returns
+-------
+float
+    Implied repo rate (annualized decimal).
+
+Raises
+------
+ValueError
+    If clean_price or futures_price is negative.</div>
+
+</div>
+
+<div class="member">
+
+<h4>ctd</h4>
+
+
+<div class="signature">
+
+<code>
+ctd(self, bonds: list, bond_clean_prices: list, futures_price: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Determine the Cheapest to Deliver (CTD) bond among candidates.
+
+The CTD is the bond with the lowest gross basis
+(= clean price - cf × futures price).
+
+Parameters
+----------
+bonds : list of Bond
+    List of deliverable bonds.
+bond_clean_prices : list of float
+    Corresponding clean prices of the bonds.
+futures_price : float
+    Futures contract price.
+
+Returns
+-------
+Bond
+    The bond identified as Cheapest to Deliver.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

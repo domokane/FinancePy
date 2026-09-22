@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Ibor Curve Risk Engine - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Market</a> &rsaquo; <a href="index.html">Curves</a> &rsaquo; Ibor Curve Risk Engine</nav>
+<h1>Ibor Curve Risk Engine</h1>
+
+<p class="source-name">
+financepy.market.curves.ibor_curve_risk_engine
+</p>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>carry_rolldown_report</h3>
+
+<div class="signature">
+
+<code>
+carry_rolldown_report(base_curve: financepy.market.curves.discount_curve.DiscountCurve, grid_last_date: financepy.utils.date.Date, grid_bucket_tenor: str | financepy.utils.tenor.Tenor, trades: list, trade_labels: list = None, bump_size=0.0001)
+</code>
+
+</div>
+
+<div class="docstring">Generate carry and rolldown risk report based on the sensitivity of
+trades to bucketed shocks of the instantaneous (ON) forward rates. Here
+shock_i is applied to the ON forward rates over [t_i, t_{i+1}] where {t_i}
+is a time grid from base_curve.value_dt to grid_last_date with
+buckets of size grid_bucket_tenor
+
+Args:
+    base_curve (DiscountCurve): base curve to apply bumps to
+    grid_last_date: the last date for the grid that defines shocks
+    grid_bucket_tenor (str): spacing of grid points as tenor string e.g&#x27;3M&#x27;
+    trades (list): a list of trades to calculate deltas of
+    trade_labels (list, optional): trade labels to identify trades in the
+    output. Defaults to None in which case these are auto generted
+    bump_size (float, optional): How big of a bump to apply to bechmarks.
+    Output always expressed as change in value per 1 bp.
+    Defaults to 1.0*G_BASIS_POINT.
+
+Returns:
+    (dict, Dataframe): (base_values, risk_report)
+        base_value is a dictionary with trade_labels as keys and base
+        trade values as values
+        risk_report is a dataframe with time buickets for rows and
+        carry/rolldown and DV01 columns
+        per trade, and a total for all trades for each measure.
+        Columns marked &#x27;ROLL&#x27; have carry in the
+        first row and rolldown in all the others</div>
+
+</div>
+
+<div class="member">
+
+<h3>forward_rate_risk_report</h3>
+
+<div class="signature">
+
+<code>
+forward_rate_risk_report(base_curve: financepy.market.curves.discount_curve.DiscountCurve, grid_last_date: financepy.utils.date.Date, grid_bucket_tenor: str, trades: list, trade_labels: list = None, bump_size=0.0001)
+</code>
+
+</div>
+
+<div class="docstring">Generate forward rate deltas (forward delta ladder) risk report, which
+is the sensitivity of trades to bucketed shocks of the instantaneous (ON)
+forward rates. Here shock_i is applied to the ON forward rates over
+[t_i, t_{i+1}] where {t_i} is a time grid from base_curve.value_dt
+to grid_last_date with buckets of size grid_bucket_tenor
+
+Args:
+    base_curve (DiscountCurve): base curve to apply bumps to
+    grid_last_date: the last date for the grid that defines shocks
+    grid_bucket_tenor (str): spacing of grid points as tenor string eg &#x27;3M&#x27;
+    trades (list): a list of trades to calculate deltas of
+    trade_labels (list, optional): trade labels to identify trades in
+    output. Defaults to None in which case these are auto generted
+    bump_size (float, optional): How big of a bump to apply to bechmarks.
+    Output always expressed as change in value per 1 bp.
+    Defaults to 1.0*G_BASIS_POINT.
+
+Returns:
+    (dict, Dataframe): (base_values, risk_report)
+        base_value is a dictionary with trade_labels as keys and base
+        trade values as values
+        risk_report is a dataframe with bump details for rows and a
+        column of forward rate deltas per trade, and a total for all trades</div>
+
+</div>
+
+<div class="member">
+
+<h3>forward_rate_risk_report_custom_grid</h3>
+
+<div class="signature">
+
+<code>
+forward_rate_risk_report_custom_grid(base_curve: financepy.market.curves.discount_curve.DiscountCurve, grid: List[financepy.utils.date.Date], trades: list, grid_labels: list = None, trade_labels: list = None, bump_size=0.0001)
+</code>
+
+</div>
+
+<div class="docstring">Generate forward rate deltas risk report, which is the sensitivity of
+trades to bucketed shocks of the instantaneous (ON) forward rates. Here
+shock_i is applied to the ON forward rates
+over [t_i, t_{i+1}] where {t_i} is the &#x27;grid&#x27; argument
+
+Args:
+    base_curve (DiscountCurve): base curve to apply bumps to
+    grid: Date grid that defines ON forward rate bumps. Note that
+    curve.value_dt must be explictly included (if so desired)
+    trades (list): a list of trades to calculate deltas of
+    trade_labels (list, optional): trade labels to identify trades in the
+    output. Defaults to None in which case these are auto generted
+    bump_size (float, optional): How big of a bump to apply to bechmarks.
+    Output always expressed as change in value per 1 bp.
+    Defaults to 1.0*G_BASIS_POINT.
+
+Returns:
+    (dict, Dataframe): (base_values, risk_report)
+        base_value is a dictionary with trade_labels as keys and base
+        trade values as values
+        risk_report is a dataframe with bump details for rows and a
+        column of forward rate deltas per trade, and a total for all trades</div>
+
+</div>
+
+<div class="member">
+
+<h3>par_rate_risk_report</h3>
+
+<div class="signature">
+
+<code>
+par_rate_risk_report(base_curve: financepy.market.curves.ibor_single_curve.IborSingleCurve, trades: list, trade_labels: list = None, bump_size=0.0001)
+</code>
+
+</div>
+
+<div class="docstring">Calculate deltas (change in value to 1bp bump) of the trades to all
+benchmarks in the base curve. Supported trades are depos, fras, swaps.
+trade_labels are used to identify trades in the output, if not provided
+simple ones are generated
+
+Args:
+    base_curve (IborSingleCurve): Base curve to be bumped
+    trades (list): a list of trades to calculate deltas of
+    trade_labels (list, optional): trade labels to identify trades in
+    the output. Defaults to None in which case these are auto generted
+    bump_size (float, optional): How big of a bump to apply to bechmarks.
+    Output always expressed as change in value per 1 bp.
+    Defaults to 1.0*G_BASIS_POINT.
+
+Returns:
+    (base_values, risk_report):
+        base_value is a dictionary with trade_labels as keys and base
+        trade values as values risk_report is a dataframe with benchmarks
+        as rows and a column of par deltas per trade, and a total for
+        all trades</div>
+
+</div>
+
+<div class="member">
+
+<h3>parallel_shift_ladder_report</h3>
+
+<div class="signature">
+
+<code>
+parallel_shift_ladder_report(base_curve: financepy.market.curves.discount_curve.DiscountCurve, curve_shifts: numpy.ndarray, trades: list, trade_labels: list = None)
+</code>
+
+</div>
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

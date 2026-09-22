@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Bond - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Bonds</a> &rsaquo; Bond</nav>
+<h1>Bond</h1>
+
+<p class="source-name">
+financepy.products.bonds.bond
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>Bond</h2>
+
+<div class="signature">
+
+<code>
+Bond(issue_dt: financepy.utils.date.Date, maturity_dt: financepy.utils.date.Date, coupon: float, freq_type: financepy.utils.frequency.FrequencyTypes, accrual_dc_type: financepy.utils.day_count.DayCountTypes, ex_div_days: int = 0, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type=&lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type=&lt;DateGenRuleTypes.BACKWARD: 2&gt;, cpn_type=&lt;CouponType.FIXED: 0&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class for fixed coupon bonds and performing related analytics. These
+are bullet bonds which means they have regular coupon payments of a known
+size that are paid on known dts plus a payment of par at maturity.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>times</h4>
+
+
+<div class="signature">
+
+<code>
+times(self, settle_dt, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Years from settlement to payments using day count convention</div>
+
+</div>
+
+<div class="member">
+
+<h4>flows</h4>
+
+
+<div class="signature">
+
+<code>
+flows(self, settle_dt)
+</code>
+
+</div>
+
+
+<div class="docstring">Times from settlement to payments</div>
+
+</div>
+
+<div class="member">
+
+<h4>reset_flows</h4>
+
+
+<div class="signature">
+
+<code>
+reset_flows(self, cpn_dts: List[financepy.utils.date.Date], payment_dts: List[financepy.utils.date.Date], flow_amounts: numpy.ndarray)
+</code>
+
+</div>
+
+
+<div class="docstring">Set the flows of the bond externally. Coupon dates are for accrued
+while payment dates are calendar adjusted. Flows are on payment dates</div>
+
+</div>
+
+<div class="member">
+
+<h4>dirty_price_from_ytm</h4>
+
+
+<div class="signature">
+
+<code>
+dirty_price_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the dirty price of bond from its yield to maturity. This
+function is vectorised with respect to the yield input. It implements
+a number of standard conventions for calculating the YTM.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dirty_price_from_ytm_vector</h4>
+
+
+<div class="signature">
+
+<code>
+dirty_price_from_ytm_vector(self, settle_dts: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, &lt;class &#x27;list&#x27;&gt;), ytms: (&lt;class &#x27;float&#x27;&gt;, &lt;class &#x27;list&#x27;&gt;, &lt;class &#x27;numpy.ndarray&#x27;&gt;), convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate dirty prices for vectors of settlement dates or yields.</div>
+
+</div>
+
+<div class="member">
+
+<h4>forward_price</h4>
+
+
+<div class="signature">
+
+<code>
+forward_price(self, settle_dt: financepy.utils.date.Date, forward_dt: financepy.utils.date.Date, clean_price: float, repo_rate: float, repo_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>principal</h4>
+
+
+<div class="signature">
+
+<code>
+principal(self, settle_dt: financepy.utils.date.Date, ytm: float, face: float, convention: financepy.utils.global_types.YTMCalcType)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the principal value of the bond based on the face
+amount from its discount margin and making assumptions about the
+future Ibor rates.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dollar_duration</h4>
+
+
+<div class="signature">
+
+<code>
+dollar_duration(self, settle_dt: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, typing.List), ytm: (&lt;class &#x27;float&#x27;&gt;, typing.List), convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate dollar duration from a 1bp bumped-yield DV01.
+
+Dollar duration is the dirty-price change for a 100bp change in yield,
+approximated as:
+
+    dollar_duration = 10000 * DV01
+
+where DV01 is the positive dirty-price change for a +1bp yield shift.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dv01</h4>
+
+
+<div class="signature">
+
+<code>
+dv01(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Change in dirty price for a +1 basis point increase in yield.
+Bloomberg-style DV01 / PV01 is positive for a long fixed-rate bond.</div>
+
+</div>
+
+<div class="member">
+
+<h4>macaulay_duration</h4>
+
+
+<div class="signature">
+
+<code>
+macaulay_duration(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the Macaulay duration of the bond on a settlement date
+given its yield to maturity.</div>
+
+</div>
+
+<div class="member">
+
+<h4>modified_duration</h4>
+
+
+<div class="signature">
+
+<code>
+modified_duration(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the modified duration of the bond on a settlement
+date given its yield to maturity.</div>
+
+</div>
+
+<div class="member">
+
+<h4>theta</h4>
+
+
+<div class="signature">
+
+<code>
+theta(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;, day_step: int = 1)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the change in the dirty price due to moving calendar time
+i.e. the settlement date, forward by day_step days.</div>
+
+</div>
+
+<div class="member">
+
+<h4>key_rate_durations_zero_tent</h4>
+
+
+<div class="signature">
+
+<code>
+key_rate_durations_zero_tent(self, settle_dt: financepy.utils.date.Date, zero_curve, key_rate_tenors: list = None, shift: float = None)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate key-rate durations using the textbook zero-rate tent formulation.
+
+This method perturbs the zero curve directly with piecewise-linear
+tent functions:
+    - interior key rates have triangular weights
+    - the first key rate is flat to the left
+    - the last key rate is flat to the right
+
+Parameters
+----------
+settle_dt : Date
+    Settlement date.
+zero_curve : DiscountCurve
+    Base zero/discount curve used for valuation. It must provide
+    discount factors through df(date).
+key_rate_tenors : list of float, optional
+    Key-rate maturities in years. If None, defaults to
+    [0.5, 1, 2, 3, 5, 7, 10, 20, 30].
+shift : float, optional
+    Size of the zero-rate bump. If None, defaults to 1 bp = 0.0001.
+
+Returns
+-------
+tuple
+    (key_rate_tenors, key_rate_durations)
+
+Notes
+-----
+The bumped zero curve is defined by
+
+    z_i^{up/down}(t) = z(t) +/- shift * w_i(t)
+
+where w_i(t) is the tent weight for key node i.
+
+This implementation assumes continuously-compounded zero rates:
+    z(t) = -log(df(t))/t
+
+For t = 0, the bump is taken to be zero.</div>
+
+</div>
+
+<div class="member">
+
+<h4>key_rate_durations</h4>
+
+
+<div class="signature">
+
+<code>
+key_rate_durations(self, settle_dt: financepy.utils.date.Date, ytm: float, key_rate_tenors: list = None, shift: float = None, rates: list = None)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculates the key rate durations for a bond.
+
+Parameters
+----------
+settle_dt : FinancePy Date object
+    The settlement date.
+ytm : float
+    The yield to maturity.
+key_rate_tenors : list of float, optional
+    The tenors of the key rates. If None, defaults to
+    [0.5, 1, 2, 3, 5, 7, 10, 20, 30].
+shift : float, optional
+    The shift used to calculate the key rate durations.
+    If None, defaults to 0.0001.
+rates : list of float, optional
+    Corresponding yield curve data aligned with key_rate_tenors.
+    If None, a flat yield curve at `ytm` is used.
+
+Returns
+-------
+tuple of (numpy array of float, numpy array of float)
+    A tuple containing the key rate tenors and the key rate durations.</div>
+
+</div>
+
+<div class="member">
+
+<h4>convexity_from_ytm</h4>
+
+
+<div class="signature">
+
+<code>
+convexity_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the bond convexity from the yield to maturity. This
+function is vectorised with respect to the yield input. This is defined
+as 1/P_D partial 2 P_D / partial dy 2</div>
+
+</div>
+
+<div class="member">
+
+<h4>clean_price_from_ytm</h4>
+
+
+<div class="signature">
+
+<code>
+clean_price_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the bond clean price from the yield to maturity. This
+function is vectorised with respect to the yield input.</div>
+
+</div>
+
+<div class="member">
+
+<h4>clean_price_from_discount_curve</h4>
+
+
+<div class="signature">
+
+<code>
+clean_price_from_discount_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the clean bond value using some discount curve to
+present-value the bond&#x27;s cash flows back to the curve anchor date and
+not to the settlement date.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dirty_price_from_discount_curve</h4>
+
+
+<div class="signature">
+
+<code>
+dirty_price_from_discount_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>yield_to_maturity</h4>
+
+
+<div class="signature">
+
+<code>
+yield_to_maturity(self, settle_dt: financepy.utils.date.Date, clean_price: int | float | list | numpy.ndarray, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.US_TREASURY: 3&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the bond&#x27;s yield to maturity by solving the price
+yield relationship using a one-dimensional root solver.</div>
+
+</div>
+
+<div class="member">
+
+<h4>current_yield</h4>
+
+
+<div class="signature">
+
+<code>
+current_yield(self, settle_dt: financepy.utils.date.Date, clean_price: float | list | numpy.ndarray)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the bond&#x27;s simple yield.</div>
+
+</div>
+
+<div class="member">
+
+<h4>accrued_interest</h4>
+
+
+<div class="signature">
+
+<code>
+accrued_interest(self, settle_dt: financepy.utils.date.Date, face: float = 100.0)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the amount of coupon that has accrued between the
+previous coupon date and the settlement date. Note that for some day
+count schemes (such as 30E/360) this is not actually the number of days
+between the previous coupon payment date and settlement date. If the
+bond trades with ex-coupon dates then you need to use the number of
+days before the coupon date the ex-coupon date is. You can specify the
+calendar to be used in the bond constructor - NONE means only calendar
+days, WEEKEND is only weekends, or you can specify a country calendar
+for business days.</div>
+
+</div>
+
+<div class="member">
+
+<h4>asset_swap_spread</h4>
+
+
+<div class="signature">
+
+<code>
+asset_swap_spread(self, settle_dt: financepy.utils.date.Date, clean_price: float, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, swap_float_day_count_convention_type=&lt;DayCountTypes.ACT_360: 8&gt;, swap_float_frequency_type=&lt;FrequencyTypes.SEMI_ANNUAL: 2&gt;, swap_float_calendar_type=&lt;CalendarTypes.WEEKEND: 2&gt;, swap_float_bus_day_adjust_rule_type=&lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, swap_float_date_gen_rule_type=&lt;DateGenRuleTypes.BACKWARD: 2&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the par asset swap spread of the bond. The discount curve
+is an Ibor curve that is passed in. This function is vectorised with
+respect to the clean price.</div>
+
+</div>
+
+<div class="member">
+
+<h4>z_spread</h4>
+
+
+<div class="signature">
+
+<code>
+z_spread(self, settle_dt: financepy.utils.date.Date, clean_price: float, discount_curve: financepy.market.curves.discount_curve.DiscountCurve)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the z-spread of the bond. The discount curve
+is a Ibor curve that is passed in.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dirty_price_from_oas</h4>
+
+
+<div class="signature">
+
+<code>
+dirty_price_from_oas(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, oas: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the price of the bond by adding a spread (OAS)
+to the curve.</div>
+
+</div>
+
+<div class="member">
+
+<h4>option_adjusted_spread</h4>
+
+
+<div class="signature">
+
+<code>
+option_adjusted_spread(self, settle_dt: financepy.utils.date.Date, clean_price: float, discount_curve: financepy.market.curves.discount_curve.DiscountCurve)
+</code>
+
+</div>
+
+
+<div class="docstring">Return OAS for bullet bond given settlement date, clean bond price
+and the discount relative to which the spread is to be computed.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dirty_price_from_survival_curve</h4>
+
+
+<div class="signature">
+
+<code>
+dirty_price_from_survival_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, survival_curve: financepy.market.curves.discount_curve.DiscountCurve, recovery_rate: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate discounted present value of flows assuming default model.
+The survival curve treats the coupons as zero recovery payments while
+the recovery fraction of the par amount is paid at default. For the
+defaulting principal we discretize the time steps using the coupon
+payment times. A finer discretization may handle the time value with
+more accuracy. I reduce any error by averaging period start and period
+end payment present values.</div>
+
+</div>
+
+<div class="member">
+
+<h4>clean_price_from_survival_curve</h4>
+
+
+<div class="signature">
+
+<code>
+clean_price_from_survival_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, survival_curve: financepy.market.curves.discount_curve.DiscountCurve, recovery_rate: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate clean price value of flows assuming default model.
+The survival curve treats the coupons as zero recovery payments while
+the recovery fraction of the par amount is paid at default.</div>
+
+</div>
+
+<div class="member">
+
+<h4>calc_ror</h4>
+
+
+<div class="signature">
+
+<code>
+calc_ror(self, begin_dt: financepy.utils.date.Date, end_dt: financepy.utils.date.Date, begin_ytm: float, end_ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.US_STREET: 2&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the rate of total return(capital return and interest) given a
+BUY YTM and a SELL YTM of this bond.
+This function computes the dirty prices at buying and selling, plus the
+coupon payments during the period.
+It returns a tuple which includes a simple rate of return, a compounded
+IRR and the PnL.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_payments</h4>
+
+
+<div class="signature">
+
+<code>
+print_payments(self, settle_dt: financepy.utils.date.Date, face: float = 100)
+</code>
+
+</div>
+
+
+<div class="docstring">Print a list of the unadjusted coupon dts and the adjusted
+payment dates used in the analytic calculations for the bond.</div>
+
+</div>
+
+<div class="member">
+
+<h4>npv</h4>
+
+
+<div class="signature">
+
+<code>
+npv(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, face: float = 100)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate full NPV of bond.</div>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>CouponType</h2>
+
+<div class="signature">
+
+<code>
+CouponType(*values)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: Enum</div>
+
+<div class="docstring">Create a collection of name/value pairs.
+
+Example enumeration:
+
+&gt;&gt;&gt; class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+
+Access them by:
+
+- attribute access:
+
+  &gt;&gt;&gt; Color.RED
+  &lt;Color.RED: 1&gt;
+
+- value lookup:
+
+  &gt;&gt;&gt; Color(1)
+  &lt;Color.RED: 1&gt;
+
+- name lookup:
+
+  &gt;&gt;&gt; Color[&#x27;RED&#x27;]
+  &lt;Color.RED: 1&gt;
+
+Enumerations can be iterated over, and know how many members they have:
+
+&gt;&gt;&gt; len(Color)
+3
+
+&gt;&gt;&gt; list(Color)
+[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
+
+Methods can be added to enumerations, and members can have their own
+attributes -- see the documentation for details.</div>
+
+
+
+</section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>validate_price</h3>
+
+<div class="signature">
+
+<code>
+validate_price(px)
+</code>
+
+</div>
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h3>validate_yield</h3>
+
+<div class="signature">
+
+<code>
+validate_yield(ytm)
+</code>
+
+</div>
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h3>vectorise_price</h3>
+
+<div class="signature">
+
+<code>
+vectorise_price(price)
+</code>
+
+</div>
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

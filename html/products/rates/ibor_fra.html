@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Ibor Fra - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Rates</a> &rsaquo; Ibor Fra</nav>
+<h1>Ibor Fra</h1>
+
+<p class="source-name">
+financepy.products.rates.ibor_fra
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>IborFRA</h2>
+
+<div class="signature">
+
+<code>
+IborFRA(start_dt: financepy.utils.date.Date, maturity_dt_or_tenor: financepy.utils.date.Date | str, fra_rate: float, accrual_dc_type: financepy.utils.day_count.DayCountTypes, notional: float = 100.0, pay_fixed_rate: bool = True, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type: financepy.utils.calendar.BusDayAdjustTypes = &lt;BusDayAdjustTypes.MODIFIED_FOLLOWING: 3&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class for managing LIBOR forward rate agreements. A forward rate
+agreement is an agreement to exchange a fixed pre-agreed rate for a
+floating rate linked to LIBOR that is not known until some specified
+future fixing date. The FRA payment occurs on or soon after this date
+on the FRA settlement date. Typically the timing gap is two days.
+
+A FRA is used to hedge a Ibor quality loan or lend of some agreed
+notional amount. This period starts on the settlement date of the
+FRA and ends on the maturity date of the FRA. For example a 1x4 FRA
+relates to a Ibor starting in 1 month for a loan period ending in 4
+months. Hence it links to 3-month Ibor rate. The amount received by a
+payer of fixed rate at settlement is:
+
+    acc(1,2) * (Ibor(1,2) - FRA RATE) / (1 + acc(0,1) x Ibor(0,1))
+
+So the value at time 0 is
+
+    acc(1,2) * (FWD Ibor(1,2) - FRA RATE) x df(0,2)
+
+If the base date of the curve is before the value date then we
+forward adjust this amount to that value date. For simplicity I have
+assumed that the fixing date and the settlement date are the same date.
+This should be amended later.
+
+The valuation below incorporates a dual curve approach.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(self, value_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, index_curve: financepy.market.curves.discount_curve.DiscountCurve = None, pv_only=True)
+</code>
+
+</div>
+
+
+<div class="docstring">Determine mark to market value of a FRA contract based on the
+market FRA rate. We allow the pricing to have a different curve for
+the Libor index and the discounting of promised cash flows.</div>
+
+</div>
+
+<div class="member">
+
+<h4>valuation_details</h4>
+
+
+<div class="signature">
+
+<code>
+valuation_details(self, value_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, index_curve: financepy.market.curves.discount_curve.DiscountCurve = None)
+</code>
+
+</div>
+
+
+<div class="docstring">A long-hand method that returns various details relevant to valuation
+in a dictionary. Slower than value(...) so should not be used when
+performance is important
+
+We want the output dictionary to have  the same labels for different
+benchmarks (depos, fras, swaps) because we want to present them
+together so please do not stick new outputs into
+one of them only</div>
+
+</div>
+
+<div class="member">
+
+<h4>maturity_df</h4>
+
+
+<div class="signature">
+
+<code>
+maturity_df(self, index_curve)
+</code>
+
+</div>
+
+
+<div class="docstring">Determine the maturity date index discount factor needed to refit
+the market FRA rate. In a dual-curve world, this is not the discount
+rate discount factor but the index curve discount factor.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_payments</h4>
+
+
+<div class="signature">
+
+<code>
+print_payments(self, value_dt)
+</code>
+
+</div>
+
+
+<div class="docstring">Determine the value of the Deposit given a Ibor curve.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Solver 1D - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">Utils</a> &rsaquo; Solver 1D</nav>
+<h1>Solver 1D</h1>
+
+<p class="source-name">
+financepy.utils.solver_1d
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>results</h2>
+
+<div class="signature">
+
+<code>
+results(root, function_calls, iterations, converged)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: tuple</div>
+
+<div class="docstring">results(root, function_calls, iterations, converged)</div>
+
+
+
+</section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>bisection</h3>
+
+<div class="signature">
+
+<code>
+bisection(func, x1, x2, args, xtol=1e-06, maxiter=100)
+</code>
+
+</div>
+
+<div class="docstring">Bisection algorithm. You need to supply root brackets x1 and x2.</div>
+
+</div>
+
+<div class="member">
+
+<h3>newton</h3>
+
+<div class="signature">
+
+<code>
+newton(func, x0, fprime=None, args=None, tol=1.48e-08, maxiter=50, fprime2=None, x1=None, rtol=0.0, full_output=False, disp=False)
+</code>
+
+</div>
+
+<div class="docstring">TAKEN FROM SCIPY
+
+Find a zero of a real or complex function using the Newton-Raphson
+(or secant or Halley&#x27;s) method.
+Find a zero of the function `func` given a nearby starting point `x0`.
+The Newton-Raphson method is used if the derivative `fprime` of `func`
+is provided, otherwise the secant method is used. If the second order
+derivative `fprime2` of `func` is also provided, then Halley&#x27;s method is
+used.
+If `x0` is a sequence with more than one item, then `newton` returns an
+array, and `func` must be vectorized and return a sequence or array of the
+same shape as its first argument. If `fprime` or `fprime2` is given, then
+its return must also have the same shape.
+Parameters
+----------
+func : callable
+    The function whose zero is wanted. It must be a function of a
+    single variable of the form ``f(x,a,b,c...)``, where ``a,b,c...``
+    are extra arguments that can be passed in the `args` parameter.
+x0 : float, sequence, or ndarray
+    An initial estimate of the zero that should be somewhere near the
+    actual zero. If not scalar, then `func` must be vectorized and return
+    a sequence or array of the same shape as its first argument.
+fprime : callable, optional
+    The derivative of the function when available and convenient. If it
+    is None (default), then the secant method is used.
+args : tuple, optional
+    Extra arguments to be used in the function call.
+tol : float, optional
+    The allowable error of the zero value. If `func` is complex-valued,
+    a larger `tol` is recommended as both the real and imaginary parts
+    of `x` contribute to ``|x - x0|``.
+maxiter : int, optional
+    Maximum number of iterations.
+fprime2 : callable, optional
+    The second order derivative of the function when available and
+    convenient. If it is None (default), then the normal Newton-Raphson
+    or the secant method is used. If it is not None, then Halley&#x27;s method
+    is used.
+x1 : float, optional
+    Another estimate of the zero that should be somewhere near the
+    actual zero. Used if `fprime` is not provided.
+rtol : float, optional
+    Tolerance (relative) for termination.
+full_output : bool, optional
+    If `full_output` is False (default), the root is returned.
+    If True and `x0` is scalar, the return value is ``(x, r)``, where ``x``
+    is the root and ``r`` is a `RootResults` object.
+    If True and `x0` is non-scalar, the return value is ``(x, converged,
+    zero_der)`` (see Returns section for details).
+disp : bool, optional
+    If True, raise a RuntimeError if the algorithm didn&#x27;t converge, with
+    the error message containing the number of iterations and current
+    function value. Otherwise, the convergence status is recorded in a
+    `RootResults` return object.
+    Ignored if `x0` is not scalar.
+    *Note: this has little to do with displaying, however,
+    the `disp` keyword cannot be renamed for backwards compatibility.*
+Returns
+-------
+root : float, sequence, or ndarray
+    Estimated location where function is zero.
+r : `RootResults`, optional
+    Present if ``full_output=True`` and `x0` is scalar.
+    Object containing information about the convergence. In particular,
+    ``r.converged`` is True if the routine converged.
+converged : ndarray of bool, optional
+    Present if ``full_output=True`` and `x0` is non-scalar.
+    For vector functions, indicates which elements converged successfully.
+zero_der : ndarray of bool, optional
+    Present if ``full_output=True`` and `x0` is non-scalar.
+    For vector functions, indicates which elements had a zero derivative.
+See Also
+--------
+brentq, brenth, ridder, bisect
+fsolve : find zeros in N dimensions.
+Notes
+-----
+The convergence rate of the Newton-Raphson method is quadratic,
+the Halley method is cubic, and the secant method is
+sub-quadratic. This means that if the function is well-behaved
+the actual error in the estimated zero after the nth iteration
+is approximately the square (cube for Halley) of the error
+after the (n-1)th step. However, the stopping criterion used
+here is the step size and there is no guarantee that a zero
+has been found. Consequently, the result should be verified.
+Safer algorithms are brentq, brenth, ridder, and bisect,
+but they all require that the root first be bracketed in an
+interval where the function changes sign. The brentq algorithm
+is recommended for general use in one dimensional problems
+when such an interval has been found.
+When `newton` is used with arrays, it is best suited for the following
+types of problems:
+* The initial guesses, `x0`, are all relatively the same distance from
+  the roots.
+* Some or all of the extra arguments, `args`, are also arrays so that a
+  class of similar problems can be solved together.
+* The size of the initial guesses, `x0`, is larger than O(100) elements.
+  Otherwise, a naive loop may perform as well or better than a vector.
+Examples
+--------
+&gt;&gt;&gt; from scipy import optimize
+&gt;&gt;&gt; import matplotlib.pyplot as plt
+&gt;&gt;&gt; def f(x):
+...     return (x**3 - 1)  # only one real root at x = 1
+``fprime`` is not provided, use the secant method:
+&gt;&gt;&gt; root = optimize.newton(f, 1.5)
+&gt;&gt;&gt; root
+1.0000000000000016
+&gt;&gt;&gt; root = optimize.newton(f, 1.5, fprime2=lambda x: 6 * x)
+&gt;&gt;&gt; root
+1.0000000000000016
+Only ``fprime`` is provided, use the Newton-Raphson method:
+&gt;&gt;&gt; root = optimize.newton(f, 1.5, fprime=lambda x: 3 * x**2)
+&gt;&gt;&gt; root
+1.0
+Both ``fprime2`` and ``fprime`` are provided, use Halley&#x27;s method:
+&gt;&gt;&gt; root = optimize.newton(f, 1.5, fprime=lambda x: 3 * x**2,
+...                        fprime2=lambda x: 6 * x)
+&gt;&gt;&gt; root
+1.0
+When we want to find zeros for a set of related starting values and/or
+function parameters, we can provide both of those as an array of inputs:
+&gt;&gt;&gt; f = lambda x, a: x**3 - a
+&gt;&gt;&gt; fder = lambda x, a: 3 * x**2
+&gt;&gt;&gt; np.random.seed(4321)
+&gt;&gt;&gt; x = np.random.randn(100)
+&gt;&gt;&gt; a = np.arange(-50, 50)
+&gt;&gt;&gt; vec_res = optimize.newton(f, x, fprime=fder, args=(a, ))
+The above is the equivalent of solving for each value in ``(x, a)``
+separately in a for-loop, just faster:
+&gt;&gt;&gt; loop_res = [optimize.newton(f, x0, fprime=fder, args=(a0,))
+...             for x0, a0 in zip(x, a)]
+&gt;&gt;&gt; np.allclose(vec_res, loop_res)
+True
+Plot the results found for all values of ``a``:
+&gt;&gt;&gt; analytical_result = np.sign(a) * np.abs(a)**(1/3)
+&gt;&gt;&gt; fig = plt.figure()
+&gt;&gt;&gt; ax = fig.add_subplot(111)
+&gt;&gt;&gt; ax.plot(a, analytical_result, &#x27;o&#x27;)
+&gt;&gt;&gt; ax.plot(a, vec_res, &#x27;.&#x27;)
+&gt;&gt;&gt; ax.set_xlabel(&#x27;$a$&#x27;)
+&gt;&gt;&gt; ax.set_ylabel(&#x27;$x$ where $f(x, a)=0$&#x27;)
+&gt;&gt;&gt; plt.show()</div>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

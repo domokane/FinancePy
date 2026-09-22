@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Discount Curve - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Market</a> &rsaquo; <a href="index.html">Curves</a> &rsaquo; Discount Curve</nav>
+<h1>Discount Curve</h1>
+
+<p class="source-name">
+financepy.market.curves.discount_curve
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>DiscountCurve</h2>
+
+<div class="signature">
+
+<code>
+DiscountCurve(anchor_dt: financepy.utils.date.Date, df_dates: list = None, df_values: list | numpy.ndarray = None, interp_type: financepy.utils.global_types.InterpTypes = &lt;InterpTypes.FLAT_FWD_RATES: 1&gt;, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">This is a base discount curve which has an internal representation of
+a vector of times and discount factors and an interpolation scheme for
+interpolating between these fixed points.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>set_times</h4>
+
+
+<div class="signature">
+
+<code>
+set_times(self, times: numpy.ndarray)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>set_dfs</h4>
+
+
+<div class="signature">
+
+<code>
+set_dfs(self, dfs: numpy.ndarray)
+</code>
+
+</div>
+
+
+<div class="docstring">Set the discount factor at the last maturity time.</div>
+
+</div>
+
+<div class="member">
+
+<h4>set_last_df</h4>
+
+
+<div class="signature">
+
+<code>
+set_last_df(self, df)
+</code>
+
+</div>
+
+
+<div class="docstring">Set the discount factor at the last maturity time.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fit</h4>
+
+
+<div class="signature">
+
+<code>
+fit(self, times: numpy.ndarray, dfs: numpy.ndarray)
+</code>
+
+</div>
+
+
+<div class="docstring">Fit the interpolator to the given times and discount factors.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fwd_rate</h4>
+
+
+<div class="signature">
+
+<code>
+fwd_rate(self, start_dt: list | financepy.utils.date.Date, date_or_tenor: financepy.utils.date.Date | str | list, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;, comp_type: financepy.utils.compounding.CompoundingTypes = &lt;CompoundingTypes.MMKT: 1&gt;, freq_type: financepy.utils.frequency.FrequencyTypes = None)
+</code>
+
+</div>
+
+
+<div class="docstring">Simple-compounded forward rate between dates.
+
+accrual_dc_type is used for the forward accrual denominator.
+self.curve_dc_type is used for curve time conversion / interpolation.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fwd_rate_t</h4>
+
+
+<div class="signature">
+
+<code>
+fwd_rate_t(self, start_t: float | list | numpy.ndarray, end_t: float | list | numpy.ndarray, accrual: float | list | numpy.ndarray = None, comp_type: financepy.utils.compounding.CompoundingTypes = &lt;CompoundingTypes.MMKT: 1&gt;, freq_type: financepy.utils.frequency.FrequencyTypes = None)
+</code>
+
+</div>
+
+
+<div class="docstring">Forward rate between curve times.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fwd_rate_inst</h4>
+
+
+<div class="signature">
+
+<code>
+fwd_rate_inst(self, dts: financepy.utils.date.Date | list, dt: float = 1e-06)
+</code>
+
+</div>
+
+
+<div class="docstring">Instantaneous continuously compounded forward rate at date(s).</div>
+
+</div>
+
+<div class="member">
+
+<h4>fwd_rate_inst_t</h4>
+
+
+<div class="signature">
+
+<code>
+fwd_rate_inst_t(self, t: float | list | numpy.ndarray, dt: float = 0.0001)
+</code>
+
+</div>
+
+
+<div class="docstring">Instantaneous continuously compounded forward rate at time t.
+
+Computes:
+
+    f(t) = - d ln Z(t) / dt
+
+using a central finite difference.</div>
+
+</div>
+
+<div class="member">
+
+<h4>zero_rate</h4>
+
+
+<div class="signature">
+
+<code>
+zero_rate(self, maturity_dt: list | financepy.utils.date.Date, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate zero rates with specified compounding frequency.</div>
+
+</div>
+
+<div class="member">
+
+<h4>curve_years</h4>
+
+
+<div class="signature">
+
+<code>
+curve_years(self, maturity_dt: list | financepy.utils.date.Date)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate zero rates with continuous compounding.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fwd_zero_rate_cc</h4>
+
+
+<div class="signature">
+
+<code>
+fwd_zero_rate_cc(self, start_dt: financepy.utils.date.Date, end_dt: financepy.utils.date.Date)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate fwd zero rates with continuous compounding.</div>
+
+</div>
+
+<div class="member">
+
+<h4>zero_rate_cc</h4>
+
+
+<div class="signature">
+
+<code>
+zero_rate_cc(self, maturity_dt: list | financepy.utils.date.Date)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate zero rates with continuous compounding.</div>
+
+</div>
+
+<div class="member">
+
+<h4>zero_rate_cc_t</h4>
+
+
+<div class="signature">
+
+<code>
+zero_rate_cc_t(self, t)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate zero rates with continuous compounding.</div>
+
+</div>
+
+<div class="member">
+
+<h4>zero_rate_t</h4>
+
+
+<div class="signature">
+
+<code>
+zero_rate_t(self, t, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>swap_rate</h4>
+
+
+<div class="signature">
+
+<code>
+swap_rate(self, effective_dt: financepy.utils.date.Date, maturity_dt: list | financepy.utils.date.Date, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>swap_rate_old</h4>
+
+
+<div class="signature">
+
+<code>
+swap_rate_old(self, effective_dt: financepy.utils.date.Date, maturity_dt: list | financepy.utils.date.Date, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the swap rate to maturity date. This is the rate paid by
+a swap that has a price of par today. This is the same as a Libor swap
+rate except that we do not do any business day adjustments.</div>
+
+</div>
+
+<div class="member">
+
+<h4>par_rate</h4>
+
+
+<div class="signature">
+
+<code>
+par_rate(self, effective_dt: financepy.utils.date.Date, maturity_dt: list | financepy.utils.date.Date, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the swap rate to maturity date. This is the rate paid by
+a swap that has a price of par today. This is the same as a Libor swap
+rate except that we do not do any business day adjustments.</div>
+
+</div>
+
+<div class="member">
+
+<h4>par_rate_simple_t</h4>
+
+
+<div class="signature">
+
+<code>
+par_rate_simple_t(self, t_maturity, freq=2)
+</code>
+
+</div>
+
+
+<div class="docstring">Simple spot-starting par rate from curve times. Handles bonds with coupons
+equal to c/f. Calculates payments backwards from maturity. Not exact for swaps
+as it ignores accrual factor weighted coupon payments.
+
+Parameters
+----------
+maturity : float
+    Final maturity in years.
+freq : int
+    Fixed-leg payments per year.</div>
+
+</div>
+
+<div class="member">
+
+<h4>par_rate_t</h4>
+
+
+<div class="signature">
+
+<code>
+par_rate_t(self, t_start: float, payment_times: numpy.ndarray, accrual_factors: numpy.ndarray)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>df</h4>
+
+
+<div class="signature">
+
+<code>
+df(self, dt: list | financepy.utils.date.Date)
+</code>
+
+</div>
+
+
+<div class="docstring">Function to calculate a discount factor from a date or a
+vector of dates. The time day count determines how dates get converted
+to years.</div>
+
+</div>
+
+<div class="member">
+
+<h4>df_t</h4>
+
+
+<div class="signature">
+
+<code>
+df_t(self, t: float | numpy.ndarray)
+</code>
+
+</div>
+
+
+<div class="docstring">Function to calculate a discount factor from a time or a
+vector of times. Discourage usage in favour of passing in dates.</div>
+
+</div>
+
+<div class="member">
+
+<h4>bump_parallel</h4>
+
+
+<div class="signature">
+
+<code>
+bump_parallel(self, bump_size: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Adjust the continuously compounded forward rates by a perturbation
+upward equal to the bump size and return a curve object with this bumped
+curve. This is used for interest rate risk.</div>
+
+</div>
+
+<div class="member">
+
+<h4>bump_bucket</h4>
+
+
+<div class="signature">
+
+<code>
+bump_bucket(self, bucket_start: float, bucket_end: float, bump_size: float, interp_type=None)
+</code>
+
+</div>
+
+
+<div class="docstring">Apply a bucket (key rate) shift: shift continuous forward rates
+only between bucket_start and bucket_end years.</div>
+
+</div>
+
+<div class="member">
+
+<h4>survival_prob</h4>
+
+
+<div class="signature">
+
+<code>
+survival_prob(self, dt: financepy.utils.date.Date) -&gt; float
+</code>
+
+</div>
+
+
+<div class="docstring">This returns a survival probability to a specified date based on
+the assumption that the continuously compounded rate is a default
+hazard rate in which case the survival probability is directly
+analogous to a discount factor.</div>
+
+</div>
+
+<div class="member">
+
+<h4>plot</h4>
+
+
+<div class="signature">
+
+<code>
+plot(self, title, times: numpy.ndarray = None, ymin: float = None, ymax: float = None, filename: str = None)
+</code>
+
+</div>
+
+
+<div class="docstring">Display discount curve.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

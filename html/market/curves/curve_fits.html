@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Curve Fits - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Market</a> &rsaquo; <a href="index.html">Curves</a> &rsaquo; Curve Fits</nav>
+<h1>Curve Fits</h1>
+
+<p class="source-name">
+financepy.market.curves.curve_fits
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>CurveFitBSpline</h2>
+
+<div class="signature">
+
+<code>
+CurveFitBSpline(power=3, knot_years=None, t_max=50.0)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: CurveFitMethod</div>
+
+<div class="docstring">B-Spline curve fitting.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>get_params</h4>
+
+
+<div class="signature">
+
+<code>
+get_params(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>set_params</h4>
+
+
+<div class="signature">
+
+<code>
+set_params(self, params)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>bounds</h4>
+
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>interp_rate</h4>
+
+
+<div class="signature">
+
+<code>
+interp_rate(self, t)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>CurveFitCubicPolynomial</h2>
+
+<div class="signature">
+
+<code>
+CurveFitCubicPolynomial(power=3, t_scale=1.0)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: CurveFitMethod</div>
+
+<div class="docstring">Polynomial curve fitting.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>interp_rate</h4>
+
+
+<div class="signature">
+
+<code>
+interp_rate(self, t)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>get_params</h4>
+
+
+<div class="signature">
+
+<code>
+get_params(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>set_params</h4>
+
+
+<div class="signature">
+
+<code>
+set_params(self, params)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>bounds</h4>
+
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>CurveFitMethod</h2>
+
+<div class="signature">
+
+<code>
+CurveFitMethod()
+</code>
+
+</div>
+
+
+
+<div class="docstring">Base class / marker for curve fit methods.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>interp_rate</h4>
+
+
+<div class="signature">
+
+<code>
+interp_rate(self, t)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>get_params</h4>
+
+
+<div class="signature">
+
+<code>
+get_params(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>set_params</h4>
+
+
+<div class="signature">
+
+<code>
+set_params(self, params)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>clone</h4>
+
+
+<div class="signature">
+
+<code>
+clone(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>bounds</h4>
+
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>CurveFitNelsonSiegel</h2>
+
+<div class="signature">
+
+<code>
+CurveFitNelsonSiegel(beta1=0.03, beta2=-0.02, beta3=0.02, tau=2.0, bounds=None)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: CurveFitMethod</div>
+
+<div class="docstring">Nelson-Siegel parametric fit.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>get_params</h4>
+
+
+<div class="signature">
+
+<code>
+get_params(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>set_params</h4>
+
+
+<div class="signature">
+
+<code>
+set_params(self, params)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>bounds</h4>
+
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>interp_rate</h4>
+
+
+<div class="signature">
+
+<code>
+interp_rate(self, t, beta_1=None, beta_2=None, beta_3=None, tau=None)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>CurveFitNelsonSiegelSvensson</h2>
+
+<div class="signature">
+
+<code>
+CurveFitNelsonSiegelSvensson(beta1=0.03, beta2=-0.02, beta3=0.02, beta4=0.01, tau1=2.0, tau2=5.0, bounds=None)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: CurveFitMethod</div>
+
+<div class="docstring">Svensson (extended Nelson-Siegel) parametric fit.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>get_params</h4>
+
+
+<div class="signature">
+
+<code>
+get_params(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>set_params</h4>
+
+
+<div class="signature">
+
+<code>
+set_params(self, params)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>bounds</h4>
+
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>interp_rate</h4>
+
+
+<div class="signature">
+
+<code>
+interp_rate(self, t, beta_1=None, beta_2=None, beta_3=None, beta_4=None, tau_1=None, tau_2=None)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>CurveFitQuarticPolynomial</h2>
+
+<div class="signature">
+
+<code>
+CurveFitQuarticPolynomial(power=4, t_scale=1.0)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: CurveFitMethod</div>
+
+<div class="docstring">Polynomial curve fitting.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>interp_rate</h4>
+
+
+<div class="signature">
+
+<code>
+interp_rate(self, t)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>get_params</h4>
+
+
+<div class="signature">
+
+<code>
+get_params(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>set_params</h4>
+
+
+<div class="signature">
+
+<code>
+set_params(self, params)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>bounds</h4>
+
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>CurveFitQuinticPolynomial</h2>
+
+<div class="signature">
+
+<code>
+CurveFitQuinticPolynomial(power=5, t_scale=1.0)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: CurveFitMethod</div>
+
+<div class="docstring">Polynomial curve fitting.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>interp_rate</h4>
+
+
+<div class="signature">
+
+<code>
+interp_rate(self, t)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>get_params</h4>
+
+
+<div class="signature">
+
+<code>
+get_params(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>set_params</h4>
+
+
+<div class="signature">
+
+<code>
+set_params(self, params)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>bounds</h4>
+
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>CurveFitTypes</h2>
+
+<div class="signature">
+
+<code>
+CurveFitTypes(*values)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: Enum</div>
+
+<div class="docstring">Create a collection of name/value pairs.
+
+Example enumeration:
+
+&gt;&gt;&gt; class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+
+Access them by:
+
+- attribute access:
+
+  &gt;&gt;&gt; Color.RED
+  &lt;Color.RED: 1&gt;
+
+- value lookup:
+
+  &gt;&gt;&gt; Color(1)
+  &lt;Color.RED: 1&gt;
+
+- name lookup:
+
+  &gt;&gt;&gt; Color[&#x27;RED&#x27;]
+  &lt;Color.RED: 1&gt;
+
+Enumerations can be iterated over, and know how many members they have:
+
+&gt;&gt;&gt; len(Color)
+3
+
+&gt;&gt;&gt; list(Color)
+[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
+
+Methods can be added to enumerations, and members can have their own
+attributes -- see the documentation for details.</div>
+
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Ibor Benchmarks Report - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Rates</a> &rsaquo; Ibor Benchmarks Report</nav>
+<h1>Ibor Benchmarks Report</h1>
+
+<p class="source-name">
+financepy.products.rates.ibor_benchmarks_report
+</p>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>benchmarks_report</h3>
+
+<div class="signature">
+
+<code>
+benchmarks_report(benchmarks, value_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, index_curve: financepy.market.curves.discount_curve.DiscountCurve = None, include_objects=False)
+</code>
+
+</div>
+
+<div class="docstring">Generate a DataFrame with one row per benchmark. A benchmark is any object that
+has a function valuation_details(...) that returns a dictionary of the right shape.
+Allowed benchmarks at the moment are depos, fras and swaps. Various useful
+information is reported. This is a bit slow so do not use in performance-critical
+spots</div>
+
+</div>
+
+<div class="member">
+
+<h3>dataframe_to_benchmarks</h3>
+
+<div class="signature">
+
+<code>
+dataframe_to_benchmarks(df: pandas.core.frame.DataFrame, asof_date: financepy.utils.date.Date, calendar_type: financepy.utils.calendar.CalendarTypes)
+</code>
+
+</div>
+
+<div class="docstring">Crete IborBenchmarks from a dataframe. The dataframe should have at least these columns
+with these sample inputs:
+            type   start_dt maturity_dt     dc_type notional contract_rate fixed_leg_type fixed_freq_type
+    0   IborDeposit  06-OCT-2001   09-OCT-2001            ACT_360    100.0         0.042            NaN             NaN
+    1       IborFRA  09-JAN-2002   09-APR-2002            ACT_360    100.0         0.042            PAY             NaN
+    2      IborSwap  09-OCT-2001   09-OCT-2002  THIRTY_E_360_ISDA  1000000         0.042            PAY     SEMI_ANNUAL
+
+start_dt and maturity_dt could be Date, string convertible to Tenor, or datetime
+Args:
+    df (pd.DataFrame): dataframe as bove, with benchmark info
+    asof_date (Date): if start_dt is a tenor string, asof_date is used as an anchor for that
+    calendar_type (CalendarTypes): What calendar to use
+
+Returns:
+    dict: Keys are benchmark types as in df[&#x27;type&#x27;], values are lists of benchmarks of that type</div>
+
+</div>
+
+<div class="member">
+
+<h3>ibor_benchmarks_report</h3>
+
+<div class="signature">
+
+<code>
+ibor_benchmarks_report(ibor_curve: financepy.products.rates.ibor_single_curve.IborSingleCurve, include_objects=False)
+</code>
+
+</div>
+
+<div class="docstring">Generate a DataFrame with one row per bechmark used in constructing a given
+ibor_curve. Various useful information is reported. This is a bit slow so do
+not use in performance-critical spots</div>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

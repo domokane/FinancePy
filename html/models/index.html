@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Models - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; Models</nav>
+<h1>Models</h1>
+
+<p class="source-name">
+financepy.models
+</p>
+
+<h2>Modules</h2>
+
+<div class="module-list">
+
+<ul>
+
+<li>
+<a href="bachelier.html">
+Bachelier
+</a>
+</li>
+
+<li>
+<a href="bdt_tree.html">
+Bdt Tree
+</a>
+</li>
+
+<li>
+<a href="bk_tree.html">
+Bk Tree
+</a>
+</li>
+
+<li>
+<a href="black.html">
+Black
+</a>
+</li>
+
+<li>
+<a href="black_scholes.html">
+Black Scholes
+</a>
+</li>
+
+<li>
+<a href="black_scholes_analytic.html">
+Black Scholes Analytic
+</a>
+</li>
+
+<li>
+<a href="black_scholes_hedging_sim.html">
+Black Scholes Hedging Sim
+</a>
+</li>
+
+<li>
+<a href="black_scholes_mc.html">
+Black Scholes Mc
+</a>
+</li>
+
+<li>
+<a href="black_scholes_mc_tests.html">
+Black Scholes Mc Tests
+</a>
+</li>
+
+<li>
+<a href="black_shifted.html">
+Black Shifted
+</a>
+</li>
+
+<li>
+<a href="bs_digital_option.html">
+Bs Digital Option
+</a>
+</li>
+
+<li>
+<a href="cev.html">
+Cev
+</a>
+</li>
+
+<li>
+<a href="cir_montecarlo.html">
+Cir Montecarlo
+</a>
+</li>
+
+<li>
+<a href="dupire.html">
+Dupire
+</a>
+</li>
+
+<li>
+<a href="equity_asian_option_bs.html">
+Equity Asian Option Bs
+</a>
+</li>
+
+<li>
+<a href="equity_barrier_option_mc.html">
+Equity Barrier Option Mc
+</a>
+</li>
+
+<li>
+<a href="equity_chooser_bs.html">
+Equity Chooser Bs
+</a>
+</li>
+
+<li>
+<a href="equity_compound_option_bs.html">
+Equity Compound Option Bs
+</a>
+</li>
+
+<li>
+<a href="equity_crr_tree.html">
+Equity Crr Tree
+</a>
+</li>
+
+<li>
+<a href="equity_lsmc.html">
+Equity Lsmc
+</a>
+</li>
+
+<li>
+<a href="finite_difference.html">
+Finite Difference
+</a>
+</li>
+
+<li>
+<a href="finite_difference_psor.html">
+Finite Difference Psor
+</a>
+</li>
+
+<li>
+<a href="fx_barrier_model.html">
+Fx Barrier Model
+</a>
+</li>
+
+<li>
+<a href="gauss_copula.html">
+Gauss Copula
+</a>
+</li>
+
+<li>
+<a href="gauss_copula_lhplus.html">
+Gauss Copula Lhplus
+</a>
+</li>
+
+<li>
+<a href="heston.html">
+Heston
+</a>
+</li>
+
+<li>
+<a href="hw_tree.html">
+Hw Tree
+</a>
+</li>
+
+<li>
+<a href="implied_volatility_surface.html">
+Implied Volatility Surface
+</a>
+</li>
+
+<li>
+<a href="lmm_mc.html">
+Lmm Mc
+</a>
+</li>
+
+<li>
+<a href="lognormal_mixture_model.html">
+Lognormal Mixture Model
+</a>
+</li>
+
+<li>
+<a href="lognormal_mixture_surface.html">
+Lognormal Mixture Surface
+</a>
+</li>
+
+<li>
+<a href="merton_firm.html">
+Merton Firm
+</a>
+</li>
+
+<li>
+<a href="merton_firm_mkt.html">
+Merton Firm Mkt
+</a>
+</li>
+
+<li>
+<a href="merton_jump_diffusion.html">
+Merton Jump Diffusion
+</a>
+</li>
+
+<li>
+<a href="model.html">
+Model
+</a>
+</li>
+
+<li>
+<a href="option_implied_dbn.html">
+Option Implied Dbn
+</a>
+</li>
+
+<li>
+<a href="process_simulator.html">
+Process Simulator
+</a>
+</li>
+
+<li>
+<a href="rates_ho_lee.html">
+Rates Ho Lee
+</a>
+</li>
+
+<li>
+<a href="sabr.html">
+Sabr
+</a>
+</li>
+
+<li>
+<a href="sabr_shifted.html">
+Sabr Shifted
+</a>
+</li>
+
+<li>
+<a href="ssvi_surface.html">
+Ssvi Surface
+</a>
+</li>
+
+<li>
+<a href="student_t_copula.html">
+Student T Copula
+</a>
+</li>
+
+<li>
+<a href="svi.html">
+Svi
+</a>
+</li>
+
+<li>
+<a href="svi_surface.html">
+Svi Surface
+</a>
+</li>
+
+<li>
+<a href="vasicek_mc.html">
+Vasicek Mc
+</a>
+</li>
+
+</ul>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

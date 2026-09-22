@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Merton Jump Diffusion - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">Models</a> &rsaquo; Merton Jump Diffusion</nav>
+<h1>Merton Jump Diffusion</h1>
+
+<p class="source-name">
+financepy.models.merton_jump_diffusion
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>MertonCalibrationResult</h2>
+
+<div class="signature">
+
+<code>
+MertonCalibrationResult(model, sigma, jump_intensity, jump_mean, jump_volatility, fitted_vols, market_vols, vol_errors, rmse, mae, max_abs_error, optimizer_result)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Container for a Merton volatility-surface calibration.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>success</h4>
+
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>jump_compensator</h4>
+
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>expected_jump_size</h4>
+
+
+
+<div class="docstring">Expected proportional jump E[J-1].</div>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>MertonJumpDiffusion</h2>
+
+<div class="signature">
+
+<code>
+MertonJumpDiffusion(sigma, jump_intensity, jump_mean, jump_volatility, poisson_tolerance=1e-12, max_jumps=200)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Merton jump-diffusion model for European equity options.
+
+The risk-neutral stock-price process is
+
+    dS/S_- =
+        (r - q - lambda * kappa_j) dt
+        + sigma dW
+        + (J - 1) dN
+
+where
+
+    log(J) ~ Normal(mu_j, delta_j^2)
+
+and
+
+    kappa_j = E[J - 1]
+            = exp(mu_j + 0.5 * delta_j^2) - 1.
+
+Parameters
+----------
+sigma : float
+    Diffusive volatility.
+
+jump_intensity : float
+    Poisson jump intensity lambda, in jumps per year.
+
+jump_mean : float
+    Mean log jump size mu_j.
+
+jump_volatility : float
+    Standard deviation delta_j of log jump sizes.
+
+poisson_tolerance : float
+    Remaining Poisson probability below which the pricing
+    summation is terminated.
+
+max_jumps : int
+    Maximum number of jump terms in the pricing summation.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>jump_compensator</h4>
+
+
+
+<div class="docstring">Expected proportional jump:
+
+    E[J - 1]
+    =
+    exp(mu_j + 0.5 delta_j^2) - 1.</div>
+
+</div>
+
+<div class="member">
+
+<h4>expected_jump_multiplier</h4>
+
+
+
+<div class="docstring">Return E[J].</div>
+
+</div>
+
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(self, stock_price, time_to_expiry, strike_price, risk_free_rate, dividend_yield, option_type=&lt;OptionTypes.EUROPEAN_CALL: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Value a European option using Merton&#x27;s Poisson-mixture solution.
+
+Conditional on N_T=n jumps, log(S_T) is Gaussian. Therefore
+the option value is a Poisson-weighted sum of Black-Scholes
+values.</div>
+
+</div>
+
+<div class="member">
+
+<h4>implied_volatility</h4>
+
+
+<div class="signature">
+
+<code>
+implied_volatility(self, stock_price, time_to_expiry, strike_price, risk_free_rate, dividend_yield, option_type=&lt;OptionTypes.EUROPEAN_CALL: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Return Black-Scholes implied volatility of the Merton price.</div>
+
+</div>
+
+<div class="member">
+
+<h4>volatility_smile</h4>
+
+
+<div class="signature">
+
+<code>
+volatility_smile(self, stock_price, time_to_expiry, strikes, risk_free_rate, dividend_yield, option_type=&lt;OptionTypes.EUROPEAN_CALL: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Generate the Merton Black-Scholes implied-volatility smile.</div>
+
+</div>
+
+<div class="member">
+
+<h4>volatility_surface</h4>
+
+
+<div class="signature">
+
+<code>
+volatility_surface(self, stock_price, strikes, expiries, risk_free_rates, dividend_yields, option_type=&lt;OptionTypes.EUROPEAN_CALL: 1&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Generate a matrix of Black-Scholes implied volatilities.
+
+Returns
+-------
+vols : ndarray
+    Shape = (number of expiries, number of strikes).</div>
+
+</div>
+
+<div class="member">
+
+<h4>calibrate</h4>
+
+
+<div class="signature">
+
+<code>
+calibrate(cls, stock_price, strikes, expiries, market_vols, risk_free_rates, dividend_yields, option_type=&lt;OptionTypes.EUROPEAN_CALL: 1&gt;, initial_guess=None, lower_bounds=None, upper_bounds=None, weights=None, calibration_type=&#x27;VOL&#x27;, max_nfev=3000)
+</code>
+
+</div>
+
+
+<div class="docstring">Calibrate one global Merton parameter set to an entire
+implied-volatility surface.
+
+The calibrated parameters are
+
+    sigma
+    jump_intensity lambda
+    jump_mean mu_j
+    jump_volatility delta_j
+
+Parameters
+----------
+market_vols : ndarray
+    Matrix of Black-Scholes implied volatilities with shape
+
+        (len(expiries), len(strikes))
+
+calibration_type : str
+    &quot;VOL&quot;
+        Minimise errors directly in Black-Scholes implied
+        volatility.
+
+    &quot;VEGA&quot;
+        Minimise Black-Scholes vega-scaled price errors.
+
+weights : ndarray or None
+    Optional calibration weights with the same dimensions
+    as market_vols.
+
+Returns
+-------
+MertonCalibrationResult</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

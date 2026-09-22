@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Equity Vol Curve - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Market</a> &rsaquo; <a href="index.html">Volatility</a> &rsaquo; Equity Vol Curve</nav>
+<h1>Equity Vol Curve</h1>
+
+<p class="source-name">
+financepy.market.volatility.equity_vol_curve
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>EquityVolCurve</h2>
+
+<div class="signature">
+
+<code>
+EquityVolCurve(strikes: numpy.ndarray, volatilities: numpy.ndarray, s: float, t_exp: float, r: float, q: float, interp: financepy.market.volatility.equity_vol_curve.EquityVolCurveInterpTypes = &lt;EquityVolCurveInterpTypes.CUBIC_SPLINE: 0&gt;, extrap: financepy.market.volatility.equity_vol_curve.EquityVolCurveExtrapTypes = &lt;EquityVolCurveExtrapTypes.TANGENT: 1&gt;, smoothing: float = 0.0001, derivative_bump: float = 0.0001)
+</code>
+
+</div>
+
+
+
+<p><em>No description available.</em></p>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>volatility</h4>
+
+
+<div class="signature">
+
+<code>
+volatility(self, strike: float | numpy.ndarray) -&gt; float | numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return interpolated volatility for the supplied strike.</div>
+
+</div>
+
+<div class="member">
+
+<h4>delta_sticky_strike</h4>
+
+
+<div class="signature">
+
+<code>
+delta_sticky_strike(self, strike: float | numpy.ndarray, option_type) -&gt; float | numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return delta assuming sticky-strike volatility.
+The result is the standard Black-Scholes delta evaluated
+using the volatility from this curve.</div>
+
+</div>
+
+<div class="member">
+
+<h4>delta_sticky_moneyness</h4>
+
+
+<div class="signature">
+
+<code>
+delta_sticky_moneyness(self, strike: float | numpy.ndarray, option_type) -&gt; float | numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return delta assuming sticky-moneyness volatility.
+The smile is held fixed as a function of K/S. So if sigma(K/S) then
+    d sigma / dS = -(K/S) d sigma/dK
+and
+    Delta = Delta_BS + Vega * d sigma/dS.</div>
+
+</div>
+
+<div class="member">
+
+<h4>delta</h4>
+
+
+<div class="signature">
+
+<code>
+delta(self, strike: float | numpy.ndarray, option_type, convention: financepy.market.volatility.equity_vol_curve.EquityVolCurveDeltaTypes = &lt;EquityVolCurveDeltaTypes.STICKY_STRIKE: 0&gt;) -&gt; float | numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return delta using the selected smile-dynamics convention.</div>
+
+</div>
+
+<div class="member">
+
+<h4>pdf</h4>
+
+
+<div class="signature">
+
+<code>
+pdf(self, smin: float, smax: float, n_intervals: int) -&gt; tuple[numpy.ndarray, numpy.ndarray]
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the smile/skew-implied probability distribution.
+
+Uses the market state stored in this volatility curve.
+
+Returns
+-------
+tuple[np.ndarray, np.ndarray]
+    Strike grid and probability masses f(K) * dK.</div>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>EquityVolCurveDeltaTypes</h2>
+
+<div class="signature">
+
+<code>
+EquityVolCurveDeltaTypes(*values)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: Enum</div>
+
+<div class="docstring">Smile dynamics used when calculating option delta.</div>
+
+
+
+</section>
+
+<section>
+
+<h2>EquityVolCurveExtrapTypes</h2>
+
+<div class="signature">
+
+<code>
+EquityVolCurveExtrapTypes(*values)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: Enum</div>
+
+<div class="docstring">Volatility extrapolation scheme.</div>
+
+
+
+</section>
+
+<section>
+
+<h2>EquityVolCurveInterpTypes</h2>
+
+<div class="signature">
+
+<code>
+EquityVolCurveInterpTypes(*values)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: Enum</div>
+
+<div class="docstring">Volatility interp scheme.</div>
+
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

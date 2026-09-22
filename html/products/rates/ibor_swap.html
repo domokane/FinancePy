@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Ibor Swap - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Rates</a> &rsaquo; Ibor Swap</nav>
+<h1>Ibor Swap</h1>
+
+<p class="source-name">
+financepy.products.rates.ibor_swap
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>IborSwap</h2>
+
+<div class="signature">
+
+<code>
+IborSwap(effective_dt: financepy.utils.date.Date, term_dt_or_tenor: financepy.utils.date.Date | str, fixed_leg_type: financepy.utils.global_types.SwapTypes, fixed_cpn: float, fixed_freq_type: financepy.utils.frequency.FrequencyTypes, fixed_dc_type: financepy.utils.day_count.DayCountTypes, notional: float = 1000000, float_spread: float = 0.0, float_freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.QUARTERLY: 4&gt;, float_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type: financepy.utils.calendar.BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type: financepy.utils.calendar.DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;, end_of_month: bool = False)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class for managing a standard Fixed vs IBOR swap. This is a contract
+in which a fixed payment leg is exchanged for a series of floating rates
+payments linked to some IBOR index rate. There is no exchange of principal.
+The contract is entered into at zero initial cost. The contract lasts from
+a start date to a specified maturity date.
+
+The floating rate is not known fully until the end of the preceding payment
+period. It is set in advance and paid in arrears.
+
+The value of the contract is the NPV of the two cpn streams. Discounting
+is done on a supplied discount curve which is separate from the curve from
+which the implied index rates are extracted.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>get_fixed_rate</h4>
+
+
+<div class="signature">
+
+<code>
+get_fixed_rate(self)
+</code>
+
+</div>
+
+
+<div class="docstring">easy read access to the coupon (fixed rate)</div>
+
+</div>
+
+<div class="member">
+
+<h4>set_fixed_rate</h4>
+
+
+<div class="signature">
+
+<code>
+set_fixed_rate(self, new_rate: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Sometimes we need to reset the coupon (fixed rate)
+This function updates caches that depend on it</div>
+
+</div>
+
+<div class="member">
+
+<h4>set_fixed_rate_to_atm</h4>
+
+
+<div class="signature">
+
+<code>
+set_fixed_rate_to_atm(self, value_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, index_curve: financepy.market.curves.discount_curve.DiscountCurve = None, first_fixing: float = None)
+</code>
+
+</div>
+
+
+<div class="docstring">Reset fixed rate to atm given curve(s). returns the new atm</div>
+
+</div>
+
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(self, value_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, index_curve: financepy.market.curves.discount_curve.DiscountCurve = None, first_fixing_rate=None, pv_only=True)
+</code>
+
+</div>
+
+
+<div class="docstring">Value the interest rate swap on a value date given a single Ibor
+discount curve.</div>
+
+</div>
+
+<div class="member">
+
+<h4>valuation_details</h4>
+
+
+<div class="signature">
+
+<code>
+valuation_details(self, value_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, index_curve: financepy.market.curves.discount_curve.DiscountCurve = None, first_fixing_rate=None)
+</code>
+
+</div>
+
+
+<div class="docstring">A long-hand method that returns various details relevant to valuation in
+a dictionary
+Slower than value(...) so should not be used when performance is important
+
+We want the output dictionary to have  the same labels for different bechmarks
+(depos, fras, swaps) because we want to present them together so please
+do not stick new outputs into one of them only</div>
+
+</div>
+
+<div class="member">
+
+<h4>pv01</h4>
+
+
+<div class="signature">
+
+<code>
+pv01(self, value_dt, discount_curve)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the value of 1 basis point coupon on the fixed leg.</div>
+
+</div>
+
+<div class="member">
+
+<h4>swap_rate</h4>
+
+
+<div class="signature">
+
+<code>
+swap_rate(self, value_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, index_curve: financepy.market.curves.discount_curve.DiscountCurve = None, first_fixing: float = None)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the fixed leg cpn that makes the swap worth zero.
+If the valuation date is before the swap payments start then this
+is the forward swap rate as it starts in the future. The swap rate
+is then a forward swap rate and so we use a forward discount
+factor. If the swap fixed leg has begun then we have a spot
+starting swap. The swap rate can also be calculated in a dual curve
+approach but in this case the first fixing on the floating leg is
+needed.</div>
+
+</div>
+
+<div class="member">
+
+<h4>cash_settled_pv01</h4>
+
+
+<div class="signature">
+
+<code>
+cash_settled_pv01(self, value_dt, flat_swap_rate, freq_type)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the forward value of an annuity of a forward starting
+swap using a single flat discount rate equal to the swap rate. This is
+used in the pricing of a cash-settled swaption in the IborSwaption
+class. This method does not affect the standard valuation methods.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_fixed_leg_pv</h4>
+
+
+<div class="signature">
+
+<code>
+print_fixed_leg_pv(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Prints the fixed leg amounts without any valuation details. Shows
+the dates and sizes of the promised fixed leg flows.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_float_leg_pv</h4>
+
+
+<div class="signature">
+
+<code>
+print_float_leg_pv(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Prints the fixed leg amounts without any valuation details. Shows
+the dates and sizes of the promised fixed leg flows.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_payments</h4>
+
+
+<div class="signature">
+
+<code>
+print_payments(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Prints the fixed leg amounts without any valuation details. Shows
+the dates and sizes of the promised fixed leg flows.</div>
+
+</div>
+
+<div class="member">
+
+<h4>macaulay_duration</h4>
+
+
+<div class="signature">
+
+<code>
+macaulay_duration(self, value_dt, discount_curve, swap_type, payment_periods: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculation of the Macaulay Duration in an Interest Rate Swap
+Based on Bond Math: The Theory Behind the Formulas, Second Edition by
+Donald J. Smith</div>
+
+</div>
+
+<div class="member">
+
+<h4>modified_duration</h4>
+
+
+<div class="signature">
+
+<code>
+modified_duration(self, value_dt, discount_curve, swap_type, payment_periods: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Computation of the Modified Duration for the Fixed-Rate
+Payer&#x27;s Perspective in Interest Rate Swap</div>
+
+</div>
+
+<div class="member">
+
+<h4>change_in_market_value</h4>
+
+
+<div class="signature">
+
+<code>
+change_in_market_value(self, value_dt, discount_curve, swap_type, payment_periods: float, swap_rate_changes: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Computation of the Profits for the Fixed-Rate Payer&#x27;s Perspective in Interest Rate Swap
+        </div>
+
+</div>
+
+<div class="member">
+
+<h4>basis_point_value</h4>
+
+
+<div class="signature">
+
+<code>
+basis_point_value(self, value_dt, discount_curve, swap_type, payment_periods: float)
+</code>
+
+</div>
+
+
+<div class="docstring">calculate the basis‐point‐value (BPV) of the swap,
+which is swap&#x27;s modified duration times the notional principal,
+times one basis point (0.0001)</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

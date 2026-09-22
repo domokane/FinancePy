@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Cds Index Portfolio - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Credit</a> &rsaquo; Cds Index Portfolio</nav>
+<h1>Cds Index Portfolio</h1>
+
+<p class="source-name">
+financepy.products.credit.cds_index_portfolio
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>CDSIndexPortfolio</h2>
+
+<div class="signature">
+
+<code>
+CDSIndexPortfolio(freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.QUARTERLY: 4&gt;, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type: financepy.utils.calendar.BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type: financepy.utils.calendar.DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">This class manages the calculations associated with an equally weighted
+portfolio of CDS contracts with the same maturity date.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>intrinsic_rpv01</h4>
+
+
+<div class="signature">
+
+<code>
+intrinsic_rpv01(self, value_dt, step_in_dt, maturity_dt, issuer_curves)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculation of the risky PV01 of the CDS portfolio by taking the
+average of the risky PV01s of each contract.</div>
+
+</div>
+
+<div class="member">
+
+<h4>intrinsic_prot_leg_pv</h4>
+
+
+<div class="signature">
+
+<code>
+intrinsic_prot_leg_pv(self, value_dt, step_in_dt, maturity_dt, issuer_curves)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculation of intrinsic protection leg value of the CDS portfolio
+by taking the average sum the protection legs of each contract.</div>
+
+</div>
+
+<div class="member">
+
+<h4>intrinsic_spread</h4>
+
+
+<div class="signature">
+
+<code>
+intrinsic_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculation of the intrinsic spd of the CDS portfolio as the one
+which would make the value of the protection legs equal to the value of
+the premium legs if all premium legs paid the same spd.</div>
+
+</div>
+
+<div class="member">
+
+<h4>average_spread</h4>
+
+
+<div class="signature">
+
+<code>
+average_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculates the average par CDS spd of the CDS portfolio.</div>
+
+</div>
+
+<div class="member">
+
+<h4>total_spread</h4>
+
+
+<div class="signature">
+
+<code>
+total_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculates the total CDS spd of the CDS portfolio by summing
+over all of the issuers and adding the spd with no weights.</div>
+
+</div>
+
+<div class="member">
+
+<h4>min_spread</h4>
+
+
+<div class="signature">
+
+<code>
+min_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculates the minimum par CDS spd across all of the issuers in
+the CDS portfolio.</div>
+
+</div>
+
+<div class="member">
+
+<h4>max_spread</h4>
+
+
+<div class="signature">
+
+<code>
+max_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculates the maximum par CDS spd across all of the issuers in
+the CDS portfolio.</div>
+
+</div>
+
+<div class="member">
+
+<h4>spread_adjust_intrinsic</h4>
+
+
+<div class="signature">
+
+<code>
+spread_adjust_intrinsic(self, value_dt, issuer_curves, index_cpns, index_upfronts, index_maturity_dts, index_recovery_rate, tolerance=1e-07)
+</code>
+
+</div>
+
+
+<div class="docstring">Adjust individual CDS discount to reprice CDS index prices.
+This approach uses an iterative scheme but is slow as it has to use a
+CDS curve bootstrap required when each trial spd adjustment is made</div>
+
+</div>
+
+<div class="member">
+
+<h4>hazard_rate_adjust_intrinsic</h4>
+
+
+<div class="signature">
+
+<code>
+hazard_rate_adjust_intrinsic(self, value_dt, issuer_curves, index_cpns, index_up_fronts, index_maturity_dts, index_recovery_rate, tolerance=1e-07, max_iterations=500)
+</code>
+
+</div>
+
+
+<div class="docstring">Adjust individual CDS discount to reprice CDS index prices.
+This approach adjusts the hazard rates and so avoids the slowish
+CDS curve bootstrap required when a spd adjustment is made.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Ois Basis Swap - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Rates</a> &rsaquo; Ois Basis Swap</nav>
+<h1>Ois Basis Swap</h1>
+
+<p class="source-name">
+financepy.products.rates.ois_basis_swap
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>OISBasisSwap</h2>
+
+<div class="signature">
+
+<code>
+OISBasisSwap(effective_dt: financepy.utils.date.Date, term_dt_or_tenor: financepy.utils.date.Date | str, ibor_type: financepy.utils.global_types.SwapTypes, ibor_freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.QUARTERLY: 4&gt;, ibor_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;, ibor_spread: float = 0.0, ois_freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.QUARTERLY: 4&gt;, ois_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;, ois_spread: float = 0.0, ois_payment_lag: int = 0, notional: float = 1000000, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type: financepy.utils.calendar.BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type: financepy.utils.calendar.DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class for managing an Ibor-OIS basis swap contract. This is a
+contract in which a floating leg with one LIBOR tenor is exchanged for a
+floating leg payment of an overnight index swap. There is no exchange of
+par. The contract is entered into at zero initial cost. The contract lasts
+from a start date to a specified maturity date.
+
+The value of the contract is the NPV of the two coupon streams. Discounting
+is done on a supplied discount curve which is separate from the discount
+from which the implied index rates are extracted.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(self, value_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, index_ibor_curve: financepy.market.curves.discount_curve.DiscountCurve = None, index_ois_curve: financepy.market.curves.discount_curve.DiscountCurve = None, first_fixing_rate_leg_1=None, first_fixing_rate_leg_2=None)
+</code>
+
+</div>
+
+
+<div class="docstring">Value the interest rate swap on a value date given a single Ibor
+discount curve and an index curve for the Ibors on each swap leg.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_payments</h4>
+
+
+<div class="signature">
+
+<code>
+print_payments(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Prints the fixed leg amounts without any valuation details. Shows
+the dates and sizes of the promised fixed leg flows.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

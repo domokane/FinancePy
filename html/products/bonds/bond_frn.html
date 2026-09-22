@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Bond Frn - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Bonds</a> &rsaquo; Bond Frn</nav>
+<h1>Bond Frn</h1>
+
+<p class="source-name">
+financepy.products.bonds.bond_frn
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>BondFRN</h2>
+
+<div class="signature">
+
+<code>
+BondFRN(issue_dt: financepy.utils.date.Date, maturity_dt: financepy.utils.date.Date, quoted_margin: float, freq_type: financepy.utils.frequency.FrequencyTypes, accrual_dc_type: financepy.utils.day_count.DayCountTypes, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class for managing floating rate notes that pay a floating index plus a
+quoted margin.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>dirty_price_from_dm</h4>
+
+
+<div class="signature">
+
+<code>
+dirty_price_from_dm(self, settle_dt: financepy.utils.date.Date, next_cpn: float, current_ibor: float, future_ibor: float, dm: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the full price of the bond from its discount margin (DM)
+using standard model based on assumptions about future Ibor rates. The
+next Ibor payment which has reset is entered, so to is the current
+Ibor rate from settlement to the next coupon date (NCD). Finally, there
+is the level of subsequent future Ibor payments and the discount
+margin.</div>
+
+</div>
+
+<div class="member">
+
+<h4>principal</h4>
+
+
+<div class="signature">
+
+<code>
+principal(self, settle_dt: financepy.utils.date.Date, next_cpn: float, current_ibor: float, future_ibor: float, dm: float, face: float = 100.0)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the clean trade price of the bond based on the face
+amount from its discount margin and making assumptions about the
+future Ibor rates.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dollar_duration</h4>
+
+
+<div class="signature">
+
+<code>
+dollar_duration(self, settle_dt: financepy.utils.date.Date, next_cpn: float, current_ibor: float, future_ibor: float, dm: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the risk or dP/dy of the bond by bumping. This is also
+known as the DV01 in Bloomberg.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dollar_credit_duration</h4>
+
+
+<div class="signature">
+
+<code>
+dollar_credit_duration(self, settle_dt: financepy.utils.date.Date, next_cpn: float, current_ibor: float, future_ibor: float, dm: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the risk or dP/dy of the bond by bumping.</div>
+
+</div>
+
+<div class="member">
+
+<h4>macaulay_duration</h4>
+
+
+<div class="signature">
+
+<code>
+macaulay_duration(self, settle_dt: financepy.utils.date.Date, next_cpn: float, current_ibor: float, future_ibor: float, dm: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the Macaulay duration of the FRN on a settlement date
+given its yield to maturity.</div>
+
+</div>
+
+<div class="member">
+
+<h4>modified_duration</h4>
+
+
+<div class="signature">
+
+<code>
+modified_duration(self, settle_dt: financepy.utils.date.Date, next_cpn: float, current_ibor: float, future_ibor: float, dm: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the modified duration of the bond on a settlement date
+using standard model based on assumptions about future Ibor rates. The
+next Ibor payment which has reset is entered, so to is the current
+Ibor rate from settlement to the next coupon date (NCD). Finally, there
+is the level of subsequent future Ibor payments and the discount
+margin.</div>
+
+</div>
+
+<div class="member">
+
+<h4>modified_credit_duration</h4>
+
+
+<div class="signature">
+
+<code>
+modified_credit_duration(self, settle_dt: financepy.utils.date.Date, next_cpn: float, current_ibor: float, future_ibor: float, dm: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the modified duration of the bond on a settlement date
+using standard model based on assumptions about future Ibor rates. The
+next Ibor payment which has reset is entered, so to is the current
+Ibor rate from settlement to the next coupon date (NCD). Finally, there
+is the level of subsequent future Ibor payments and the discount
+margin.</div>
+
+</div>
+
+<div class="member">
+
+<h4>convexity_from_dm</h4>
+
+
+<div class="signature">
+
+<code>
+convexity_from_dm(self, settle_dt: financepy.utils.date.Date, next_cpn: float, current_ibor: float, future_ibor: float, dm: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the bond convexity from the discount margin (DM) using a
+standard model based on assumptions about future Ibor rates. The
+next Ibor payment which has reset is entered, so to is the current
+Ibor rate from settlement to the next coupon date (NCD). Finally, there
+is the level of subsequent future Ibor payments and the discount
+margin.</div>
+
+</div>
+
+<div class="member">
+
+<h4>clean_price_from_dm</h4>
+
+
+<div class="signature">
+
+<code>
+clean_price_from_dm(self, settle_dt: financepy.utils.date.Date, next_cpn: float, current_ibor: float, future_ibor: float, dm: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the bond clean price from the discount margin
+using standard model based on assumptions about future Ibor rates. The
+next Ibor payment which has reset is entered, so to is the current
+Ibor rate from settlement to the next coupon date (NCD). Finally, there
+is the level of subsequent future Ibor payments and the discount
+margin.</div>
+
+</div>
+
+<div class="member">
+
+<h4>discount_margin</h4>
+
+
+<div class="signature">
+
+<code>
+discount_margin(self, settle_dt: financepy.utils.date.Date, next_cpn: float, current_ibor: float, future_ibor: float, clean_price: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the bond&#x27;s yield to maturity by solving the price
+yield relationship using a one-dimensional root solver.</div>
+
+</div>
+
+<div class="member">
+
+<h4>accrued_interest</h4>
+
+
+<div class="signature">
+
+<code>
+accrued_interest(self, settle_dt: financepy.utils.date.Date, next_cpn: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the amount of coupon that has accrued between the
+previous coupon date and the settlement date. Ex-dividend dates are
+not handled. Contact me if you need this functionality.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_payments</h4>
+
+
+<div class="signature">
+
+<code>
+print_payments(self, settle_dt: financepy.utils.date.Date)
+</code>
+
+</div>
+
+
+<div class="docstring">Print a list of the unadjusted coupon payment dates used in
+analytic calculations for the bond.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Date - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">Utils</a> &rsaquo; Date</nav>
+<h1>Date</h1>
+
+<p class="source-name">
+financepy.utils.date
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>Date</h2>
+
+<div class="signature">
+
+<code>
+Date(d, m, y, hh=0, mm=0, ss=0)
+</code>
+
+</div>
+
+
+
+<div class="docstring">A date class to manage dates that is simple to use and includes a
+number of useful date functions used frequently in Finance.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>day_of_year</h4>
+
+
+<div class="signature">
+
+<code>
+day_of_year(self) -&gt; float
+</code>
+
+</div>
+
+
+<div class="docstring">Day of the year which can be float for intraday</div>
+
+</div>
+
+<div class="member">
+
+<h4>from_ymd_excel</h4>
+
+
+<div class="signature">
+
+<code>
+from_ymd_excel(cls, d, m, y, excel_dt)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>from_excel</h4>
+
+
+<div class="signature">
+
+<code>
+from_excel(excel_dt: float) -&gt; &#x27;Date&#x27;
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>from_string</h4>
+
+
+<div class="signature">
+
+<code>
+from_string(cls, date_string, format_string)
+</code>
+
+</div>
+
+
+<div class="docstring">Create a Date from a date and format string.
+Example Input:
+start_dt = Date(&#x27;1-1-2018&#x27;, &#x27;%d-%m-%Y&#x27;)</div>
+
+</div>
+
+<div class="member">
+
+<h4>from_date</h4>
+
+
+<div class="signature">
+
+<code>
+from_date(cls, value)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>is_weekend</h4>
+
+
+<div class="signature">
+
+<code>
+is_weekend(self)
+</code>
+
+</div>
+
+
+<div class="docstring">returns True if the date falls on a weekend.</div>
+
+</div>
+
+<div class="member">
+
+<h4>is_eom</h4>
+
+
+<div class="signature">
+
+<code>
+is_eom(self)
+</code>
+
+</div>
+
+
+<div class="docstring">returns True if this date falls on a month end.</div>
+
+</div>
+
+<div class="member">
+
+<h4>eom</h4>
+
+
+<div class="signature">
+
+<code>
+eom(self)
+</code>
+
+</div>
+
+
+<div class="docstring">returns last date of month of this date.</div>
+
+</div>
+
+<div class="member">
+
+<h4>add_hours</h4>
+
+
+<div class="signature">
+
+<code>
+add_hours(self, hours)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>add_minutes</h4>
+
+
+<div class="signature">
+
+<code>
+add_minutes(self, minutes)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>add_seconds</h4>
+
+
+<div class="signature">
+
+<code>
+add_seconds(self, seconds)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>add_days</h4>
+
+
+<div class="signature">
+
+<code>
+add_days(self, num_days=1)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>add_weekdays</h4>
+
+
+<div class="signature">
+
+<code>
+add_weekdays(self, num_days: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Returns a new date that is num_days working days after Date. Note
+that only weekends are taken into account. Other Holidays are not. If
+you want to include regional holidays then use add_business_days from
+the FinCalendar class.</div>
+
+</div>
+
+<div class="member">
+
+<h4>add_months</h4>
+
+
+<div class="signature">
+
+<code>
+add_months(self, mm: list | int) -&gt; ForwardRef(&#x27;Date&#x27;) | list
+</code>
+
+</div>
+
+
+<div class="docstring">Returns a new date that is mm months after the Date. If mm is an
+integer or float you get back a single date. If mm is a vector you get
+back a vector of dates.</div>
+
+</div>
+
+<div class="member">
+
+<h4>add_years</h4>
+
+
+<div class="signature">
+
+<code>
+add_years(self, yy: numpy.ndarray | float)
+</code>
+
+</div>
+
+
+<div class="docstring">Returns a new date that is yy years after the Date. If yy is an
+integer or float you get back a single date. If yy is a list you get
+back a vector of dates.</div>
+
+</div>
+
+<div class="member">
+
+<h4>next_cds_date</h4>
+
+
+<div class="signature">
+
+<code>
+next_cds_date(self, mm: int = 0)
+</code>
+
+</div>
+
+
+<div class="docstring">Returns a CDS date that is mm months after the Date. If no
+argument is supplied then the next CDS date after today is returned.</div>
+
+</div>
+
+<div class="member">
+
+<h4>third_wednesday_of_month</h4>
+
+
+<div class="signature">
+
+<code>
+third_wednesday_of_month(self, m: int, y: int)
+</code>
+
+</div>
+
+
+<div class="docstring">For a specific month and year this returns the day number of the
+3rd Wednesday by scanning through dates in the third week.</div>
+
+</div>
+
+<div class="member">
+
+<h4>next_imm_date</h4>
+
+
+<div class="signature">
+
+<code>
+next_imm_date(self)
+</code>
+
+</div>
+
+
+<div class="docstring">This function returns the next IMM date after the current date
+This is a 3rd Wednesday of Jun, March, Sep or December. For an
+IMM contract the IMM date is the First Delivery Date of the
+futures contract.</div>
+
+</div>
+
+<div class="member">
+
+<h4>add_tenor</h4>
+
+
+<div class="signature">
+
+<code>
+add_tenor(self, tenor: list | financepy.utils.date.Date.str | financepy.utils.tenor.Tenor)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the date following the Date by a period given by the
+tenor which is a string consisting of a number and a letter, the
+letter being d, w, m , y for day, week, month or year. This is case
+independent. For example 10Y means 10 years while 120m also means 10
+years. The date is NOT weekend or holiday calendar adjusted. This must
+be done AFTERWARDS.</div>
+
+</div>
+
+<div class="member">
+
+<h4>datetime</h4>
+
+
+<div class="signature">
+
+<code>
+datetime(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Returns a datetime of the date</div>
+
+</div>
+
+<div class="member">
+
+<h4>str</h4>
+
+
+<div class="signature">
+
+<code>
+str(self)
+</code>
+
+</div>
+
+
+<div class="docstring">returns a formatted string of the date</div>
+
+</div>
+
+
+</section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>daily_working_day_schedule</h3>
+
+<div class="signature">
+
+<code>
+daily_working_day_schedule(start_dt: financepy.utils.date.Date, end_dt: financepy.utils.date.Date)
+</code>
+
+</div>
+
+<div class="docstring">Returns a list of working dates between start_dt and end_dt.
+This function should be replaced by dateRange once add_tenor allows
+for working days.</div>
+
+</div>
+
+<div class="member">
+
+<h3>date_range</h3>
+
+<div class="signature">
+
+<code>
+date_range(start_dt: financepy.utils.date.Date, end_dt: financepy.utils.date.Date, tenor: str = &#x27;1D&#x27;)
+</code>
+
+</div>
+
+<div class="docstring">Returns a list of dates between start_dt (inclusive)
+and end_dt (inclusive). The tenor represents the distance between two
+consecutive dates and is set to daily by default.</div>
+
+</div>
+
+<div class="member">
+
+<h3>datediff</h3>
+
+<div class="signature">
+
+<code>
+datediff(d1: financepy.utils.date.Date, d2: financepy.utils.date.Date)
+</code>
+
+</div>
+
+<div class="docstring">Calculate the number of days between two Findates.</div>
+
+</div>
+
+<div class="member">
+
+<h3>days_in_month</h3>
+
+<div class="signature">
+
+<code>
+days_in_month(m, y)
+</code>
+
+</div>
+
+<div class="docstring">Get the number of days in the month (1-12) of a given year y.</div>
+
+</div>
+
+<div class="member">
+
+<h3>from_datetime</h3>
+
+<div class="signature">
+
+<code>
+from_datetime(dt: financepy.utils.date.Date)
+</code>
+
+</div>
+
+<div class="docstring">Construct a Date from a datetime as this is often needed if we
+receive inputs from other Python objects such as Pandas dataframes.</div>
+
+</div>
+
+<div class="member">
+
+<h3>is_leap_year</h3>
+
+<div class="signature">
+
+<code>
+is_leap_year(y: int)
+</code>
+
+</div>
+
+<div class="docstring">Test whether year y is a leap year - if so return True, else False</div>
+
+</div>
+
+<div class="member">
+
+<h3>parse_dt</h3>
+
+<div class="signature">
+
+<code>
+parse_dt(date_str, date_format)
+</code>
+
+</div>
+
+<div class="docstring">Parse a date string into day, month, and year components.</div>
+
+</div>
+
+<div class="member">
+
+<h3>vectorisation_helper</h3>
+
+<div class="signature">
+
+<code>
+vectorisation_helper(func)
+</code>
+
+</div>
+
+<div class="docstring">Decorator to allow a function to be vectorised over an iterable</div>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

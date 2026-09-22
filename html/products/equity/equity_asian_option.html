@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Equity Asian Option - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Equity</a> &rsaquo; Equity Asian Option</nav>
+<h1>Equity Asian Option</h1>
+
+<p class="source-name">
+financepy.products.equity.equity_asian_option
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>EquityAsianOption</h2>
+
+<div class="signature">
+
+<code>
+EquityAsianOption(start_averaging_dt: financepy.utils.date.Date, expiry_dt: financepy.utils.date.Date, strike_price: float, opt_type: financepy.utils.global_types.OptionTypes, num_obs_per_year: int = 100)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class for an Equity Asian Option. This is an option with a final payoff
+linked to the averaging of the stock price over some specified period
+before the option expires. The valuation is done for both an arithmetic and
+a geometric average but the former can only be done either using an
+analytical approximation of the arithmetic average distribution or by using
+Monte-Carlo simulation.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(self, value_dt: financepy.utils.date.Date, stock_price: float, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, dividend_curve: financepy.market.curves.discount_curve.DiscountCurve, model, method: financepy.utils.global_types.AsianOptionValuationTypes, accrued_average: float = None)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the value of an Asian option using one of the specified
+analytical approximations for an average rate option. These are the
+three enumerated values in the enum AsianOptionValuationTypes. The
+choices of approximation are (i) GEOMETRIC - the average is a geometric
+one as in paper by Kenna and Worst (1990), (ii) TURNBULL_WAKEMAN -
+this is a value based on an edgeworth expansion of the moments of the
+arithmetic average, and (iii) CURRAN - another approximative approach
+by Curran based on conditioning on the geometric mean price. Just
+choose the corresponding enumerated value to switch between these
+different approaches.
+
+Note that the accrued average is only required if the value date is
+inside the averaging period for the option.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_mc</h4>
+
+
+<div class="signature">
+
+<code>
+value_mc(self, value_dt: financepy.utils.date.Date, stock_price: float, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, dividend_curve: financepy.market.curves.discount_curve.DiscountCurve, model, num_paths: int, seed: int, accrued_average: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Monte Carlo valuation of the Asian Average option using standard
+Monte Carlo code enhanced by Numba. I have discontinued the use of this
+as it is both slow and has limited variance reduction.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_mc_fast</h4>
+
+
+<div class="signature">
+
+<code>
+value_mc_fast(self, value_dt: financepy.utils.date.Date, stock_price: float, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, dividend_curve: financepy.market.curves.discount_curve.DiscountCurve, model, num_paths, seed, accrued_average)
+</code>
+
+</div>
+
+
+<div class="docstring">Monte Carlo valuation of the Asian Average option. This method uses
+a lot of Numpy vectorisation. It is also helped by Numba.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_mc_fast_cv</h4>
+
+
+<div class="signature">
+
+<code>
+value_mc_fast_cv(self, value_dt: financepy.utils.date.Date, stock_price: float, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, dividend_curve: financepy.market.curves.discount_curve.DiscountCurve, model, num_paths, seed, accrued_average)
+</code>
+
+</div>
+
+
+<div class="docstring">Monte Carlo valuation of the Asian Average option using a control
+variate method that improves accuracy and reduces the variance of the
+price. This uses Numpy and Numba. This is the standard MC pricer.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

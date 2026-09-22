@@ -15,9 +15,9 @@ class EquityVolCurveNew:
 
     The smile is interpolated using total variance in log-forward-moneyness:
 
-        F = S * exp((r - q) * T)
-        k = log(K / F)
-        w(k) = sigma(k)^2 * T
+        $F = S * exp((r - q) * T)$
+        $k = log(K / F)$
+        $w(k) = sigma(k)^2 * T$
 
     PCHIP interpolation is used to reduce artificial oscillation and
     curvature relative to a standard cubic spline.
@@ -285,4 +285,4 @@ class EquityVolCurveNew:
     def forward(self) -> float:
         """Return the forward price used by the smile."""
 
-        return self._forward############################################################
+        return self._forward

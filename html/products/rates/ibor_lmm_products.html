@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Ibor Lmm Products - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Rates</a> &rsaquo; Ibor Lmm Products</nav>
+<h1>Ibor Lmm Products</h1>
+
+<p class="source-name">
+financepy.products.rates.ibor_lmm_products
+</p>
+<div class="docstring">This module implements the LMM in the spot measure. It combines both model
+and product specific code - I am not sure if it is better to separate these. At
+the moment this seems to work ok.
+
+THIS IS STILL IN PROTOPTYPE MODE. DO NOT USE.</div><h1>Classes</h1>
+<section>
+
+<h2>IborLMMProducts</h2>
+
+<div class="signature">
+
+<code>
+IborLMMProducts(settle_dt: financepy.utils.date.Date, maturity_dt: financepy.utils.date.Date, float_freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.QUARTERLY: 4&gt;, float_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type: financepy.utils.calendar.BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type: financepy.utils.calendar.DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">This is the class for pricing Ibor products using the LMM.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>simulate_1f</h4>
+
+
+<div class="signature">
+
+<code>
+simulate_1f(self, discount_curve, vol_curve: financepy.market.volatility.ibor_cap_vol_curve.IborCapVolCurve, num_paths: int = 1000, numeraire_index: int = 0, use_sobol: bool = True, seed: int = 42)
+</code>
+
+</div>
+
+
+<div class="docstring">Run the one-factor simulation of the evolution of the forward
+Ibors to generate and store all of the Ibor forward rate paths.</div>
+
+</div>
+
+<div class="member">
+
+<h4>simulate_mf</h4>
+
+
+<div class="signature">
+
+<code>
+simulate_mf(self, discount_curve, num_factors: int, lambdas: numpy.ndarray, num_paths: int = 10000, numeraire_index: int = 0, use_sobol: bool = True, seed: int = 42)
+</code>
+
+</div>
+
+
+<div class="docstring">Run the simulation to generate and store all of the Ibor forward
+rate paths. This is a multi-factorial version so the user must input
+a numpy array consisting of a column for each factor and the number of
+rows must equal the number of grid times on the underlying simulation
+grid. CHECK THIS.</div>
+
+</div>
+
+<div class="member">
+
+<h4>simulate_nf</h4>
+
+
+<div class="signature">
+
+<code>
+simulate_nf(self, discount_curve, vol_curve: financepy.market.volatility.ibor_cap_vol_curve.IborCapVolCurve, corr_matrix: numpy.ndarray, model_type: financepy.utils.global_types.LMMModelTypes, num_paths: int = 1000, numeraire_index: int = 0, use_sobol: bool = True, seed: int = 42)
+</code>
+
+</div>
+
+
+<div class="docstring">Run the simulation to generate and store all of the Ibor forward
+rate paths using a full factor reduction of the fwd-fwd correlation
+matrix using Cholesky decomposition.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_swaption</h4>
+
+
+<div class="signature">
+
+<code>
+value_swaption(self, settle_dt: financepy.utils.date.Date, exercise_dt: financepy.utils.date.Date, maturity_dt: financepy.utils.date.Date, swaption_type: financepy.utils.global_types.SwapTypes, fixed_cpn: float, fixed_freq_type: financepy.utils.frequency.FrequencyTypes, fixed_dc_type: financepy.utils.day_count.DayCountTypes, notional: float = 1000000, float_freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.QUARTERLY: 4&gt;, float_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type: financepy.utils.calendar.BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type: financepy.utils.calendar.DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Value a swaption in the LMM model using simulated paths of the
+forward curve. This relies on pricing the fixed leg of the swap and
+assuming that the floating leg will be worth par. As a result we only
+need simulate Ibors with the frequency of the fixed leg.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_cap_floor</h4>
+
+
+<div class="signature">
+
+<code>
+value_cap_floor(self, settle_dt: financepy.utils.date.Date, maturity_dt: financepy.utils.date.Date, cap_floor_type: financepy.utils.global_types.CapFloorTypes, cap_floor_rate: float, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.QUARTERLY: 4&gt;, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;, notional: float = 1000000, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type: financepy.utils.calendar.BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type: financepy.utils.calendar.DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Value a cap or floor in the LMM.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

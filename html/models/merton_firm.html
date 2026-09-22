@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Merton Firm - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">Models</a> &rsaquo; Merton Firm</nav>
+<h1>Merton Firm</h1>
+
+<p class="source-name">
+financepy.models.merton_firm
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>MertonFirm</h2>
+
+<div class="signature">
+
+<code>
+MertonFirm(asset_value: float | numpy.ndarray, debt_face_value: float | numpy.ndarray, time_to_maturity: float | numpy.ndarray, risk_free_rate: float | numpy.ndarray, asset_drift: float | numpy.ndarray, asset_volatility: float | numpy.ndarray) -&gt; None
+</code>
+
+</div>
+
+
+
+<div class="docstring">Merton structural firm-value model.
+
+Inputs may be scalars or NumPy arrays and are broadcast using NumPy rules.
+
+Parameters
+----------
+asset_value : float or np.ndarray
+    Market value of the firm&#x27;s assets, A(t).
+
+debt_face_value : float or np.ndarray
+    Face value of zero-coupon debt, F.
+
+time_to_maturity : float or np.ndarray
+    Time to debt maturity, tau = T - t, in years.
+
+risk_free_rate : float or np.ndarray
+    Continuously compounded risk-free rate.
+
+asset_drift : float or np.ndarray
+    Physical expected return on the firm&#x27;s assets.
+
+asset_volatility : float or np.ndarray
+    Volatility of the firm&#x27;s asset value.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>asset_value</h4>
+
+
+<div class="signature">
+
+<code>
+asset_value(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the firm&#x27;s asset value.</div>
+
+</div>
+
+<div class="member">
+
+<h4>debt_face_value</h4>
+
+
+<div class="signature">
+
+<code>
+debt_face_value(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the debt face value.</div>
+
+</div>
+
+<div class="member">
+
+<h4>time_to_maturity</h4>
+
+
+<div class="signature">
+
+<code>
+time_to_maturity(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return time to maturity.</div>
+
+</div>
+
+<div class="member">
+
+<h4>risk_free_rate</h4>
+
+
+<div class="signature">
+
+<code>
+risk_free_rate(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the risk-free rate.</div>
+
+</div>
+
+<div class="member">
+
+<h4>asset_drift</h4>
+
+
+<div class="signature">
+
+<code>
+asset_drift(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the physical asset drift.</div>
+
+</div>
+
+<div class="member">
+
+<h4>asset_volatility</h4>
+
+
+<div class="signature">
+
+<code>
+asset_volatility(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the asset volatility.</div>
+
+</div>
+
+<div class="member">
+
+<h4>asset_to_debt_ratio</h4>
+
+
+<div class="signature">
+
+<code>
+asset_to_debt_ratio(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return A(t) / F.</div>
+
+</div>
+
+<div class="member">
+
+<h4>equity_value</h4>
+
+
+<div class="signature">
+
+<code>
+equity_value(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the market value of equity.</div>
+
+</div>
+
+<div class="member">
+
+<h4>debt_value</h4>
+
+
+<div class="signature">
+
+<code>
+debt_value(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the market value of risky zero-coupon debt.</div>
+
+</div>
+
+<div class="member">
+
+<h4>equity_volatility</h4>
+
+
+<div class="signature">
+
+<code>
+equity_volatility(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the equity volatility implied by the Merton model.</div>
+
+</div>
+
+<div class="member">
+
+<h4>risky_yield</h4>
+
+
+<div class="signature">
+
+<code>
+risky_yield(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the continuously compounded risky debt yield.</div>
+
+</div>
+
+<div class="member">
+
+<h4>credit_spread</h4>
+
+
+<div class="signature">
+
+<code>
+credit_spread(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the continuously compounded credit spread.</div>
+
+</div>
+
+<div class="member">
+
+<h4>distance_to_default</h4>
+
+
+<div class="signature">
+
+<code>
+distance_to_default(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the physical-measure distance to default.
+
+This uses the physical asset drift rather than the risk-free rate.</div>
+
+</div>
+
+<div class="member">
+
+<h4>physical_default_probability</h4>
+
+
+<div class="signature">
+
+<code>
+physical_default_probability(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the physical probability of default by maturity.</div>
+
+</div>
+
+<div class="member">
+
+<h4>risk_neutral_default_probability</h4>
+
+
+<div class="signature">
+
+<code>
+risk_neutral_default_probability(self) -&gt; numpy.ndarray
+</code>
+
+</div>
+
+
+<div class="docstring">Return the risk-neutral probability of default by maturity.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

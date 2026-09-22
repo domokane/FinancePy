@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Fx Vanilla Option - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Fx</a> &rsaquo; Fx Vanilla Option</nav>
+<h1>Fx Vanilla Option</h1>
+
+<p class="source-name">
+financepy.products.fx.fx_vanilla_option
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>FXVanillaOption</h2>
+
+<div class="signature">
+
+<code>
+FXVanillaOption(expiry_dt: financepy.utils.date.Date, strike_fx_rate: float | numpy.ndarray, currency_pair: str, opt_type: financepy.utils.global_types.OptionTypes | list, notional: float, prem_currency: str, spot_days: int = 0)
+</code>
+
+</div>
+
+
+
+<div class="docstring">This is a class for an FX Option trade. It permits the user to
+calculate the price of an FX Option trade which can be expressed in a
+number of ways depending on the investor or hedger&#x27;s currency. It aslo
+allows the calculation of the option&#x27;s delta in a number of forms as
+well as the various Greek risk sensitivies.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
+</code>
+
+</div>
+
+
+<div class="docstring">This function calculates the value of the option using a specified
+model with the resulting value being in domestic i.e. ccy2 terms.
+Recall that Domestic = CCY2 and Foreign = CCY1 and FX rate is in
+price in domestic of one unit of foreign currency.</div>
+
+</div>
+
+<div class="member">
+
+<h4>delta_bump</h4>
+
+
+<div class="signature">
+
+<code>
+delta_bump(self, value_dt, spot_fx_rate, ccy1_discount_curve, ccy2_discount_curve, model)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculation of the FX option delta by bumping the spot FX rate by
+1 cent of its value. This gives the FX spot delta. For speed we prefer
+to use the analytical calculation of the derivative given below.</div>
+
+</div>
+
+<div class="member">
+
+<h4>delta</h4>
+
+
+<div class="signature">
+
+<code>
+delta(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculation of the FX Option delta. There are several definitions
+of delta and so we are required to return a dictionary of values. The
+definitions can be found on Page 44 of Foreign Exchange Option Pricing
+by Iain Clark, published by Wiley Finance.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fast_delta</h4>
+
+
+<div class="signature">
+
+<code>
+fast_delta(self, t, s, rd, rf, vol)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculation of the FX Option delta. Used in the determination of
+the volatility surface. Avoids discount curve interpolation so it
+should be slightly faster than the full calculation of delta.</div>
+
+</div>
+
+<div class="member">
+
+<h4>gamma</h4>
+
+
+<div class="signature">
+
+<code>
+gamma(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
+</code>
+
+</div>
+
+
+<div class="docstring">This function calculates the FX Option Gamma using spot delta.</div>
+
+</div>
+
+<div class="member">
+
+<h4>vega</h4>
+
+
+<div class="signature">
+
+<code>
+vega(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
+</code>
+
+</div>
+
+
+<div class="docstring">This function calculates the FX Option Vega using the spot delta.</div>
+
+</div>
+
+<div class="member">
+
+<h4>theta</h4>
+
+
+<div class="signature">
+
+<code>
+theta(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
+</code>
+
+</div>
+
+
+<div class="docstring">This function calculates the time decay of the FX option.</div>
+
+</div>
+
+<div class="member">
+
+<h4>implied_volatility</h4>
+
+
+<div class="signature">
+
+<code>
+implied_volatility(self, value_dt, stock_price, discount_curve, dividend_curve, price)
+</code>
+
+</div>
+
+
+<div class="docstring">This function determines the implied volatility of an FX option
+given a price and the other option details. It uses a one-dimensional
+Newton root search algorith to determine the implied volatility.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_mc</h4>
+
+
+<div class="signature">
+
+<code>
+value_mc(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model, num_paths=10000, seed=4242)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the value of an FX Option using Monte Carlo methods.
+This function can be used to validate the risk measures calculated
+above or used as the starting code for a model exotic FX product that
+cannot be priced analytically. This function uses Numpy vectorisation
+for speed of execution.</div>
+
+</div>
+
+
+</section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>f</h3>
+
+<div class="signature">
+
+<code>
+f(volatility, *args)
+</code>
+
+</div>
+
+<div class="docstring">This is the objective function used in the determination of the FX
+Option implied volatility which is computed in the class below.</div>
+
+</div>
+
+<div class="member">
+
+<h3>fvega</h3>
+
+<div class="signature">
+
+<code>
+fvega(volatility, *args)
+</code>
+
+</div>
+
+<div class="docstring">This is the derivative of the objective function with respect to the
+option volatility. It is used to speed up the determination of the FX
+Option implied volatility which is computed in the class below.</div>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

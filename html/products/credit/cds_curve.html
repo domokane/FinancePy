@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Cds Curve - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Credit</a> &rsaquo; Cds Curve</nav>
+<h1>Cds Curve</h1>
+
+<p class="source-name">
+financepy.products.credit.cds_curve
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>CDSCurve</h2>
+
+<div class="signature">
+
+<code>
+CDSCurve(anchor_dt: financepy.utils.date.Date, cds_contracts: list, libor_curve, recovery_rate, interp_method: financepy.utils.global_types.InterpTypes = &lt;InterpTypes.FLAT_FWD_RATES: 1&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Generate a survival probability curve implied by the value of CDS
+contracts given a Ibor curve and an assumed recovery rate. The recovery
+rate corresponds to the seniority of the debt for these CDS. A scheme for
+the interpolation of the survival probabilities is also required.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>set_times</h4>
+
+
+<div class="signature">
+
+<code>
+set_times(self, times: &lt;built-in function array&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Set the times vector</div>
+
+</div>
+
+<div class="member">
+
+<h4>set_qs</h4>
+
+
+<div class="signature">
+
+<code>
+set_qs(self, qvector: &lt;built-in function array&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Set the survival probability curve</div>
+
+</div>
+
+<div class="member">
+
+<h4>set_q</h4>
+
+
+<div class="signature">
+
+<code>
+set_q(self, index, q)
+</code>
+
+</div>
+
+
+<div class="docstring">Set the survival probability at a specific index.</div>
+
+</div>
+
+<div class="member">
+
+<h4>set_last_q</h4>
+
+
+<div class="signature">
+
+<code>
+set_last_q(self, q)
+</code>
+
+</div>
+
+
+<div class="docstring">Set the survival probability factor at last index.</div>
+
+</div>
+
+<div class="member">
+
+<h4>survival_prob</h4>
+
+
+<div class="signature">
+
+<code>
+survival_prob(self, dt)
+</code>
+
+</div>
+
+
+<div class="docstring">Extract the survival probability to date dt. This function
+supports vectorisation.</div>
+
+</div>
+
+<div class="member">
+
+<h4>df</h4>
+
+
+<div class="signature">
+
+<code>
+df(self, dt)
+</code>
+
+</div>
+
+
+<div class="docstring">Extract the discount factor from the underlying Ibor curve. This
+function supports vectorisation.</div>
+
+</div>
+
+<div class="member">
+
+<h4>build_curve</h4>
+
+
+<div class="signature">
+
+<code>
+build_curve(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Construct the CDS survival curve from a set of CDS contracts</div>
+
+</div>
+
+<div class="member">
+
+<h4>fwd</h4>
+
+
+<div class="signature">
+
+<code>
+fwd(self, fwd_dt)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the instantaneous forward rate at date fwd_dt
+using a numerical derivative.</div>
+
+</div>
+
+<div class="member">
+
+<h4>zero_rate</h4>
+
+
+<div class="signature">
+
+<code>
+zero_rate(self, dt, freq_type=&lt;FrequencyTypes.CONTINUOUS: 99&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the zero rate to date dt in the chosen compounding
+frequency where -1 is continuous is the default.</div>
+
+</div>
+
+
+</section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>f</h3>
+
+<div class="signature">
+
+<code>
+f(q, *args)
+</code>
+
+</div>
+
+<div class="docstring">Function that returns zero when the survival probability that gives a
+zero value of the CDS has been determined.</div>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

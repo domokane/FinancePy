@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Helpers - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">Utils</a> &rsaquo; Helpers</nav>
+<h1>Helpers</h1>
+
+<p class="source-name">
+financepy.utils.helpers
+</p>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>beta_vector_to_corr_matrix</h3>
+
+<div class="signature">
+
+<code>
+beta_vector_to_corr_matrix(betas)
+</code>
+
+</div>
+
+<div class="docstring">Convert a one-factor vector of factor weights to a square correlation
+matrix.</div>
+
+</div>
+
+<div class="member">
+
+<h3>check_argument_types</h3>
+
+<div class="signature">
+
+<code>
+check_argument_types(func, values)
+</code>
+
+</div>
+
+<div class="docstring">Check function arguments against their type annotations.
+
+Parameters
+----------
+func : callable
+    Function whose annotations are used for type checking.
+values : dict
+    Mapping of argument names to supplied values, typically locals().
+
+Raises
+------
+FinError
+    If an argument does not match its annotated type.</div>
+
+</div>
+
+<div class="member">
+
+<h3>check_dt</h3>
+
+<div class="signature">
+
+<code>
+check_dt(d: financepy.utils.date.Date)
+</code>
+
+</div>
+
+<div class="docstring">Check that input d is a Date.</div>
+
+</div>
+
+<div class="member">
+
+<h3>check_vector_differences</h3>
+
+<div class="signature">
+
+<code>
+check_vector_differences(x: numpy.ndarray, y: numpy.ndarray, tol: float = 1e-06)
+</code>
+
+</div>
+
+<div class="docstring">Compare two vectors elementwise to see if they are more different than
+tolerance.</div>
+
+</div>
+
+<div class="member">
+
+<h3>dump</h3>
+
+<div class="signature">
+
+<code>
+dump(obj)
+</code>
+
+</div>
+
+<div class="docstring">Get a list of all of the attributes of a class (not built in ones)</div>
+
+</div>
+
+<div class="member">
+
+<h3>format_table</h3>
+
+<div class="signature">
+
+<code>
+format_table(header, rows)
+</code>
+
+</div>
+
+<div class="docstring">Format a table without PrettyTable.
+Left-align text, right-align numbers.</div>
+
+</div>
+
+<div class="member">
+
+<h3>grid_index</h3>
+
+<div class="signature">
+
+<code>
+grid_index(t, grid_times)
+</code>
+
+</div>
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h3>input_time</h3>
+
+<div class="signature">
+
+<code>
+input_time(dt: financepy.utils.date.Date, curve)
+</code>
+
+</div>
+
+<div class="docstring">Validates a time input in relation to a curve. If it is a float then
+it returns a float as long as it is positive. If it is a Date then it
+converts it to a float. If it is a Numpy array then it returns the array
+as long as it is all positive.</div>
+
+</div>
+
+<div class="member">
+
+<h3>label_to_string</h3>
+
+<div class="signature">
+
+<code>
+label_to_string(label: str, value: float | str, separator: str = &#x27;\n&#x27;, list_format: bool = False)
+</code>
+
+</div>
+
+<div class="docstring">Format label/value pairs for a unified formatting.</div>
+
+</div>
+
+<div class="member">
+
+<h3>option_years</h3>
+
+<div class="signature">
+
+<code>
+option_years(value_dt: financepy.utils.date.Date, expiry_dt: financepy.utils.date.Date, floor=1e-10, fail=True)
+</code>
+
+</div>
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h3>print_tree</h3>
+
+<div class="signature">
+
+<code>
+print_tree(array: numpy.ndarray, depth: int = None)
+</code>
+
+</div>
+
+<div class="docstring">Function that prints a binomial or trinonial tree to screen for the
+purpose of debugging.</div>
+
+</div>
+
+<div class="member">
+
+<h3>pv01_times</h3>
+
+<div class="signature">
+
+<code>
+pv01_times(t: float, f: float)
+</code>
+
+</div>
+
+<div class="docstring">Calculate a bond style pv01 by calculating remaining coupon times for a
+bond with t years to maturity and a coupon frequency of f. The order of the
+list is reverse time order - it starts with the last coupon date and ends
+with the first coupon date.</div>
+
+</div>
+
+<div class="member">
+
+<h3>table_to_string</h3>
+
+<div class="signature">
+
+<code>
+table_to_string(header: str, value_table, float_precision=&#x27;10.7f&#x27;)
+</code>
+
+</div>
+
+<div class="docstring">Format a 2D array into a table-like string.</div>
+
+</div>
+
+<div class="member">
+
+<h3>times_from_dates</h3>
+
+<div class="signature">
+
+<code>
+times_from_dates(value_dt: financepy.utils.date.Date, dt: financepy.utils.date.Date | list, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;)
+</code>
+
+</div>
+
+<div class="docstring">Return year fractions from value_dt to dt.
+
+If dt is a single Date, return a float.
+If dt is a list of Dates, return a numpy array of floats.</div>
+
+</div>
+
+<div class="member">
+
+<h3>to_usable_type</h3>
+
+<div class="signature">
+
+<code>
+to_usable_type(t)
+</code>
+
+</div>
+
+<div class="docstring">Convert a type such that it can be used with `isinstance`</div>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

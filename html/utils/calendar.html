@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Calendar - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">Utils</a> &rsaquo; Calendar</nav>
+<h1>Calendar</h1>
+
+<p class="source-name">
+financepy.utils.calendar
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>BusDayAdjustTypes</h2>
+
+<div class="signature">
+
+<code>
+BusDayAdjustTypes(*values)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: Enum</div>
+
+<div class="docstring">Enum for business day adjustment types.</div>
+
+
+
+</section>
+
+<section>
+
+<h2>Calendar</h2>
+
+<div class="signature">
+
+<code>
+Calendar(cal_type: financepy.utils.calendar.CalendarTypes | list | tuple)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class to manage designation of payment dates as holidays according to
+a regional or country-specific calendar convention specified by the user.
+It also supplies an adjustment method which takes in an adjustment
+convention and then applies that to any date that falls on a holiday in the
+specified calendar.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>adjust_cached</h4>
+
+
+<div class="signature">
+
+<code>
+adjust_cached(self, dt: &#x27;Date&#x27;, bd_type: &#x27;BusDayAdjustTypes&#x27;) -&gt; &#x27;Date&#x27;
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>adjust</h4>
+
+
+<div class="signature">
+
+<code>
+adjust(self, dt: financepy.utils.date.Date, bd_type: financepy.utils.calendar.BusDayAdjustTypes)
+</code>
+
+</div>
+
+
+<div class="docstring">Adjust a payment date if it falls on a holiday according to the
+specified business day convention.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fast_adjust</h4>
+
+
+<div class="signature">
+
+<code>
+fast_adjust(self, dt: financepy.utils.date.Date, bd_type: financepy.utils.calendar.BusDayAdjustTypes)
+</code>
+
+</div>
+
+
+<div class="docstring">Fast adjust a payment date using business day conventions.</div>
+
+</div>
+
+<div class="member">
+
+<h4>add_business_days</h4>
+
+
+<div class="signature">
+
+<code>
+add_business_days(self, start_dt: financepy.utils.date.Date, num_days: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the date num_days business days from start_dt.
+
+The start date itself is not counted.</div>
+
+</div>
+
+<div class="member">
+
+<h4>add_business_days_old</h4>
+
+
+<div class="signature">
+
+<code>
+add_business_days_old(self, start_dt: financepy.utils.date.Date, num_days: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Returns a new date that is num_days business days after Date.
+All holidays in the chosen calendar are assumed not business days.</div>
+
+</div>
+
+<div class="member">
+
+<h4>is_business_day</h4>
+
+
+<div class="signature">
+
+<code>
+is_business_day(self, dt: financepy.utils.date.Date)
+</code>
+
+</div>
+
+
+<div class="docstring">Determines if a date is a business day according to the specified
+calendar. If it is it returns True, otherwise False.</div>
+
+</div>
+
+<div class="member">
+
+<h4>is_holiday</h4>
+
+
+<div class="signature">
+
+<code>
+is_holiday(self, dt: financepy.utils.date.Date)
+</code>
+
+</div>
+
+
+<div class="docstring">Determines if a date is a Holiday according to the specified
+calendar. Weekends are not holidays unless the holiday falls on a
+weekend date.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_weekend</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_weekend(self, dt: financepy.utils.date.Date)
+</code>
+
+</div>
+
+
+<div class="docstring">Weekends by themselves are a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_australia</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_australia(self, dt: financepy.utils.date.Date, day_in_year: int, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_sydney</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_sydney(self, dt: financepy.utils.date.Date, day_in_year: int, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Sydney / NSW banking calendar.
+
+Weekends are handled separately by is_business_day().
+
+Includes NSW public holidays relevant to Sydney banking,
+plus the NSW Bank Holiday on the first Monday in August.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_australia_rits</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_australia_rits(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">RITS settlement calendar.
+
+RITS is open when banks are generally open in either Sydney
+or Melbourne. It is closed on weekends and on holidays
+observed in both NSW and Victoria.
+
+Weekends are handled separately by is_business_day().</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_aud_fx_settlement</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_aud_fx_settlement(self, dt: financepy.utils.date.Date, day_in_year: int, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">AUD FX settlement calendar.
+
+An AUD FX value date must be a Sydney banking business day.
+Weekends are handled separately by is_business_day().</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_united_kingdom</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_united_kingdom(self, dt: financepy.utils.date.Date, day_in_year: int, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_london</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_london(self, dt: financepy.utils.date.Date, day_in_year: int, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_france</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_france(self, dt: financepy.utils.date.Date, day_in_year: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_singapore</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_singapore(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Singapore banking / public holiday calendar.
+
+Intended for:
+  - SGD derivatives
+  - Singapore banking business days
+  - SGD settlement
+
+Weekends are handled separately by is_business_day().
+
+Moving religious holidays are maintained from the official
+Singapore Ministry of Manpower annual holiday calendar.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_sweden</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_sweden(self, dt: financepy.utils.date.Date, day_in_year: int, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_germany</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_germany(self, dt: financepy.utils.date.Date, day_in_year: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_switzerland</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_switzerland(self, dt: financepy.utils.date.Date, day_in_year: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_zurich</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_zurich(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Zurich / CHF currency holiday calendar.
+
+Intended for:
+  - SARON
+  - CHF OIS / swaps
+  - CHF money-market settlement
+
+Weekends are handled separately by is_business_day().</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_japan</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_japan(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Japanese statutory public holidays. Weekends handled separately.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_tokyo</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_tokyo(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_new_zealand</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_new_zealand(self, dt: financepy.utils.date.Date, day_in_year: int, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">New Zealand public / banking holiday calendar.
+
+Weekends are handled separately by is_business_day().
+
+Includes:
+  - New Year&#x27;s Day and day after New Year&#x27;s Day
+  - Waitangi Day
+  - Good Friday
+  - Easter Monday
+  - ANZAC Day
+  - King&#x27;s / Queen&#x27;s Birthday
+  - Matariki
+  - Labour Day
+  - Christmas Day
+  - Boxing Day
+
+Provincial anniversary days are deliberately excluded.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_norway</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_norway(self, dt: financepy.utils.date.Date, day_in_year: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_united_states</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_united_states(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.
+This is a legacy generic US calendar that contains the superset of
+holidays for bond markets, NYSE, and public holidays. For each of
+these and other categories there will be some variations.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_us_government_securities</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_us_government_securities(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">U.S. Government Securities / SIFMA calendar.
+
+Intended for:
+  - U.S. Treasury / government securities market
+  - SOFR-related business-day logic
+
+Weekends are handled separately by is_business_day().
+
+NOTE:
+SIFMA recommendations can change and exceptional dates occur.
+Keep year-specific overrides for authoritative market closures.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_us_federal_reserve</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_us_federal_reserve(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Federal Reserve Bank business-day calendar.
+
+Intended for:
+  - Federal Reserve Bank business days
+  - Fedwire / National Settlement Service
+  - EFFR / OBFR publication calendar
+
+Weekends are handled separately by is_business_day().
+
+Important:
+  - Saturday holidays are NOT observed on Friday by Federal Reserve Banks.
+  - Sunday holidays ARE observed on Monday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_new_york</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_new_york(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.
+This is a NY specific US calendar close to Federal Reserve calendar.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_canada</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_canada(self, dt: financepy.utils.date.Date, day_in_year: int, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_toronto</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_toronto(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Toronto banking calendar.
+
+Intended for:
+  - CORRA
+  - CAD OIS / swaps
+  - Toronto banking business-day conventions
+
+Weekends are handled separately by is_business_day().</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_italy</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_italy(self, dt: financepy.utils.date.Date, day_in_year: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_hong_kong</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_hong_kong(self, dt: financepy.utils.date.Date, weekday: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Hong Kong banking / general holiday calendar.
+
+Intended for:
+  - HKD derivatives
+  - Hong Kong banking business days
+  - HKD settlement
+
+Weekends are handled separately by is_business_day().
+
+Lunar and substitution holidays should be maintained
+from the official gazetted Hong Kong holiday calendar.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_target</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_target(self, dt: financepy.utils.date.Date, day_in_year)
+</code>
+
+</div>
+
+
+<div class="docstring">Only bank holidays. Weekends by themselves are not a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>holiday_none</h4>
+
+
+<div class="signature">
+
+<code>
+holiday_none(self, dt: financepy.utils.date.Date = None)
+</code>
+
+</div>
+
+
+<div class="docstring">No day is a holiday.</div>
+
+</div>
+
+<div class="member">
+
+<h4>get_holiday_list</h4>
+
+
+<div class="signature">
+
+<code>
+get_holiday_list(self, year: int)
+</code>
+
+</div>
+
+
+<div class="docstring">Generate a list of declared calendar holidays in a given year.
+
+This includes declared holidays that fall on weekends, but does not
+include ordinary weekends unless the calendar type is WEEKEND.</div>
+
+</div>
+
+<div class="member">
+
+<h4>easter_monday</h4>
+
+
+<div class="signature">
+
+<code>
+easter_monday(self, year: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Get the day in a given year that is Easter Monday. This is not
+easy to compute, so we rely on a pre-calculated array.</div>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>CalendarTypes</h2>
+
+<div class="signature">
+
+<code>
+CalendarTypes(*values)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: Enum</div>
+
+<div class="docstring">Enum for calendar types.</div>
+
+
+
+</section>
+
+<section>
+
+<h2>DateGenRuleTypes</h2>
+
+<div class="signature">
+
+<code>
+DateGenRuleTypes(*values)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: Enum</div>
+
+<div class="docstring">Enum for date generation rule types.</div>
+
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

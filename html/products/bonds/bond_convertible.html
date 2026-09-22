@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Bond Convertible - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Bonds</a> &rsaquo; Bond Convertible</nav>
+<h1>Bond Convertible</h1>
+
+<p class="source-name">
+financepy.products.bonds.bond_convertible
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>BondConvertible</h2>
+
+<div class="signature">
+
+<code>
+BondConvertible(maturity_dt: financepy.utils.date.Date, coupon: float, freq_type: financepy.utils.frequency.FrequencyTypes, start_convert_dt: financepy.utils.date.Date, conversion_ratio: float, call_dts: List[financepy.utils.date.Date], call_prices: numpy.ndarray, put_dts: List[financepy.utils.date.Date], put_prices: numpy.ndarray, accrual_dc_type: financepy.utils.day_count.DayCountTypes, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class for convertible bonds. These bonds embed rights to call and put
+the bond in return for equity. Until then, they are bullet bonds which
+means they have regular coupon payments of a known size that are paid on
+known dates plus a payment of par at maturity. As the options are price
+based, the decision to convert to equity depends on the stock price,
+the credit quality of the issuer and the level of interest rates.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(self, settle_dt: financepy.utils.date.Date, stock_price: float, stock_volatility: float, dividend_dts: List[financepy.utils.date.Date], dividend_yields: numpy.ndarray, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, credit_spread: float, recovery_rate: float = 0.4, num_steps_per_year: int = 100)
+</code>
+
+</div>
+
+
+<div class="docstring">A binomial tree valuation model for a convertible bond that captures
+the embedded equity option due to the existence of a conversion option
+which can be invoked after a specific date.
+
+The model allows the user to enter a schedule of dividend payment
+dates but the size of the payments must be in yield terms i.e. a known
+percentage of currently unknown future stock price is paid. Not a
+fixed amount. A fixed yield. Following this payment the stock is
+assumed to drop by the size of the dividend payment.
+
+The model also captures the stock dependent credit risk of the cash
+flows in which the bond price can default at any time with a hazard
+rate implied by the credit spread and an associated recovery rate.
+This is the model proposed by Hull (OFODS 6th edition,.page 522).
+
+The model captures both the issuer&#x27;s call schedule which is assumed
+to apply on a list of dates provided by the user, along with a call
+price. It also captures the embedded owner&#x27;s put schedule of prices.</div>
+
+</div>
+
+<div class="member">
+
+<h4>accrued_interest</h4>
+
+
+<div class="signature">
+
+<code>
+accrued_interest(self, settle_dt: financepy.utils.date.Date, face: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the amount of coupon that has accrued between the
+previous coupon date and the settlement date.</div>
+
+</div>
+
+<div class="member">
+
+<h4>current_yield</h4>
+
+
+<div class="signature">
+
+<code>
+current_yield(self, clean_price: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the current yield of the bond which is the
+coupon divided by the clean price (not the full price)</div>
+
+</div>
+
+
+</section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>print_tree</h3>
+
+<div class="signature">
+
+<code>
+print_tree(array)
+</code>
+
+</div>
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

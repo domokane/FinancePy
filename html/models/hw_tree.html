@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Hw Tree - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">Models</a> &rsaquo; Hw Tree</nav>
+<h1>Hw Tree</h1>
+
+<p class="source-name">
+financepy.models.hw_tree
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>HWTree</h2>
+
+<div class="signature">
+
+<code>
+HWTree(sigma: float, a: float, num_time_steps: int = 100, european_calc_type: financepy.utils.global_types.HWEuropeanCalcTypes = &lt;HWEuropeanCalcTypes.EXPIRY_TREE: 3&gt;) -&gt; None
+</code>
+
+</div>
+
+
+
+<p><em>No description available.</em></p>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>option_on_zcb</h4>
+
+
+<div class="signature">
+
+<code>
+option_on_zcb(self, t_exp: float, t_mat: float, strike: float, face_amount: float, df_times: numpy.ndarray, df_values: numpy.ndarray) -&gt; Dict[str, float]
+</code>
+
+</div>
+
+
+<div class="docstring">Price an option on a zero cpn bond using analytical solution of
+Hull-White model. User provides bond face and option strike and expiry
+date and maturity date.</div>
+
+</div>
+
+<div class="member">
+
+<h4>european_bond_option_jamshidian</h4>
+
+
+<div class="signature">
+
+<code>
+european_bond_option_jamshidian(self, t_exp: float, strike_price: float, face: float, cpn_times: numpy.ndarray, cpn_amounts: numpy.ndarray, df_times: numpy.ndarray, df_values: numpy.ndarray)
+</code>
+
+</div>
+
+
+<div class="docstring">Valuation of a European bond option using the Jamshidian
+deconstruction of the bond into a strip of zero cpn bonds with the
+short rate that would make the bond option be at the money forward.</div>
+
+</div>
+
+<div class="member">
+
+<h4>european_bond_option_expiry_only</h4>
+
+
+<div class="signature">
+
+<code>
+european_bond_option_expiry_only(self, t_exp: float, strike_price: float, face_amount: float, cpn_times: numpy.ndarray, cpn_amounts: numpy.ndarray) -&gt; Dict[str, float]
+</code>
+
+</div>
+
+
+<div class="docstring">Price a European option on a cpn-paying bond using a tree to
+generate short rates at the expiry date and then to use the analytical
+solution of zero cpn bond prices in the HW model to calculate the
+corresponding bond price. User provides bond object and option details.</div>
+
+</div>
+
+<div class="member">
+
+<h4>option_on_zero_cpn_bond_tree</h4>
+
+
+<div class="signature">
+
+<code>
+option_on_zero_cpn_bond_tree(self, t_exp: float, t_mat: float, strike_price: float, face_amount: float) -&gt; Dict[str, float]
+</code>
+
+</div>
+
+
+<div class="docstring">Price an option on a zero cpn bond using a HW trinomial
+tree. The discount curve was already supplied to the tree build.</div>
+
+</div>
+
+<div class="member">
+
+<h4>bermudan_swaption</h4>
+
+
+<div class="signature">
+
+<code>
+bermudan_swaption(self, t_exp: float, t_mat: float, strike: float, face: float, cpn_times: numpy.ndarray, cpn_flows: numpy.ndarray, exercise_type: Any) -&gt; Dict[str, float]
+</code>
+
+</div>
+
+
+<div class="docstring">Swaption that can be exercised on specific dates over the exercise
+period. Due to non-analytical bond price we need to extend tree out to
+bond maturity and take into account cash flows through time.</div>
+
+</div>
+
+<div class="member">
+
+<h4>bond_option</h4>
+
+
+<div class="signature">
+
+<code>
+bond_option(self, t_exp: float, strike_price: float, face_amount: float, cpn_times: numpy.ndarray, cpn_flows: numpy.ndarray, exercise_type: Any) -&gt; Dict[str, float]
+</code>
+
+</div>
+
+
+<div class="docstring">Value a bond option that can have European or American exercise.
+This is done using a trinomial tree that we extend out to bond
+maturity. For European bond options, Jamshidian&#x27;s model is
+faster and is used instead i.e. not this function.</div>
+
+</div>
+
+<div class="member">
+
+<h4>callable_puttable_bond_tree</h4>
+
+
+<div class="signature">
+
+<code>
+callable_puttable_bond_tree(self, cpn_times: numpy.ndarray, cpn_flows: numpy.ndarray, call_times: numpy.ndarray, call_prices: numpy.ndarray, put_times: numpy.ndarray, put_prices: numpy.ndarray, face_amount: float) -&gt; Dict[str, float]
+</code>
+
+</div>
+
+
+<div class="docstring">Value an option on a bond with cpns that can have European or
+American exercise. Some minor issues to do with handling cpns on
+the option expiry date need to be solved. Also this function should be
+moved out of the class so it can be sped up using NUMBA.</div>
+
+</div>
+
+<div class="member">
+
+<h4>df_tree</h4>
+
+
+<div class="signature">
+
+<code>
+df_tree(self, t_mat: float) -&gt; float | tuple
+</code>
+
+</div>
+
+
+<div class="docstring">Discount factor as seen from now to time t_mat as long as the time
+is on the tree grid.</div>
+
+</div>
+
+<div class="member">
+
+<h4>build_tree</h4>
+
+
+<div class="signature">
+
+<code>
+build_tree(self, tree_mat: float, df_times: numpy.ndarray, df_values: numpy.ndarray) -&gt; None
+</code>
+
+</div>
+
+
+<div class="docstring">Build the trinomial tree.</div>
+
+</div>
+
+
+</section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>fwd_dirty_bond_price</h3>
+
+<div class="signature">
+
+<code>
+fwd_dirty_bond_price(r_t: float, *args: Any) -&gt; float
+</code>
+
+</div>
+
+<div class="docstring">Price a cpn bearing bond on the option expiry date and return
+the difference from a strike price. This is used in a root search to
+find the future expiry time short rate that makes the bond price equal
+to the option strike price. It is a key step in the Jamshidian bond
+decomposition approach. The strike is a clean price.
+Args:
+    r_t (float): Short rate at expiry.
+    *args: See function body for unpacked arguments.
+Returns:
+    float: Difference between bond price and strike.</div>
+
+</div>
+
+<div class="member">
+
+<h3>option_exercise_types_to_int</h3>
+
+<div class="signature">
+
+<code>
+option_exercise_types_to_int(option_exercise_type: Any) -&gt; int
+</code>
+
+</div>
+
+<div class="docstring">Convert option exercise type enum to integer.
+Args:
+    option_exercise_type (ExerciseTypes): The exercise type.
+Returns:
+    int: 1=European, 2=Bermudan, 3=American</div>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

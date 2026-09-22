@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Fx Vol Surface Plus - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Market</a> &rsaquo; <a href="index.html">Volatility</a> &rsaquo; Fx Vol Surface Plus</nav>
+<h1>Fx Vol Surface Plus</h1>
+
+<p class="source-name">
+financepy.market.volatility.fx_vol_surface_plus
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>FXVolSurfacePlus</h2>
+
+<div class="signature">
+
+<code>
+FXVolSurfacePlus(anchor_dt: financepy.utils.date.Date, spot_fx_rate: float, currency_pair: str, notional_currency: str, domestic_curve: financepy.market.curves.discount_curve.DiscountCurve, foreign_curve: financepy.market.curves.discount_curve.DiscountCurve, tenors: List[financepy.utils.tenor.Tenor], atm_vols: numpy.ndarray | List, ms_25_delta_vols: numpy.ndarray | List, rr_25_delta_vols: numpy.ndarray | List, ms_10_delta_vols: numpy.ndarray | List, rr_10_delta_vols: numpy.ndarray | List, alpha: float, atm_method: financepy.utils.global_types.FXATMMethodTypes = &lt;FXATMMethodTypes.FWD_DELTA_NEUTRAL: 3&gt;, delta_method: financepy.utils.global_types.FXDeltaMethodTypes = &lt;FXDeltaMethodTypes.SPOT_DELTA: 1&gt;, vol_func_type: financepy.utils.global_types.VolFuncTypes = &lt;VolFuncTypes.CLARK: 0&gt;, fin_solver_type: financepy.utils.global_types.SolverTypes = &lt;SolverTypes.NELDER_MEAD: 1&gt;, tol: float = 1e-08) -&gt; None
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class to perform a calibration of a chosen parametrised surface to the
+prices of FX options at different strikes and expiry tenors. The
+calibration inputs are the ATM and 25 and 10 Delta volatilities in terms of
+the market strangle amd risk reversals. There is a choice of volatility
+function from cubic in delta to full SABR. Check out VolFuncTypes.
+Parameter alpha [0,1] is used to interpolate between fitting only 25d when
+alpha=0 to fitting only 10d when alpha=1.0. Alpha=0.5 assigns equal weights
+A vol function with more parameters will give a better fit. Of course. But
+it might also overfit. Visualising the volatility curve is useful. Also,
+there is no guarantee that the implied pdf will be positive.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>vol_from_strike_dt</h4>
+
+
+<div class="signature">
+
+<code>
+vol_from_strike_dt(self, kk: float, expiry_dt: financepy.utils.date.Date) -&gt; float
+</code>
+
+</div>
+
+
+<div class="docstring">Interpolates the Black-Scholes volatility from the volatility
+surface given call option strike and expiry date. Linear interpolation
+is done in variance space. The smile strikes at bracketed dates are
+determined by determining the strike that reproduces the provided delta
+value. This uses the calibration delta convention, but it can be
+overriden by a provided delta convention. The resulting volatilities
+are then determined for each bracketing expiry time and linear
+interpolation is done in variance space and then converted back to a
+lognormal volatility.</div>
+
+</div>
+
+<div class="member">
+
+<h4>delta_to_strike</h4>
+
+
+<div class="signature">
+
+<code>
+delta_to_strike(self, call_delta: float, expiry_dt: financepy.utils.date.Date, delta_method: Any | None) -&gt; float
+</code>
+
+</div>
+
+
+<div class="docstring">Interpolates the strike at a delta and expiry date. Linear
+time to expiry interpolation is used in strike.</div>
+
+</div>
+
+<div class="member">
+
+<h4>vol_from_delta_date</h4>
+
+
+<div class="signature">
+
+<code>
+vol_from_delta_date(self, call_delta: float, expiry_dt: financepy.utils.date.Date, delta_method: financepy.utils.global_types.FXDeltaMethodTypes | None = None) -&gt; Tuple[float, float]
+</code>
+
+</div>
+
+
+<div class="docstring">Interpolates the Black-Scholes volatility from the volatility
+surface given a call option delta and expiry date. Linear interpolation
+is done in variance space. The smile strikes at bracketed dates are
+determined by determining the strike that reproduces the provided delta
+value. This uses the calibration delta convention, but it can be
+overriden by a provided delta convention. The resulting volatilities
+are then determined for each bracketing expiry time and linear
+interpolation is done in variance space and then converted back to a
+lognormal volatility.</div>
+
+</div>
+
+<div class="member">
+
+<h4>check_calibration</h4>
+
+
+<div class="signature">
+
+<code>
+check_calibration(self, verbose: bool, tol: float = 1e-06) -&gt; None
+</code>
+
+</div>
+
+
+<div class="docstring">Compare calibrated vol surface with market and output a report
+which sets out the quality of fit to the ATM and 10 and 25 delta market
+strangles and risk reversals.</div>
+
+</div>
+
+<div class="member">
+
+<h4>implied_dbns</h4>
+
+
+<div class="signature">
+
+<code>
+implied_dbns(self, low_fx: float, high_fx: float, num_intervals: int) -&gt; List[financepy.utils.distribution.FinDistribution]
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the pdf for each tenor horizon. Returns a list of
+FinDistribution objects, one for each tenor horizon.</div>
+
+</div>
+
+<div class="member">
+
+<h4>plot_vol_curves</h4>
+
+
+<div class="signature">
+
+<code>
+plot_vol_curves(self) -&gt; None
+</code>
+
+</div>
+
+
+<div class="docstring">Generates a plot of each of the vol discount implied by the market
+and fitted.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

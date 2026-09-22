@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Lognormal Mixture Surface - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">Models</a> &rsaquo; Lognormal Mixture Surface</nav>
+<h1>Lognormal Mixture Surface</h1>
+
+<p class="source-name">
+financepy.models.lognormal_mixture_surface
+</p>
+<div class="docstring">Created on Mon Sep  7 19:29:25 2026
+
+@author: Dominic</div><h1>Classes</h1>
+<section>
+
+<h2>LognormalMixtureSurface</h2>
+
+<div class="signature">
+
+<code>
+LognormalMixtureSurface(maturities, forwards, strikes, vol_surface, rates=0.0)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Calibrates one LognormalMixtureModel per maturity.
+
+Parameters
+----------
+maturities : array-like
+    Times to maturity.
+forwards : array-like
+    Forward corresponding to each maturity.
+rates : array-like or float
+    Continuously compounded rates.
+strikes : array-like
+    Common strike grid across maturities.
+vol_surface : 2D array-like
+    Implied volatility surface with shape
+
+        (n_maturities, n_strikes)</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>calibrate</h4>
+
+
+<div class="signature">
+
+<code>
+calibrate(self, weights=None, warm_start=True)
+</code>
+
+</div>
+
+
+<div class="docstring">Calibrate one mixture model for each maturity.
+
+Parameters
+----------
+weights : None or array-like
+    Optional calibration weights.
+
+    Can be:
+        - 1D array of length n_strikes
+        - 2D array matching vol_surface
+
+warm_start : bool
+    If True, use previous maturity&#x27;s fitted parameters
+    as the starting point for the next maturity.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fitted_vol_surface</h4>
+
+
+<div class="signature">
+
+<code>
+fitted_vol_surface(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Return calibrated implied vols on the original strike grid.</div>
+
+</div>
+
+<div class="member">
+
+<h4>call_price_surface</h4>
+
+
+<div class="signature">
+
+<code>
+call_price_surface(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Return call prices on the original strike grid.</div>
+
+</div>
+
+<div class="member">
+
+<h4>implied_vol</h4>
+
+
+<div class="signature">
+
+<code>
+implied_vol(self, K, T)
+</code>
+
+</div>
+
+
+<div class="docstring">Interpolate implied volatility between calibrated maturities.
+
+Interpolation is done in total variance:
+
+    w(K,T) = sigma(K,T)^2 T
+
+which is preferable to direct interpolation of volatility.</div>
+
+</div>
+
+<div class="member">
+
+<h4>calibration_errors</h4>
+
+
+<div class="signature">
+
+<code>
+calibration_errors(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Return model vol errors on the original grid.</div>
+
+</div>
+
+<div class="member">
+
+<h4>rmse_by_maturity</h4>
+
+
+<div class="signature">
+
+<code>
+rmse_by_maturity(self)
+</code>
+
+</div>
+
+
+<div class="docstring">RMSE of fitted implied vols by maturity.</div>
+
+</div>
+
+<div class="member">
+
+<h4>max_abs_error_by_maturity</h4>
+
+
+<div class="signature">
+
+<code>
+max_abs_error_by_maturity(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>calendar_arbitrage_flags</h4>
+
+
+<div class="signature">
+
+<code>
+calendar_arbitrage_flags(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Simple diagnostic using total variance on the original strike grid.
+
+Returns True where total variance decreases between maturities.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

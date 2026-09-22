@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Ibor Future - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Rates</a> &rsaquo; Ibor Future</nav>
+<h1>Ibor Future</h1>
+
+<p class="source-name">
+financepy.products.rates.ibor_future
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>IborFuture</h2>
+
+<div class="signature">
+
+<code>
+IborFuture(today_dt: financepy.utils.date.Date, future_number: int, future_tenor: str = &#x27;3M&#x27;, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;, contract_size: float = 1000000)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class for managing short term interest rate futures contracts.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>to_fra</h4>
+
+
+<div class="signature">
+
+<code>
+to_fra(self, futures_price, convexity)
+</code>
+
+</div>
+
+
+<div class="docstring">Convert the futures contract to a IborFRA object so it can be
+used to boostrap a Ibor curve. For this we need to adjust the futures
+rate using the convexity correction.</div>
+
+</div>
+
+<div class="member">
+
+<h4>futures_rate</h4>
+
+
+<div class="signature">
+
+<code>
+futures_rate(self, futures_price)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate implied futures rate from the futures price.</div>
+
+</div>
+
+<div class="member">
+
+<h4>accrual_factor</h4>
+
+
+<div class="signature">
+
+<code>
+accrual_factor(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the accrual factor for the futures interest period.</div>
+
+</div>
+
+<div class="member">
+
+<h4>basis_point_value</h4>
+
+
+<div class="signature">
+
+<code>
+basis_point_value(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the cash value of one basis point move in futures price.</div>
+
+</div>
+
+<div class="member">
+
+<h4>settlement_amount</h4>
+
+
+<div class="signature">
+
+<code>
+settlement_amount(self, futures_price: float, settlement_price: float, num_contracts: float = 1.0)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the cash settlement amount for a futures price move.
+
+The amount is for a long position. Use a negative number of contracts
+for a short position. Prices are quoted in futures price points, for
+example 97.50.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fra_rate</h4>
+
+
+<div class="signature">
+
+<code>
+fra_rate(self, futures_price, convexity)
+</code>
+
+</div>
+
+
+<div class="docstring">Convert futures price and convexity to a FRA rate using the BBG
+negative convexity (in percent). This is then divided by 100 before
+being added to the futures rate.</div>
+
+</div>
+
+<div class="member">
+
+<h4>convexity</h4>
+
+
+<div class="signature">
+
+<code>
+convexity(self, value_dt, volatility, mean_reversion)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculation of the convexity adjustment between FRAs and interest
+rate futures using the Hull-White model as described in technical note
+in link below:
+http://www-2.rotman.utoronto.ca/~hull/TechnicalNotes/TechnicalNote1.pdf
+
+NOTE THIS DOES NOT APPEAR TO AGREE WITH BLOOMBERG!! INVESTIGATE.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

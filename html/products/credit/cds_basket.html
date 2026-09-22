@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Cds Basket - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Credit</a> &rsaquo; Cds Basket</nav>
+<h1>Cds Basket</h1>
+
+<p class="source-name">
+financepy.products.credit.cds_basket
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>CDSBasket</h2>
+
+<div class="signature">
+
+<code>
+CDSBasket(step_in_dt: financepy.utils.date.Date, maturity_dt: financepy.utils.date.Date, notional: float = 1000000, running_cpn: float = 0.0, long_protect: bool = True, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.QUARTERLY: 4&gt;, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;, cal_type: financepy.utils.calendar.CalendarTypes | list | tuple = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type: financepy.utils.calendar.BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type: financepy.utils.calendar.DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class to deal with n-to-default CDS baskets.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>value_legs_mc_old</h4>
+
+
+<div class="signature">
+
+<code>
+value_legs_mc_old(self, value_dt, n_to_default, default_times, issuer_curves, libor_curve)
+</code>
+
+</div>
+
+
+<div class="docstring">Value the legs of the default basket using Monte Carlo. The default
+times are an input so this valuation is not model dependent.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_legs_mc</h4>
+
+
+<div class="signature">
+
+<code>
+value_legs_mc(self, value_dt, n_to_default, default_times, issuer_curves, libor_curve)
+</code>
+
+</div>
+
+
+<div class="docstring">Value the premium PV01 and protection legs of an n-to-default basket via
+Monte Carlo `default_times` is (num_credits x num_trials) of default times
+in YEARS from value_dt. The valuation is pathwise (no model dependence
+beyond the given default times).</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_gaussian_mc</h4>
+
+
+<div class="signature">
+
+<code>
+value_gaussian_mc(self, value_dt, n_to_default, issuer_curves, corr_matrix, libor_curve, num_trials, seed)
+</code>
+
+</div>
+
+
+<div class="docstring">Value the default basket using a Gaussian copula model. This
+depends on the issuer discount and correlation matrix.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_student_t_mc</h4>
+
+
+<div class="signature">
+
+<code>
+value_student_t_mc(self, value_dt, n_to_default, issuer_curves, corr_matrix, degrees_of_freedom, libor_curve, num_trials, seed)
+</code>
+
+</div>
+
+
+<div class="docstring">Value the default basket using the Student-T copula.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_1f_gaussian_homo</h4>
+
+
+<div class="signature">
+
+<code>
+value_1f_gaussian_homo(self, value_dt, n_to_default, issuer_curves, beta_vector, libor_curve, num_points=50)
+</code>
+
+</div>
+
+
+<div class="docstring">Value default basket using 1 factor Gaussian copula and analytical
+approach which is only exact when all recovery rates are the same.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

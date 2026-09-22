@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Cev - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">Models</a> &rsaquo; Cev</nav>
+<h1>Cev</h1>
+
+<p class="source-name">
+financepy.models.cev
+</p>
+<div class="docstring">Created on Fri Sep  4 21:15:09 2026
+
+@author: Dominic</div><h1>Classes</h1>
+<section>
+
+<h2>CEV</h2>
+
+<div class="signature">
+
+<code>
+CEV(sigma: float, beta: float)
+</code>
+
+</div>
+
+
+
+<p><em>No description available.</em></p>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(self, stock_price, t_exp, strike, option_type, interest_rate, dividend_yield)
+</code>
+
+</div>
+
+
+<div class="docstring">Value a European call or put option under the CEV model.</div>
+
+</div>
+
+<div class="member">
+
+<h4>call_value</h4>
+
+
+<div class="signature">
+
+<code>
+call_value(self, stock_price, t_exp, strike, interest_rate, dividend_yield)
+</code>
+
+</div>
+
+
+<div class="docstring">Value a European call option under the CEV model.
+
+For beta &lt; 1 the exact European CEV formula is expressed in
+terms of non-central chi-square distribution functions.
+
+For beta = 1 the model reduces to Black-Scholes.</div>
+
+</div>
+
+<div class="member">
+
+<h4>put_value</h4>
+
+
+<div class="signature">
+
+<code>
+put_value(self, stock_price, t_exp, strike, interest_rate, dividend_yield)
+</code>
+
+</div>
+
+
+<div class="docstring">Value a European put option using put-call parity.</div>
+
+</div>
+
+<div class="member">
+
+<h4>local_volatility</h4>
+
+
+<div class="signature">
+
+<code>
+local_volatility(self, stock_price)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the instantaneous percentage local volatility
+
+    sigma_loc(S) = sigma S^(beta - 1).</div>
+
+</div>
+
+<div class="member">
+
+<h4>diffusion_coefficient</h4>
+
+
+<div class="signature">
+
+<code>
+diffusion_coefficient(self, stock_price)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the absolute diffusion coefficient
+
+    sigma S^beta
+
+appearing in
+
+    dS = (r-q)S dt + sigma S^beta dW.</div>
+
+</div>
+
+<div class="member">
+
+<h4>implied_volatility</h4>
+
+
+<div class="signature">
+
+<code>
+implied_volatility(self, stock_price, t_exp, strike, interest_rate, dividend_yield)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the Black-Scholes implied volatility corresponding
+to the CEV European call price.</div>
+
+</div>
+
+<div class="member">
+
+<h4>implied_volatility_curve</h4>
+
+
+<div class="signature">
+
+<code>
+implied_volatility_curve(self, stock_price, t_exp, strikes, interest_rate, dividend_yield)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the Black-Scholes implied-volatility curve across strikes.</div>
+
+</div>
+
+<div class="member">
+
+<h4>implied_volatility_skew</h4>
+
+
+<div class="signature">
+
+<code>
+implied_volatility_skew(self, stock_price, t_exp, strikes, interest_rate, dividend_yield)
+</code>
+
+</div>
+
+
+<div class="docstring">Alias for implied_volatility_curve().
+
+For beta &lt; 1 the basic CEV model generally produces a
+negative implied-volatility skew.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_mc</h4>
+
+
+<div class="signature">
+
+<code>
+value_mc(self, stock_price, t_exp, strike_price, option_type, interest_rate, dividend_yield, num_paths=10000, num_steps_per_year=252, seed=4242)
+</code>
+
+</div>
+
+
+<div class="docstring">Monte Carlo valuation using a full-truncation Euler scheme.
+
+This is primarily intended as a numerical cross-check of the
+analytic European pricing formula.</div>
+
+</div>
+
+<div class="member">
+
+<h4>implied_volatility_surface</h4>
+
+
+<div class="signature">
+
+<code>
+implied_volatility_surface(self, stock_price, expiries, strikes, interest_rate, dividend_yield)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the Black-Scholes implied-volatility surface generated
+by the CEV model.
+
+Parameters
+----------
+stock_price : float
+    Current stock price.
+
+expiries : array_like
+    Times to expiry in years.
+
+strikes : array_like
+    Strike grid.
+
+interest_rate : float
+    Continuously compounded risk-free rate.
+
+dividend_yield : float
+    Continuously compounded dividend yield.
+
+Returns
+-------
+vols : ndarray
+    Matrix of implied volatilities with shape
+
+        (len(expiries), len(strikes))
+
+    so that
+
+        vols[i, j]
+
+    is the implied volatility for expiries[i] and strikes[j].</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

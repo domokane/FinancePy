@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Fx Vol Surface - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Market</a> &rsaquo; <a href="index.html">Volatility</a> &rsaquo; Fx Vol Surface</nav>
+<h1>Fx Vol Surface</h1>
+
+<p class="source-name">
+financepy.market.volatility.fx_vol_surface
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>FXVolSurface</h2>
+
+<div class="signature">
+
+<code>
+FXVolSurface(anchor_dt: financepy.utils.date.Date, spot_fx_rate: float, currency_pair: str, notional_currency: str, domestic_curve: financepy.market.curves.discount_curve.DiscountCurve, foreign_curve: financepy.market.curves.discount_curve.DiscountCurve, tenors: List[financepy.utils.tenor.Tenor], atm_vols: List | numpy.ndarray, ms_25_delta_vols: List | numpy.ndarray, rr_25_delta_vols: List | numpy.ndarray, atm_method: financepy.utils.global_types.FXATMMethodTypes = &lt;FXATMMethodTypes.FWD_DELTA_NEUTRAL: 3&gt;, delta_method: financepy.utils.global_types.FXDeltaMethodTypes = &lt;FXDeltaMethodTypes.SPOT_DELTA: 1&gt;, vol_func_type: financepy.utils.global_types.VolFuncTypes = &lt;VolFuncTypes.CLARK: 0&gt;) -&gt; None
+</code>
+
+</div>
+
+
+
+<div class="docstring">Class to perform a calibration of a chosen parametrised surface to the
+prices of FX options at different strikes and expiry tenors. The
+calibration inputs are the ATM and 25 Delta volatilities given in terms of
+the market strangle amd risk reversals. There is a choice of volatility
+function ranging from polynomial in delta to a limited version of SABR.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>volatility</h4>
+
+
+<div class="signature">
+
+<code>
+volatility(self, k: float, expiry_dt: financepy.utils.date.Date) -&gt; float
+</code>
+
+</div>
+
+
+<div class="docstring">Interpolate the Black-Scholes volatility from the volatility
+surface given the option strike and expiry date. Linear interpolation
+is done in variance x time.</div>
+
+</div>
+
+<div class="member">
+
+<h4>build_vol_surface</h4>
+
+
+<div class="signature">
+
+<code>
+build_vol_surface(self) -&gt; None
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>solver_for_smile_strike</h4>
+
+
+<div class="signature">
+
+<code>
+solver_for_smile_strike(self, opt_type_value: int, delta_target: float, tenor_index: int, initial_value: float) -&gt; float
+</code>
+
+</div>
+
+
+<div class="docstring">Solve for the strike that sets the delta of the option equal to the
+target value of delta allowing the volatility to be a function of the
+strike.</div>
+
+</div>
+
+<div class="member">
+
+<h4>check_calibration</h4>
+
+
+<div class="signature">
+
+<code>
+check_calibration(self, verbose: bool, tol: float = 1e-05) -&gt; None
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>implied_dbns</h4>
+
+
+<div class="signature">
+
+<code>
+implied_dbns(self, low_fx: float, high_fx: float, num_intervals: int) -&gt; List[financepy.utils.distribution.FinDistribution]
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the pdf for each tenor horizon. Returns a list of
+FinDistribution objects, one for each tenor horizon.</div>
+
+</div>
+
+<div class="member">
+
+<h4>plot_vol_curves</h4>
+
+
+<div class="signature">
+
+<code>
+plot_vol_curves(self) -&gt; None
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+
+</section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>solve_to_horizon_fast</h3>
+
+<div class="signature">
+
+<code>
+solve_to_horizon_fast(s: float, t: float, rd: float, rf: float, k_atm: float, atm_vol: float, ms_25d_vol: float, rr_25d_vol: float, delta_method_value: int, vol_type_value: int, xopt: Sequence[float]) -&gt; Tuple[numpy.ndarray, float, float, float, float]
+</code>
+
+</div>
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

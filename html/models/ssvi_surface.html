@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Ssvi Surface - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">Models</a> &rsaquo; Ssvi Surface</nav>
+<h1>Ssvi Surface</h1>
+
+<p class="source-name">
+financepy.models.ssvi_surface
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>SSVIPowerLawPhi</h2>
+
+<div class="signature">
+
+<code>
+SSVIPowerLawPhi(eta, gamma) -&gt; None
+</code>
+
+</div>
+
+
+
+<div class="docstring">Power-law SSVI phi function
+
+    phi(theta) = eta * theta^(-gamma)</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(self, theta)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>parameters</h4>
+
+
+<div class="signature">
+
+<code>
+parameters(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+
+</section>
+
+<section>
+
+<h2>SSVISurface</h2>
+
+<div class="signature">
+
+<code>
+SSVISurface(expiries=None, atm_total_variances=None, rho=None, phi_function=None) -&gt; None
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: ImpliedVolatilitySurface</div>
+
+<div class="docstring">SSVI implied-volatility surface
+
+    w(k, theta)
+    =
+    theta / 2
+    [
+        1
+        + rho phi(theta) k
+        + sqrt(
+            (phi(theta) k + rho)^2
+            + 1 - rho^2
+        )
+    ]
+
+using the power-law specification
+
+    phi(theta)
+    =
+    eta theta^(-gamma).
+
+The surface can either be constructed from known parameters
+or calibrated directly to a market implied-volatility grid.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>calibrate</h4>
+
+
+<div class="signature">
+
+<code>
+calibrate(self, forwards, strikes, expiries, implied_volatilities)
+</code>
+
+</div>
+
+
+<div class="docstring">Jointly calibrate
+
+    theta(T_1), ..., theta(T_N), rho, eta, gamma
+
+to the complete implied-volatility grid.
+
+The theta term structure is parameterized so that
+
+    0 &lt; theta_1 &lt; theta_2 &lt; ... &lt; theta_N.
+
+This guarantees monotonic ATM total variance.</div>
+
+</div>
+
+<div class="member">
+
+<h4>theta</h4>
+
+
+<div class="signature">
+
+<code>
+theta(self, t_exp)
+</code>
+
+</div>
+
+
+<div class="docstring">Return ATM total variance theta(T).
+
+Linear interpolation is performed in total variance.</div>
+
+</div>
+
+<div class="member">
+
+<h4>total_variance_from_log_moneyness</h4>
+
+
+<div class="signature">
+
+<code>
+total_variance_from_log_moneyness(self, k, t_exp)
+</code>
+
+</div>
+
+
+<div class="docstring">Return SSVI total implied variance.</div>
+
+</div>
+
+<div class="member">
+
+<h4>total_variance</h4>
+
+
+<div class="signature">
+
+<code>
+total_variance(self, forward, strike, t_exp)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>implied_volatility</h4>
+
+
+<div class="signature">
+
+<code>
+implied_volatility(self, forward, strike, t_exp)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>implied_volatility_curve</h4>
+
+
+<div class="signature">
+
+<code>
+implied_volatility_curve(self, forward, strikes, t_exp)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>implied_volatility_surface</h4>
+
+
+<div class="signature">
+
+<code>
+implied_volatility_surface(self, forwards, strikes, expiries)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>parameters</h4>
+
+
+<div class="signature">
+
+<code>
+parameters(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Return global SSVI parameters
+
+    rho, eta, gamma.</div>
+
+</div>
+
+<div class="member">
+
+<h4>atm_total_variances</h4>
+
+
+<div class="signature">
+
+<code>
+atm_total_variances(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>expiries</h4>
+
+
+<div class="signature">
+
+<code>
+expiries(self)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

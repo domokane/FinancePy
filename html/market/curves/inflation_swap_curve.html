@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Inflation Swap Curve - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Market</a> &rsaquo; <a href="index.html">Curves</a> &rsaquo; Inflation Swap Curve</nav>
+<h1>Inflation Swap Curve</h1>
+
+<p class="source-name">
+financepy.market.curves.inflation_swap_curve
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>InflationSwapCurve</h2>
+
+<div class="signature">
+
+<code>
+InflationSwapCurve(anchor_dt: financepy.utils.date.Date, ibor_deposits: list, ibor_fras: list, ibor_swaps: list, interp_type: financepy.utils.global_types.InterpTypes = &lt;InterpTypes.FLAT_FWD_RATES: 1&gt;, check_refit_flag: bool = False)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: DiscountCurve</div>
+
+<div class="docstring">Constructs a discount curve as implied by the prices of Ibor
+deposits, FRAs and IRS. The curve date is the date on which we are
+performing the valuation based on the information available on the
+curve date. Typically it is the date on which an amount of 1 unit paid
+has a present value of 1. This class inherits from DiscountCurve
+and so it has all of the methods that that class has.
+
+There are two main curve-building approaches:
+
+1) The first uses a bootstrap that interpolates swap rates linearly for
+cpn dates that fall between the swap maturity dates. With this, we can
+solve for the discount factors iteratively without need of a solver. This
+will give us a set of discount factors on the grid dates that refit the
+market exactly. However, when extracting discount factors, we will then
+assume flat forward rates between these cpn dates. There is no
+contradiction as it is as though we had been quoted a swap curve with all
+of the market swap rates, and with an additional set as though the market
+quoted swap rates at a higher frequency than the market.
+
+2) The second uses a bootstrap that uses only the swap rates provided but
+which also assumes that forwards are flat between these swap maturity
+dates. This approach is non-linear and so requires a solver. Consequently
+it is slower. Its advantage is that we can switch interpolation schemes
+to provide a smoother or other functional curve shape which may have a more
+economically justifiable shape. However the root search makes it slower.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>build_curve</h4>
+
+
+<div class="signature">
+
+<code>
+build_curve(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Build curve based on interpolation.</div>
+
+</div>
+
+<div class="member">
+
+<h4>check_refit</h4>
+
+
+<div class="signature">
+
+<code>
+check_refit(self, depo_tol, fra_tol, swap_tol)
+</code>
+
+</div>
+
+
+<div class="docstring">Ensure that the Ibor curve refits the calibration instruments.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

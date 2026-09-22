@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>Bond Zero - FinancePy</title>
+
+
+<style>
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #222;
+    background: #ffffff;
+}
+
+header {
+    background: #20232a;
+    color: white;
+    padding: 20px 40px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0 0;
+    color: #cccccc;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 40px 80px 40px;
+}
+
+nav {
+    margin-bottom: 30px;
+    font-size: 95%;
+}
+
+nav a {
+    margin-right: 6px;
+}
+
+a {
+    color: #0057a8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h1 {
+    margin-top: 0;
+}
+
+h2 {
+    margin-top: 40px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #dddddd;
+}
+
+h3 {
+    margin-top: 30px;
+}
+
+h4 {
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+code {
+    font-family: Consolas, "Courier New", monospace;
+}
+
+pre {
+    background: #f5f5f5;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    padding: 14px;
+    overflow-x: auto;
+    line-height: 1.4;
+}
+
+.signature {
+    background: #f5f5f5;
+    border-left: 4px solid #777777;
+    padding: 12px;
+    margin: 10px 0 18px 0;
+    overflow-x: auto;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.package-list,
+.module-list {
+    line-height: 1.9;
+}
+
+.member {
+    margin-bottom: 35px;
+}
+
+.inheritance {
+    color: #555555;
+    margin: 8px 0 14px 0;
+}
+
+.source-name {
+    color: #666666;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 90%;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 16px;
+    background: #fafafa;
+}
+
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.card p {
+    margin-bottom: 0;
+    color: #555555;
+}
+
+.generated {
+    margin-top: 60px;
+    padding-top: 15px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 90%;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Bonds</a> &rsaquo; Bond Zero</nav>
+<h1>Bond Zero</h1>
+
+<p class="source-name">
+financepy.products.bonds.bond_zero
+</p>
+<h1>Classes</h1>
+<section>
+
+<h2>BondZero</h2>
+
+<div class="signature">
+
+<code>
+BondZero(issue_dt: financepy.utils.date.Date, maturity_dt: financepy.utils.date.Date, issue_price: float, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;)
+</code>
+
+</div>
+
+
+
+<div class="docstring">A zero cpn bond is a bond which doesn&#x27;t pay any periodic payments.
+Instead, it is issued at a discount. The entire face value of the bond is
+paid out at maturity. It is issued as a deep discount bond.
+
+There is a special convention for accrued interest in which
+
+    Accrued_interest = (par - issue price) * D
+
+where D = (settle_dt - issue_dt)/(maturity_dt - issue_dt).</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>dirty_price_from_ytm</h4>
+
+
+<div class="signature">
+
+<code>
+dirty_price_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>principal</h4>
+
+
+<div class="signature">
+
+<code>
+principal(self, settle_dt: financepy.utils.date.Date, ytm: float, face: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Return BBG principal value for a given face amount.</div>
+
+</div>
+
+<div class="member">
+
+<h4>accretion_yield</h4>
+
+
+<div class="signature">
+
+<code>
+accretion_yield(self, settle_dt: financepy.utils.date.Date, clean_price)
+</code>
+
+</div>
+
+
+<div class="docstring">Return average annual accretion yield from settlement.</div>
+
+</div>
+
+<div class="member">
+
+<h4>current_yield</h4>
+
+
+<div class="signature">
+
+<code>
+current_yield(self, clean_price)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the current yield of the bond which is the
+cpn divided by the clean price (not the full price).
+The cpn of a zero cpn bond is defined as:
+(par - issue_price) / tenor</div>
+
+</div>
+
+<div class="member">
+
+<h4>yield_to_maturity</h4>
+
+
+<div class="signature">
+
+<code>
+yield_to_maturity(self, settle_dt: financepy.utils.date.Date, clean_price: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Return YTM from clean price for a zero coupon bond.</div>
+
+</div>
+
+<div class="member">
+
+<h4>discount_rate</h4>
+
+
+<div class="signature">
+
+<code>
+discount_rate(self, settle_dt: financepy.utils.date.Date, clean_price: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Return discount rate for a zero coupon bond.</div>
+
+</div>
+
+<div class="member">
+
+<h4>accrued_interest</h4>
+
+
+<div class="signature">
+
+<code>
+accrued_interest(self, settle_dt: financepy.utils.date.Date, face: float = 100.0)
+</code>
+
+</div>
+
+
+<div class="docstring">Return accrued discount on a zero coupon bond.
+
+Convention:
+    accrued = face * (par - issue_price) / par
+              * (settle_dt - issue_dt) / (maturity_dt - issue_dt)</div>
+
+</div>
+
+<div class="member">
+
+<h4>dollar_duration</h4>
+
+
+<div class="signature">
+
+<code>
+dollar_duration(self, settle_dt: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, typing.List), ytm: (&lt;class &#x27;float&#x27;&gt;, typing.List), convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate dollar duration from a 1bp bumped-yield DV01.
+
+Dollar duration is the dirty-price change for a 100bp change in yield,
+approximated as:
+
+    dollar_duration = 10000 * DV01
+
+where DV01 is the positive dirty-price change for a +1bp yield shift.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dv01</h4>
+
+
+<div class="signature">
+
+<code>
+dv01(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Change in dirty price for a +1 basis point increase in yield.
+Bloomberg-style DV01 / PV01 is positive for a long fixed-rate bond.</div>
+
+</div>
+
+<div class="member">
+
+<h4>macaulay_duration</h4>
+
+
+<div class="signature">
+
+<code>
+macaulay_duration(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Return Macaulay duration of a zero coupon bond.</div>
+
+</div>
+
+<div class="member">
+
+<h4>modified_duration</h4>
+
+
+<div class="signature">
+
+<code>
+modified_duration(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the modified duration of the bondon a settlement date
+given its yield to maturity.</div>
+
+</div>
+
+<div class="member">
+
+<h4>convexity_from_ytm</h4>
+
+
+<div class="signature">
+
+<code>
+convexity_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the bond convexity from the yield to maturity. This
+function is vectorised with respect to the yield input.</div>
+
+</div>
+
+<div class="member">
+
+<h4>clean_price_from_ytm</h4>
+
+
+<div class="signature">
+
+<code>
+clean_price_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the clean price of a zero coupon bond from its YTM.</div>
+
+</div>
+
+<div class="member">
+
+<h4>clean_price_from_discount_curve</h4>
+
+
+<div class="signature">
+
+<code>
+clean_price_from_discount_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the clean bond value using some discount curve to
+present-value the bond&#x27;s cash flows back to the curve anchor date and
+not to the settlement date.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dirty_price_from_discount_curve</h4>
+
+
+<div class="signature">
+
+<code>
+dirty_price_from_discount_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve)
+</code>
+
+</div>
+
+
+<div class="docstring">Return dirty price per 100 nominal using a discount curve.</div>
+
+</div>
+
+<div class="member">
+
+<h4>bond_payments</h4>
+
+
+<div class="signature">
+
+<code>
+bond_payments(self, settle_dt: financepy.utils.date.Date, face: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Return the zero bond redemption payment.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_payments</h4>
+
+
+<div class="signature">
+
+<code>
+print_payments(self, settle_dt: financepy.utils.date.Date, face: float = 100.0)
+</code>
+
+</div>
+
+
+<div class="docstring">Print a list of the unadjusted cpn payment dates used in
+analytic calculations for the bond.</div>
+
+</div>
+
+<div class="member">
+
+<h4>dirty_price_from_survival_curve</h4>
+
+
+<div class="signature">
+
+<code>
+dirty_price_from_survival_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, survival_curve: financepy.market.curves.discount_curve.DiscountCurve, recovery_rate: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Return risky dirty price per 100 nominal for a zero coupon bond.</div>
+
+</div>
+
+<div class="member">
+
+<h4>clean_price_from_survival_curve</h4>
+
+
+<div class="signature">
+
+<code>
+clean_price_from_survival_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, survival_curve: financepy.market.curves.discount_curve.DiscountCurve, recovery_rate: float)
+</code>
+
+</div>
+
+
+<div class="docstring">Return risky clean price per 100 nominal for a zero coupon bond.</div>
+
+</div>
+
+<div class="member">
+
+<h4>calc_ror</h4>
+
+
+<div class="signature">
+
+<code>
+calc_ror(self, begin_dt: financepy.utils.date.Date, end_dt: financepy.utils.date.Date, begin_ytm: float, end_ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;)
+</code>
+
+</div>
+
+
+<div class="docstring">Return annualised simple return, IRR, and PnL for a zero coupon bond.</div>
+
+</div>
+
+
+</section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>validate_yield</h3>
+
+<div class="signature">
+
+<code>
+validate_yield(ytm)
+</code>
+
+</div>
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>
