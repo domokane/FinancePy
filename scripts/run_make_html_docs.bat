@@ -14,7 +14,7 @@ REM     financepy-git\
 for %%I in ("%SCRIPT_DIR%..") do set "PROJECT_ROOT=%%~fI"
 
 REM Generated documentation:
-REM     financepy-git\html\index.html
+REM     financepy-git\docs\index.html
 set "INDEX_FILE=%PROJECT_ROOT%\html\index.html"
 
 echo.

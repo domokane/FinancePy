@@ -54,7 +54,7 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 FINANCEPY_DIR = PROJECT_ROOT / "financepy"
 
 # financepy-git/html/
-HTML_DIR = PROJECT_ROOT / "html"
+HTML_DIR = PROJECT_ROOT / "docs"
 
 PACKAGE_NAME = "financepy"
 
