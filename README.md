@@ -32,14 +32,16 @@ https://domokane.github.io/FinancePy/
 ## Example Code
 Look at the many code files under 
 
-https://github/domokane/examples/scripts 
+https://github.com/domokane/FinancePy/tree/master/examples/scripts
 
 to get going in 2 minutes! Just copy and paste or download !
 
 ## Example Jupyter Notebooks
 Look at the many Notebooks under 
 
-https://github/domokane/examples/notebooks
+https://github.com/domokane/FinancePy/tree/master/examples/notebooks
+
+Start building your own!
 
 ## Structure of Financepy
 
