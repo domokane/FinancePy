@@ -26,8 +26,7 @@ Warning: You may notice that the library can take several seconds to import afte
 
 ## Quickstart Guide
 
-👉 See [Quick Start Guide](./docs/QUICKSTART.md) to get going in 2 minutes!
-
+👉 Look at the code under examples/scripts or examples/notebooks to get going in 2 minutes!
 
 ## Structure of Financepy
 
