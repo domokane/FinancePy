@@ -24,24 +24,33 @@ You should see
 
 Warning: You may notice that the library can take several seconds to import after the first install if you do a wildcard import of classes which rely on certain models. This is because financepy relies upon Numba to compile a lot of the models - resulting in calculation speeds similar to C/C++. This compile only takes place on the first import of the model and the compiled code is then cached on your machine. No further compilation will be required. As a consequence subsequent imports will be almost instant.
 
-## Documentation Guide
-The FinancePy API documentation is available here:
+## Examples
 
-https://domokane.github.io/FinancePy/
+### Example Code
 
-## Example Code
-Look at the many code files under 
+FinancePy includes many ready-to-run Python examples:
 
 https://github.com/domokane/FinancePy/tree/master/examples/scripts
 
-to get going in 2 minutes! Just copy and paste or download !
+The examples show how to construct and use FinancePy products and models.  
+Copy, download, and modify them to get started quickly.
 
-## Example Jupyter Notebooks
-Look at the many Notebooks under 
+### Jupyter Notebooks
+
+Interactive Jupyter notebooks are available here:
 
 https://github.com/domokane/FinancePy/tree/master/examples/notebooks
 
-Start building your own!
+Use these to explore FinancePy interactively and as a starting point for your own analysis.
+
+## API Documentation
+
+The automatically generated FinancePy API documentation is available here:
+
+https://domokane.github.io/FinancePy/
+
+The API reference contains the available classes, functions, method signatures,
+arguments, and docstrings, organised by package.
 
 ## Structure of Financepy
 
