@@ -5,6 +5,7 @@
 from typing import Union
 
 import numpy as np
+from scipy.special import log_ndtr
 
 from numba import njit
 
@@ -127,6 +128,14 @@ def _barrier_pay_asset_at_expiry_up_out(s, h):
 ########################################################################################
 
 
+def _power_times_cdf(base, exponent, x):
+    """base**exponent * N(x) in log space, finite when the power overflows and N(x) underflows."""
+    return np.exp(exponent * np.log(base) + log_ndtr(x))
+
+
+########################################################################################
+
+
 class FXOneTouchOption(FXOption):
     """A FinFXOneTouchOption is an option in which the buyer receives one
     unit of currency if the FX rate touches a barrier at any time
@@ -184,8 +193,8 @@ class FXOneTouchOption(FXOption):
         sqrt_t_exp = np.sqrt(t_exp)
 
         df = domestic_curve.df_t(t_exp)
-        r_d = domestic_curve.zero_rate_t(t_exp)
-        r_f = foreign_curve.zero_rate_t(t_exp)
+        r_d = domestic_curve.zero_rate_cc_t(t_exp)
+        r_f = foreign_curve.zero_rate_cc_t(t_exp)
 
         v = model.volatility
         v = max(v, 1e-6)
@@ -210,8 +219,8 @@ class FXOneTouchOption(FXOption):
 
             eta = 1.0
             z = np.log(h / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
-            a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
-            a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
+            a5_1 = _power_times_cdf(h / s0, mu + lam, eta * z)
+            a5_2 = _power_times_cdf(h / s0, mu - lam, eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
             v = (a5_1 + a5_2) * k
             return v
 
@@ -223,8 +232,8 @@ class FXOneTouchOption(FXOption):
 
             eta = -1.0
             z = np.log(h / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
-            a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
-            a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
+            a5_1 = _power_times_cdf(h / s0, mu + lam, eta * z)
+            a5_2 = _power_times_cdf(h / s0, mu - lam, eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
             v = (a5_1 + a5_2) * k
             return v
 
@@ -237,8 +246,8 @@ class FXOneTouchOption(FXOption):
             eta = 1.0
             k = h
             z = np.log(h / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
-            a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
-            a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
+            a5_1 = _power_times_cdf(h / s0, mu + lam, eta * z)
+            a5_2 = _power_times_cdf(h / s0, mu - lam, eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
             v = (a5_1 + a5_2) * k
             return v
 
@@ -251,8 +260,8 @@ class FXOneTouchOption(FXOption):
             eta = -1.0
             k = h
             z = np.log(h / s0) / v / sqrt_t_exp + lam * v * sqrt_t_exp
-            a5_1 = np.power(h / s0, mu + lam) * normcdf_vect(eta * z)
-            a5_2 = np.power(h / s0, mu - lam) * normcdf_vect(eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
+            a5_1 = _power_times_cdf(h / s0, mu + lam, eta * z)
+            a5_2 = _power_times_cdf(h / s0, mu - lam, eta * z - 2.0 * eta * lam * v * sqrt_t_exp)
             v = (a5_1 + a5_2) * k
             return v
 
@@ -267,7 +276,7 @@ class FXOneTouchOption(FXOption):
             x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
-            b_4 = k * df * np.power(h / s0, 2.0 * mu) * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
+            b_4 = k * df * _power_times_cdf(h / s0, 2.0 * mu, eta * y2 - eta * v * sqrt_t_exp)
             v = b_2 + b_4
             return v
 
@@ -283,7 +292,7 @@ class FXOneTouchOption(FXOption):
             x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
-            b_4 = k * df * np.power(h / s0, 2.0 * mu) * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
+            b_4 = k * df * _power_times_cdf(h / s0, 2.0 * mu, eta * y2 - eta * v * sqrt_t_exp)
             v = b_2 + b_4
             return v
 
@@ -299,7 +308,7 @@ class FXOneTouchOption(FXOption):
             y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             dq = np.exp(-r_f * t_exp)
             a_2 = s0 * dq * normcdf_vect(phi * x2)
-            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a_4 = s0 * dq * _power_times_cdf(h / s0, 2.0 * (mu + 1.0), eta * y2)
             v = a_2 + a_4
             return v
 
@@ -315,7 +324,7 @@ class FXOneTouchOption(FXOption):
             y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             dq = np.exp(-r_f * t_exp)
             a_2 = s0 * dq * normcdf_vect(phi * x2)
-            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a_4 = s0 * dq * _power_times_cdf(h / s0, 2.0 * (mu + 1.0), eta * y2)
             v = a_2 + a_4
             return v
 
@@ -331,7 +340,7 @@ class FXOneTouchOption(FXOption):
             x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
-            b_4 = k * df * np.power(h / s0, 2.0 * mu) * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
+            b_4 = k * df * _power_times_cdf(h / s0, 2.0 * mu, eta * y2 - eta * v * sqrt_t_exp)
             v = b_2 - b_4
             return v
 
@@ -347,7 +356,7 @@ class FXOneTouchOption(FXOption):
             x2 = np.log(s0 / h) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             b_2 = k * df * normcdf_vect(phi * x2 - phi * v * sqrt_t_exp)
-            b_4 = k * df * np.power(h / s0, 2.0 * mu) * normcdf_vect(eta * y2 - eta * v * sqrt_t_exp)
+            b_4 = k * df * _power_times_cdf(h / s0, 2.0 * mu, eta * y2 - eta * v * sqrt_t_exp)
             v = b_2 - b_4
             return v
 
@@ -364,7 +373,7 @@ class FXOneTouchOption(FXOption):
             y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             dq = np.exp(-r_f * t_exp)
             a_2 = s0 * dq * normcdf_vect(phi * x2)
-            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a_4 = s0 * dq * _power_times_cdf(h / s0, 2.0 * (mu + 1.0), eta * y2)
             v = a_2 - a_4
             return v
 
@@ -381,7 +390,7 @@ class FXOneTouchOption(FXOption):
             y2 = np.log(h / s0) / v / sqrt_t_exp + (mu + 1.0) * v * sqrt_t_exp
             dq = np.exp(-r_f * t_exp)
             a_2 = s0 * dq * normcdf_vect(phi * x2)
-            a_4 = s0 * dq * np.power(h / s0, 2.0 * (mu + 1.0)) * normcdf_vect(eta * y2)
+            a_4 = s0 * dq * _power_times_cdf(h / s0, 2.0 * (mu + 1.0), eta * y2)
             v = a_2 - a_4
             return v
 
