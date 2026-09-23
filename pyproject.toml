@@ -64,6 +64,7 @@ Source = "https://github.com/domokane/FinancePy"
 Tracker = "https://github.com/domokane/FinancePy/issues"
 
 [tool.pytest.ini_options]
+testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = [
     "--ignore=tests/unit/legacy"
@@ -72,7 +73,6 @@ addopts = [
 filterwarnings = [
     "ignore::pyparsing.PyparsingDeprecationWarning",
 ]
-
 
 markers = [
     "unit: implementation unit tests",
