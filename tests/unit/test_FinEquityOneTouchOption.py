@@ -320,3 +320,33 @@ def test_up_and_out_asset_or_nothing():
 
     assert_close(v, 19.19968)
     assert_close(v_mc, 20.00701)
+
+
+########################################################################################
+
+
+def test_low_volatility():
+
+    up_curves = (FlatDiscountCurve(value_dt, 0.05), FlatDiscountCurve(value_dt, 0.02))
+    down_curves = (FlatDiscountCurve(value_dt, 0.02), FlatDiscountCurve(value_dt, 0.05))
+
+    # Expected values are Haug's formulas evaluated in 50-digit arithmetic
+    cases = [
+        (TouchOptionTypes.UP_AND_IN_CASH_AT_HIT, 101.0, up_curves, 14.753293742197327),
+        (TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY, 101.0, up_curves, 14.628646684008793),
+        (TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING, 101.0, up_curves, 0.0),
+        (TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT, 101.0, up_curves, 99.33884453079534),
+        (TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY, 101.0, up_curves, 99.00227094677558),
+        (TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING, 101.0, up_curves, 0.0),
+        (TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT, 99.0, down_curves, 14.899833281515132),
+        (TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY, 99.0, down_curves, 14.850340642016338),
+        (TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING, 99.0, down_curves, 0.0),
+        (TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT, 99.0, down_curves, 98.33889965799987),
+        (TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY, 99.0, down_curves, 97.52431122672527),
+        (TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING, 99.0, down_curves, 0.0),
+    ]
+
+    for opt_type, barrier, curves, expected in cases:
+        option = EquityOneTouchOption(expiry_dt, opt_type, barrier, payment_size)
+        v = option.value(value_dt, 100.0, curves[0], curves[1], BlackScholes(0.0005))
+        assert np.isclose(v, expected, rtol=1e-10, atol=1e-10), (opt_type, v, expected)
