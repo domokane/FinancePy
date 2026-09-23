@@ -8,7 +8,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -24,7 +23,7 @@ from financepy.market.curves.ois_curve import OISCurve
 from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.market.curves.ibor_dual_curve import IborDualCurve
 
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 
 # ============================================================================
@@ -227,8 +226,6 @@ def build_ois(value_dt):
 
 
 ########################################################################################
-
-
 
     # swaps[0].print_fixed_leg_pv()
     # swaps[0].print_float_leg_pv()
@@ -1137,4 +1134,3 @@ if plot is True:
     plt.plot(years, index_curve_fwds, label="Libor Index Curve")
 
     plt.legend()
-

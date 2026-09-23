@@ -4,7 +4,7 @@ from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_single_curve_par_shocker import (
     IborSingleCurveParShocker,
 )
@@ -20,7 +20,6 @@ def test_ibor_curve_par_rate_shocker():
 
     value_dt = Date(6, 10, 2001)
     cal = CalendarTypes.LONDON
-    interp_type = InterpTypes.FLAT_FWD_RATES
 
     depo_dcc_type = DayCountTypes.ACT_360
     depos = []

@@ -6,7 +6,7 @@ from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_single_curve_smoothing_calibrator import (
     IborSingleCurveSmoothingCalibrator,
 )
@@ -19,10 +19,7 @@ REPORT_PROGRESS = True
 
 
 @pytest.mark.parametrize("interp_type", InterpTypes)
-
 ########################################################################################
-
-
 def test_smooth_fit_simple(interp_type):
 
     value_dt = Date(6, 10, 2001)
@@ -103,10 +100,7 @@ def test_smooth_fit_simple(interp_type):
 
 
 @pytest.mark.parametrize("interp_type", [InterpTypes.FLAT_FWD_RATES])
-
 ########################################################################################
-
-
 def test_smooth_fit(interp_type):
 
     value_dt = Date(6, 10, 2001)

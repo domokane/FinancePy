@@ -7,9 +7,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-from financepy.utils.format_graphs import set_plot_style
 from financepy.utils.date import Date
+
 from financepy.models.black_scholes import BlackScholes
+
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.equity.equity_asian_option import (
     AsianOptionValuationTypes,
@@ -17,7 +18,6 @@ from financepy.products.equity.equity_asian_option import (
 )
 from financepy.utils.global_types import OptionTypes
 
-set_plot_style()
 
 # ============================================================================
 # 1. ASIAN OPTION VALUATION METHODS

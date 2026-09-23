@@ -1,19 +1,19 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 import pytest
 
+from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.day_count import DayCountTypes
+from financepy.utils.calendar import CalendarTypes
+from financepy.utils.helpers import times_from_dates
+
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_future import IborFuture
 from financepy.market.curves.ibor_single_curve import IborSingleCurve
-from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.day_count import DayCountTypes
-from financepy.utils.date import Date
-from financepy.utils.calendar import Calendar, CalendarTypes
-from financepy.utils.helpers import times_from_dates
 
 ########################################################################################
 

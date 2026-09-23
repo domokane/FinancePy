@@ -9,8 +9,8 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...utils.math import ONE_MILLION, normcdf
+from ...utils.global_vars import G_DAYS_IN_YEAR, ONE_MILLION
+from ...utils.math import normcdf
 from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date

@@ -8,7 +8,7 @@ from financepy.utils.day_count import DayCountTypes
 
 from financepy.products.rates.ibor_swap import IborSwap
 
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.bond_embedded_option import BondEmbeddedOption

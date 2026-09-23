@@ -1,5 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+from FinTestCases import FinTestCases, global_test_case_mode
 import time
 import numpy as np
 
@@ -19,14 +20,12 @@ from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.products.credit.cds import CDS
 
 DIRTY = 0
 CLEAN = 1
 
-
-from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 

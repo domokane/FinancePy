@@ -2,8 +2,6 @@
 
 import numpy as np
 
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -12,10 +10,14 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.products.rates.ibor_swap import IborSwap
-from financepy.utils.math import ONE_MILLION
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.utils.global_vars import ONE_MILLION
+from financepy.market.curves.interpolator import InterpTypes
+from financepy.market.curves.discount_curve import DiscountCurve
+
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 
 from .helpers import build_ibor_single_curve
+
 
 ########################################################################################
 
@@ -264,8 +266,3 @@ def test_ibor_swap_end_of_month_applies_to_float_leg_schedule():
 
 
 ########################################################################################
-
-# if __name__ == '__main__':
-#     test_libor_swap_cashflow_report()
-
-test_libor_swap()

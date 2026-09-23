@@ -21,6 +21,13 @@ def main():
         default=120,
         help="Maximum runtime per example in seconds (default: 120).",
     )
+
+    parser.add_argument(
+        "--fail-fast",
+        action="store_true",
+        help="Stop after the first failed or timed-out example.",
+    )
+
     args = parser.parse_args()
 
     # This file is:
@@ -36,7 +43,7 @@ def main():
     examples_dir = scripts_dir.parent
 
     # Find all example*.py files below examples/scripts.
-    scripts = sorted(scripts_dir.rglob("example*.py"))
+    scripts = sorted(scripts_dir.rglob("example_*.py"))
 
     if not scripts:
         print(f"No example*.py files found in {scripts_dir}")
@@ -88,6 +95,8 @@ def main():
                 cwd=examples_dir,
                 env=env,
                 timeout=args.timeout,
+                capture_output=True,
+                text=True,
             )
 
             elapsed = time.perf_counter() - start
@@ -95,9 +104,25 @@ def main():
             if result.returncode == 0:
                 passed.append((relative, elapsed))
                 print(f"\nPASS ({elapsed:.2f}s): {relative}")
+
             else:
                 failed.append((relative, result.returncode, elapsed))
-                print(f"\nFAIL ({elapsed:.2f}s, " f"exit={result.returncode}): {relative}")
+
+                print(
+                    f"\nFAIL ({elapsed:.2f}s, "
+                    f"exit={result.returncode}): {relative}"
+                )
+
+                if result.stdout:
+                    print("\nSTDOUT:")
+                    print(result.stdout)
+
+                if result.stderr:
+                    print("\nSTDERR:")
+                    print(result.stderr)
+
+                if args.fail_fast:
+                    break
 
         except subprocess.TimeoutExpired:
             elapsed = time.perf_counter() - start

@@ -16,7 +16,6 @@ license = "GPL-3.0-or-later"
 # Move keywords here
 keywords = ["FINANCE", "OPTIONS", "BONDS", "VALUATION", "DERIVATIVES"]
 
-
 description = "A Finance Securities Valuation Library"
 
 # Python compatibility must match NumPy / SciPy reality
@@ -65,11 +64,15 @@ Source = "https://github.com/domokane/FinancePy"
 Tracker = "https://github.com/domokane/FinancePy/issues"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-
+python_files = ["test_*.py"]
 addopts = [
     "--ignore=tests/unit/legacy"
 ]
+
+filterwarnings = [
+    "ignore::pyparsing.PyparsingDeprecationWarning",
+]
+
 
 markers = [
     "unit: implementation unit tests",

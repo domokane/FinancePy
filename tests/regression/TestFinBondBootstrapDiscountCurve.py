@@ -7,8 +7,8 @@ import time
 import add_fp_to_path
 
 from financepy.products.bonds.bond import Bond
-from financepy.products.bonds import get_bond_market_conventions, BondMarkets
-from financepy.market.curves import BondBootstrapDiscountCurve
+from financepy.products.bonds.bond_market import get_bond_market_conventions, BondMarkets
+from financepy.market.curves.bond_bootstrap_discount_curve import BondBootstrapDiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.date_format import set_date_format, DateFormatTypes

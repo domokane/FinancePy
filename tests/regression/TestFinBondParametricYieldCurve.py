@@ -11,8 +11,8 @@ from financepy.products.bonds.bond import Bond
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 
-from financepy.market.curves import CurveFitTypes
-from financepy.market.curves import BondParametricYieldCurve
+from financepy.market.curves.curve_fits import CurveFitTypes
+from financepy.market.curves.bond_parametric_yield_curve import BondParametricYieldCurve
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)

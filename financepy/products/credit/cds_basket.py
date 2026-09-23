@@ -13,7 +13,7 @@ from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.helpers import label_to_string

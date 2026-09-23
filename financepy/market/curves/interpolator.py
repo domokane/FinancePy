@@ -11,10 +11,22 @@ from scipy.interpolate import CubicSpline, PchipInterpolator
 
 from ...utils.error import FinError
 from ...utils.global_vars import G_SMALL
-from ...utils.global_types import InterpTypes
 from ...utils.tension_spline import TensionSpline
 
-#    LINEAR_AVG_FWD_RATES = 11
+from enum import Enum
+
+
+class InterpTypes(Enum):
+    FLAT_FWD_RATES = 1
+    LINEAR_DISCOUNT = 2
+    LINEAR_ZERO_RATES = 3
+    LINEAR_ONFWD_RATES = 4
+    FINCUBIC_ZERO_RATES = 5
+    NATCUBIC_LOG_DISCOUNT = 6
+    NATCUBIC_ZERO_RATES = 7
+    PCHIP_ZERO_RATES = 8
+    PCHIP_LOG_DISCOUNT = 9
+    TENSION_ZERO_RATES = 10
 
 
 # Groups used to make dispatch readable and cheap.

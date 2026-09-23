@@ -18,7 +18,7 @@ from ...utils.calendar import DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date

@@ -10,16 +10,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from financepy.utils.date import Date
+from financepy.utils.global_types import OptionTypes
+
 from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.date import Date
-from financepy.utils.global_types import OptionTypes
-from financepy.utils.format_graphs import set_plot_style
-
-
-set_plot_style()
 
 
 # ============================================================================

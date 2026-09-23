@@ -6,8 +6,8 @@ from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.calendar import CalendarTypes
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.utils.date import Date
 
 ########################################################################################

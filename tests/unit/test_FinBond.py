@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes

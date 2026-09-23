@@ -8,13 +8,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.products.equity.equity_forward import EquityForward
 from financepy.utils.date import Date
-from financepy.utils.format_graphs import set_plot_style
 from financepy.utils.global_types import LongShortTypes
 
-set_plot_style()
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.products.equity.equity_forward import EquityForward
 
 
 # ============================================================================

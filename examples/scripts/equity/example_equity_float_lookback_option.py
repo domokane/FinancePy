@@ -8,11 +8,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from financepy.utils.date import Date
+from financepy.utils.global_types import OptionTypes
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_float_lookback_option import EquityFloatLookbackOption
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.utils.date import Date
-from financepy.utils.global_types import OptionTypes
 
 
 value_dt = Date(1, 1, 2015)

@@ -3,7 +3,7 @@
 
 # Allow this example to run directly from its category folder.
 
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
@@ -20,25 +20,16 @@ from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 # ============================================================================
 
 
-
 ########################################################################################
-
-
-
-
-########################################################################################
-
-
 
 
 ########################################################################################
 
 
-
-
 ########################################################################################
 
 
+########################################################################################
 
 
 ########################################################################################
@@ -80,7 +71,6 @@ def swap_fixed_leg_month_ends():
 
 
 ########################################################################################
-
 
     # print("leg_2")
     # fixedleg_2.print_payments()
@@ -307,4 +297,3 @@ first_fixing = 0.03
 v = swap_float_leg.value(
     effective_dt, libor_curve, libor_curve, first_fixing
 )
-

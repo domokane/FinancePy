@@ -9,9 +9,9 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date, from_datetime
 from financepy.market.curves.interpolator import InterpTypes
 from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.bonds.bond import Bond
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_benchmarks_report import (
     dataframe_to_benchmarks,
 )

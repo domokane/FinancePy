@@ -2,7 +2,7 @@
 
 import add_fp_to_path
 
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes

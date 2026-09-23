@@ -22,7 +22,7 @@ from financepy.market.curves.ois_curve import OISCurve
 from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.market.curves.ibor_dual_curve import IborDualCurve
 
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -464,7 +464,6 @@ def test_bloomberg_pricing_example():
 
     ois_curve = build_ois(value_dt)
     #    print(ois_curve)
-
 
     libor_dual_curve = IborDualCurve(
         value_dt,

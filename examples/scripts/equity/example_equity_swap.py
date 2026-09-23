@@ -41,7 +41,7 @@ from financepy.utils.day_count import DayCount, DayCountTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.global_types import SwapTypes, ReturnTypes
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 
 from financepy.products.equity.equity_swap import EquitySwap
 from financepy.products.equity.equity_swap_leg import EquitySwapLeg

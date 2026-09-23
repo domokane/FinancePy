@@ -34,13 +34,15 @@ import os
 import numpy as np
 import pandas as pd
 
-from financepy.market.curves import BondParametricDiscountCurve
-from financepy.market.curves.curve_fits import CurveFitTypes
-from financepy.products.bonds.bond import Bond
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.format_graphs import set_plot_style
+
+from financepy.market.curves import BondParametricDiscountCurve
+from financepy.market.curves.curve_fits import CurveFitTypes
+
+from financepy.products.bonds.bond import Bond
 
 set_plot_style()
 

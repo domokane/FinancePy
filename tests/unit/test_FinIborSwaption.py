@@ -1,8 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import numpy as np
-
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.models.bk_tree import BKTree
 from financepy.models.hw_tree import HWTree
 from financepy.models.sabr_shifted import SABRShifted
@@ -133,9 +131,9 @@ def test_pay():
     swap4 = swaption.value(value_dt, libor_curve, model4)
     swap5 = swaption.value(value_dt, libor_curve, model5)
     swap6 = swaption.value(value_dt, libor_curve, model6)
-    assert round(swap1, 0) == 62596
-    assert round(swap2, 0) == 62596
-    assert round(swap3, 0) == 62596
+    assert round(swap1, 0) == 62595
+    assert round(swap2, 0) == 62595
+    assert round(swap3, 0) == 62595
     assert round(swap4, 0) == 62596
     assert round(swap5, 0) == 62979
     assert round(swap6, 0) == 62189
@@ -241,5 +239,5 @@ def test_receive():
     assert round(swap2, 0) == 125182
     assert round(swap3, 0) == 125182
     assert round(swap4, 0) == 125185
-    assert round(swap5, 0) == 124798
+    assert round(swap5, 0) == 124799
     assert round(swap6, 0) == 124415

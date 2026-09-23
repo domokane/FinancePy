@@ -5,11 +5,6 @@
 import numpy as np
 
 
-from financepy.utils.math import ONE_MILLION
-from financepy.market.curves.ibor_single_curve import IborSingleCurve
-from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_fra import IborFRA
-from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import CalendarTypes
@@ -17,6 +12,12 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import SwapTypes
+from financepy.utils.global_vars import ONE_MILLION
+
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
+from financepy.products.rates.ibor_swap import IborSwap
+from financepy.products.rates.ibor_fra import IborFRA
+from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 
@@ -262,21 +263,15 @@ def build_ibor_single_curve(value_dt):
 ########################################################################################
 
 
-
-
 ########################################################################################
 
 
-
-
 ########################################################################################
-
 # ============================================================================
 # 1. LIBOR SWAP
 # ============================================================================
 # What this section demonstrates:
 # Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
-
 print("\n" + "=" * 78)
 print("1. LIBOR SWAP")
 print("=" * 78)
@@ -407,4 +402,3 @@ v = swap.value(value_dt, curve, curve)
 # This is essentially zero
 print("LABEL", "VALUE")
 print("Swap Value on a Notional of $1M:", v)
-

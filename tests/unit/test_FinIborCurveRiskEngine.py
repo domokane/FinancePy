@@ -11,7 +11,7 @@ from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_fra import IborFRA
 from financepy.products.rates.ibor_swap import IborSwap
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 import financepy.products.rates.ibor_curve_risk_engine as re
 
 from .helpers import build_ibor_single_curve

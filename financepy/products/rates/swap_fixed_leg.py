@@ -9,7 +9,7 @@ import pandas as pd
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
@@ -296,8 +296,11 @@ class SwapFixedLeg:
         print("DAY COUNT:", str(self.accrual_dc_type))
 
         if len(self.payments) == 0:
-            print("Payments not calculated.")
+            raise FinError("Payments not calculated.")
             return
+
+        if len(self.payments) != len(self.payment_dfs):
+            raise FinError("Unable to print valuation. Swap Valuation not calculated.")
 
         header = [
             "PAY_NUM",

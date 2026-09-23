@@ -8,11 +8,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from financepy.products.equity.equity_one_touch_option import EquityOneTouchOption
+from financepy.utils.date import Date
 from financepy.utils.global_types import TouchOptionTypes
+
+from financepy.products.equity.equity_one_touch_option import EquityOneTouchOption
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
-from financepy.utils.date import Date
 
 
 value_dt = Date(1, 1, 2016)

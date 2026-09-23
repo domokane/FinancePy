@@ -5,16 +5,18 @@
 # Copyright (C) 2018-2026 Dominic O'Kane
 #
 
+from helpers import load_heterogeneous_spread_curves
+from helpers import build_ibor_curve
 import matplotlib.pyplot as plt
 import numpy as np
 
 from financepy.utils.date import Date
-from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from financepy.utils.format_graphs import set_plot_style
 
-from helpers import build_ibor_curve
-from helpers import load_heterogeneous_spread_curves
+from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
+
 set_plot_style()
+
 
 # ============================================================================
 # 1. CDS INDEX PORTFOLIO

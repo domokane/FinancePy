@@ -1,4 +1,15 @@
 ## CHANGE LOG
+23 Sep 2026
+List of changes
+- Completed equity examples
+- *** Moved variables ONE_MILLION, ONE_BILLION from utils.math to utils.global_vars
+- Removed all * imports for products - this reduces initial run from 1 minute to seconds!
+- The only wildcard import remaining is for utils folder so `from financepy.utils import *' works
+- This exposed some incomplete imports that have been fixed
+- Improved implied volatility calculation by providing custom Numba secant and bisection functions
+- Error checks added to swap_fixed_leg print_valuation()
+- Regression tests and unit tests work
+
 22 Sep 2026
 List of changes
 - Added example scripts for all bonds, credit and most equity products

@@ -10,7 +10,7 @@ from ...utils.day_count import DayCountTypes
 from ...utils.date import Date, from_datetime
 from ...utils.frequency import FrequencyTypes
 from ...market.curves.discount_curve import DiscountCurve
-from ...products.rates.ibor_single_curve import IborSingleCurve
+from ...market.curves.ibor_single_curve import IborSingleCurve
 from ...utils.check_values import check_curve_dt
 
 from ...products.rates.ibor_fra import IborFRA

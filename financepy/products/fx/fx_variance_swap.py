@@ -8,7 +8,7 @@ import numpy as np
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import OptionTypes
 from .fx_vanilla_option import FXVanillaOption

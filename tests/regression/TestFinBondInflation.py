@@ -1,5 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+from FinTestCases import FinTestCases, global_test_case_mode
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
+
 import add_fp_to_path
 
 from financepy.utils.date import Date
@@ -7,14 +11,10 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 
 from financepy.products.bonds.bond_inflation import BondInflation
-from financepy.utils.global_types import YTMCalcType
-from financepy.market.curves.inflation_index_curve import (
-    InflationIndexCurve,
-)
-from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
-from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.products.bonds.bond import YTMCalcType
 
-from FinTestCases import FinTestCases, global_test_case_mode
+from financepy.market.curves.inflation_index_curve import InflationIndexCurve
+
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -318,7 +318,6 @@ def test_fin_inflation_bond_stack():
 
 
 ########################################################################################
-
 test_fin_inflation_bond_bbg()
 test_fin_inflation_bond_stack()
 test_cases.compare_test_cases()

@@ -6,7 +6,7 @@ from ...utils.global_vars import G_BASIS_POINT
 from ...products.rates.ibor_deposit import IborDeposit
 from ...products.rates.ibor_fra import IborFRA
 from ...products.rates.ibor_swap import IborSwap
-from ...products.rates.ibor_single_curve import IborSingleCurve
+from ...market.curves.ibor_single_curve import IborSingleCurve
 from ...products.rates.ibor_benchmarks_report import (
     benchmarks_report,
     ibor_benchmarks_report,

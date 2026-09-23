@@ -18,7 +18,7 @@ from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.utils.global_types import SwapTypes
 
 # ============================================================================
@@ -31,16 +31,10 @@ PLOT_GRAPHS = False
 ########################################################################################
 
 
-
-
 ########################################################################################
 
 
-
-
 ########################################################################################
-
-
 
 
 # https://github.com/vilen22/curve-building/blob/master/Bloomberg%20Curve%20Building%20Replication.xlsx
@@ -63,18 +57,12 @@ def future_tofra_rate(price, convexity):
 ########################################################################################
 
 
-
-
 #        print(libor_curve)
 
 ########################################################################################
 
 
-
-
 ########################################################################################
-
-
 
 
 ########################################################################################
@@ -1025,4 +1013,3 @@ if PLOT_GRAPHS:
 
     swap.print_fixed_leg_pv(spot_dt)
     swap.print_float_leg_pv(spot_dt)
-

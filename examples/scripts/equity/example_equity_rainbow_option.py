@@ -5,21 +5,22 @@
 # Copyright (C) 2018-2026 Dominic O'Kane
 #
 
-from financepy.utils.global_types import OptionTypes
-from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.models.black_scholes import BlackScholes
 from math import sqrt
-
 import matplotlib.pyplot as plt
 import numpy as np
+
+from financepy.utils.global_types import OptionTypes
+from financepy.utils.date import Date
+from financepy.utils.helpers import beta_vector_to_corr_matrix
+
+from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
+from financepy.models.black_scholes import BlackScholes
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.equity.equity_rainbow_option import (
     EquityRainbowOption,
     EquityRainbowOptionTypes,
 )
-from financepy.utils.date import Date
-from financepy.utils.helpers import beta_vector_to_corr_matrix
 
 
 def print_header(number, title):

@@ -9,7 +9,7 @@ from financepy.utils.day_count import DayCount, DayCountTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.global_types import SwapTypes, ReturnTypes
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 
 from financepy.products.equity.equity_swap import EquitySwap
 from financepy.products.equity.equity_swap_leg import EquitySwapLeg
@@ -77,9 +77,9 @@ def test_equity_swap_at_inception():
 
 def test_equity_swap_not_in_inception():
 
-    ## According to http://www-2.rotman.utoronto.ca/~hull/technicalnotes/TechnicalNote19.pdf
-    ## We can engineer a price to which the equity and float leg balance each other. This is
-    ## relatively easy for a single period swap.
+    # According to http://www-2.rotman.utoronto.ca/~hull/technicalnotes/TechnicalNote19.pdf
+    # We can engineer a price to which the equity and float leg balance each other. This is
+    # relatively easy for a single period swap.
 
     effective_dt = Date(13, 2, 2018)
     value_dt = effective_dt.add_months(6)
@@ -106,7 +106,7 @@ def test_equity_swap_not_in_inception():
 
     index_curve = discount_curve
 
-    ## Rate determined at last reset date, from that date to maturity
+    # Rate determined at last reset date, from that date to maturity
     index_curve_first = FlatDiscountCurve(effective_dt, discount_rate)
     index_alpha_first = DayCount(index_curve_first.dc_type).year_frac(
         effective_dt, maturity_dt
@@ -115,7 +115,7 @@ def test_equity_swap_not_in_inception():
         (index_curve_first.df(effective_dt) / index_curve_first.df(maturity_dt)) - 1.0
     ) / index_alpha_first
 
-    ## Rate between valuation date to maturity
+    # Rate between valuation date to maturity
     index_curve_period = FlatDiscountCurve(value_dt, discount_rate)
     index_alpha_period = DayCount(index_curve_period._dc_type).year_frac(
         value_dt, maturity_dt
@@ -124,7 +124,7 @@ def test_equity_swap_not_in_inception():
         (index_curve_period.df(value_dt) / index_curve_period.df(maturity_dt)) - 1.0
     ) / index_alpha_period
 
-    ## This is the price at which abs_value(equity leg) == abs_value(float leg)
+    # This is the price at which abs_value(equity leg) == abs_value(float leg)
     stock_price = (
         stock_strike
         * (1 + first_fixing * index_alpha_first)

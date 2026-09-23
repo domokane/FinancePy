@@ -10,7 +10,7 @@ import pandas as pd
 
 from ...utils.error import FinError
 from ...utils.date import Date
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes

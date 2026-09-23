@@ -2,7 +2,7 @@
 
 import add_fp_to_path
 
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.products.rates.ois import OIS
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.frequency import FrequencyTypes

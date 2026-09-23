@@ -914,11 +914,10 @@ class IborSingleCurve(DiscountCurve):
 
     ####################################################################################
 
-    def __repr__(self):
+    def print_calibration_instruments(self):
         """Print out the details of the Ibor curve."""
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("VALUATION DATE", self.anchor_dt)
+        s = "CALIBRATED TO:\n"
 
         for depo in self.used_deposits:
             s += label_to_string("DEPOSIT", "")
@@ -931,6 +930,16 @@ class IborSingleCurve(DiscountCurve):
         for swap in self.used_swaps:
             s += label_to_string("SWAP", "")
             s += swap.__repr__()
+
+        return s
+
+    ####################################################################################
+
+    def __repr__(self):
+        """Print out the details of the Ibor curve."""
+
+        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s += label_to_string("VALUATION DATE", self.anchor_dt)
 
         s += label_to_string("INTERP TYPE", self._interp_type)
         s += label_to_string("IS BUILT", self.is_built)

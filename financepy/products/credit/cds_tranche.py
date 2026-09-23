@@ -22,7 +22,7 @@ from ...products.credit.cds import CDS
 from ...market.curves.cds_curve import CDSCurve
 
 from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...market.curves.interpolator import InterpTypes, interpolate
 from ...utils.error import FinError
 

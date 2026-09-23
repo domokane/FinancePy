@@ -5,7 +5,7 @@ import numpy as np
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.market.curves.inflation_index_curve import InflationIndexCurve
-from financepy.products.bonds import YTMCalcType
+from financepy.products.bonds.bond import YTMCalcType
 from financepy.products.bonds.bond_inflation import BondInflation
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes

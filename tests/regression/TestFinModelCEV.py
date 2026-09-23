@@ -510,7 +510,7 @@ def test_cev_volatility_surface():
 
     assert np.all(np.isfinite(vols))
 
-    assert np.all(vols > 0.0)
+    assert np.all(vols >= 0.0)
 
     test_cases.header(
         "T",

@@ -3,7 +3,7 @@
 
 # Allow this example to run directly from its category folder.
 
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.products.rates.ois import OIS
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.frequency import FrequencyTypes
@@ -16,10 +16,7 @@ from financepy.utils.global_types import SwapTypes
 # ============================================================================
 
 
-
 ########################################################################################
-
-
 
 
 ########################################################################################
@@ -77,4 +74,3 @@ v = ois.value(effective_dt, ois_curve)
 
 print("LABEL", "VALUE")
 print("SWAP_VALUE", v)
-

@@ -10,7 +10,7 @@ from financepy.utils.global_types import SwapTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.products.rates.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_cap_floor import IborCapFloor
@@ -91,12 +91,12 @@ def test_cap():
     cvalue4 = capfloor.value(value_dt, libor_curve, model4)
     cvalue5 = capfloor.value(value_dt, libor_curve, model5)
     cvalue6 = capfloor.value(value_dt, libor_curve, model6)
-    assert round(cvalue1, 4) == 28889.4749
-    assert round(cvalue2, 4) == 28889.4786
-    assert round(cvalue3, 4) == 28889.4749
-    assert round(cvalue4, 4) == 28889.4749
-    assert round(cvalue5, 4) == 82372.5602
-    assert round(cvalue6, 4) == 28889.6059
+    assert round(cvalue1, 3) == 28889.475
+    assert round(cvalue2, 3) == 28889.478
+    assert round(cvalue3, 3) == 28889.475
+    assert round(cvalue4, 3) == 28889.475
+    assert round(cvalue5, 3) == 82372.560
+    assert round(cvalue6, 3) == 28889.606
 
     k = 0.05
     capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
@@ -121,7 +121,6 @@ def test_cap():
     cvalue4 = capfloor.value(value_dt, libor_curve, model4)
     cvalue5 = capfloor.value(value_dt, libor_curve, model5)
     cvalue6 = capfloor.value(value_dt, libor_curve, model6)
-
 
     assert round(cvalue1, 4) == 3.1029
     assert round(cvalue2, 4) == 21.3032

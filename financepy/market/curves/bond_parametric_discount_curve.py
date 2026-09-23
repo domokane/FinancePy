@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 
 from scipy.optimize import least_squares
 
-from ...utils.format_graphs import *
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.error import FinError
 from ...utils.date import Date
@@ -25,6 +24,9 @@ from .curve_fits import CurveFitQuinticPolynomial
 from .curve_fits import CurveFitNelsonSiegel
 from .curve_fits import CurveFitNelsonSiegelSvensson
 from .curve_fits import CurveFitBSpline
+
+from ...utils.format_graphs import set_plot_style
+set_plot_style()
 
 ################################################################################
 

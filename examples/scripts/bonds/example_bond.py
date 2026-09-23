@@ -23,11 +23,12 @@ import datetime as dt
 import matplotlib.pyplot as plt
 import numpy as np
 
-from financepy.products.bonds.bond import Bond
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.format_graphs import set_plot_style
+
+from financepy.products.bonds.bond import Bond
 
 set_plot_style()
 

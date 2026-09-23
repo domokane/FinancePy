@@ -29,16 +29,18 @@ import time
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from financepy.market.curves import BondBootstrapDiscountCurve
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.products.bonds import BondMarkets
-from financepy.products.bonds import get_bond_market_conventions
-from financepy.products.bonds.bond import Bond
 from financepy.utils.date import Date
 from financepy.utils.date import from_datetime
 from financepy.utils.date_format import DateFormatTypes
 from financepy.utils.date_format import set_date_format
 from financepy.utils.format_graphs import set_plot_style
+
+from financepy.market.curves import BondBootstrapDiscountCurve
+from financepy.market.curves.interpolator import InterpTypes
+
+from financepy.products.bonds import BondMarkets
+from financepy.products.bonds import get_bond_market_conventions
+from financepy.products.bonds.bond import Bond
 
 set_date_format(DateFormatTypes.UK_LONG)
 set_plot_style()

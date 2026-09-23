@@ -5,18 +5,15 @@
 # TODO: Add perturbatory risk using the analytical methods !!
 # TODO: Add Sobol to Monte Carlo
 
+from enum import Enum
+
 from ...utils.error import FinError
 
 from ...utils.global_types import OptionTypes
-from ...utils.global_types import AsianOptionValuationTypes
 
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
-
-from ...utils.check_values import check_curve_dt
-from ...utils.check_values import check_stock_price
-from ...utils.helpers import option_years
 
 from ...models.equity_asian_option_mc import equity_asian_value_mc_fast_cv_numba
 from ...models.equity_asian_option_mc import equity_asian_value_mc_fast_numba
@@ -27,7 +24,6 @@ from ...models.equity_asian_option_bs import value_turnbull_wakeman
 from ...models.equity_asian_option_bs import value_geometric
 
 from ...utils.check_values import check_curve_dt
-from ...utils.check_values import check_corr_matrix
 from ...utils.check_values import check_volatility
 from ...utils.check_values import check_stock_price
 from ...utils.check_values import check_strike_price
@@ -36,6 +32,10 @@ from ...utils.helpers import option_years
 
 ########################################################################################
 
+class AsianOptionValuationTypes(Enum):
+    GEOMETRIC = 1
+    TURNBULL_WAKEMAN = 2
+    CURRAN = 3
 
 ########################################################################################
 # An Asian option on an arithmetic average and strike K has a payoff

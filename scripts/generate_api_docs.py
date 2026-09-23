@@ -11,13 +11,13 @@ The generated documentation mirrors the FinancePy package hierarchy.
 For example:
 
     financepy.products
-        -> html/products/index.html
+        -> docs/products/index.html
 
     financepy.products.bonds
-        -> html/products/bonds/index.html
+        -> docs/products/bonds/index.html
 
     financepy.products.bonds.bond
-        -> html/products/bonds/bond.html
+        -> docs/products/bonds/bond.html
 
 Run from the repository root using:
 
@@ -53,8 +53,8 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 # financepy-git/financepy/
 FINANCEPY_DIR = PROJECT_ROOT / "financepy"
 
-# financepy-git/html/
-HTML_DIR = PROJECT_ROOT / "docs"
+# financepy-git/docs/
+DOCS_DIR = PROJECT_ROOT / "docs"
 
 PACKAGE_NAME = "financepy"
 
@@ -65,7 +65,6 @@ PACKAGE_NAME = "financepy"
 
 EXCLUDED_DIRECTORIES = {
     "__pycache__",
-    "html",
     "scripts",
 }
 
@@ -322,7 +321,7 @@ def module_parts(module_name: str) -> list[str]:
 
 
 def module_to_output_path(module_name: str) -> Path:
-    """Return the generated HTML path for a Python module.
+    """Return the generated documentation path for a Python module.
 
     Example
     -------
@@ -330,12 +329,12 @@ def module_to_output_path(module_name: str) -> Path:
 
     becomes
 
-    html/products/bonds/bond.html
+    docs/products/bonds/bond.html
     """
 
     parts = module_parts(module_name)
 
-    return HTML_DIR.joinpath(*parts).with_suffix(".html")
+    return DOCS_DIR.joinpath(*parts).with_suffix(".html")
 
 
 ###############################################################################
@@ -350,15 +349,15 @@ def package_to_output_path(package_name: str) -> Path:
 
     becomes
 
-    html/products/bonds/index.html
+    docs/products/bonds/index.html
     """
 
     parts = module_parts(package_name)
 
     if not parts:
-        return HTML_DIR / "index.html"
+        return DOCS_DIR / "index.html"
 
-    return HTML_DIR.joinpath(*parts) / "index.html"
+    return DOCS_DIR.joinpath(*parts) / "index.html"
 
 
 ###############################################################################
@@ -501,6 +500,7 @@ def get_module_classes(module):
         if not is_public_name(name):
             continue
 
+        # Do not document imported classes.
         if obj.__module__ != module.__name__:
             continue
 
@@ -525,6 +525,7 @@ def get_module_functions(module):
         if not is_public_name(name):
             continue
 
+        # Do not document imported functions.
         if obj.__module__ != module.__name__:
             continue
 
@@ -749,7 +750,7 @@ def make_breadcrumbs(
 
     links = []
 
-    root_file = HTML_DIR / "index.html"
+    root_file = DOCS_DIR / "index.html"
 
     links.append(
         f'<a href="{relative_link(current_file, root_file)}">'
@@ -1126,7 +1127,7 @@ def generate_root_index(
 ):
     """Generate the main FinancePy API index."""
 
-    output_file = HTML_DIR / "index.html"
+    output_file = DOCS_DIR / "index.html"
 
     body = page_header(
         "FinancePy API Reference",
@@ -1210,27 +1211,53 @@ repository.
 
 
 def clean_output(force: bool = False):
-    """Prepare the documentation output directory."""
+    """Prepare the documentation output directory.
 
-    if force and HTML_DIR.exists():
+    If force is True, attempt to remove the existing documentation first.
+    A failed clean does not prevent the documentation from being regenerated
+    because generated files are overwritten individually.
+
+    A .nojekyll file is created so that GitHub Pages serves the generated
+    static HTML directly.
+    """
+
+    if force and DOCS_DIR.exists():
 
         try:
-            shutil.rmtree(HTML_DIR)
+
+            shutil.rmtree(
+                DOCS_DIR
+            )
 
         except PermissionError as exc:
+
             print()
-            print("WARNING: Could not completely clean HTML directory.")
-            print("A file may be open in a browser, Explorer, or Dropbox.")
+            print(
+                "WARNING: Could not completely clean "
+                "the documentation directory."
+            )
+            print(
+                "A file may be open in a browser, "
+                "Explorer, or Dropbox."
+            )
             print()
             print(f"    {exc}")
             print()
-            print("Continuing without a full clean.")
+            print(
+                "Continuing without a full clean."
+            )
             print()
 
-    HTML_DIR.mkdir(
+    DOCS_DIR.mkdir(
         parents=True,
         exist_ok=True,
     )
+
+    # GitHub Pages should serve the generated HTML directly rather
+    # than processing the directory using Jekyll.
+    nojekyll_file = DOCS_DIR / ".nojekyll"
+
+    nojekyll_file.touch()
 
 
 ###############################################################################
@@ -1285,7 +1312,9 @@ def build():
             )
 
     print()
-    print("Generating package indexes...")
+    print(
+        "Generating package indexes..."
+    )
 
     # Generate deepest packages first.
     sorted_packages = sorted(
@@ -1324,11 +1353,11 @@ def build():
     print("=" * 72)
     print()
     print("Output directory:")
-    print(f"    {HTML_DIR}")
+    print(f"    {DOCS_DIR}")
     print()
     print("Open:")
     print(
-        f"    {HTML_DIR / 'index.html'}"
+        f"    {DOCS_DIR / 'index.html'}"
     )
     print()
 

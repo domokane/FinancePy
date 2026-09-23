@@ -11,7 +11,6 @@ import numpy as np
 import scipy
 from scipy.optimize import least_squares
 
-from ...utils.format_graphs import *
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
@@ -26,6 +25,9 @@ from .curve_fits import CurveFitQuinticPolynomial
 from .curve_fits import CurveFitNelsonSiegel
 from .curve_fits import CurveFitNelsonSiegelSvensson
 from .curve_fits import CurveFitBSpline
+
+from ...utils.format_graphs import set_plot_style
+set_plot_style()
 
 
 class BondParametricYieldCurve:

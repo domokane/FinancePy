@@ -2,7 +2,6 @@
 
 import os
 import datetime as dt
-import numpy as np
 import pandas as pd
 
 from financepy.utils.frequency import FrequencyTypes
@@ -10,8 +9,8 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date, from_datetime
 from financepy.products.bonds.bond import Bond
 
-from financepy.market.curves import CurveFitTypes
-from financepy.market.curves import BondParametricYieldCurve
+from financepy.market.curves.curve_fits import CurveFitTypes
+from financepy.market.curves.bond_parametric_yield_curve import BondParametricYieldCurve
 
 path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
 bond_dataframe = pd.read_csv(path, sep="\t")

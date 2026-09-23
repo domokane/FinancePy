@@ -9,12 +9,6 @@ from enum import Enum
 ########################################################################################
 
 
-class AsianOptionValuationTypes(Enum):
-    GEOMETRIC = 1
-    TURNBULL_WAKEMAN = 2
-    CURRAN = 3
-
-
 class LMMModelTypes(Enum):
 
     ONE_FACTOR = 1
@@ -56,28 +50,6 @@ class VolFuncTypes(Enum):
     CLARK5 = 5
     SVI = 6
     SSVI = 7
-
-
-class YTMCalcType(Enum):
-    ZERO = 0
-    UK_DMO = 1
-    US_STREET = 2
-    US_TREASURY = 3
-    CFETS = 4  # China Foreign Exchange Trade System
-    CALCULUS = 5  # Using Calculus for duration
-
-
-class InterpTypes(Enum):
-    FLAT_FWD_RATES = 1
-    LINEAR_DISCOUNT = 2
-    LINEAR_ZERO_RATES = 3
-    LINEAR_ONFWD_RATES = 4
-    FINCUBIC_ZERO_RATES = 5
-    NATCUBIC_LOG_DISCOUNT = 6
-    NATCUBIC_ZERO_RATES = 7
-    PCHIP_ZERO_RATES = 8
-    PCHIP_LOG_DISCOUNT = 9
-    TENSION_ZERO_RATES = 10
 
 
 class BlackScholesTypes(Enum):

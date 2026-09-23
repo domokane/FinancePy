@@ -11,15 +11,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from financepy.utils.date import Date
+from financepy.utils.global_types import OptionTypes
+
 from financepy.models.black_scholes import BlackScholes
+
 from financepy.products.equity.equity_barrier_option import BarrierTypes
 from financepy.products.equity.equity_barrier_option import EquityBarrierOption
 from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.utils.global_types import OptionTypes
-from financepy.utils.format_graphs import set_plot_style
 
-set_plot_style()
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+
 
 LINE = "=" * 78
 

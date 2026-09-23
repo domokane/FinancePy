@@ -18,7 +18,7 @@ from ...utils.calendar import DateGenRuleTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...utils.error import FinError
 from ...utils.schedule import Schedule
 from ...utils.helpers import label_to_string

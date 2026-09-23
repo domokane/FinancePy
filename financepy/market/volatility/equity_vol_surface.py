@@ -24,7 +24,28 @@
 
 ########################################################################################
 
-from typing import Union, Any, Sequence, Optional, Tuple, List
+from ...utils.global_types import SolverTypes
+from ...utils.solver_nm import nelder_mead
+from ...utils.solver_1d import newton_secant
+from ...utils.distribution import FinDistribution
+from ...models.black_scholes_analytic import delta
+from ...utils.math import norminvcdf
+from ...models.sabr import vol_function_sabr_beta_half
+from ...models.sabr import vol_function_sabr_beta_one
+from ...models.sabr import vol_function_sabr
+from ...models.volatility_fns import vol_function_ssvi
+from ...models.volatility_fns import vol_function_svi
+from ...models.volatility_fns import vol_function_bloomberg
+from ...models.volatility_fns import vol_function_clark
+from ...utils.global_types import VolFuncTypes
+from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import check_argument_types, label_to_string
+from ...models.option_implied_dbn import option_implied_dbn
+from ...utils.global_types import OptionTypes
+from ...utils.global_vars import G_DAYS_IN_YEAR
+from ...utils.date import Date
+from ...utils.error import FinError
+from typing import Union, Any, Sequence, Tuple, List
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -32,33 +53,9 @@ from scipy.optimize import minimize
 
 from numba import njit, float64, int64
 
-from ...utils.format_graphs import *
-from ...utils.error import FinError
-from ...utils.date import Date
-from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...utils.global_types import OptionTypes
-from ...models.option_implied_dbn import option_implied_dbn
-from ...utils.helpers import check_argument_types, label_to_string
-from ...market.curves.discount_curve import DiscountCurve
+from ...utils.format_graphs import set_plot_style
+set_plot_style()
 
-from ...utils.global_types import VolFuncTypes
-from ...models.volatility_fns import vol_function_clark
-from ...models.volatility_fns import vol_function_bloomberg
-from ...models.volatility_fns import vol_function_svi
-from ...models.volatility_fns import vol_function_ssvi
-from ...models.sabr import vol_function_sabr
-from ...models.sabr import vol_function_sabr_beta_one
-from ...models.sabr import vol_function_sabr_beta_half
-
-from ...utils.math import norminvcdf
-
-from ...models.black_scholes_analytic import delta
-
-from ...utils.distribution import FinDistribution
-
-from ...utils.solver_1d import newton_secant
-from ...utils.solver_nm import nelder_mead
-from ...utils.global_types import SolverTypes
 
 ########################################################################################
 # ISSUES

@@ -6,7 +6,7 @@ from scipy import optimize
 
 from ...utils.date import datediff
 from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...products.rates.ibor_single_curve import IborSingleCurve
+from ...market.curves.ibor_single_curve import IborSingleCurve
 from ...products.rates.ibor_benchmarks_report import ibor_benchmarks_report
 
 

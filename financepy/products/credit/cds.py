@@ -15,7 +15,7 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_vars import CLEAN, DIRTY
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...utils.helpers import label_to_string, table_to_string
 from ...utils.check_values import check_curve_dt
 

@@ -4,7 +4,7 @@ import add_fp_to_path
 
 import numpy as np
 
-from financepy.products.fx import FXDoubleOneTouchOption
+from financepy.products.fx.fx_double_one_touch_option import FXDoubleOneTouchOption
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date

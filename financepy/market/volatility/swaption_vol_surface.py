@@ -4,16 +4,17 @@
 
 # UNDER CONSTRUCTION
 
+from ...utils.global_types import SolverTypes
+from ...utils.solver_nm import nelder_mead
 import matplotlib.pyplot as plt
 
-from typing import Union, Any, Sequence, Optional, Tuple, List
+from typing import Any, List
 
 import numpy as np
 from scipy.optimize import minimize
 
 from numba import njit, float64, int64
 
-from ...utils.format_graphs import *
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.global_vars import G_DAYS_IN_YEAR
@@ -28,9 +29,9 @@ from ...models.sabr import vol_function_sabr
 from ...models.sabr import vol_function_sabr_beta_half
 from ...models.sabr import vol_function_sabr_beta_one
 
+from ...utils.format_graphs import set_plot_style
+set_plot_style()
 
-from ...utils.solver_nm import nelder_mead
-from ...utils.global_types import SolverTypes
 
 ########################################################################################
 # ISSUES

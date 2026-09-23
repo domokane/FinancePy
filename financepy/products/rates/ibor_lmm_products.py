@@ -32,7 +32,7 @@ from ...models.lmm_mc import lmm_simulate_fwds_nf
 from ...models.lmm_mc import lmm_cap_flr_pricer
 
 from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 
 from ...utils.global_types import SwapTypes
 from ...utils.global_types import CapFloorTypes

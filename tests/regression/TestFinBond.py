@@ -14,14 +14,15 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.date import Date, from_datetime
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.bonds.bond_market import get_bond_market_conventions
 from financepy.products.bonds.bond_market import BondMarkets
 from financepy.products.bonds.bond import YTMCalcType, Bond, CouponType
-from financepy.utils.global_types import SwapTypes, InterpTypes
+from financepy.utils.global_types import SwapTypes
+from financepy.market.curves.interpolator import InterpTypes
 
 from financepy.utils.date_format import set_date_format, DateFormatTypes
 

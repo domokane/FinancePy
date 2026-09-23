@@ -9,15 +9,13 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
-from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.models.black_scholes import BlackScholes
-from financepy.products.equity.equity_digital_option import EquityDigitalOption
 from financepy.utils.date import Date
-from financepy.utils.format_graphs import set_plot_style
 from financepy.utils.global_types import DigitalOptionTypes
 from financepy.utils.global_types import OptionTypes
 
-set_plot_style()
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.models.black_scholes import BlackScholes
+from financepy.products.equity.equity_digital_option import EquityDigitalOption
 
 
 # ============================================================================

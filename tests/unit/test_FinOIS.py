@@ -6,7 +6,7 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.rates.ois import OIS
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 
 ########################################################################################
 

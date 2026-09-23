@@ -9,7 +9,7 @@ from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
 from ...utils.error import FinError
 from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...market.curves import DiscountCurve
+from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import _uinterpolate, InterpTypes
 from ...utils.helpers import input_time, table_to_string
 from ...utils.frequency import annual_frequency, FrequencyTypes

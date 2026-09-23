@@ -10,7 +10,8 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.math import ONE_MILLION, INV_ROOT_2_PI, normcdf
+from ...utils.math import INV_ROOT_2_PI, normcdf
+from ...utils.global_vars import ONE_MILLION
 from ...utils.error import FinError
 from ...market.curves.cds_curve import CDSCurve
 from ...products.credit.cds import CDS

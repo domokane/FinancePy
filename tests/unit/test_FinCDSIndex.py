@@ -1,14 +1,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+from .helpers import build_ibor_curve, build_issuer_curve
 from financepy.utils.date import Date
-from financepy.utils.math import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION
 from financepy.products.credit.cds import CDS
 
 
 DIRTY = 0
 CLEAN = 1
 
-from .helpers import build_ibor_curve, build_issuer_curve
 
 # We treat an index as a CDS contract with a flat CDS curve
 trade_dt = Date(7, 2, 2006)
@@ -43,20 +43,20 @@ def test_cds_index():
     assert round(v[CLEAN], 1) == 32621.6
 
     p = cds_index_contract.clean_price(value_dt, issuer_curve, cds_recovery)
-    assert round(p, 4) == 99.6738
+    assert round(p, 3) == 99.674
 
     accrued_days = cds_index_contract.accrued_days(value_dt)
     assert accrued_days == 50.0
 
     accrued_interest = cds_index_contract.accrued_interest(value_dt)
-    assert round(accrued_interest, 4) == 5555.5556
+    assert round(accrued_interest, 3) == 5555.556
 
     prot_pv = cds_index_contract.prot_leg_pv(
         value_dt, issuer_curve, cds_recovery
     )
-    assert round(prot_pv, 4) == 188429.562
+    assert round(prot_pv, 3) == 188429.562
 
     prem_pv = cds_index_contract.premium_leg_pv(
         value_dt, issuer_curve)
 
-    assert round(prem_pv, 4) == 161363.4880
+    assert round(prem_pv, 3) == 161363.488

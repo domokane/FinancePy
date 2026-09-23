@@ -9,7 +9,6 @@ import numpy as np
 from scipy import optimize
 
 from ...utils.date import Date
-from ...utils.format_graphs import *
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import times_from_dates
 from ...utils.day_count import DayCountTypes
@@ -18,6 +17,9 @@ from .interpolator import InterpTypes, Interpolator
 from ...utils.error import FinError
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string
+
+from ...utils.format_graphs import set_plot_style
+set_plot_style()
 
 FAST = True
 

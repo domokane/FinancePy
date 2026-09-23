@@ -15,7 +15,7 @@ from ...utils.frequency import FrequencyTypes, annual_frequency
 from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.helpers import check_argument_types, label_to_string
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...utils.global_types import SwapTypes
 
 from ...market.curves.discount_curve import DiscountCurve

@@ -1,22 +1,23 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import matplotlib.pyplot as plt
+from ...market.curves.interpolator import InterpTypes, Interpolator
+from ...utils.helpers import check_argument_types
+from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import times_from_dates
+from ...utils.helpers import label_to_string
+from ...utils.math import test_monotonicity
+from ...utils.day_count import DayCountTypes
+from ...utils.date import Date
+from ...utils.error import FinError
+from ...utils.frequency import FrequencyTypes
 from typing import Union
 
 import numpy as np
 
-from ...utils.format_graphs import *
-from ...utils.frequency import FrequencyTypes
-from ...utils.error import FinError
-from ...utils.date import Date
-from ...utils.day_count import DayCountTypes
-from ...utils.math import test_monotonicity
-from ...utils.helpers import label_to_string
-from ...utils.helpers import times_from_dates
-from ...market.curves.discount_curve import DiscountCurve
-from ...utils.helpers import check_argument_types
-from ...market.curves.interpolator import InterpTypes, Interpolator
+from ...utils.format_graphs import set_plot_style
+set_plot_style()
 
-import matplotlib.pyplot as plt
 
 # TODO: Fix up __repr__ function
 

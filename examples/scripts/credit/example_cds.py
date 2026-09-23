@@ -35,8 +35,9 @@ import numpy as np
 
 from financepy.utils.date import Date
 from financepy.utils.global_vars import CLEAN, DIRTY
-from financepy.products.credit.cds import CDS
 from financepy.utils.format_graphs import set_plot_style
+
+from financepy.products.credit.cds import CDS
 
 from helpers import build_ibor_curve
 from helpers import build_issuer_curve

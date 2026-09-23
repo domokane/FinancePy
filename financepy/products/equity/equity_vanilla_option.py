@@ -2,13 +2,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from typing import Union
-from typing import List
+from typing import List, Union
 
 import numpy as np
-from numba import njit
 
-# from scipy import optimize
 from ...utils.date import Date
 from ...utils.error import FinError
 
@@ -38,41 +35,6 @@ from ...models.black_scholes_mc import value_mc_numpy_numba
 from ...models.black_scholes_mc import value_mc_numba_only
 from ...models.black_scholes_mc import value_mc_numpy_only
 from ...models.black_scholes_mc import value_mc_numba_parallel
-
-########################################################################################
-
-
-@njit(fastmath=True, cache=True)
-def _f(v, args):
-
-    opt_type_value = int(args[0])
-    t_exp = args[1]
-    s0 = args[2]
-    r = args[3]
-    q = args[4]
-    k = args[5]
-    price = args[6]
-
-    obj_fn = european_value(s0, t_exp, k, r, q, v, opt_type_value)
-    obj_fn = obj_fn - price
-    return obj_fn
-
-
-########################################################################################
-
-
-def _fvega(v, *args):
-
-    self = args[0]
-    t_exp = args[1]
-    s0 = args[2]
-    r = args[3]
-    q = args[4]
-    k = args[5]
-
-    fprime = vega(s0, t_exp, k, r, q, v, self.opt_type_value)
-    return fprime
-
 
 ########################################################################################
 
@@ -108,12 +70,10 @@ class EquityVanillaOption:
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
     ):
-        """Equity Vanilla Option valuation using Black-Scholes model."""
+        """Calculate the discounted intrinsic value of the option."""
 
         t_exp = option_years(value_dt, self.expiry_dt)
-
         check_stock_price(stock_price)
-
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
@@ -141,9 +101,7 @@ class EquityVanillaOption:
         """Equity Vanilla Option valuation using Black-Scholes model."""
 
         t_exp = option_years(value_dt, self.expiry_dt)
-
         check_stock_price(stock_price)
-
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
@@ -335,11 +293,11 @@ class EquityVanillaOption:
 
         if isinstance(model, BlackScholes):
             v = model.volatility
-            r = rho(s0, t_exp, k, r, q, v, self.opt_type_value)
+            rh = rho(s0, t_exp, k, r, q, v, self.opt_type_value)
         else:
             raise FinError("Unknown Model Type")
 
-        return r
+        return rh
 
     ###########################################################################
 
@@ -391,8 +349,7 @@ class EquityVanillaOption:
         t_exp = option_years(value_dt, self.expiry_dt)
 
         if t_exp < 1.0 / 366.0:
-            print("Expiry time is too close to zero.")
-            return -999
+            raise FinError("Expiry time is too close to zero.")
 
         check_stock_price(stock_price)
         s0 = stock_price

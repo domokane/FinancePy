@@ -12,7 +12,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.pwf_onf_discount_curve import PWFONFDiscountCurve
 from ...market.curves.composite_discount_curve import CompositeDiscountCurve
 
-from ...products.rates.ibor_single_curve import IborSingleCurve
+from ...market.curves.ibor_single_curve import IborSingleCurve
 from ...products.rates.ibor_single_curve_par_shocker import (
     IborSingleCurveParShocker,
 )
@@ -312,7 +312,7 @@ def _grid_from_dates_tenor(grid_last_date, grid_bucket_tenor: Union[str, Tenor],
     while d < grid_last_date:
         d = d.add_tenor(bucket_tenor)
         grid.append(d)
-        grid_labels.append(f"{count *bucket_tenor}x{bucket_tenor}")
+        grid_labels.append(f"{count * bucket_tenor}x{bucket_tenor}")
         count += 1
     grid[-1] = grid_last_date
     return grid, grid_labels

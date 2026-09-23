@@ -7,7 +7,7 @@ import numpy as np
 from ...utils.error import FinError
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...utils.math import ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...utils.date import Date
 
 from ...utils.helpers import label_to_string, check_argument_types

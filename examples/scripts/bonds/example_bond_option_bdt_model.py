@@ -28,17 +28,20 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.models.bdt_tree import BDTTree
-from financepy.products.bonds.bond import Bond
-from financepy.products.bonds.bond_option import BondOption
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.format_graphs import set_plot_style
+
+from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+
+from financepy.models.bdt_tree import BDTTree
+
+from financepy.products.bonds.bond import Bond
+from financepy.products.bonds.bond_option import BondOption
 
 set_plot_style()
 

@@ -31,20 +31,22 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.market.curves.ibor_single_curve import IborSingleCurve
-from financepy.market.curves.interpolator import InterpTypes
-from financepy.products.bonds.bond import Bond
-from financepy.products.rates.ibor_benchmarks_report import (
-    dataframe_to_benchmarks,
-)
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.date import Date, from_datetime
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.global_vars import G_PERCENT
 from financepy.utils.format_graphs import set_plot_style
+
+from financepy.market.curves.discount_curve import DiscountCurve
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.market.curves.ibor_single_curve import IborSingleCurve
+from financepy.market.curves.interpolator import InterpTypes
+
+from financepy.products.bonds.bond import Bond
+from financepy.products.rates.ibor_benchmarks_report import (
+    dataframe_to_benchmarks,
+)
 
 set_plot_style()
 
