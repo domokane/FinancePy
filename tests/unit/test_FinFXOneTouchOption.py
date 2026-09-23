@@ -31,3 +31,33 @@ def test_matches_equity_one_touch():
         v_fx = fx_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
         v_equity = equity_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
         assert np.isclose(v_fx, v_equity, rtol=1e-6), (opt_type, v_fx, v_equity)
+
+
+########################################################################################
+
+
+def test_low_volatility():
+
+    up_curves = (FlatDiscountCurve(value_dt, 0.05), FlatDiscountCurve(value_dt, 0.02))
+    down_curves = (FlatDiscountCurve(value_dt, 0.02), FlatDiscountCurve(value_dt, 0.05))
+
+    # Expected values are Haug's formulas evaluated in 50-digit arithmetic
+    cases = [
+        (TouchOptionTypes.UP_AND_IN_CASH_AT_HIT, 1.01, up_curves, 1.4753293742197326),
+        (TouchOptionTypes.UP_AND_IN_CASH_AT_EXPIRY, 1.01, up_curves, 1.4628646684008793),
+        (TouchOptionTypes.UP_AND_OUT_CASH_OR_NOTHING, 1.01, up_curves, 0.0),
+        (TouchOptionTypes.UP_AND_IN_ASSET_AT_HIT, 1.01, up_curves, 0.9933884453079533),
+        (TouchOptionTypes.UP_AND_IN_ASSET_AT_EXPIRY, 1.01, up_curves, 0.9900227094677558),
+        (TouchOptionTypes.UP_AND_OUT_ASSET_OR_NOTHING, 1.01, up_curves, 0.0),
+        (TouchOptionTypes.DOWN_AND_IN_CASH_AT_HIT, 0.99, down_curves, 1.4899833281515131),
+        (TouchOptionTypes.DOWN_AND_IN_CASH_AT_EXPIRY, 0.99, down_curves, 1.4850340642016338),
+        (TouchOptionTypes.DOWN_AND_OUT_CASH_OR_NOTHING, 0.99, down_curves, 0.0),
+        (TouchOptionTypes.DOWN_AND_IN_ASSET_AT_HIT, 0.99, down_curves, 0.9833889965799987),
+        (TouchOptionTypes.DOWN_AND_IN_ASSET_AT_EXPIRY, 0.99, down_curves, 0.9752431122672528),
+        (TouchOptionTypes.DOWN_AND_OUT_ASSET_OR_NOTHING, 0.99, down_curves, 0.0),
+    ]
+
+    for opt_type, barrier, curves, expected in cases:
+        option = FXOneTouchOption(expiry_dt, opt_type, barrier, payment_size)
+        v = option.value(value_dt, 1.0, curves[0], curves[1], BlackScholes(0.0005))
+        assert np.isclose(v, expected, rtol=1e-10, atol=1e-10), (opt_type, v, expected)
