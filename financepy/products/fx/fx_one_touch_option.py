@@ -184,8 +184,8 @@ class FXOneTouchOption(FXOption):
         sqrt_t_exp = np.sqrt(t_exp)
 
         df = domestic_curve.df_t(t_exp)
-        r_d = domestic_curve.zero_rate_t(t_exp)
-        r_f = foreign_curve.zero_rate_t(t_exp)
+        r_d = domestic_curve.zero_rate_cc_t(t_exp)
+        r_f = foreign_curve.zero_rate_cc_t(t_exp)
 
         v = model.volatility
         v = max(v, 1e-6)
