@@ -560,7 +560,7 @@ class FXVanillaOption:
 
             volatility = model.volatility
 
-            if np.any(volatility) < 0.0:
+            if np.any(volatility < 0.0):
                 raise FinError("Volatility should not be negative.")
 
             volatility = np.maximum(volatility, 1e-10)
@@ -619,7 +619,7 @@ class FXVanillaOption:
 
             volatility = model.volatility
 
-            if np.any(volatility) < 0.0:
+            if np.any(volatility < 0.0):
                 raise FinError("Volatility should not be negative.")
 
             volatility = np.maximum(volatility, 1e-10)
@@ -674,7 +674,7 @@ class FXVanillaOption:
 
             vol = model.volatility
 
-            if np.any(vol) < 0.0:
+            if np.any(vol < 0.0):
                 raise FinError("Volatility should not be negative.")
 
             vol = np.maximum(vol, 1e-10)
