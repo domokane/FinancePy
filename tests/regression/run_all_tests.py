@@ -2,19 +2,24 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ########################################################################################
 
+from financepy.utils.error import FinError
+from financepy.utils.date_format import set_date_format, DateFormatTypes
+import financepy
+import add_fp_to_path
 import glob
 from os.path import dirname, basename, join
 import traceback
 import time
 
-import add_fp_to_path
+import sys
+from pathlib import Path
 
-import financepy
+repo_root = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(repo_root))
+
 
 print("FinancePy imported successfully from:", financepy.__file__)
 
-from financepy.utils.date_format import set_date_format, DateFormatTypes
-from financepy.utils.error import FinError
 
 # This only works if I have an init.py in the parent folder
 set_date_format(DateFormatTypes.UK_LONG)

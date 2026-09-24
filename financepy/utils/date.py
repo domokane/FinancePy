@@ -1,6 +1,7 @@
 ##############################################################################
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
+from __future__ import annotations
 
 from collections.abc import Iterable
 from functools import partial
@@ -276,20 +277,20 @@ class Date:
     @staticmethod
     def from_excel(excel_dt: float) -> "Date":
         excel_dt = float(excel_dt)
-    
+
         whole_day = math.floor(excel_dt)
         fraction = excel_dt - whole_day
-    
+
         total_seconds = int(round(fraction * SECONDS_PER_DAY))
-    
+
         # Handle rounding such as 23:59:59.999 -> next day.
         if total_seconds >= SECONDS_PER_DAY:
             whole_day += 1
             total_seconds = 0
-    
+
         hh, remainder = divmod(total_seconds, 3600)
         mm, ss = divmod(remainder, 60)
-    
+
         d, m, y = ymd_from_excel(int(whole_day))
         return Date(d, m, y, hh, mm, ss)
 
@@ -317,17 +318,17 @@ class Date:
                 value.minute,
                 value.second,
             )
-    
+
         if isinstance(value, datetime.date):
             return cls(value.day, value.month, value.year)
-    
+
         if isinstance(value, np.datetime64):
             timestamp = (
                 value - np.datetime64("1970-01-01T00:00:00")
             ) / np.timedelta64(1, "s")
-    
+
             value = datetime.datetime.utcfromtimestamp(float(timestamp))
-    
+
             return cls(
                 value.day,
                 value.month,
@@ -336,7 +337,7 @@ class Date:
                 value.minute,
                 value.second,
             )
-    
+
         raise FinError("Expected datetime, date or numpy datetime64")
 
     ####################################################################################
@@ -464,14 +465,12 @@ class Date:
         return Date.from_excel(
             self.excel_dt + float(hours) / 24.0
         )
-    
-    
+
     def add_minutes(self, minutes):
         return Date.from_excel(
             self.excel_dt + float(minutes) / (24.0 * 60.0)
         )
-    
-    
+
     def add_seconds(self, seconds):
         return Date.from_excel(
             self.excel_dt + float(seconds) / (24.0 * 60.0 * 60.0)
@@ -480,29 +479,29 @@ class Date:
     ####################################################################################
 
     # def add_days(self, num_days:int=1):
-    
+
     #     if np.isscalar(num_days):
     #         new_excel_dt = self.excel_dt + int(num_days)
     #         d, m, y = ymd_from_excel(new_excel_dt)
     #         return Date._make_fast(d, m, y, new_excel_dt)
-    
+
     #     new_excel_dts = self.excel_dt + np.asarray(num_days, dtype=np.int64)
-    
+
     #     dates = []
-    
+
     #     for excel_dt in new_excel_dts:
     #         d, m, y = ymd_from_excel(int(excel_dt))
     #         dt = Date._make_fast(d, m, y, int(excel_dt))
     #         dates.append(dt)
-    
+
     #     return dates
 
     ####################################################################################
 
-    def add_days(self, num_days: int=1):
+    def add_days(self, num_days: int = 1):
         if np.isscalar(num_days):
             return Date.from_excel(self.excel_dt + float(num_days))
-    
+
         return [
             Date.from_excel(self.excel_dt + float(x))
             for x in num_days
