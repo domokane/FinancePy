@@ -11,7 +11,6 @@ from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
-from ...market.curves.discount_curve import DiscountCurve
 from ...models.gbm_process_simulator import get_paths_times
 from .fx_option import FXOption
 from ...utils.check_values import check_curve_dt
@@ -19,6 +18,8 @@ from ...utils.helpers import option_years
 from ...models.double_touch_option import fast_double_no_touch_pricer
 from ...models.double_touch_option import barrier_pay_at_expiry_double_hit
 from ...models.double_touch_option import p_double_touch_bb_parallel
+from ...market.curves.discount_curve import DiscountCurve
+from ...models.model import Model
 
 ########################################################################################
 # TODO: Implement Sobol random numbers

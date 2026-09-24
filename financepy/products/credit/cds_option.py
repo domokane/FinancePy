@@ -16,6 +16,7 @@ from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.check_values import check_curve_dt
+from ...market.curves.discount_curve import DiscountCurve
 
 DIRTY = 0
 CLEAN = 1

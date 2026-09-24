@@ -15,8 +15,7 @@ from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import label_to_string
 from ...utils.global_vars import CLEAN
 from ...utils.check_values import check_curve_dt
-
-# from numba import njit, float64
+from ...market.curves.discount_curve import DiscountCurve
 
 ########################################################################################
 

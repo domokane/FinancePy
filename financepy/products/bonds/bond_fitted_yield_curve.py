@@ -9,7 +9,6 @@ import numpy as np
 import scipy
 from scipy.interpolate import splrep
 
-from ...utils.format_graphs import plt
 from ...utils.error import FinError
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
@@ -45,6 +44,9 @@ class BondFittedYieldCurve:
         print("Class BondFittedYieldCurve is Deprecated.")
         print("Use BondParametricYieldCurve in market/curves")
 
+        if len(bonds) != len(ylds):
+            raise FinError("Number of bonds must equal number of yields.")
+
         self.settle_dt = settle_dt
         self.bonds = bonds
         self.ylds = np.array(ylds)
@@ -70,7 +72,7 @@ class BondFittedYieldCurve:
 
         self.years_to_maturity = np.array(years_to_maturities)
 
-        if fit_type is CurveFitPolynomial:
+        if isinstance(fit_type, CurveFitPolynomial):
 
             d = curve_fit.power
             # Highest powers are first
@@ -79,7 +81,7 @@ class BondFittedYieldCurve:
             coeffs2 = coeffs1[::-1]
             curve_fit.coeffs = coeffs2
 
-        elif fit_type is CurveFitNelsonSiegel:
+        elif isinstance(fit_type, CurveFitNelsonSiegel):
 
             xdata = self.years_to_maturity
             ydata = self.ylds
@@ -91,7 +93,7 @@ class BondFittedYieldCurve:
             curve_fit.beta_3 = popt[2]
             curve_fit.tau = popt[3]
 
-        elif fit_type is CurveFitNelsonSiegelSvensson:
+        elif isinstance(fit_type, CurveFitNelsonSiegelSvensson):
 
             xdata = self.years_to_maturity
             ydata = self.ylds
@@ -105,7 +107,7 @@ class BondFittedYieldCurve:
             curve_fit.tau_1 = popt[4]
             curve_fit.tau_2 = popt[5]
 
-        elif fit_type is CurveFitBSpline:
+        elif isinstance(fit_type, CurveFitBSpline):
 
             xdata = self.years_to_maturity
             ydata = self.ylds

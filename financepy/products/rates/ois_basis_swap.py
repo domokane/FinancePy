@@ -14,6 +14,7 @@ from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.global_vars import ONE_MILLION
 from ...utils.global_types import SwapTypes
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.check_values import check_curve_dt
 
 from .swap_float_leg import SwapFloatLeg
 
@@ -127,8 +128,8 @@ class OISBasisSwap:
             index_ois_curve = discount_curve
 
         check_curve_dt(value_dt, discount_curve)
-        check_curve_dt(value_dt, index_curve)
-        check_curve_dt(value_dt, index_curve)
+        check_curve_dt(value_dt, index_ibor_curve)
+        check_curve_dt(value_dt, index_ois_curve)
 
         float_ibor_leg_value = self.float_ibor_leg.value(
             value_dt, discount_curve, index_ibor_curve, first_fixing_rate_leg_1

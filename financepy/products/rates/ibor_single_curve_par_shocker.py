@@ -48,7 +48,7 @@ class IborSingleCurveParShocker:
         composite_shock[benchmark_idx] = bump_size
         return self.apply_composite_bump(composite_shock)
 
-    def apply_composite_bump(self, bump_sizes: Union[np.array, list]):
+    def apply_composite_bump(self, bump_sizes: Union[np.ndarray, list]):
         """Apply a composite bump to base_curve.
         A composite bump is a list/array of bumps, one per bechmark
 

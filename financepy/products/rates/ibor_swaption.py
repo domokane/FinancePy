@@ -39,6 +39,7 @@ from ...utils.global_types import SwapTypes
 from ...utils.global_types import ExerciseTypes
 
 from ...utils.check_values import check_curve_dt
+from ...models.model import Model
 
 ########################################################################################
 
@@ -103,7 +104,9 @@ class IborSwaption:
 
     ###########################################################################
 
-    def value(self, value_dt: Date, discount_curve: DiscountCurve, model: Model):
+    def value(self, value_dt: Date,
+              discount_curve: DiscountCurve,
+              model: Model):
         """Valuation of a Ibor European-style swaption using a choice of
         models on a specified valuation date. Models include FinModelBlack,
         FinModelBlackShifted, SABR, SABRShifted, FinModelHW,

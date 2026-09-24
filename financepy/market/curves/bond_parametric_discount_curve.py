@@ -26,6 +26,7 @@ from .curve_fits import CurveFitNelsonSiegelSvensson
 from .curve_fits import CurveFitBSpline
 
 from ...utils.format_graphs import set_plot_style
+
 set_plot_style()
 
 ################################################################################
@@ -45,7 +46,9 @@ def get_fit_bounds(fit, n_params):
         hi = np.full(n_params, hi)
 
     if len(lo) != n_params or len(hi) != n_params:
-        raise FinError(f"Bounds length {len(lo)},{len(hi)} does not match number of params {n_params}.")
+        raise FinError(
+            f"Bounds length {len(lo)},{len(hi)} does not match number of params {n_params}."
+        )
 
     return lo, hi
 
@@ -181,9 +184,7 @@ class BondParametricDiscountCurve(DiscountCurve):
         for bond in bonds:
 
             t_mat = times_from_dates(
-                self.anchor_dt,
-                bond.maturity_dt,
-                self.curve_dc_type,
+                self.anchor_dt, bond.maturity_dt, self.curve_dc_type
             )
 
             self._t_mats.append(t_mat)
@@ -233,10 +234,7 @@ class BondParametricDiscountCurve(DiscountCurve):
 
         x0 = self._curve_fit.get_params()
 
-        bounds = get_fit_bounds(
-            self._curve_fit,
-            len(x0),
-        )
+        bounds = get_fit_bounds(self._curve_fit, len(x0))
 
         lo, hi = bounds
 
@@ -245,15 +243,9 @@ class BondParametricDiscountCurve(DiscountCurve):
         lower_finite = np.isfinite(lo)
         upper_finite = np.isfinite(hi)
 
-        x0[lower_finite] = np.maximum(
-            x0[lower_finite],
-            lo[lower_finite] + 1.0e-10,
-        )
+        x0[lower_finite] = np.maximum(x0[lower_finite], lo[lower_finite] + 1.0e-10)
 
-        x0[upper_finite] = np.minimum(
-            x0[upper_finite],
-            hi[upper_finite] - 1.0e-10,
-        )
+        x0[upper_finite] = np.minimum(x0[upper_finite], hi[upper_finite] - 1.0e-10)
 
         result = least_squares(
             f_fast,
@@ -271,12 +263,7 @@ class BondParametricDiscountCurve(DiscountCurve):
 
         self._curve_fit.set_params(result.x)
 
-        self._times = np.concatenate(
-            (
-                [0.0],
-                self._t_mats,
-            )
-        )
+        self._times = np.concatenate(([0.0], self._t_mats))
 
         self._zero_rates = self._curve_fit.interp_rate(self._times)
 
@@ -312,10 +299,7 @@ class BondParametricDiscountCurve(DiscountCurve):
 
         for bond in self.used_bonds:
 
-            bond.accrued_interest(
-                self.anchor_dt,
-                bond.par,
-            )
+            bond.accrued_interest(self.anchor_dt, bond.par)
 
             self._accrued.append(bond.accrued_int)
 
@@ -323,23 +307,17 @@ class BondParametricDiscountCurve(DiscountCurve):
             amounts = []
 
             for cpn_dt, pmt_dt, flow in zip(
-                bond.cpn_dts,
-                bond.payment_dts,
-                bond.flow_amounts,
+                bond.cpn_dts, bond.payment_dts, bond.flow_amounts
             ):
 
-                if cpn_dt > self.anchor_dt:
+                if pmt_dt > self.anchor_dt:
 
                     amt = flow
 
                     if pmt_dt == bond.payment_dts[-1]:
                         amt += bond.par / 100.0
 
-                    t = times_from_dates(
-                        self.anchor_dt,
-                        pmt_dt,
-                        self.curve_dc_type,
-                    )
+                    t = times_from_dates(self.anchor_dt, pmt_dt, self.curve_dc_type)
 
                     times.append(t)
                     amounts.append(amt)
@@ -356,18 +334,11 @@ class BondParametricDiscountCurve(DiscountCurve):
 
         zero_rates = self._curve_fit.interp_rate(times)
 
-        expo = np.clip(
-            -zero_rates * times,
-            -100.0,
-            100.0,
-        )
+        expo = np.clip(-zero_rates * times, -100.0, 100.0)
 
         dfs = np.exp(expo)
 
-        dfs = np.maximum(
-            dfs,
-            1.0e-300,
-        )
+        dfs = np.maximum(dfs, 1.0e-300)
 
         if scalar_input:
             return float(dfs[0])
@@ -407,10 +378,7 @@ class BondParametricDiscountCurve(DiscountCurve):
 
         n = len(self.used_bonds)
 
-        maturities = np.asarray(
-            self._t_mats,
-            dtype=float,
-        )
+        maturities = np.asarray(self._t_mats, dtype=float)
 
         market_clean = self.clean_prices
 
@@ -430,15 +398,9 @@ class BondParametricDiscountCurve(DiscountCurve):
 
             fitted_clean[i] = fitted_dirty - accrued_i
 
-            market_ytm[i] = bond.yield_to_maturity(
-                self.anchor_dt,
-                market_clean[i],
-            )
+            market_ytm[i] = bond.yield_to_maturity(self.anchor_dt, market_clean[i])
 
-            fitted_ytm[i] = bond.yield_to_maturity(
-                self.anchor_dt,
-                fitted_clean[i],
-            )
+            fitted_ytm[i] = bond.yield_to_maturity(self.anchor_dt, fitted_clean[i])
 
         ytm_error = fitted_ytm - market_ytm
 
@@ -484,20 +446,9 @@ class BondParametricDiscountCurve(DiscountCurve):
         plt.xlabel("Time to maturity")
         plt.ylabel("Yield (%)")
 
-        plt.plot(
-            t,
-            market_ytm,
-            "o",
-            label="Market YTM",
-        )
+        plt.plot(t, market_ytm, "o", label="Market YTM")
 
-        plt.plot(
-            t,
-            fitted_ytm,
-            "-",
-            lw=2,
-            label="Fitted YTM",
-        )
+        plt.plot(t, fitted_ytm, "-", lw=2, label="Fitted YTM")
 
         plt.legend(loc="best")
         plt.grid(True)
@@ -520,26 +471,16 @@ class BondParametricDiscountCurve(DiscountCurve):
         plt.xlabel("Time to maturity")
         plt.ylabel("Yield error (bp)")
 
-        plt.axhline(
-            0.0,
-            linestyle="--",
-            linewidth=1.0,
-        )
+        plt.axhline(0.0, linestyle="--", linewidth=1.0)
 
-        plt.plot(
-            t,
-            error_bp,
-            "o-",
-            label="Fitted - market",
-        )
+        plt.plot(t, error_bp, "o-", label="Fitted - market")
 
         rmse_bp = np.sqrt(np.mean(error_bp * error_bp))
 
         max_abs_bp = np.max(np.abs(error_bp))
 
         plt.legend(
-            title=(f"RMSE={rmse_bp:.3f} bp, " f"MaxAbs={max_abs_bp:.3f} bp"),
-            loc="best",
+            title=(f"RMSE={rmse_bp:.3f} bp, " f"MaxAbs={max_abs_bp:.3f} bp"), loc="best"
         )
 
         plt.grid(True)
@@ -563,11 +504,7 @@ class BondParametricDiscountCurve(DiscountCurve):
 
         z = scale(z, 100.0)
 
-        plt.plot(
-            t,
-            z,
-            label=str(self._curve_fit),
-        )
+        plt.plot(t, z, label=str(self._curve_fit))
 
         plt.legend(loc="lower right")
         plt.grid(True)
@@ -585,29 +522,17 @@ class BondParametricDiscountCurve(DiscountCurve):
         plt.xlabel("Time to Maturity (years)")
         plt.ylabel(ylabel)
 
-        t = np.maximum(
-            self._times,
-            1.0e-6,
-        )
+        t = np.maximum(self._times, 1.0e-6)
 
         z = self.fwd_rate_inst_t(t)
 
         z = scale(z, 100.0)
 
-        plt.plot(
-            t,
-            z,
-            label=str(self._curve_fit),
-        )
+        plt.plot(t, z, label=str(self._curve_fit))
 
         plt.legend(loc="lower right")
 
-        plt.ylim(
-            (
-                min(z) - 0.3,
-                max(z) * 1.1,
-            )
-        )
+        plt.ylim((min(z) - 0.3, max(z) * 1.1))
 
         plt.grid(True)
 
@@ -617,30 +542,15 @@ class BondParametricDiscountCurve(DiscountCurve):
 
     def __repr__(self):
 
-        s = label_to_string(
-            "OBJECT TYPE",
-            type(self).__name__,
-        )
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
 
-        s += label_to_string(
-            "ANCHOR DATE",
-            self.anchor_dt,
-        )
+        s += label_to_string("ANCHOR DATE", self.anchor_dt)
 
-        s += label_to_string(
-            "CLEAN PRICES",
-            self.clean_prices,
-        )
+        s += label_to_string("CLEAN PRICES", self.clean_prices)
 
-        s += label_to_string(
-            "CURVE FIT TYPE",
-            self.curve_fit_type,
-        )
+        s += label_to_string("CURVE FIT TYPE", self.curve_fit_type)
 
-        s += label_to_string(
-            "CURVE FIT",
-            self._curve_fit,
-        )
+        s += label_to_string("CURVE FIT", self._curve_fit)
 
         return s
 

@@ -18,7 +18,8 @@ from ...utils.date import Date
 # from ...products.fx.FinFXModelTypes import FinFXModel
 from ...models.black_scholes import BlackScholes
 from ...utils.helpers import check_argument_types
-
+from ...market.curves.discount_curve import DiscountCurve
+from ...models.model import Model
 
 class FXDoubleDigitalOption:
 

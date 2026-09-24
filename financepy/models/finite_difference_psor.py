@@ -34,8 +34,7 @@ def black_scholes_fd_psor(
 
     Parameters:
         acc: Keep iterating until this accuracy is achieved
-        d_omega: Larger numbers lead to bigger changes in omega with each
-        iteration
+        d_omega: Larger numbers lead to bigger changes in omega with each iteration
         max_iter: Maximum number of iterations in psor step. Set to 0 to
         allow any number of iterations.
     """

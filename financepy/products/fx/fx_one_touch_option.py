@@ -16,11 +16,12 @@ from ...utils.date import Date
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_t_exp
 from ...utils.helpers import option_years
-
-from ...market.curves.discount_curve import DiscountCurve
+from ...models.model import Model
 from ...models.gbm_process_simulator import get_paths_times
 from ...products.fx.fx_option import FXOption
 from ...utils.math import normcdf_vect
+from ...market.curves.discount_curve import DiscountCurve
+from ...models.model import Model
 
 ########################################################################################
 # TODO: Implement Sobol random numbers

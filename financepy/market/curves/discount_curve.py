@@ -193,12 +193,17 @@ class DiscountCurve:
             end_dts = date_or_tenor
 
         else:
-            raise FinError("date_or_tenor must be a Date, tenor string, or list of Dates.")
+            raise FinError(
+                "date_or_tenor must be a Date, tenor string, or list of Dates."
+            )
 
         day_counter = DayCount(accrual_dc_type)
 
         accruals = np.array(
-            [day_counter.year_frac(dt1, dt2)[0] for dt1, dt2 in zip(start_dts, end_dts)],
+            [
+                day_counter.year_frac(dt1, dt2)[0]
+                for dt1, dt2 in zip(start_dts, end_dts)
+            ],
             dtype=float,
         )
 
@@ -287,11 +292,7 @@ class DiscountCurve:
 
     ###########################################################################
 
-    def fwd_rate_inst_t(
-        self,
-        t: Union[float, list, np.ndarray],
-        dt: float = 1.0e-4,
-    ):
+    def fwd_rate_inst_t(self, t: Union[float, list, np.ndarray], dt: float = 1.0e-4):
         """Instantaneous continuously compounded forward rate at time t.
 
         Computes:
@@ -372,11 +373,7 @@ class DiscountCurve:
 
     ####################################################################################
 
-    def zero_rate_t(
-        self,
-        t,
-        freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-    ):
+    def zero_rate_t(self, t, freq_type: FrequencyTypes = FrequencyTypes.ANNUAL):
         if not isinstance(freq_type, FrequencyTypes):
             raise FinError("Invalid Frequency type.")
 
@@ -525,9 +522,7 @@ class DiscountCurve:
 
         acc_day_counter = DayCount(accrual_dc_type)
 
-        t_start = times_from_dates(self.anchor_dt,
-                                   effective_dt,
-                                   self.curve_dc_type)
+        t_start = times_from_dates(self.anchor_dt, effective_dt, self.curve_dc_type)
 
         par_rates = []
 
@@ -540,13 +535,11 @@ class DiscountCurve:
             flow_dts = schedule.generate()
 
             payment_times = times_from_dates(
-                self.anchor_dt,
-                flow_dts[1:],
-                self.curve_dc_type,
+                self.anchor_dt, flow_dts[1:], self.curve_dc_type
             )
 
-#            payment_times = np.array([times_from_dates(self.anchor_dt, dt, self.curve_dc_type)
-#                                      for dt in flow_dts[1:]])
+            #            payment_times = np.array([times_from_dates(self.anchor_dt, dt, self.curve_dc_type)
+            #                                      for dt in flow_dts[1:]])
 
             accrual_factors = []
             for prev_dt, next_dt in zip(flow_dts[:-1], flow_dts[1:]):
@@ -597,10 +590,7 @@ class DiscountCurve:
     #############################################################################
 
     def par_rate_t(
-        self,
-        t_start: float,
-        payment_times: np.ndarray,
-        accrual_factors: np.ndarray,
+        self, t_start: float, payment_times: np.ndarray, accrual_factors: np.ndarray
     ):
 
         df_start = self.df_t(t_start)
@@ -621,9 +611,7 @@ class DiscountCurve:
         vector of dates. The time day count determines how dates get converted
         to years."""
 
-        times = times_from_dates(self.anchor_dt,
-                                 dt,
-                                 self.curve_dc_type)
+        times = times_from_dates(self.anchor_dt, dt, self.curve_dc_type)
 
         dfs = self.df_t(times)
 
@@ -841,7 +829,7 @@ class DiscountCurve:
 
         # Hardcode this as we want this not parent class
         s = label_to_string("OBJECT_TYPE", "DiscountCurve")
-        s += label_to_string("VALUE DATE", (self.anchor_dt))
+        s += label_to_string("VALUE DATE", (self.anchor_dt.str()))
 
         s += "    DATES      TIMES(YRS) DISC FACTORS\n"
         for dt, t, df in zip(self._df_dates, self._times, self._dfs):

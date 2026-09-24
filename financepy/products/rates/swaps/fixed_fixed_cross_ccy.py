@@ -347,7 +347,7 @@ class FixedFixedCrossCurrencySwap:
         value_dt,  # This should be the settlement date
         discount_curve,
         index_curve,
-        first_fixing_rate=None,
+        first_fixing_rate:float=None,
         principal=0.0,
     ):
         """Value the floating leg with payments from an index curve and

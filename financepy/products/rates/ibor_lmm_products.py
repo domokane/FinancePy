@@ -37,6 +37,10 @@ from ...utils.global_vars import ONE_MILLION
 from ...utils.global_types import SwapTypes
 from ...utils.global_types import CapFloorTypes
 
+from ...market.curves.discount_curve import DiscountCurve
+from ...models.model import Model
+from ...utils.check_values import check_curve_dt
+
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
 
 ########################################################################################
@@ -177,11 +181,7 @@ class IborLMMProducts:
         if num_paths < 2 or num_paths > 1000000:
             raise FinError("NumPaths must be between 2 and 1 million")
 
-        if discount_curve.curve_dt != self.start_dt:
-            raise FinError("Curve anchor date not the same as LMM start date.")
-
-        check_curve_dt(value_dt, discount_curve)
-        check_curve_dt(value_dt, index_curve)
+        check_curve_dt(self.start_dt, discount_curve)
 
         print("LEN LAMBDAS", len(lambdas))
         print("LEN", len(lambdas[0]))

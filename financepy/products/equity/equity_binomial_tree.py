@@ -12,6 +12,8 @@ from numba import njit, float64, int64
 from ...utils.error import FinError
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import heaviside
+from ...market.curves.discount_curve import DiscountCurve
+from ...utils.date import Date
 
 ########################################################################################
 

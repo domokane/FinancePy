@@ -13,6 +13,8 @@ from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.global_vars import ONE_MILLION
 from ...utils.global_types import SwapTypes
+from ...utils.check_values import check_curve_dt
+
 from ...market.curves.discount_curve import DiscountCurve
 
 from .swap_float_leg import SwapFloatLeg

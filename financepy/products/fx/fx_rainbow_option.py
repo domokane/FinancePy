@@ -16,7 +16,7 @@ from ...products.fx.fx_option import FXOption
 from ...utils.helpers import check_argument_types
 from ...utils.check_values import check_curve_dt
 
-from ...models.models import Model
+from ...models.model import Model
 from ...market.curves.discount_curve import DiscountCurve
 
 ########################################################################################
