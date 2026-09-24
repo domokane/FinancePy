@@ -15,10 +15,10 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.bs_digital_option import bs_digital_option_value
-from ...utils.math import normcdf_vect
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_t_exp
 from ...utils.helpers import option_years
+from ...models.model import Model
 
 ########################################################################################
 

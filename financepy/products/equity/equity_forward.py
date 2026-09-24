@@ -9,6 +9,7 @@ from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
+from ...market.curves.discount_curve import DiscountCurve
 
 ########################################################################################
 # ADD START DATE TO CLASS ?

@@ -17,6 +17,7 @@ from ...utils.calendar import Calendar, BusDayAdjustTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.global_vars import ONE_MILLION
 from ...utils.global_types import SwapTypes
+from ...utils.check_values import check_curve_dt
 
 from ...market.curves.discount_curve import DiscountCurve
 
@@ -160,7 +161,7 @@ class IborFixedFloatSwap:
         value_dt: Date,
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve = None,
-        first_fixing_rate: float=None,
+        first_fixing_rate: float = None,
         pv_only=True,
     ):
         """Value the interest rate swap on a value date given a single Ibor
@@ -195,10 +196,10 @@ class IborFixedFloatSwap:
 
     def valuation_details(
         self,
-        value_date: Date,
+        value_dt: Date,
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve = None,
-        first_fixing_rate: float=None,
+        first_fixing_rate: float = None,
     ):
         """
         A long-hand method that returns various details relevant to valuation in
@@ -215,9 +216,9 @@ class IborFixedFloatSwap:
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, index_curve)
 
-        fixed_leg_value = self.fixed_leg.value(value_date, discount_curve)
+        fixed_leg_value = self.fixed_leg.value(value_dt, discount_curve)
 
-        float_leg_value = self.float_leg.value(value_date, discount_curve, index_curve, first_fixing_rate)
+        float_leg_value = self.float_leg.value(value_dt, discount_curve, index_curve, first_fixing_rate)
 
         value = fixed_leg_value + float_leg_value
         pv01 = np.abs(fixed_leg_value / self.fixed_leg.cpn / self.fixed_leg.notional)

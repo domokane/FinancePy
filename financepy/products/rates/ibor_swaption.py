@@ -22,6 +22,7 @@ from ...utils.global_vars import ONE_MILLION
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
+from ...market.curves.discount_curve import DiscountCurve
 
 from ...products.rates.ibor_swap import IborSwap
 

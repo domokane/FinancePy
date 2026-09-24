@@ -7,6 +7,8 @@ from ...models.black_scholes import BlackScholes
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.date import Date
 from ...utils.check_values import check_curve_dt
+from ...market.curves.discount_curve import DiscountCurve
+from ...models.model import Model
 
 ##########################################################################
 

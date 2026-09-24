@@ -17,6 +17,7 @@ from ...utils.global_types import SwapTypes
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.check_values import check_curve_dt
+from ...market.curves.discount_curve import DiscountCurve
 
 from .ibor_swap import IborSwap
 
@@ -95,7 +96,7 @@ class IborBermudanSwaption:
 
     ###################################################################
 
-    def value(self, value_dt: Date, discount_curve: DiscountCurve, model: Model):
+    def value(self, value_dt: Date, discount_curve: DiscountCurve, model):
         """Value the Bermudan swaption using the specified model and a
         discount curve. The choices of model are the Hull-White model,
         the Black-Karasinski model and the Black-Derman-Toy model."""

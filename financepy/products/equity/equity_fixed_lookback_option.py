@@ -17,6 +17,7 @@ from ...products.equity.equity_option import EquityOption
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.global_types import OptionTypes
+from ...models.model import Model
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo

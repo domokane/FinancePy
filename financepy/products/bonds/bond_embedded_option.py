@@ -19,6 +19,7 @@ from ...products.bonds.bond import Bond
 from ...utils.date import Date
 from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
+from ...models.model import Model
 
 ########################################################################################
 # TODO: Make it possible to specify start and end of American Callable/Puttable

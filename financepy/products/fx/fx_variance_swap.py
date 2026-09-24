@@ -13,6 +13,7 @@ from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import OptionTypes
 from .fx_vanilla_option import FXVanillaOption
 from ...models.black_scholes import BlackScholes
+from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.helpers import check_argument_types
 
@@ -86,7 +87,10 @@ class FinFXVarianceSwap:
 
     ###########################################################################
 
-    def fair_strike_approx(self, value_dt: Date, fwd_stock_price: float, strikes, volatilities: np.ndarray):
+    def fair_strike_approx(self, value_dt: Date,
+                           fwd_stock_price: float,
+                           strikes: np.ndarray,
+                           volatilities: np.ndarray):
         """This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
         F is the forward stock price and sigma(F) is the ATM forward vol."""
@@ -116,7 +120,7 @@ class FinFXVarianceSwap:
         volatility_curve: DiscountCurve,
         num_call_options: int,
         num_put_options: int,
-        strike_spacing,
+        strike_spacing: float,
         discount_curve: DiscountCurve,
         use_forward=True,
     ):

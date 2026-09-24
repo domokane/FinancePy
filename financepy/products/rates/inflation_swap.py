@@ -11,6 +11,8 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
+from ...utils.check_values import check_curve_dt
+from ...market.curves.discount_curve import DiscountCurve
 
 ########################################################################################
 
@@ -109,8 +111,6 @@ class InflationSwap:
     def maturity_df(self, libor_curve: DiscountCurve):
         """Determine the maturity date discount factor needed to refit
         the FRA given the libor curve anbd the contract FRA rate."""
-
-        check_curve_dt(value_dt, libor_curve)
 
         dc = DayCount(self.accrual_dc_type)
         df1 = libor_curve.df(self.start_dt)

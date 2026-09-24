@@ -17,6 +17,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import option_years
 from ...utils.check_values import check_curve_dt
+from ...models.model import Model
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo

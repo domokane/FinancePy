@@ -22,6 +22,7 @@ from ...utils.check_values import check_curve_dt
 from ...utils.helpers import check_argument_types
 from ...models.cds_model import risky_pv01_numba
 from ...models.cds_model import prot_leg_pv_numba
+from ...market.curves.discount_curve import DiscountCurve
 
 USE_FLAT_HAZARD_RATE_INTEGRAL = True
 STANDARD_RECOVERY_RATE = 0.40
@@ -200,7 +201,7 @@ class CDS:
         contract_recovery_rate: float,
         pv01_method: int = 0,
         prot_method: int = 0,
-        num_steps_per_year: int=GLOB_NUM_STEPS_PER_YEAR,
+        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
     ):
         """Valuation of a CDS contract on a specific valuation date given
         an issuer curve and a contract recovery rate."""
@@ -241,7 +242,7 @@ class CDS:
         contract_recovery_rate: float,
         pv01_method=0,
         prot_method=0,
-        num_steps_per_year: int=GLOB_NUM_STEPS_PER_YEAR,
+        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
     ):
         """Calculation of the change in the value of the CDS contract for a
         one basis point change in the level of the CDS curve."""
@@ -285,7 +286,7 @@ class CDS:
         contract_recovery_rate: float,
         pv01_method: int = 0,
         prot_method: int = 0,
-        num_steps_per_year: int=GLOB_NUM_STEPS_PER_YEAR,
+        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
     ):
         """Calculation of the interest DV01 based on a simple bump of
         the discount factors and reconstruction of the CDS curve."""
@@ -334,7 +335,7 @@ class CDS:
         contract_recovery_rate: float,
         pv01_method: int = 0,
         prot_method: int = 0,
-        num_steps_per_year: int=GLOB_NUM_STEPS_PER_YEAR,
+        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
     ):
         """PV change when contract and curve recovery both increase by 1%.
 
@@ -408,7 +409,7 @@ class CDS:
         contract_recovery_rate: float,
         pv01_method=0,
         prot_method=0,
-        num_steps_per_year: int=GLOB_NUM_STEPS_PER_YEAR,
+        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
     ):
         """Return clean percentage PV expressed on T+3 settlement date."""
 
@@ -448,7 +449,7 @@ class CDS:
         contract_recovery_rate: float,
         pv01_method=0,
         prot_method=0,
-        num_steps_per_year: int=GLOB_NUM_STEPS_PER_YEAR,
+        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
     ):
         """Return dirty amount paid on the T+3 settlement date."""
 
@@ -487,7 +488,7 @@ class CDS:
         contract_recovery_rate: float,
         pv01_method=0,
         prot_method=0,
-        num_steps_per_year: int=GLOB_NUM_STEPS_PER_YEAR,
+        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
     ):
         """Value of the CDS contract excluding accrued interest."""
         check_curve_dt(value_dt, issuer_curve)
@@ -544,8 +545,8 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: DiscountCurve,
-        contract_recovery_rate: float=STANDARD_RECOVERY_RATE,
-        num_steps_per_year: int=GLOB_NUM_STEPS_PER_YEAR,
+        contract_recovery_rate: float = STANDARD_RECOVERY_RATE,
+        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
         prot_method=0,
     ):
         """Calculates the protection leg PV of the CDS by calling into the
@@ -665,8 +666,8 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: DiscountCurve,
-        contract_recovery_rate: float=STANDARD_RECOVERY_RATE,
-        num_steps_per_year: int=GLOB_NUM_STEPS_PER_YEAR,
+        contract_recovery_rate: float = STANDARD_RECOVERY_RATE,
+        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
         pv01_method=0,
         prot_method=0,
     ):
@@ -694,10 +695,10 @@ class CDS:
         value_dt: Date,
         flat_cont_interest_rate: float,
         flat_cds_curve_spread,
-        curve_recovery: float=STANDARD_RECOVERY_RATE,
-        contract_recovery_rate: float=STANDARD_RECOVERY_RATE,
-        bump_size: float=ONE_BP,
-        recovery_bump_size: float=ONE_PCT,
+        curve_recovery: float = STANDARD_RECOVERY_RATE,
+        contract_recovery_rate: float = STANDARD_RECOVERY_RATE,
+        bump_size: float = ONE_BP,
+        recovery_bump_size: float = ONE_PCT,
     ):
         """Fast approximate CDS valuation using flat hazard and discount curves.
 

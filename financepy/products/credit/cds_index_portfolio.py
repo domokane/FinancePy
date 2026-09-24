@@ -3,12 +3,14 @@
 ##############################################################################
 
 
+from ...utils.date import Date
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.error import FinError
 from ...products.credit.cds import CDS
+from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.cds_curve import CDSCurve
 from ...utils.helpers import check_argument_types
 from ...utils.helpers import label_to_string

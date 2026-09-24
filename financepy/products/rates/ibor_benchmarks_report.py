@@ -13,9 +13,10 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.ibor_single_curve import IborSingleCurve
 from ...utils.check_values import check_curve_dt
 
-from ...products.rates.ibor_fra import IborFRA
-from ...products.rates.ibor_swap import IborSwap
-from ...products.rates.ibor_deposit import IborDeposit
+# DO NOT REMOVE AS USED BELOW
+from ...products.rates.ibor_fra import IborFRA  # ruff: noqa: F401
+from ...products.rates.ibor_swap import IborSwap  # ruff: noqa: F401
+from ...products.rates.ibor_deposit import IborDeposit  # ruff: noqa: F401
 
 
 def benchmarks_report(

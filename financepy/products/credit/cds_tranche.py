@@ -17,20 +17,21 @@ from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
 from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
-
-from ...products.credit.cds import CDS
-from ...market.curves.cds_curve import CDSCurve
-
+from ...utils.error import FinError
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_vars import ONE_MILLION
-from ...market.curves.interpolator import InterpTypes, interpolate
-from ...utils.error import FinError
-
 from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
 from ...utils.check_values import check_curve_dt
 
 from ...utils.global_vars import CLEAN
+
+from ...products.credit.cds import CDS
+from ...market.curves.cds_curve import CDSCurve
+
+from ...market.curves.discount_curve import DiscountCurve
+from ...market.curves.interpolator import InterpTypes, interpolate
+
 
 ########################################################################################
 
@@ -107,8 +108,8 @@ class CDSTranche:
         running_cpn: float,
         corr1,
         corr2,
-        num_points: int=50,
-        model: Model=FinLossDistributionBuilder.RECURSION,
+        num_points: int = 50,
+        algorithm: FinLossDistributionBuilder = FinLossDistributionBuilder.RECURSION,
     ):
 
         check_curve_dt(value_dt, *issuer_curves)
@@ -174,7 +175,7 @@ class CDSTranche:
                 recovery_rates[j] = issuer_curve.recovery_rate
                 q_vector[j] = interpolate(t, v_times, q_row, InterpTypes.FLAT_FWD_RATES.value)
 
-            if model == FinLossDistributionBuilder.RECURSION:
+            if algorithm == FinLossDistributionBuilder.RECURSION:
 
                 qt1[i] = tranche_surv_prob_recursion(
                     0.0,
@@ -196,7 +197,7 @@ class CDSTranche:
                     num_points,
                 )
 
-            elif model == FinLossDistributionBuilder.ADJUSTED_BINOMIAL:
+            elif algorithm == FinLossDistributionBuilder.ADJUSTED_BINOMIAL:
 
                 qt1[i] = tranche_surv_prob_adj_binomial(
                     0.0,
@@ -218,7 +219,7 @@ class CDSTranche:
                     num_points,
                 )
 
-            elif model == FinLossDistributionBuilder.GAUSSIAN:
+            elif algorithm == FinLossDistributionBuilder.GAUSSIAN:
 
                 qt1[i] = tranch_surv_prob_gaussian(
                     0.0,
@@ -240,7 +241,7 @@ class CDSTranche:
                     num_points,
                 )
 
-            elif model == FinLossDistributionBuilder.LHP:
+            elif algorithm == FinLossDistributionBuilder.LHP:
 
                 qt1[i] = tr_surv_prob_lhp(0.0, k1, num_credits, q_vector, recovery_rates, beta_1)
 

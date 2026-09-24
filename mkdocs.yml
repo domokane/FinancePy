@@ -52,6 +52,7 @@ plugins:
             show_source: true
             heading_level: 2
             docstring_style: google
+            inherited_members: false
   - mkdocs-jupyter:
       execute: false   # set true if you want notebooks auto-executed
 

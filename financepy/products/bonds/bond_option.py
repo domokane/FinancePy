@@ -13,6 +13,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.global_types import OptionTypes, ExerciseTypes
 from ...products.bonds.bond import Bond
+from ...models.model import Model
 
 ########################################################################################
 # TODO: Add BDT model to valuation

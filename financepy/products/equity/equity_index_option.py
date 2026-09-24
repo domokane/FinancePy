@@ -7,7 +7,6 @@ from typing import Union, Optional
 import numpy as np
 
 from ...utils.date import Date
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string

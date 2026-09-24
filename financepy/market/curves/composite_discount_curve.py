@@ -8,7 +8,6 @@ import numpy as np
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string
 from ...utils.helpers import check_argument_types
-from ...utils.day_count import DayCountTypes
 
 from ...market.curves.discount_curve import DiscountCurve
 
