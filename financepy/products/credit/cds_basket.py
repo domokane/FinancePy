@@ -23,7 +23,7 @@ from ...models.gauss_copula import default_times_gc
 from ...models.student_t_copula import StudentTCopula
 
 from ...market.curves.interpolator import interpolate, InterpTypes
-
+from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.cds_curve import CDSCurve
 from ...products.credit.cds import CDS
 
@@ -80,7 +80,11 @@ class CDSBasket:
 
     ###########################################################################
 
-    def value_legs_mc_old(self, value_dt: Date, n_to_default, default_times: np.ndarray, issuer_curves: list[DiscountCurve], libor_curve: DiscountCurve):
+    def value_legs_mc_old(self, value_dt: Date,
+                          n_to_default: int,
+                          default_times: np.ndarray,
+                          issuer_curves: list[DiscountCurve],
+                          libor_curve: DiscountCurve):
         """Value the legs of the default basket using Monte Carlo. The default
         times are an input so this valuation is not model dependent."""
 
@@ -337,7 +341,7 @@ class CDSBasket:
         issuer_curves: list[DiscountCurve],
         beta_vector: np.ndarray,
         libor_curve: DiscountCurve,
-        num_points: int=50,
+        num_points: int = 50,
     ):
         """Value default basket using 1 factor Gaussian copula and analytical
         approach which is only exact when all recovery rates are the same."""

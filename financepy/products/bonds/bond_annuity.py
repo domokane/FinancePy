@@ -52,17 +52,19 @@ class BondAnnuity:
         self.cpn_dts = []
 
         self.settle_dt = Date(1, 1, 1900)
-        self.accrued_int = None
+        self.accrued_int = 0.0
         self.accrued_days = 0.0
         self.alpha = 0.0
 
         self._pcd = None
         self._ncd = None
-        self.flow_amounts = None
+        self.flow_amounts = []
 
     ###########################################################################
 
-    def clean_price_from_discount_curve(self, settle_dt: Date, discount_curve: DiscountCurve):
+    def clean_price_from_discount_curve(
+        self, settle_dt: Date, discount_curve: DiscountCurve
+    ):
         """Calculate the bond price using some discount curve to present-value
         the bond's cash flows."""
 
@@ -75,7 +77,9 @@ class BondAnnuity:
 
     ###########################################################################
 
-    def dirty_price_from_discount_curve(self, settle_dt: Date, discount_curve: DiscountCurve):
+    def dirty_price_from_discount_curve(
+        self, settle_dt: Date, discount_curve: DiscountCurve
+    ):
         """Calculate the bond price using some discount curve to present-value
         the bond's cash flows."""
 
@@ -110,12 +114,7 @@ class BondAnnuity:
         dg_type = DateGenRuleTypes.BACKWARD
 
         self.cpn_dts = Schedule(
-            settle_dt,
-            self.maturity_dt,
-            self.freq_type,
-            self.cal_type,
-            bd_type,
-            dg_type,
+            settle_dt, self.maturity_dt, self.freq_type, self.cal_type, bd_type, dg_type
         ).generate()
 
         self._pcd = self.cpn_dts[0]
@@ -147,7 +146,9 @@ class BondAnnuity:
 
         dc_counter = DayCount(self.accrual_dc_type)
 
-        acc_factor, num, _ = dc_counter.year_frac(self._pcd, settle_dt, self._ncd, self.freq)
+        acc_factor, num, _ = dc_counter.year_frac(
+            self._pcd, settle_dt, self._ncd, self.freq
+        )
 
         self.alpha = 1.0 - acc_factor * self.freq
 

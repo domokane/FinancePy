@@ -14,6 +14,8 @@ from ...utils.global_types import OptionTypes
 from ...market.curves.flat_discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
+
+from ...models.model import Model
 from ...models.black_scholes_analytic import european_value
 from ...utils.helpers import option_years
 from ...utils.check_values import check_curve_dt

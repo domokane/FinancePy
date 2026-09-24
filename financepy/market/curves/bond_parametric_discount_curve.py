@@ -559,7 +559,7 @@ class BondParametricDiscountCurve(DiscountCurve):
 
         t = self._times
 
-        z = self.zero_rate(t)
+        z = self.zero_rate_t(t)
 
         z = scale(z, 100.0)
 

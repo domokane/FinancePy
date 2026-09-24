@@ -22,6 +22,7 @@ from ...models.equity_asian_option_mc import equity_asian_value_mc_numba
 from ...models.equity_asian_option_bs import value_curran
 from ...models.equity_asian_option_bs import value_turnbull_wakeman
 from ...models.equity_asian_option_bs import value_geometric
+from ...models.model import Model
 
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_volatility

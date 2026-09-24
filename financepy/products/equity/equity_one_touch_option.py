@@ -17,6 +17,7 @@ from ...models.gbm_process_simulator import get_paths_times
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
 from ...utils.helpers import option_years
+from ...models.model import Model
 
 from ...utils.math import normcdf_vect
 from ...models.equity_one_touch_bs import barrier_pay_one_at_hit_pv_down

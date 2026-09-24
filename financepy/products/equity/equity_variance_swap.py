@@ -14,6 +14,7 @@ from ...utils.global_types import OptionTypes
 from ...models.black_scholes import BlackScholes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.check_values import check_curve_dt
+from ...market.curves.discount_curve import DiscountCurve
 
 from .equity_vanilla_option import EquityVanillaOption
 
@@ -59,7 +60,10 @@ class EquityVarianceSwap:
 
     ###########################################################################
 
-    def value(self, value_dt: Date, realised_var, fair_strike_var, libor_curve: DiscountCurve):
+    def value(self, value_dt: Date,
+              realised_var: float,
+              fair_strike_var: float,
+              libor_curve: DiscountCurve):
         """Calculate the value of the variance swap based on the realised
         volatility to the valuation date, the forward looking implied
         volatility to the maturity date using the libor discount curve."""
@@ -78,7 +82,10 @@ class EquityVarianceSwap:
 
     ###########################################################################
 
-    def fair_strike_approx(self, value_dt: Date, fwd_stock_price: float, strikes, volatilities: np.ndarray):
+    def fair_strike_approx(self, value_dt: Date,
+                           fwd_stock_price: float,
+                           strikes: np.ndarray,
+                           volatilities: np.ndarray):
         """This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
         F is the forward stock price and sigma(F) is the ATM forward vol."""

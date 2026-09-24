@@ -79,44 +79,20 @@ fixed_dc_type = DayCountTypes.THIRTY_E_360
 fixed_freq_type = FrequencyTypes.ANNUAL
 
 swap1 = IborSwap(
-    settle_dt,
-    "1Y",
-    fixed_leg_type,
-    0.0350,
-    fixed_freq_type,
-    fixed_dc_type,
+    settle_dt, "1Y", fixed_leg_type, 0.0350, fixed_freq_type, fixed_dc_type
 )
 
 swap2 = IborSwap(
-    settle_dt,
-    "2Y",
-    fixed_leg_type,
-    0.0400,
-    fixed_freq_type,
-    fixed_dc_type,
+    settle_dt, "2Y", fixed_leg_type, 0.0400, fixed_freq_type, fixed_dc_type
 )
 
 swap3 = IborSwap(
-    settle_dt,
-    "3Y",
-    fixed_leg_type,
-    0.0450,
-    fixed_freq_type,
-    fixed_dc_type,
+    settle_dt, "3Y", fixed_leg_type, 0.0450, fixed_freq_type, fixed_dc_type
 )
 
-swaps = [
-    swap1,
-    swap2,
-    swap3,
-]
+swaps = [swap1, swap2, swap3]
 
-discount_curve = IborSingleCurve(
-    value_dt,
-    [],
-    [],
-    swaps,
-)
+discount_curve = IborSingleCurve(value_dt, [], [], swaps)
 
 
 # ============================================================================
@@ -134,18 +110,9 @@ coupon = 0.0525
 freq_type = FrequencyTypes.ANNUAL
 dc_type = DayCountTypes.ACT_ACT_ICMA
 
-bond = Bond(
-    issue_dt,
-    maturity_dt,
-    coupon,
-    freq_type,
-    dc_type,
-)
+bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
-bond_pure_curve = bond.dirty_price_from_discount_curve(
-    settle_dt,
-    discount_curve,
-)
+bond_pure_curve = bond.dirty_price_from_discount_curve(settle_dt, discount_curve)
 
 print(f"Option-free bond price from discount curve: {bond_pure_curve:.6f}")
 
@@ -220,7 +187,13 @@ sigma = 0.01
 print("\nBDT TREE CONVERGENCE")
 print("-" * 90)
 
-print(f"{'STEPS':>8}" f"{'WITH OPTION':>16}" f"{'BOND PURE':>16}" f"{'OPTION VALUE':>16}" f"{'TIME':>14}")
+print(
+    f"{'STEPS':>8}"
+    f"{'WITH OPTION':>16}"
+    f"{'BOND PURE':>16}"
+    f"{'OPTION VALUE':>16}"
+    f"{'TIME':>14}"
+)
 
 print("-" * 90)
 
@@ -229,18 +202,11 @@ values = []
 
 for num_time_steps in time_steps:
 
-    model = BDTTree(
-        sigma,
-        num_time_steps,
-    )
+    model = BDTTree(sigma, num_time_steps)
 
     start = time.perf_counter()
 
-    result = puttable_bond.value(
-        settle_dt,
-        discount_curve,
-        model,
-    )
+    result = puttable_bond.value(settle_dt, discount_curve, model)
 
     elapsed = time.perf_counter() - start
 
@@ -262,11 +228,7 @@ for num_time_steps in time_steps:
 # Plot convergence of the puttable-bond value.
 plt.figure()
 
-plt.plot(
-    list(time_steps),
-    values,
-    marker="o",
-)
+plt.plot(list(time_steps), values, marker="o")
 
 plt.title("Puttable Bond Price Convergence")
 plt.xlabel("Number of BDT Time Steps")
@@ -301,11 +263,7 @@ print("=" * 90)
 value_dt = Date(16, 8, 2016)
 settle_dt = value_dt.add_weekdays(3)
 
-discount_curve = FlatDiscountCurve(
-    value_dt,
-    0.035,
-    FrequencyTypes.SEMI_ANNUAL,
-)
+discount_curve = FlatDiscountCurve(value_dt, 0.035, FrequencyTypes.SEMI_ANNUAL)
 
 
 # ============================================================================
@@ -319,18 +277,9 @@ coupon = 0.025
 freq_type = FrequencyTypes.QUARTERLY
 dc_type = DayCountTypes.ACT_ACT_ICMA
 
-bond = Bond(
-    issue_dt,
-    maturity_dt,
-    coupon,
-    freq_type,
-    dc_type,
-)
+bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
-bond_pure_curve = bond.dirty_price_from_discount_curve(
-    settle_dt,
-    discount_curve,
-)
+bond_pure_curve = bond.dirty_price_from_discount_curve(settle_dt, discount_curve)
 
 print(f"Option-free bond price from discount curve: {bond_pure_curve:.6f}")
 
@@ -403,7 +352,13 @@ sigma = 0.12 / 0.035
 print("\nBDT TREE CONVERGENCE")
 print("-" * 90)
 
-print(f"{'STEPS':>8}" f"{'WITH OPTION':>16}" f"{'BOND PURE':>16}" f"{'CALL VALUE':>16}" f"{'TIME':>14}")
+print(
+    f"{'STEPS':>8}"
+    f"{'WITH OPTION':>16}"
+    f"{'BOND PURE':>16}"
+    f"{'CALL VALUE':>16}"
+    f"{'TIME':>14}"
+)
 
 print("-" * 90)
 
@@ -412,18 +367,11 @@ values = []
 
 for num_time_steps in time_steps:
 
-    model = BDTTree(
-        sigma,
-        num_time_steps,
-    )
+    model = BDTTree(sigma, num_time_steps)
 
     start = time.perf_counter()
 
-    result = callable_bond.value(
-        settle_dt,
-        discount_curve,
-        model,
-    )
+    result = callable_bond.value(settle_dt, discount_curve, model)
 
     elapsed = time.perf_counter() - start
 
@@ -432,7 +380,11 @@ for num_time_steps in time_steps:
     call_value = bond_pure - bond_with_option
 
     print(
-        f"{num_time_steps:8d}" f"{bond_with_option:16.6f}" f"{bond_pure:16.6f}" f"{call_value:16.6f}" f"{elapsed:14.6f}"
+        f"{num_time_steps:8d}"
+        f"{bond_with_option:16.6f}"
+        f"{bond_pure:16.6f}"
+        f"{call_value:16.6f}"
+        f"{elapsed:14.6f}"
     )
 
     values.append(bond_with_option)
@@ -441,11 +393,7 @@ for num_time_steps in time_steps:
 # Plot convergence of the callable-bond value.
 plt.figure()
 
-plt.plot(
-    list(time_steps),
-    values,
-    marker="o",
-)
+plt.plot(list(time_steps), values, marker="o")
 
 plt.title("Callable Bond Price Convergence")
 plt.xlabel("Number of BDT Time Steps")

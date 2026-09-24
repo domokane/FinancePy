@@ -16,6 +16,7 @@ from ...models.equity_compound_option_bs import equity_compound_option_value_tre
 from ...models.equity_compound_option_bs import equity_compound_option_bs
 from ...utils.check_values import check_curve_dt
 from ...utils.helpers import option_years
+from ...models.model import Model
 
 ########################################################################################
 # TODO: Vectorise pricer

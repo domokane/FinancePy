@@ -14,6 +14,7 @@ from ...utils.math import INV_ROOT_2_PI, normcdf
 from ...utils.global_vars import ONE_MILLION
 from ...utils.error import FinError
 from ...market.curves.cds_curve import CDSCurve
+from ...market.curves.discount_curve import DiscountCurve
 from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
 from ...utils.helpers import times_from_dates

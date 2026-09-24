@@ -10,9 +10,9 @@ from ..utils.global_types import DigitalOptionTypes
 from ..utils.math import normcdf_vect
 
 
-def bs_digital_option_value(s0, t, K, r, q, vol, call_put, cash_asset):
+def bs_digital_option_value(s0, t, k, r, q, vol, call_put, cash_asset):
 
-    ln_s0_k = np.log(s0 / K)
+    ln_s0_k = np.log(s0 / k)
     sqrt_t = np.sqrt(t)
 
     if abs(vol) < G_SMALL:
