@@ -68,7 +68,7 @@ class FinError(Exception):
     """Simple error class specific to FinPy. Need to decide how to handle
     FinancePy errors. Work in progress."""
 
-    def __init__(self, message: str):
+    def __init__(self, message: str) -> None:
         """Create FinError object by passing a message string."""
         self._message = message
 

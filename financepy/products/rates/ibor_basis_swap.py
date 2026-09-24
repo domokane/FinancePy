@@ -46,7 +46,7 @@ class IborBasisSwap:
         cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Create a Ibor basis swap contract giving the contract start
         date, its maturity, frequency and day counts on the two floating
         legs and notional. The floating leg parameters have default
@@ -114,8 +114,8 @@ class IborBasisSwap:
         discount_curve: DiscountCurve,
         index_curve_leg_1: DiscountCurve = None,
         index_curve_leg_2: DiscountCurve = None,
-        first_fixing_rate_leg_1=None,
-        first_fixing_rate_leg_2=None,
+        first_fixing_rate_leg_1: float=None,
+        first_fixing_rate_leg_2: float=None,
     ):
         """Value the interest rate swap on a value date given a single Ibor
         discount curve and an index curve for the Ibors on each swap leg."""

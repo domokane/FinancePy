@@ -36,7 +36,7 @@ class ScalarFunction:
         epsilon=1.4901161193847656e-8,
         bounds=None,
         finite_diff_rel_step=None,
-    ):
+    ) -> None:
         self.fun = lambda x: fun(x, *args)
         if callable(grad):
             self.grad = lambda x: grad(x, *args)

@@ -113,7 +113,7 @@ class OISCurve(DiscountCurve):
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
         check_refit_flag: bool = False,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):  # Set to True to test it works
+    ) -> None:  # Set to True to test it works
         """Create an instance of an overnight index rate swap curve given a
         valuation date and a set of OIS rates. Some of these may
         be left None and the algorithm will just use what is provided. An

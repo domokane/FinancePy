@@ -16,7 +16,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-PLOT_FLAG = True
+PLOT_FLAG = False
 
 test_convergence = True
 test_time_evolution = True

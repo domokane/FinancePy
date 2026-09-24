@@ -40,7 +40,7 @@ class BondParametricYieldCurve:
         ylds: Union[np.ndarray, list],
         curve_fit_type: CurveFitTypes,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):
+    ) -> None:
 
         self.settle_dt = settle_dt
         self.bonds = bonds
@@ -206,7 +206,7 @@ class BondParametricYieldCurve:
 
     ##########################################################################
 
-    def interp_yield(self, maturity_dt):
+    def interp_yield(self, maturity_dt: Date):
         """Interpolate yield."""
 
         if isinstance(maturity_dt, Date):

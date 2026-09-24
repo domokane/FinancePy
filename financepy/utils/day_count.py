@@ -67,7 +67,7 @@ class DayCount:
     """Calculate the fractional day count between two dates according to a
     specified day count convention."""
 
-    def __init__(self, dcc_type: DayCountTypes):
+    def __init__(self, dcc_type: DayCountTypes) -> None:
         """Create Day Count convention by passing in the Day Count Type."""
 
         if dcc_type not in DayCountTypes:

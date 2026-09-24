@@ -30,7 +30,7 @@ class EquityIndexOption:
         strike_price: Union[float, np.ndarray],
         opt_type: OptionTypes,
         num_options: Optional[float] = 1.0,
-    ):
+    ) -> None:
         """Create the Equity Index option object by specifying the expiry
         date, the option strike, the option type and the number of options."""
 
@@ -89,7 +89,7 @@ class EquityIndexOption:
         value_dt: Date,
         forward_price: float,
         discount_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Calculate delta of a European/American Index option."""
 

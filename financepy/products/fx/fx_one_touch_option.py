@@ -14,6 +14,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_t_exp
+from ...utils.helpers import option_years
 
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.gbm_process_simulator import get_paths_times
@@ -141,7 +142,7 @@ class FXOneTouchOption(FXOption):
         opt_type: TouchOptionTypes,
         barrier_rate: float,
         payment_size: float = 1.0,
-    ):
+    ) -> None:
         """Create the one touch option by defining its expiry date and the
         barrier level and a payment size if it is a cash ."""
 
@@ -160,7 +161,7 @@ class FXOneTouchOption(FXOption):
         spot_fx_rate: Union[float, np.ndarray],
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """FX One-Touch Option valuation using the Black-Scholes model
         assuming a continuous (American) barrier from value date to expiry.
@@ -171,8 +172,7 @@ class FXOneTouchOption(FXOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
-        t_exp = check_t_exp(value_dt, self.expiry_dt)
-        t_exp = max(t_exp, 1e-6)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         check_curve_dt(value_dt, domestic_curve)
         check_curve_dt(value_dt, foreign_curve)
@@ -183,9 +183,9 @@ class FXOneTouchOption(FXOption):
 
         sqrt_t_exp = np.sqrt(t_exp)
 
-        df = domestic_curve.df_t(t_exp)
-        r_d = domestic_curve.zero_rate_t(t_exp)
-        r_f = foreign_curve.zero_rate_t(t_exp)
+        df = domestic_curve.df(self.expiry_dt)
+        r_d = domestic_curve.zero_rate_cc(self.expiry_dt)
+        r_f = foreign_curve.zero_rate_cc(self.expiry_dt)
 
         v = model.volatility
         v = max(v, 1e-6)
@@ -414,7 +414,7 @@ class FXOneTouchOption(FXOption):
         stock_price: float,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
-        model,
+        model: Model,
         num_paths: int = 10000,
         num_steps_per_year: int = 252,
         seed: int = 4242,

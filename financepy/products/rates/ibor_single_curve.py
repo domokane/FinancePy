@@ -146,7 +146,7 @@ class IborSingleCurve(DiscountCurve):
         check_refit_flag: bool = False,  # Set to True to test it works
         do_build: bool = True,
         **kwargs,
-    ):
+    ) -> None:
         """Create an instance of a FinIbor curve given a valuation date and
         a set of ibor deposits, ibor FRAs and ibor_swaps. Some of these may
         be left None and the algorithm will just use what is provided. An

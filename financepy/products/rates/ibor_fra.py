@@ -59,7 +59,7 @@ class IborFRA:
         pay_fixed_rate: bool = True,  # True if the FRA rate is being paid
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING,
-    ):
+    ) -> None:
         """Create a Forward Rate Agreement object."""
 
         check_argument_types(self.__init__, locals())
@@ -199,7 +199,7 @@ class IborFRA:
 
     ##########################################################################
 
-    def maturity_df(self, index_curve):
+    def maturity_df(self, index_curve: DiscountCurve):
         """Determine the maturity date index discount factor needed to refit
         the market FRA rate. In a dual-curve world, this is not the discount
         rate discount factor but the index curve discount factor."""
@@ -212,7 +212,7 @@ class IborFRA:
 
     ###########################################################################
 
-    def print_payments(self, value_dt):
+    def print_payments(self, value_dt: Date):
         """Determine the value of the Deposit given a Ibor curve."""
 
         flow_settle = self.notional

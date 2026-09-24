@@ -32,7 +32,7 @@ class PWFDiscountCurve(DiscountCurve):
         zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):
+    ) -> None:
         """Creates a discount curve using a vector of times and zero rates
         that assumes that the zero rates are piecewise flat."""
 

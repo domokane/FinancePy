@@ -42,7 +42,7 @@ class EquityCliquetOption(EquityOption):
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Create the EquityCliquetOption by passing in the start date
         and the end date and whether it is a call or a put. Some additional
         data is needed in order to calculate the individual payments."""

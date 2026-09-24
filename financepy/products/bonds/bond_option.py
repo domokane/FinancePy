@@ -44,7 +44,7 @@ class BondOption:
         expiry_dt: Date,
         strike_price: float,
         opt_type: OptionTypes,
-    ):
+    ) -> None:
 
         check_argument_types(self.__init__, locals())
 
@@ -56,7 +56,7 @@ class BondOption:
 
     ####################################################################################
 
-    def value(self, value_dt: Date, discount_curve: DiscountCurve, model):
+    def value(self, value_dt: Date, discount_curve: DiscountCurve, model: Model):
         """Value a bond option (option on a bond) using a specified model
         which include the Hull-White, Black-Karasinski and Black-Derman-Toy
         model which are all implemented as short rate tree models."""

@@ -29,13 +29,14 @@ class Schedule:
         # This is UNADJUSTED (set flag to adjust it)
         termination_dt: Date,
         freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
-        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
+        cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
+        bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
         adjust_termination_dt: bool = True,  # Default is to adjust
         end_of_month: bool = False,  # All flow dates are EOM if True
-        first_dt=None,  # First coupon date
-        next_to_last_dt=None,
-    ):  # Penultimate coupon date
+        first_dt: Date | None = None,  # First coupon date
+        next_to_last_dt: Date | None = None,
+    ) -> None:  # Penultimate coupon date
         """Create Schedule object which calculates a sequence of dates
         following the ISDA convention for fixed income products, mainly swaps.
 

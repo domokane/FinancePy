@@ -395,7 +395,7 @@ class Calendar:
     convention and then applies that to any date that falls on a holiday in the
     specified calendar."""
 
-    def __init__(self, cal_type: CalendarTypes | list | tuple):
+    def __init__(self, cal_type: CalendarTypes | list | tuple) -> None:
         """Create a calendar based on a specified calendar type.
 
         A list or tuple of calendar types creates a joint calendar whose

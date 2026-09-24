@@ -22,7 +22,7 @@ class CompositeDiscountCurve(DiscountCurve):
 
     ###########################################################################
 
-    def __init__(self, child_curves: List[DiscountCurve]):
+    def __init__(self, child_curves: List[DiscountCurve]) -> None:
         """Create a discount curve that is a sum (in rates) of other
         discount curves.
         """

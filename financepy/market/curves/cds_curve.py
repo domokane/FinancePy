@@ -56,7 +56,7 @@ class CDSCurve:
         recovery_rate: float,
         dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         interp_method: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-    ):
+    ) -> None:
         """Construct a credit curve from a sequence of maturity-ordered CDS
         contracts and a Ibor curve using the same recovery rate and the
         same interpolation method."""
@@ -223,7 +223,7 @@ class CDSCurve:
 
     ###########################################################################
 
-    def fwd(self, fwd_dt):
+    def fwd(self, fwd_dt: Date):
         """Calculate the instantaneous forward rate at date fwd_dt
         using a numerical derivative."""
 

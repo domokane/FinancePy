@@ -56,7 +56,7 @@ class IborSwap:
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
         end_of_month: bool = False,
-    ):
+    ) -> None:
         """Create an interest rate swap contract giving the contract start
         date, its maturity, fixed cpn, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
@@ -161,7 +161,7 @@ class IborSwap:
         value_dt: Date,
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve = None,
-        first_fixing_rate=None,
+        first_fixing_rate: float=None,
         pv_only=True,
     ):
         """Value the interest rate swap on a value date given a single Ibor
@@ -199,7 +199,7 @@ class IborSwap:
         value_dt: Date,
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve = None,
-        first_fixing_rate=None,
+        first_fixing_rate: float=None,
     ):
         """
         A long-hand method that returns various details relevant to valuation in
@@ -253,7 +253,7 @@ class IborSwap:
 
     ###########################################################################
 
-    def pv01(self, value_dt, discount_curve):
+    def pv01(self, value_dt: Date, discount_curve: DiscountCurve):
         """Calculate the value of 1 basis point coupon on the fixed leg."""
 
         pv = self.fixed_leg.value(value_dt, discount_curve)
@@ -303,7 +303,7 @@ class IborSwap:
 
     ###########################################################################
 
-    def cash_settled_pv01(self, value_dt, flat_swap_rate, freq_type):
+    def cash_settled_pv01(self, value_dt: Date, flat_swap_rate: float, freq_type):
         """Calculate the forward value of an annuity of a forward starting
         swap using a single flat discount rate equal to the swap rate. This is
         used in the pricing of a cash-settled swaption in the IborSwaption
@@ -361,7 +361,7 @@ class IborSwap:
 
     ###########################################################################
 
-    def macaulay_duration(self, value_dt, discount_curve, swap_type, payment_periods: float):
+    def macaulay_duration(self, value_dt: Date, discount_curve: DiscountCurve, swap_type, payment_periods: float):
         """Calculation of the Macaulay Duration in an Interest Rate Swap
         Based on Bond Math: The Theory Behind the Formulas, Second Edition by
         Donald J. Smith
@@ -400,7 +400,7 @@ class IborSwap:
 
     ###########################################################################
 
-    def modified_duration(self, value_dt, discount_curve, swap_type, payment_periods: float):
+    def modified_duration(self, value_dt: Date, discount_curve: DiscountCurve, swap_type, payment_periods: float):
         """Computation of the Modified Duration for the Fixed-Rate
         Payer's Perspective in Interest Rate Swap
         """
@@ -418,7 +418,7 @@ class IborSwap:
     ###########################################################################
 
     def change_in_market_value(self,
-                               value_dt, discount_curve, swap_type, payment_periods: float,
+                               value_dt: Date, discount_curve: DiscountCurve, swap_type, payment_periods: float,
                                swap_rate_changes: float):
         """Computation of the Profits for the Fixed-Rate Payer's Perspective in Interest Rate Swap
         """
@@ -434,7 +434,7 @@ class IborSwap:
 
     ###########################################################################
 
-    def basis_point_value(self, value_dt, discount_curve, swap_type, payment_periods: float):
+    def basis_point_value(self, value_dt: Date, discount_curve: DiscountCurve, swap_type, payment_periods: float):
         """
         calculate the basis‐point‐value (BPV) of the swap,
         which is swap's modified duration times the notional principal,

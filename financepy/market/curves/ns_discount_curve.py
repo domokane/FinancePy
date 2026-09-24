@@ -33,7 +33,7 @@ class NSDiscountCurve(DiscountCurve):
         beta_2: float,
         tau: float,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):
+    ) -> None:
         """Create a Nelson-Siegel discount curve. The parameters
         beta_0, beta_1, beta_2 and tau define continuously compounded
         zero rates. Other inherited methods may convert these zero

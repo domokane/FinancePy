@@ -50,7 +50,7 @@ class CDSBasket:
         cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
 
         check_argument_types(self.__init__, locals())
 
@@ -80,7 +80,7 @@ class CDSBasket:
 
     ###########################################################################
 
-    def value_legs_mc_old(self, value_dt, n_to_default, default_times, issuer_curves, libor_curve):
+    def value_legs_mc_old(self, value_dt: Date, n_to_default, default_times: np.ndarray, issuer_curves: list[DiscountCurve], libor_curve: DiscountCurve):
         """Value the legs of the default basket using Monte Carlo. The default
         times are an input so this valuation is not model dependent."""
 
@@ -160,7 +160,7 @@ class CDSBasket:
 
     ####################################################################################
 
-    def value_legs_mc(self, value_dt, n_to_default, default_times, issuer_curves, libor_curve):
+    def value_legs_mc(self, value_dt: Date, n_to_default, default_times: np.ndarray, issuer_curves: list[DiscountCurve], libor_curve: DiscountCurve):
         """
         Value the premium PV01 and protection legs of an n-to-default basket via
         Monte Carlo `default_times` is (num_credits x num_trials) of default times
@@ -170,7 +170,7 @@ class CDSBasket:
 
         # TODO: You can do it much faster by vectorizing on trials
 
-        def to_years(dt, value_dt, days_in_year=365.0):
+        def to_years(dt, value_dt: Date, days_in_year=365.0):
             """Convert date difference into year fraction."""
             delta = dt - value_dt
             if hasattr(delta, "days"):  # datetime.timedelta
@@ -261,12 +261,12 @@ class CDSBasket:
 
     def value_gaussian_mc(
         self,
-        value_dt,
+        value_dt: Date,
         n_to_default,
-        issuer_curves,
-        corr_matrix,
-        libor_curve,
-        num_trials,
+        issuer_curves: list[DiscountCurve],
+        corr_matrix: np.ndarray,
+        libor_curve: DiscountCurve,
+        num_trials: int,
         seed,
     ):
         """Value the default basket using a Gaussian copula model. This
@@ -296,13 +296,13 @@ class CDSBasket:
 
     def value_student_t_mc(
         self,
-        value_dt,
+        value_dt: Date,
         n_to_default,
-        issuer_curves,
-        corr_matrix,
+        issuer_curves: list[DiscountCurve],
+        corr_matrix: np.ndarray,
         degrees_of_freedom,
-        libor_curve,
-        num_trials,
+        libor_curve: DiscountCurve,
+        num_trials: int,
         seed,
     ):
         """Value the default basket using the Student-T copula."""
@@ -332,12 +332,12 @@ class CDSBasket:
 
     def value_1f_gaussian_homo(
         self,
-        value_dt,
+        value_dt: Date,
         n_to_default,
-        issuer_curves,
-        beta_vector,
-        libor_curve,
-        num_points=50,
+        issuer_curves: list[DiscountCurve],
+        beta_vector: np.ndarray,
+        libor_curve: DiscountCurve,
+        num_points: int=50,
     ):
         """Value default basket using 1 factor Gaussian copula and analytical
         approach which is only exact when all recovery rates are the same."""

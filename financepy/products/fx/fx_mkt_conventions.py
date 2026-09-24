@@ -108,7 +108,7 @@ delta_convention = {
 
 class FinFXRate:
 
-    def __init__(self, ccy1, ccy2, rate):
+    def __init__(self, ccy1, ccy2, rate: float) -> None:
 
         if ccy1 in ccyNames:
             self.ccy1 = ccy1

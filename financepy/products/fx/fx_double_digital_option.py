@@ -31,7 +31,7 @@ class FXDoubleDigitalOption:
         notional: float,
         prem_currency: str,
         spot_days: int = 0,
-    ):
+    ) -> None:
         """Create the FX Double Digital Option object. The option pays out
         the notional in the premium currency if the fx rate is between
         the upper and lower strike at maturity.
@@ -84,11 +84,11 @@ class FXDoubleDigitalOption:
 
     def value(
         self,
-        value_dt,
-        spot_fx_rate,  # 1 unit of foreign in domestic
-        domestic_curve,
-        foreign_curve,
-        model,
+        value_dt: Date,
+        spot_fx_rate: float,  # 1 unit of foreign in domestic
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
+        model: Model,
     ):
         """Valuation of a double digital option using Black-Scholes model.
         The option pays out the notional in the premium currency if the

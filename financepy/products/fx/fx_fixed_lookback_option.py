@@ -33,7 +33,7 @@ from ...utils.check_values import check_curve_dt
 class FXFixedLookbackOption:
     """The Class for FX Fixed Strike Lookback options."""
 
-    def __init__(self, expiry_dt: Date, opt_type: OptionTypes, option_strike: float):
+    def __init__(self, expiry_dt: Date, opt_type: OptionTypes, option_strike: float) -> None:
         """Create option with expiry date, option type and the option strike"""
 
         check_argument_types(self.__init__, locals())

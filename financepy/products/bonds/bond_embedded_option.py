@@ -60,7 +60,7 @@ class BondEmbeddedOption:
         call_prices: np.ndarray,
         put_dts: List[Date],
         put_prices: np.ndarray,
-    ):
+    ) -> None:
         """Create a BondEmbeddedOption object with a maturity date, coupon
         and all the bond inputs."""
 
@@ -132,7 +132,7 @@ class BondEmbeddedOption:
 
     ####################################################################################
 
-    def value(self, settle_dt: Date, discount_curve: DiscountCurve, model):
+    def value(self, settle_dt: Date, discount_curve: DiscountCurve, model: Model):
         """Value the bond that settles on the specified date that can have
         both embedded call and put options. This is done using the specified
         model and a discount curve."""

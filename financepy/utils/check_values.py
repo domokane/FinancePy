@@ -10,7 +10,7 @@ from .error import FinError
 ###########################################################################
 
 
-def check_curve_dt(anchor_dt, *curves):
+def check_curve_dt(anchor_dt: Date, *curves):
     """Check that curves are valid for the requested valuation date."""
 
     for curve in curves:
@@ -23,7 +23,7 @@ def check_curve_dt(anchor_dt, *curves):
 ###########################################################################
 
 
-def check_t_exp(value_dt: Date, expiry_dt):
+def check_t_exp(value_dt: Date, expiry_dt: Date):
     """Calculate time to expiry in years."""
 
     if not isinstance(value_dt, Date):
@@ -57,7 +57,7 @@ def check_t_exp(value_dt: Date, expiry_dt):
 ########################################################################################
 
 
-def check_stock_price(stock_price):
+def check_stock_price(stock_price: float):
 
     s0 = np.asarray(stock_price, dtype=float)
 
@@ -77,7 +77,7 @@ def check_stock_price(stock_price):
 ########################################################################################
 
 
-def check_volatility(volatility):
+def check_volatility(volatility: float):
 
     v = np.asarray(volatility, dtype=float)
 
@@ -97,7 +97,7 @@ def check_volatility(volatility):
 ########################################################################################
 
 
-def check_strike_price(strike_price):
+def check_strike_price(strike_price: float):
 
     k = np.asarray(strike_price, dtype=float)
 
@@ -119,8 +119,8 @@ def check_strike_price(strike_price):
 ########################################################################################
 
 def check_corr_matrix(
-    corr_matrix,
-    num_assets,
+    corr_matrix: np.ndarray,
+    num_assets: int,
     tol=1e-12,
     positive_definite=False,
 ):

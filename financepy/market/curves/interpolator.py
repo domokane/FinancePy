@@ -357,7 +357,7 @@ class Interpolator:
       selected interpolation type.
     """
 
-    def __init__(self, interpolator_type: InterpTypes, **kwargs: dict):
+    def __init__(self, interpolator_type: InterpTypes, **kwargs: dict) -> None:
         self._interp_type = interpolator_type
         self._method = interpolator_type.value
         self._times: Optional[np.ndarray] = None

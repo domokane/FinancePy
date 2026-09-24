@@ -30,7 +30,7 @@ def nelder_mead(
     roh=1.0,
     chi=2.0,
     v=0.5,
-    sigma=0.5,
+    sigma: float=0.5,
 ):
     """
     Minimize a scalar-valued function using Nelder-Mead method.
@@ -169,7 +169,7 @@ def _initialize_simplex(x0, bounds):
 
 
 @njit(cache=True, fastmath=True)
-def _check_params(rho, chi, v, sigma, bounds, n):
+def _check_params(rho, chi, v, sigma: float, bounds, n):
     if rho <= 0:
         raise ValueError("rho must be > 0")
     if chi <= max(1, rho):

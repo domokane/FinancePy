@@ -193,7 +193,7 @@ financepy.market.curves.ibor_curve_risk_engine
 <div class="signature">
 
 <code>
-carry_rolldown_report(base_curve: financepy.market.curves.discount_curve.DiscountCurve, grid_last_date: financepy.utils.date.Date, grid_bucket_tenor: str | financepy.utils.tenor.Tenor, trades: list, trade_labels: list = None, bump_size=0.0001)
+carry_rolldown_report(base_curve: financepy.market.curves.discount_curve.DiscountCurve, grid_last_date: financepy.utils.date.Date, grid_bucket_tenor: str | financepy.utils.tenor.Tenor, trades: list, trade_labels: list = None, bump_size: float = 0.0001)
 </code>
 
 </div>
@@ -234,7 +234,7 @@ Returns:
 <div class="signature">
 
 <code>
-forward_rate_risk_report(base_curve: financepy.market.curves.discount_curve.DiscountCurve, grid_last_date: financepy.utils.date.Date, grid_bucket_tenor: str, trades: list, trade_labels: list = None, bump_size=0.0001)
+forward_rate_risk_report(base_curve: financepy.market.curves.discount_curve.DiscountCurve, grid_last_date: financepy.utils.date.Date, grid_bucket_tenor: str, trades: list, trade_labels: list = None, bump_size: float = 0.0001)
 </code>
 
 </div>
@@ -272,7 +272,7 @@ Returns:
 <div class="signature">
 
 <code>
-forward_rate_risk_report_custom_grid(base_curve: financepy.market.curves.discount_curve.DiscountCurve, grid: List[financepy.utils.date.Date], trades: list, grid_labels: list = None, trade_labels: list = None, bump_size=0.0001)
+forward_rate_risk_report_custom_grid(base_curve: financepy.market.curves.discount_curve.DiscountCurve, grid: List[financepy.utils.date.Date], trades: list, grid_labels: list = None, trade_labels: list = None, bump_size: float = 0.0001)
 </code>
 
 </div>
@@ -309,7 +309,7 @@ Returns:
 <div class="signature">
 
 <code>
-par_rate_risk_report(base_curve: financepy.market.curves.ibor_single_curve.IborSingleCurve, trades: list, trade_labels: list = None, bump_size=0.0001)
+par_rate_risk_report(base_curve: financepy.market.curves.ibor_single_curve.IborSingleCurve, trades: list, trade_labels: list = None, bump_size: float = 0.0001)
 </code>
 
 </div>

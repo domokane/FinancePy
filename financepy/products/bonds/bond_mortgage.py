@@ -42,7 +42,7 @@ class BondMortgage:
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Create the mortgage using start and end dates and principal."""
 
         check_argument_types(self.__init__, locals())

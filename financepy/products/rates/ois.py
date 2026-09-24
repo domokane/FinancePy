@@ -72,7 +72,7 @@ class OIS:
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Create an overnight index swap contract giving the contract start
         date, its maturity, fixed cpn, fixed leg frequency, fixed leg day
         count convention and notional. The floating leg parameters have default
@@ -135,7 +135,7 @@ class OIS:
 
     ##########################################################################
 
-    def value(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate=None):
+    def value(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate: float=None):
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
 
@@ -150,7 +150,7 @@ class OIS:
 
     ###########################################################################
 
-    def pv01(self, value_dt, discount_curve):
+    def pv01(self, value_dt: Date, discount_curve: DiscountCurve):
         """Calculate the value of 1 basis point cpn on the fixed leg."""
 
         pv = self.fixed_leg.value(value_dt, discount_curve)
@@ -162,7 +162,7 @@ class OIS:
 
     ###########################################################################
 
-    def swap_rate(self, value_dt, ois_curve, first_fixing_rate=None):
+    def swap_rate(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate: float=None):
         """Calculate the fixed leg cpn that makes the swap worth zero.
         If the valuation date is before the swap payments start then this
         is the forward swap rate as it starts in the future. The swap rate

@@ -34,7 +34,7 @@ class FlatDiscountCurve(DiscountCurve):
         flat_zero_rate: float,
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):
+    ) -> None:
         """Create a discount curve which is flat. This is very useful for
         quick testing and simply requires a curve date a rate and a compound
         frequency. As we have entered a rate, a corresponding day count

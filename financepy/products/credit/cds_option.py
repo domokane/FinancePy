@@ -23,7 +23,7 @@ CLEAN = 1
 ########################################################################################
 
 
-def fvol(volatility, *args):
+def fvol(volatility: float, *args):
     """Root searching function in the calculation of the CDS implied
     volatility."""
 
@@ -60,7 +60,7 @@ class CDSOption:
         cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Create a FinCDSOption object with the option expiry date, the
         maturity date of the underlying CDS, the option strike coupon,
         notional, whether the option knocks out or not in the event of a credit
@@ -89,7 +89,7 @@ class CDSOption:
 
     ####################################################################################
 
-    def value(self, value_dt, issuer_curve, volatility):
+    def value(self, value_dt: Date, issuer_curve: DiscountCurve, volatility: float):
         """Value the CDS option using Black's model with an adjustment for any
         Front End Protection.
         TODO - Should the CDS be created in the init method ?"""
@@ -153,7 +153,7 @@ class CDSOption:
 
     ####################################################################################
 
-    def implied_volatility(self, value_dt, issuer_curve, option_value):
+    def implied_volatility(self, value_dt: Date, issuer_curve: DiscountCurve, option_value):
         """Calculate the implied CDS option volatility from a price."""
         arg_tuple = (self, value_dt, issuer_curve, option_value)
         sigma = optimize.newton(fvol, x0=0.3, args=arg_tuple, tol=1e-6, maxiter=50)

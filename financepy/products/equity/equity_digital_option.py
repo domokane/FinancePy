@@ -37,7 +37,7 @@ class EquityDigitalOption(EquityOption):
         barrier: float,
         call_put_type: OptionTypes,
         digital_type: DigitalOptionTypes,
-    ):
+    ) -> None:
         """Create the digital option by specifying the expiry date, the
         barrier price and the type of option which is either a EUROPEAN_CALL
         or a EUROPEAN_PUT or an AMERICAN_CALL or AMERICAN_PUT. There are two
@@ -64,17 +64,15 @@ class EquityDigitalOption(EquityOption):
         stock_price: Union[float, np.ndarray],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Digital Option valuation using the Black-Scholes model assuming a
         barrier at expiry. Handles both cash-or-nothing and asset-or-nothing
         options."""
 
+        t_exp = option_years(value_dt, self.expiry_dt)
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
-
-        t_exp = option_years(value_dt, self.expiry_dt)
-        t_exp = max(t_exp, 1e-10)
 
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
@@ -85,63 +83,6 @@ class EquityDigitalOption(EquityOption):
 
         return v
 
-    # ###########################################################################
-
-    # def value_old(
-    #     self,
-    #     value_dt: Date,
-    #     stock_price: Union[float, np.ndarray],
-    #     discount_curve: DiscountCurve,
-    #     dividend_curve: DiscountCurve,
-    #     model,
-    # ):
-    #     """Digital Option valuation using the Black-Scholes model assuming a
-    #     barrier at expiry. Handles both cash-or-nothing and asset-or-nothing
-    #     options."""
-
-    #     check_curve_dt(value_dt, discount_curve)
-    #     check_curve_dt(value_dt, dividend_curve)
-
-    #     r = discount_curve.zero_rate_cc(self.expiry_dt)
-    #     q = dividend_curve.zero_rate_cc(self.expiry_dt)
-
-    #     t_exp = option_years(value_dt, self.expiry_dt)
-    #     t_exp = max(t_exp, 1e-10)
-
-    #     s0 = stock_price
-    #     x = self.barrier
-    #     ln_s0_k = np.log(s0 / x)
-    #     sqrt_t_exp = np.sqrt(t_exp)
-
-    #     volatility = model.volatility
-
-    #     if abs(volatility) < G_SMALL:
-    #         volatility = G_SMALL
-
-    #     d1 = ln_s0_k + (r - q + volatility * volatility / 2.0) * t_exp
-    #     d1 = d1 / volatility / sqrt_t_exp
-    #     d2 = d1 - volatility * sqrt_t_exp
-    #     v = None
-
-    #     if self.digital_type == DigitalOptionTypes.CASH_OR_NOTHING:
-
-    #         if self.call_put_type == OptionTypes.EUROPEAN_CALL:
-    #             v = np.exp(-r * t_exp) * normcdf_vect(d2)
-    #         elif self.call_put_type == OptionTypes.EUROPEAN_PUT:
-    #             v = np.exp(-r * t_exp) * normcdf_vect(-d2)
-
-    #     elif self.digital_type == DigitalOptionTypes.ASSET_OR_NOTHING:
-
-    #         if self.call_put_type == OptionTypes.EUROPEAN_CALL:
-    #             v = s0 * np.exp(-q * t_exp) * normcdf_vect(d1)
-    #         elif self.call_put_type == OptionTypes.EUROPEAN_PUT:
-    #             v = s0 * np.exp(-q * t_exp) * normcdf_vect(-d1)
-
-    #     else:
-    #         raise FinError("Unknown underlying type.")
-
-    #     return v
-
     ###########################################################################
 
     def value_mc(
@@ -150,7 +91,7 @@ class EquityDigitalOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         num_paths: int = 10000,
         seed: int = 4242,
     ):
@@ -169,6 +110,7 @@ class EquityDigitalOption(EquityOption):
         df = discount_curve.df(self.expiry_dt)
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
+        mu = r - q
 
         volatility = model.volatility
         k = self.barrier
@@ -176,7 +118,7 @@ class EquityDigitalOption(EquityOption):
 
         # Use Antithetic variables
         g = np.random.normal(0.0, 1.0, size=num_paths)
-        s = stock_price * np.exp((r - q - volatility * volatility / 2.0) * t_exp)
+        s = stock_price * np.exp((mu - volatility * volatility / 2.0) * t_exp)
         m = np.exp(g * sqrt_t_exp * volatility)
 
         s_1 = s * m

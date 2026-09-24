@@ -10,7 +10,7 @@ from .error import FinError
 class FinDistribution:
     """Container class for a probability density function."""
 
-    def __init__(self, x, y):
+    def __init__(self, x, y) -> None:
         """Initialise FinDistribution with x values and associated vector of
         density times dx values."""
 

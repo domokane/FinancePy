@@ -31,7 +31,7 @@ class EquityForwardStartOption(EquityOption):
     """A EquityCliquetOption is an option which starts on t_F and sets the strike to
     S(T_F). It expires at time T. This is also known as a reset option."""
 
-    def __init__(self, start_dt: Date, final_expiry_dt: Date, opt_type: OptionTypes, freq_type: FrequencyTypes):
+    def __init__(self, start_dt: Date, final_expiry_dt: Date, opt_type: OptionTypes, freq_type: FrequencyTypes) -> None:
         """Create the EquityCliquetOption by passing in the start date
         and the end date and whether it is a call or a put. Some additional
         data is needed in order to calculate the individual payments."""

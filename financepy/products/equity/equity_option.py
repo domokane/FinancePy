@@ -54,7 +54,7 @@ class EquityOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Calculation of option delta by perturbation of stock price and
         revaluation."""
@@ -73,7 +73,7 @@ class EquityOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Calculation of option gamma by perturbation of stock price and
         revaluation."""
@@ -95,7 +95,7 @@ class EquityOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Calculation of option vega by perturbing vol and revaluation."""
 
@@ -119,7 +119,7 @@ class EquityOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Calculation of option vanna by perturbing delta with respect to the
         stock price volatility."""
@@ -141,7 +141,7 @@ class EquityOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Calculation of option theta by perturbing value date by one
         calendar date (not a business date) and then doing revaluation and
@@ -173,7 +173,7 @@ class EquityOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Calculation of option rho by perturbing interest rate and
         revaluation."""

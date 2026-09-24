@@ -44,7 +44,7 @@ class CDSIndexOption:
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Initialisation of the class object. Note that a
         large number of the inputs are set to default values in line with
         the standard contract."""
@@ -88,7 +88,7 @@ class CDSIndexOption:
 
     ###########################################################################
 
-    def value_adjusted_black(self, value_dt, index_curve, index_recovery, libor_curve, sigma):
+    def value_adjusted_black(self, value_dt: Date, index_curve: DiscountCurve, index_recovery: float, libor_curve: DiscountCurve, sigma: float):
         """This approach uses two adjustments to black's option pricing
         model to value an option on a CDS index."""
 
@@ -134,7 +134,7 @@ class CDSIndexOption:
 
     ###########################################################################
 
-    def value_anderson(self, value_dt, issuer_curves, index_recovery, sigma):
+    def value_anderson(self, value_dt: Date, issuer_curves: list[DiscountCurve], index_recovery: float, sigma: float):
         """This function values a CDS index option following approach by
         Anderson (2006). This ensures that a no-arbitrage relationship between
         the constituent CDS contract and the CDS index is enforced. It models
@@ -199,7 +199,7 @@ class CDSIndexOption:
 
     ###########################################################################
 
-    def _solve_for_x(self, value_dt, sigma, index_cpn, index_recovery, libor_curve, exp_h):
+    def _solve_for_x(self, value_dt: Date, sigma: float, index_cpn: float, index_recovery: float, libor_curve: DiscountCurve, exp_h):
         """Function to solve for the arbitrage free"""
         x1 = 0.0
         x2 = 0.9999
@@ -248,11 +248,11 @@ class CDSIndexOption:
     def _calc_obj_func(
         self,
         x,
-        value_dt,
-        sigma,
-        index_cpn,  # TODO - do I need this input ?
-        index_recovery,
-        libor_curve,
+        value_dt: Date,
+        sigma: float,
+        index_cpn: float,  # TODO - do I need this input ?
+        index_recovery: float,
+        libor_curve: DiscountCurve,
     ):
         """An internal function used in the Anderson valuation."""
 
@@ -276,13 +276,13 @@ class CDSIndexOption:
 
     def _calc_index_payer_option_price(
         self,
-        value_dt,
+        value_dt: Date,
         x,
-        sigma,
-        index_cpn,
+        sigma: float,
+        index_cpn: float,
         strike_value,
-        libor_curve,
-        index_recovery,
+        libor_curve: DiscountCurve,
+        index_recovery: float,
     ):
         """Calculates the intrinsic value of the index payer swap and the
         value of the index payer option which are both returned in an array.

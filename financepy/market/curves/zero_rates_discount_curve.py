@@ -43,7 +43,7 @@ class ZeroRatesDiscountCurve(DiscountCurve):
         freq_type: FrequencyTypes = FrequencyTypes.ANNUAL,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
-    ):
+    ) -> None:
         """Create the discount curve from a vector of dates and zero rates
         factors. The first date is the curve anchor. Then a vector of zero
         dates and then another same-length vector of rates. The rate is to the

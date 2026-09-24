@@ -35,7 +35,7 @@ class FXFloatLookbackOption(FXOption):
     but is set at expiry to equal the minimum fx rate in the case of a call
     or the maximum fx rate in the case of a put."""
 
-    def __init__(self, expiry_dt: Date, opt_type: OptionTypes):
+    def __init__(self, expiry_dt: Date, opt_type: OptionTypes) -> None:
         """Create the FX Float Look Back Option by specifying the expiry
         date and the option type."""
 
@@ -129,14 +129,14 @@ class FXFloatLookbackOption(FXOption):
 
     def value_mc(
         self,
-        value_dt,
-        stock_price,
-        domestic_curve,
-        foreign_curve,
-        volatility,
+        value_dt: Date,
+        stock_price: float,
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
+        volatility: float,
         stock_min_max,
-        num_paths=10000,
-        num_steps_per_year=252,
+        num_paths: int=10000,
+        num_steps_per_year: int=252,
         seed=4242,
     ):
         """Value FX floating lookback option using Monte Carlo"""

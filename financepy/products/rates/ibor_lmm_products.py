@@ -54,7 +54,7 @@ class IborLMMProducts:
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed cpn and the details of the fixed and the
@@ -105,7 +105,7 @@ class IborLMMProducts:
 
     def simulate_1f(
         self,
-        discount_curve,
+        discount_curve: DiscountCurve,
         vol_curve: IborCapVolCurve,
         num_paths: int = 1000,
         numeraire_index: int = 0,
@@ -158,7 +158,7 @@ class IborLMMProducts:
 
     def simulate_mf(
         self,
-        discount_curve,
+        discount_curve: DiscountCurve,
         num_factors: int,
         lambdas: np.ndarray,
         num_paths: int = 10000,
@@ -224,7 +224,7 @@ class IborLMMProducts:
 
     def simulate_nf(
         self,
-        discount_curve,
+        discount_curve: DiscountCurve,
         vol_curve: IborCapVolCurve,
         corr_matrix: np.ndarray,
         model_type: LMMModelTypes,

@@ -37,7 +37,7 @@ class EquityCompoundOption(EquityOption):
         u_expiry_dt: Date,  # Underlying option expiry date
         u_opt_type: OptionTypes,  # Underlying OPTION_TYPE
         u_strike_price: float,
-    ):  # Underlying option strike price
+    ) -> None:  # Underlying option strike price
         """Create the EquityCompoundOption by passing in the first and
         second expiry dates as well as the corresponding strike prices and
         OPTION_TYPEs."""
@@ -79,7 +79,7 @@ class EquityCompoundOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         num_steps: int = 200,
     ):
         """Value the compound option using an analytical approach if it is
@@ -125,7 +125,7 @@ class EquityCompoundOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         num_steps: int = 200,
     ):
         """Value the compound option using a Tree approach to handle the

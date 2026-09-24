@@ -29,9 +29,6 @@ from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.utils.format_graphs import set_plot_style
-
-set_plot_style()
 
 # Common valuation and contract parameters.
 settle_dt = Date(20, 6, 2018)

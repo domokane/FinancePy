@@ -36,7 +36,7 @@ class Tenor:
     and multiply them by integers )
     """
 
-    def __init__(self, tenor_string: str = None):
+    def __init__(self, tenor_string: str = None) -> None:
         self._units = TenorUnit.NONE
         self._num_periods = 0
 
@@ -91,7 +91,7 @@ class Tenor:
 
     ####################################################################################
 
-    def set_num_periods(self, num):
+    def set_num_periods(self, num: int):
         """Set the number of periods for the tenor."""
         if not isinstance(num, Union[float, int]):
             print(num)
@@ -100,7 +100,7 @@ class Tenor:
 
     ####################################################################################
 
-    def set(self, num, units: TenorUnit):
+    def set(self, num: int, units: TenorUnit):
         """Convenience method to set both number and units at once."""
         self.set_num_periods(num)
         self.set_units(units)

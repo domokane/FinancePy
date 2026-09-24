@@ -29,7 +29,7 @@ class FinFXVarianceSwap:
         strike_variance: float,
         notional: float = ONE_MILLION,
         pay_strike_flag: bool = True,
-    ):
+    ) -> None:
         """Create variance swap contract."""
 
         check_argument_types(self.__init__, locals())
@@ -58,7 +58,7 @@ class FinFXVarianceSwap:
 
     ###########################################################################
 
-    def value(self, value_dt, realised_var, fair_strike_var, libor_curve):
+    def value(self, value_dt: Date, realised_var, fair_strike_var, libor_curve: DiscountCurve):
         """Calculate the value of the variance swap based on the realised
         volatility to the valuation date, the forward looking implied
         volatility to the maturity date using the libor discount curve."""
@@ -86,7 +86,7 @@ class FinFXVarianceSwap:
 
     ###########################################################################
 
-    def fair_strike_approx(self, value_dt, fwd_stock_price, strikes, volatilities):
+    def fair_strike_approx(self, value_dt: Date, fwd_stock_price: float, strikes, volatilities: np.ndarray):
         """This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
         F is the forward stock price and sigma(F) is the ATM forward vol."""
@@ -110,14 +110,14 @@ class FinFXVarianceSwap:
 
     def fair_strike(
         self,
-        value_dt,
-        stock_price,
-        dividend_curve,
-        volatility_curve,
-        num_call_options,
-        num_put_options,
+        value_dt: Date,
+        stock_price: float,
+        dividend_curve: DiscountCurve,
+        volatility_curve: DiscountCurve,
+        num_call_options: int,
+        num_put_options: int,
         strike_spacing,
-        discount_curve,
+        discount_curve: DiscountCurve,
         use_forward=True,
     ):
         """Calculate the implied variance according to the volatility surface
@@ -224,7 +224,7 @@ class FinFXVarianceSwap:
 
     ###########################################################################
 
-    def realised_variance(self, close_prices, use_logs=True):
+    def realised_variance(self, close_prices: float, use_logs=True):
         """Calculate the realised variance according to market standard
         calculations which can either use log or percentage returns."""
 

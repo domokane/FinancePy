@@ -81,7 +81,7 @@ class BondBootstrapDiscountCurve(DiscountCurve):
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         check_refit_flag: bool = False,  # Set to True to test it works
         do_build: bool = True,
-    ):
+    ) -> None:
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 

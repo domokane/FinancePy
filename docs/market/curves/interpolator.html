@@ -188,12 +188,67 @@ financepy.market.curves.interpolator
 <h1>Classes</h1>
 <section>
 
+<h2>InterpTypes</h2>
+
+<div class="signature">
+
+<code>
+InterpTypes(*values)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: Enum</div>
+
+<div class="docstring">Create a collection of name/value pairs.
+
+Example enumeration:
+
+&gt;&gt;&gt; class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+
+Access them by:
+
+- attribute access:
+
+  &gt;&gt;&gt; Color.RED
+  &lt;Color.RED: 1&gt;
+
+- value lookup:
+
+  &gt;&gt;&gt; Color(1)
+  &lt;Color.RED: 1&gt;
+
+- name lookup:
+
+  &gt;&gt;&gt; Color[&#x27;RED&#x27;]
+  &lt;Color.RED: 1&gt;
+
+Enumerations can be iterated over, and know how many members they have:
+
+&gt;&gt;&gt; len(Color)
+3
+
+&gt;&gt;&gt; list(Color)
+[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
+
+Methods can be added to enumerations, and members can have their own
+attributes -- see the documentation for details.</div>
+
+
+
+</section>
+
+<section>
+
 <h2>Interpolator</h2>
 
 <div class="signature">
 
 <code>
-Interpolator(interpolator_type: &#x27;InterpTypes&#x27;, **kwargs: &#x27;dict&#x27;)
+Interpolator(interpolator_type: &#x27;InterpTypes&#x27;, **kwargs: &#x27;dict&#x27;) -&gt; &#x27;None&#x27;
 </code>
 
 </div>

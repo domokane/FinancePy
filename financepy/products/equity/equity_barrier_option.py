@@ -14,7 +14,7 @@ from ...utils.global_types import GBMNumericalSchemeTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
 from ...models.equity_barrier_option_bs import value_equity_barrier_option_bs
-from ...models.equity_barrier_option_mc import value_equity_barrier_option_mc
+from ...models.barrier_option_mc import value_barrier_option_mc
 from ...models.process_simulator import ProcessTypes
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
@@ -35,11 +35,11 @@ class EquityBarrierOption(EquityOption):
         self,
         expiry_dt: Date,
         strike_price: float,
-        opt_type: BarrierTypes,
+        barrier_type: BarrierTypes,
         barrier_level: float,
         num_obs_per_year: Union[int, float] = 252,
         notional: float = 1.0,
-    ):
+    ) -> None:
         """Create the EquityBarrierOption by specifying the expiry date,
         strike price, OPTION_TYPE, barrier level, the number of observations
         per year and the notional."""
@@ -53,10 +53,10 @@ class EquityBarrierOption(EquityOption):
         self.barrier_level = float(barrier_level)
         self.num_obs_per_year = int(num_obs_per_year)
 
-        if opt_type not in BarrierTypes:
-            raise FinError("OPTION_TYPE " + str(opt_type) + " unknown.")
+        if barrier_type not in BarrierTypes:
+            raise FinError("OPTION_TYPE " + str(barrier_type) + " unknown.")
 
-        self.opt_type = opt_type
+        self.barrier_type = barrier_type
         self.notional = notional
 
     ###########################################################################
@@ -67,7 +67,7 @@ class EquityBarrierOption(EquityOption):
         stock_price: Union[float, np.ndarray],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """This prices an Equity Barrier option using the formulae given in
         the paper by Clewlow, Llanos and Strickland December 1994 which can be
@@ -76,6 +76,7 @@ class EquityBarrierOption(EquityOption):
         https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
         """
 
+        t_exp = option_years(value_dt, self.expiry_dt)
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
         check_stock_price(stock_price)
@@ -85,8 +86,6 @@ class EquityBarrierOption(EquityOption):
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        t_exp = option_years(value_dt, self.expiry_dt)
-
         values = value_equity_barrier_option_bs(
             t_exp,
             self.strike_price,
@@ -95,7 +94,7 @@ class EquityBarrierOption(EquityOption):
             r,
             q,
             model.volatility,
-            self.opt_type.value,
+            self.barrier_type.value,
             self.num_obs_per_year,
         )
 
@@ -111,20 +110,15 @@ class EquityBarrierOption(EquityOption):
     def value_mc(
         self,
         value_dt: Date,
-        stock_price: Union[float, np.ndarray],
+        stock_price: float | np.ndarray,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
-        num_obs_per_year=252,
+        model: Model,
+        num_obs_per_year: int=252,
         num_paths: int = 10000,
         seed: int = 42,
     ):
-        """This prices an Equity Barrier option using the formulae given in
-        the paper by Clewlow, Llanos and Strickland December 1994 which can be
-        found at
-
-        https://warwick.ac.uk/fac/soc/wbs/subjects/finance/research/wpaperseries/1994/94-54.pdf
-        """
+        """Value the Equity Barrier Option using Monte Carlo."""
 
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
@@ -137,20 +131,19 @@ class EquityBarrierOption(EquityOption):
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        drift = r - q
+        mu = r - q
 
-        scheme = GBMNumericalSchemeTypes.NORMAL
+        scheme = GBMNumericalSchemeTypes.ANTITHETIC
 
-        model_params = (stock_price, drift, model.volatility, scheme)
+        model_params = (stock_price, mu, model.volatility, scheme)
 
         process_type = ProcessTypes.GBM_PROCESS
 
-        value = value_equity_barrier_option_mc(
+        value = value_barrier_option_mc(
             t_exp,
             self.strike_price,
-            self.opt_type,
+            self.barrier_type,
             self.barrier_level,
-            self.notional,
             stock_price,
             r,
             process_type,
@@ -161,7 +154,6 @@ class EquityBarrierOption(EquityOption):
         )
 
         value = value * self.notional
-
         return value
 
     ###########################################################################
@@ -170,7 +162,7 @@ class EquityBarrierOption(EquityOption):
         s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION_TYPE", self.opt_type)
+        s += label_to_string("BARRIER TYPE", self.barrier_type)
         s += label_to_string("BARRIER LEVEL", self.barrier_level)
         s += label_to_string("NUM OBSERVATIONS", self.num_obs_per_year)
         s += label_to_string("NOTIONAL", self.notional, "")

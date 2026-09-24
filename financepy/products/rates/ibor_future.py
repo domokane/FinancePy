@@ -29,7 +29,7 @@ class IborFuture:
         future_tenor: str = "3M",  # '1M', '3M'
         accrual_dc_type: DayCountTypes = DayCountTypes.ACT_360,
         contract_size: float = ONE_MILLION,
-    ):
+    ) -> None:
         """Create an interest rate futures contract which has the same
         conventions as those traded on the CME. The current _dt, the tenor of
         the future, the number of the future and the accrual convention and
@@ -102,7 +102,7 @@ class IborFuture:
 
     ###########################################################################
 
-    def to_fra(self, futures_price, convexity):
+    def to_fra(self, futures_price: float, convexity):
         """Convert the futures contract to a IborFRA object so it can be
         used to boostrap a Ibor curve. For this we need to adjust the futures
         rate using the convexity correction."""
@@ -122,7 +122,7 @@ class IborFuture:
 
     ###########################################################################
 
-    def futures_rate(self, futures_price):
+    def futures_rate(self, futures_price: float):
         """Calculate implied futures rate from the futures price."""
         futures_rate = (100.0 - futures_price) / 100.0
         return futures_rate
@@ -170,7 +170,7 @@ class IborFuture:
 
     ###########################################################################
 
-    def fra_rate(self, futures_price, convexity):
+    def fra_rate(self, futures_price: float, convexity):
         """Convert futures price and convexity to a FRA rate using the BBG
         negative convexity (in percent). This is then divided by 100 before
         being added to the futures rate."""
@@ -186,7 +186,7 @@ class IborFuture:
 
     ###########################################################################
 
-    def convexity(self, value_dt, volatility, mean_reversion):
+    def convexity(self, value_dt: Date, volatility: float, mean_reversion):
         """Calculation of the convexity adjustment between FRAs and interest
         rate futures using the Hull-White model as described in technical note
         in link below:

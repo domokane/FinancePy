@@ -29,7 +29,7 @@ class FXForward:
         notional: float,
         notional_currency: str,  # must be FOR or DOM
         spot_days: int = 0,
-    ):
+    ) -> None:
         """Creates a FinFXForward which allows the owner to buy the FOR
         against the DOM currency at the strike_fx_rate and to pay it in the
         notional currency."""
@@ -71,10 +71,10 @@ class FXForward:
 
     def value(
         self,
-        value_dt,
-        spot_fx_rate,  # 1 unit of foreign in domestic
-        domestic_curve,
-        foreign_curve,
+        value_dt: Date,
+        spot_fx_rate: float,  # 1 unit of foreign in domestic
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
     ):
         """Calculate the value of an FX forward contract where the current
         FX rate is the spot_fx_rate."""
@@ -137,10 +137,10 @@ class FXForward:
 
     def forward(
         self,
-        value_dt,
-        spot_fx_rate,  # 1 unit of foreign in domestic
-        domestic_curve,
-        foreign_curve,
+        value_dt: Date,
+        spot_fx_rate: float,  # 1 unit of foreign in domestic
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
     ):
         """Calculate the FX Forward rate that makes the value of the FX
         contract equal to zero."""

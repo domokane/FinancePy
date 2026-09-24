@@ -113,7 +113,7 @@ class BondParametricDiscountCurve(DiscountCurve):
         curve_fit_type: CurveFitTypes,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         do_build: bool = True,
-    ):
+    ) -> None:
 
         check_argument_types(getattr(self, _func_name(), None), locals())
 

@@ -51,7 +51,7 @@ class InflationSwap:
         pay_fixed_rate: bool = True,  # True if the FRA rate is being paid
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING,
-    ):
+    ) -> None:
         """Create a Forward Rate Agreeement object."""
 
         print("DO NOT USE")
@@ -81,7 +81,7 @@ class InflationSwap:
 
     ###########################################################################
 
-    def value(self, value_dt, libor_curve):
+    def value(self, value_dt: Date, libor_curve: DiscountCurve):
         """Determine mark to market value of a FRA contract based on the
         market FRA rate. The same curve is used for calculating the forward
         Ibor and for doing discounting on the expected forward payment."""
@@ -106,7 +106,7 @@ class InflationSwap:
 
     ###########################################################################
 
-    def maturity_df(self, libor_curve):
+    def maturity_df(self, libor_curve: DiscountCurve):
         """Determine the maturity date discount factor needed to refit
         the FRA given the libor curve anbd the contract FRA rate."""
 
@@ -120,7 +120,7 @@ class InflationSwap:
 
     ###########################################################################
 
-    def print_payments(self, value_dt):
+    def print_payments(self, value_dt: Date):
         """Determine the value of the Deposit given a Ibor curve."""
 
         flow_settle = self.notional

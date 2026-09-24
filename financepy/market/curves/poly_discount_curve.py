@@ -31,7 +31,7 @@ class PolyDiscountCurve(DiscountCurve):
         anchor_dt: Date,
         coefficients: Union[list, np.ndarray],
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):
+    ) -> None:
         """Create zero rate curve parametrised using a cubic curve from
         coefficients and specifying a compounding frequency type and day count
         convention."""

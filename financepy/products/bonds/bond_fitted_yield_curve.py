@@ -37,7 +37,7 @@ class BondFittedYieldCurve:
         ylds: Union[np.ndarray, list],
         curve_fit,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):
+    ) -> None:
         """Fit the curve to a set of bond yields using the type of curve
         specified. Bounds can be provided if you wish to enforce lower and
         upper limits on the respective model parameters."""

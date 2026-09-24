@@ -193,7 +193,7 @@ financepy.market.curves.cds_curve
 <div class="signature">
 
 <code>
-CDSCurve(anchor_dt: financepy.utils.date.Date, cds_contracts: list, libor_curve: financepy.market.curves.discount_curve.DiscountCurve, recovery_rate: float, dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;, interp_method: financepy.utils.global_types.InterpTypes = &lt;InterpTypes.FLAT_FWD_RATES: 1&gt;)
+CDSCurve(anchor_dt: financepy.utils.date.Date, cds_contracts: list, libor_curve: financepy.market.curves.discount_curve.DiscountCurve, recovery_rate: float, dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;, interp_method: financepy.market.curves.interpolator.InterpTypes = &lt;InterpTypes.FLAT_FWD_RATES: 1&gt;) -&gt; None
 </code>
 
 </div>
@@ -342,7 +342,7 @@ build_curve(self)
 <div class="signature">
 
 <code>
-fwd(self, fwd_dt)
+fwd(self, fwd_dt: financepy.utils.date.Date)
 </code>
 
 </div>

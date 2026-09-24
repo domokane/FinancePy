@@ -58,7 +58,7 @@ def option_years(value_dt: Date, expiry_dt: Date, floor=1e-10, fail=True):
 ########################################################################################
 
 
-def grid_index(t, grid_times):
+def grid_index(t, grid_times: np.ndarray):
     n = len(grid_times)
     for i in range(0, n):
         grid_time = grid_times[i]

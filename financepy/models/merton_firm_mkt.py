@@ -28,22 +28,23 @@ def _merton_equations(
 
     asset_value, asset_volatility = x
 
-    if asset_value <= 0.0 or asset_volatility <= 0.0:
+    sigma = asset_volatility
+    a = asset_value
+    e = equity_value
+    r = risk_free_rate
+    t = years_to_maturity
+    f = bond_face
+
+    if a <= 0.0 or sigma <= 0.0:
         return np.array([1.0e10, 1.0e10])
 
-    sigma_root_t = asset_volatility * np.sqrt(years_to_maturity)
+    sigma_root_t = sigma * np.sqrt(t)
 
-    d1 = (
-        np.log(asset_value / bond_face) + (risk_free_rate + 0.5 * asset_volatility**2) * years_to_maturity
-    ) / sigma_root_t
-
+    d1 = (np.log(a / f) + (r + 0.5 * sigma**2) * t) / sigma_root_t
     d2 = d1 - sigma_root_t
 
-    model_equity_value = asset_value * normcdf(d1) - bond_face * np.exp(-risk_free_rate * years_to_maturity) * normcdf(
-        d2
-    )
-
-    model_equity_volatility = asset_value / equity_value * normcdf(d1) * asset_volatility
+    model_equity_value = a * normcdf(d1) - f * np.exp(-r * t) * normcdf(d2)
+    model_equity_volatility = a / e * normcdf(d1) * sigma
 
     return np.array(
         [

@@ -40,7 +40,7 @@ class BondZero:
         maturity_dt: Date,
         issue_price: float,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,  # ONLY NEEDED FOR YIELD CALCULATIONS
-    ):
+    ) -> None:
         """Create BondZero object by providing the issue date, maturity Date,
         face amount and issue price."""
 
@@ -111,7 +111,7 @@ class BondZero:
 
     ###########################################################################
 
-    def accretion_yield(self, settle_dt: Date, clean_price):
+    def accretion_yield(self, settle_dt: Date, clean_price: float):
         """Return average annual accretion yield from settlement."""
 
         if settle_dt > self.maturity_dt:
@@ -143,7 +143,7 @@ class BondZero:
 
     ###########################################################################
 
-    def current_yield(self, clean_price):
+    def current_yield(self, clean_price: float):
         """
         Calculate the current yield of the bond which is the
         cpn divided by the clean price (not the full price).

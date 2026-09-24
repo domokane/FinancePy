@@ -7,7 +7,7 @@ import add_fp_to_path
 from financepy.utils.date import Date
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.fx.fx_barrier_option import FXBarrierOption
-from financepy.products.fx.fx_barrier_option import FXBarrierTypes
+from financepy.utils.global_types import BarrierTypes
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.global_types import GBMNumericalSchemeTypes
 from financepy.models.process_simulator import ProcessTypes
@@ -28,13 +28,10 @@ def test_fin_fx_barrier_option():
     volatility = 0.20
     dom_interest_rate = 0.05
     for_interest_rate = 0.02
-    opt_type = FXBarrierTypes.DOWN_AND_OUT_CALL
+    opt_type = BarrierTypes.DOWN_AND_OUT_CALL
     notional = 100.0
     notional_currency = "USD"
 
-    drift = dom_interest_rate - for_interest_rate
-    scheme = GBMNumericalSchemeTypes.ANTITHETIC
-    process_type = ProcessTypes.GBM_PROCESS
     domestic_curve = FlatDiscountCurve(value_dt, dom_interest_rate)
     foreign_curve = FlatDiscountCurve(value_dt, for_interest_rate)
     model = BlackScholes(volatility)
@@ -42,7 +39,7 @@ def test_fin_fx_barrier_option():
     start = time.time()
     num_obs_per_year = 100
 
-    for opt_type in FXBarrierTypes:
+    for opt_type in BarrierTypes:
 
         test_cases.header("Type", "K", "B", "S", "Value", "ValueMC", "TIME", "Diff")
 
@@ -57,8 +54,8 @@ def test_fin_fx_barrier_option():
                 opt_type,
                 b,
                 num_obs_per_year,
-                notional,
                 notional_currency,
+                notional,
             )
 
             value = option.value(
@@ -66,13 +63,12 @@ def test_fin_fx_barrier_option():
             )
 
             start = time.time()
-            model_params = (spot_fx_rate, drift, volatility, scheme)
             value_mc = option.value_mc(
                 value_dt,
                 spot_fx_rate,
-                dom_interest_rate,
-                process_type,
-                model_params,
+                domestic_curve,
+                foreign_curve,
+                model,
             )
 
             end = time.time()
@@ -101,8 +97,8 @@ def test_fin_fx_barrier_option():
                 opt_type,
                 b,
                 num_obs_per_year,
-                notional,
                 notional_currency,
+                notional,
             )
 
             value = option.value(
@@ -110,13 +106,12 @@ def test_fin_fx_barrier_option():
             )
 
             start = time.time()
-            model_params = (spot_fx_rate, drift, volatility, scheme)
             value_mc = option.value_mc(
                 value_dt,
                 spot_fx_rate,
-                dom_interest_rate,
-                process_type,
-                model_params,
+                domestic_curve,
+                foreign_curve,
+                model,
             )
 
             end = time.time()
@@ -141,7 +136,7 @@ def test_fin_fx_barrier_option():
 
     test_cases.header("Type", "K", "B", "S:", "Value", "Delta", "Vega", "Theta")
 
-    for opt_type in FXBarrierTypes:
+    for opt_type in BarrierTypes:
         for spot_fx_rate in spot_fx_rates:
             barrier_option = FXBarrierOption(
                 expiry_dt,
@@ -150,8 +145,8 @@ def test_fin_fx_barrier_option():
                 opt_type,
                 b,
                 num_obs_per_year,
-                notional,
                 notional_currency,
+                notional,
             )
 
             value = barrier_option.value(

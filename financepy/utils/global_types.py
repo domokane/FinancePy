@@ -79,17 +79,6 @@ class VasicekNumericalSchemeTypes(Enum):
     ANTITHETIC = 2
 
 
-class FXBarrierTypes(Enum):
-    DOWN_AND_OUT_CALL = 1
-    DOWN_AND_IN_CALL = 2
-    UP_AND_OUT_CALL = 3
-    UP_AND_IN_CALL = 4
-    UP_AND_OUT_PUT = 5
-    UP_AND_IN_PUT = 6
-    DOWN_AND_OUT_PUT = 7
-    DOWN_AND_IN_PUT = 8
-
-
 class OISCompoundingTypes(Enum):
     COMPOUNDED = 1
     OVERNIGHT_COMPOUNDED_ANNUAL_RATE = 2
@@ -165,7 +154,7 @@ class OptionTypes(Enum):
 
 
 class BarrierTypes(Enum):
-    """Enumeration of equity barrier types."""
+    """Enumeration of barrier types."""
 
     DOWN_AND_OUT_CALL = 1
     DOWN_AND_IN_CALL = 2
@@ -175,7 +164,6 @@ class BarrierTypes(Enum):
     UP_AND_IN_PUT = 6
     DOWN_AND_OUT_PUT = 7
     DOWN_AND_IN_PUT = 8
-
 
 ########################################################################################
 

@@ -40,7 +40,7 @@ class EquityFloatLookbackOption(EquityOption):
     before expiry while the buyer of the put gets to sell the asset at the
     highest price before expiry."""
 
-    def __init__(self, expiry_dt: Date, opt_type: OptionTypes):
+    def __init__(self, expiry_dt: Date, opt_type: OptionTypes) -> None:
         """Create the FloatLookbackOption by specifying the expiry date and
         the OPTION_TYPE. The strike is determined internally as the maximum or
         minimum of the stock price depending on whether it is a put or a call
@@ -65,7 +65,7 @@ class EquityFloatLookbackOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         stock_min_max: float,
     ):
         """Valuation of the Floating Lookback option using Black-Scholes using
@@ -166,7 +166,7 @@ class EquityFloatLookbackOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         stock_min_max: float,
         num_paths: int = 10000,
         num_steps_per_year: int = 252,

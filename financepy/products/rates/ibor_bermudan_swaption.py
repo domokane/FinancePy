@@ -50,7 +50,7 @@ class IborBermudanSwaption:
         cal_type=CalendarTypes.WEEKEND,
         bd_type=BusDayAdjustTypes.FOLLOWING,
         dg_type=DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Create a Bermudan swaption contract. This is an option to enter
         into a payer or receiver swap at a fixed coupon on all the fixed
         # leg coupon dates until the exercise date inclusive."""
@@ -95,7 +95,7 @@ class IborBermudanSwaption:
 
     ###################################################################
 
-    def value(self, value_dt, discount_curve, model):
+    def value(self, value_dt: Date, discount_curve: DiscountCurve, model: Model):
         """Value the Bermudan swaption using the specified model and a
         discount curve. The choices of model are the Hull-White model,
         the Black-Karasinski model and the Black-Derman-Toy model."""

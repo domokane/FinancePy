@@ -45,7 +45,7 @@ class EquitySwapLeg:
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
         end_of_month: bool = False,
-    ):
+    ) -> None:
         """Create the equity leg of a swap contract giving the contract start
         date, its maturity, underlying strike price and quantity, payment
         frequency, day count convention, return type, and other details"""

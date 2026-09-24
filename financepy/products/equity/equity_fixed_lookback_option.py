@@ -37,7 +37,7 @@ class EquityFixedLookbackOption(EquityOption):
     the value of the stock price used to determine the payoff is the maximum
     in the case of a call option, and a minimum in the case of a put option."""
 
-    def __init__(self, expiry_dt: Date, opt_type: OptionTypes, strike_price: float):
+    def __init__(self, expiry_dt: Date, opt_type: OptionTypes, strike_price: float) -> None:
         """Create the FixedLookbackOption by specifying the expiry date, the
         OPTION_TYPE and the option strike."""
 
@@ -61,7 +61,7 @@ class EquityFixedLookbackOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         stock_min_max: float,
     ):
         """Valuation of the Fixed Lookback option using Black-Scholes using
@@ -186,7 +186,7 @@ class EquityFixedLookbackOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         stock_min_max: float,
         num_paths: int = 10000,
         num_steps_per_year: int = 252,

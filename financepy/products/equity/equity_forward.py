@@ -24,7 +24,7 @@ class EquityForward:
         forward_price: float,  # PRICE OF 1 UNIT OF FOREIGN IN DOM CCY
         notional: float,
         long_short: LongShortTypes = LongShortTypes.LONG,
-    ):
+    ) -> None:
         """Creates a EquityForward which allows the owner to buy the stock
         at a price agreed today. Need to specify if LONG or SHORT."""
 
@@ -39,10 +39,10 @@ class EquityForward:
 
     def value(
         self,
-        value_dt,
-        stock_price,  # Current stock price
-        discount_curve,
-        dividend_curve,
+        value_dt: Date,
+        stock_price: float,  # Current stock price
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
     ):
         """Calculate the value of an equity forward contract from the stock
         price and discount and dividend discount."""
@@ -74,10 +74,10 @@ class EquityForward:
 
     def forward(
         self,
-        value_dt,
-        stock_price,  # Current stock price
-        discount_curve,
-        dividend_curve,
+        value_dt: Date,
+        stock_price: float,  # Current stock price
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
     ):
         """Calculate the value of an equity forward contract from the stock
         price and discount and dividend discount."""

@@ -26,7 +26,7 @@ def par_rate_risk_report(
     base_curve: IborSingleCurve,
     trades: list,
     trade_labels: list = None,
-    bump_size=1.0 * G_BASIS_POINT,
+    bump_size: float=1.0 * G_BASIS_POINT,
 ):
     """Calculate deltas (change in value to 1bp bump) of the trades to all
     benchmarks in the base curve. Supported trades are depos, fras, swaps.
@@ -83,7 +83,7 @@ def forward_rate_risk_report(
     grid_bucket_tenor: str,
     trades: list,
     trade_labels: list = None,
-    bump_size=1.0 * G_BASIS_POINT,
+    bump_size: float=1.0 * G_BASIS_POINT,
 ):
     """Generate forward rate deltas (forward delta ladder) risk report, which
     is the sensitivity of trades to bucketed shocks of the instantaneous (ON)
@@ -125,7 +125,7 @@ def forward_rate_risk_report_custom_grid(
     trades: list,
     grid_labels: list = None,
     trade_labels: list = None,
-    bump_size=1.0 * G_BASIS_POINT,
+    bump_size: float=1.0 * G_BASIS_POINT,
 ):
     """Generate forward rate deltas risk report, which is the sensitivity of
     trades to bucketed shocks of the instantaneous (ON) forward rates. Here
@@ -210,7 +210,7 @@ def carry_rolldown_report(
     grid_bucket_tenor: Union[str, Tenor],
     trades: list,
     trade_labels: list = None,
-    bump_size=1.0 * G_BASIS_POINT,
+    bump_size: float=1.0 * G_BASIS_POINT,
 ):
     """Generate carry and rolldown risk report based on the sensitivity of
     trades to bucketed shocks of the instantaneous (ON) forward rates. Here

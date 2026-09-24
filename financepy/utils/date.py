@@ -200,7 +200,7 @@ class Date:
 
     ####################################################################################
 
-    def __init__(self, d, m, y, hh=0, mm=0, ss=0):
+    def __init__(self, d, m, y, hh=0, mm=0, ss=0) -> None:
         # validation checks (as you already had)
         if 1900 <= d <= 2100 and 1 <= y <= 31:
             raise FinError("Date arguments must be in order Date(day, month, year)")
@@ -246,7 +246,7 @@ class Date:
     ###########################################################################
 
     @classmethod
-    def _make_fast(cls, d, m, y, excel_dt):
+    def _make_fast(cls, d, m, y, excel_dt: Date):
         """Fast constructor when excel_dt is already known."""
         obj = cls.__new__(cls)
         obj.d, obj.m, obj.y = d, m, y
@@ -258,7 +258,7 @@ class Date:
     ###########################################################################
 
     @classmethod
-    def from_ymd_excel(cls, d, m, y, excel_dt):
+    def from_ymd_excel(cls, d, m, y, excel_dt: Date):
         obj = cls.__new__(cls)  # allocate without __init__
         obj.d, obj.m, obj.y = d, m, y
         obj.hh = obj.mm = obj.ss = 0
@@ -499,7 +499,7 @@ class Date:
 
     ####################################################################################
 
-    def add_days(self, num_days=1):
+    def add_days(self, num_days: int=1):
         if np.isscalar(num_days):
             return Date.from_excel(self.excel_dt + float(num_days))
     

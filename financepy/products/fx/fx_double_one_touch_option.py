@@ -39,7 +39,7 @@ class FXDoubleOneTouchOption(FXOption):
         lower_barrier_fx_rate: float,
         upper_barrier_fx_rate: float,
         payment_size: float = 1.0,
-    ):
+    ) -> None:
         """Create the double one touch option by defining its expiry date and the
         barrier level and a payment size if it is a cash ."""
 
@@ -59,7 +59,7 @@ class FXDoubleOneTouchOption(FXOption):
         spot_fx_rate: Union[float, np.ndarray],
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """FX One-Touch Option valuation using the Black-Scholes model
         assuming a continuous (American) barrier from value date to expiry.
@@ -115,7 +115,7 @@ class FXDoubleOneTouchOption(FXOption):
         stock_price: float,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
-        model,
+        model: Model,
         num_paths: int = 10000,
         num_steps_per_year: int = 252,
         seed: int = 4242,
@@ -158,13 +158,13 @@ class FXDoubleOneTouchOption(FXOption):
 
     def value_mc_bb_slow(
         self,
-        value_dt,
-        stock_price,
+        value_dt: Date,
+        stock_price: float,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
-        model,
-        num_steps_per_year=52,
-        num_paths=100000,
+        model: Model,
+        num_steps_per_year: int=52,
+        num_paths: int=100000,
         seed=42,
     ):
 
@@ -240,11 +240,11 @@ class FXDoubleOneTouchOption(FXOption):
 
     def value_mc(
         self,
-        value_dt,
+        value_dt: Date,
         spot_fx_rate: float,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
-        model,
+        model: Model,
         num_steps_per_year: int = 52,
         num_paths: int = 1_000_000,
         seed: int = 42,

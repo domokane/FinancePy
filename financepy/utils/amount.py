@@ -16,7 +16,7 @@ class Amount:
         self,
         amount: float,
         currency_type: CurrencyTypes,
-    ):
+    ) -> None:
         if not isinstance(amount, Real):
             raise FinError("Amount must be numeric.")
 

@@ -32,7 +32,7 @@ class CDSIndexPortfolio:
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Create Fincds_index_portfolio object. Note that all of the inputs
         have a default value which reflects the CDS market standard."""
 
@@ -46,7 +46,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def intrinsic_rpv01(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def intrinsic_rpv01(self, value_dt: Date, step_in_dt: Date, maturity_dt: Date, issuer_curves: list[DiscountCurve]):
         """Calculation of the risky PV01 of the CDS portfolio by taking the
         average of the risky PV01s of each contract."""
 
@@ -69,7 +69,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def intrinsic_prot_leg_pv(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def intrinsic_prot_leg_pv(self, value_dt: Date, step_in_dt: Date, maturity_dt: Date, issuer_curves: list[DiscountCurve]):
         """Calculation of intrinsic protection leg value of the CDS portfolio
         by taking the average sum the protection legs of each contract."""
 
@@ -90,7 +90,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def intrinsic_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def intrinsic_spread(self, value_dt: Date, step_in_dt: Date, maturity_dt: Date, issuer_curves: list[DiscountCurve]):
         """Calculation of the intrinsic spd of the CDS portfolio as the one
         which would make the value of the protection legs equal to the value of
         the premium legs if all premium legs paid the same spd."""
@@ -107,7 +107,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def average_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def average_spread(self, value_dt: Date, step_in_dt: Date, maturity_dt: Date, issuer_curves: list[DiscountCurve]):
         """Calculates the average par CDS spd of the CDS portfolio."""
 
         check_curve_dt(value_dt, *issuer_curves)
@@ -127,7 +127,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def total_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def total_spread(self, value_dt: Date, step_in_dt: Date, maturity_dt: Date, issuer_curves: list[DiscountCurve]):
         """Calculates the total CDS spd of the CDS portfolio by summing
         over all of the issuers and adding the spd with no weights."""
 
@@ -147,7 +147,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def min_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def min_spread(self, value_dt: Date, step_in_dt: Date, maturity_dt: Date, issuer_curves: list[DiscountCurve]):
         """Calculates the minimum par CDS spd across all of the issuers in
         the CDS portfolio."""
 
@@ -171,7 +171,7 @@ class CDSIndexPortfolio:
 
     ####################################################################################
 
-    def max_spread(self, value_dt, step_in_dt, maturity_dt, issuer_curves):
+    def max_spread(self, value_dt: Date, step_in_dt: Date, maturity_dt: Date, issuer_curves: list[DiscountCurve]):
         """Calculates the maximum par CDS spd across all of the issuers in
         the CDS portfolio."""
 
@@ -197,12 +197,12 @@ class CDSIndexPortfolio:
 
     def spread_adjust_intrinsic(
         self,
-        value_dt,
-        issuer_curves,
-        index_cpns,
+        value_dt: Date,
+        issuer_curves: list[DiscountCurve],
+        index_cpns: float,
         index_upfronts,
         index_maturity_dts,
-        index_recovery_rate,
+        index_recovery_rate: float,
         tolerance=1e-7,
     ):
         """Adjust individual CDS discount to reprice CDS index prices.
@@ -342,12 +342,12 @@ class CDSIndexPortfolio:
 
     def hazard_rate_adjust_intrinsic(
         self,
-        value_dt,
-        issuer_curves,
-        index_cpns,
+        value_dt: Date,
+        issuer_curves: list[DiscountCurve],
+        index_cpns: float,
         index_up_fronts,
         index_maturity_dts,
-        index_recovery_rate,
+        index_recovery_rate: float,
         tolerance=1e-7,
         max_iterations=500,
     ):

@@ -101,11 +101,11 @@ def _payoff_value(s, payoff_type, payoff_params):
 
 @njit(fastmath=True, cache=True)
 def _value_once(
-    stock_price,
+    stock_price: float,
     r,
     q,
-    volatility,
-    num_steps,
+    volatility: float,
+    num_steps: int,
     time_to_expiry,
     payoff_type,
     exercise_type,
@@ -199,7 +199,7 @@ def _value_once(
 
 class EquityBinomialTree:
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     #        self.m_option_values = np.zeros()
@@ -213,14 +213,14 @@ class EquityBinomialTree:
 
     def value(
         self,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        volatility,
-        num_steps,
-        value_dt,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        volatility: float,
+        num_steps: int,
+        value_dt: Date,
         payoff,
-        expiry_dt,
+        expiry_dt: Date,
         payoff_type,
         exercise_type,
         payoff_params,

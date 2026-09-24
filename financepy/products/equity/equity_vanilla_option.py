@@ -49,7 +49,7 @@ class EquityVanillaOption:
         strike_price: Union[float, np.ndarray],
         opt_type: OptionTypes,
         num_options: float = 1.0,
-    ):
+    ) -> None:
         """Create the Equity Vanilla option object by specifying the expiry
         date, the option strike, the option type and the number of options."""
 
@@ -131,7 +131,7 @@ class EquityVanillaOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Calculate the analytical delta of a European vanilla option."""
 
@@ -341,7 +341,7 @@ class EquityVanillaOption:
         stock_price: Union[float, list, np.ndarray],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        price,
+        price: float,
     ):
         """Calculate the Black-Scholes implied volatility of a European
         vanilla option."""

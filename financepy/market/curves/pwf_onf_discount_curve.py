@@ -32,7 +32,7 @@ class PWFONFDiscountCurve(DiscountCurve):
         knot_dts: list,
         onfwd_rates: Union[list, np.ndarray],
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):
+    ) -> None:
         """
         Creates a discount curve using a vector of times and ON fwd rates
         The fwd rate is right-continuous i.e. a given value in the input

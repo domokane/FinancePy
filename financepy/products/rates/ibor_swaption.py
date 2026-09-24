@@ -62,7 +62,7 @@ class IborSwaption:
         cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Create a European-style swaption by defining the exercise date of
         the swaption, and all of the details of the underlying interest rate
         swap including the fixed cpn and the details of the fixed and the
@@ -102,7 +102,7 @@ class IborSwaption:
 
     ###########################################################################
 
-    def value(self, value_dt, discount_curve, model):
+    def value(self, value_dt: Date, discount_curve: DiscountCurve, model: Model):
         """Valuation of a Ibor European-style swaption using a choice of
         models on a specified valuation date. Models include FinModelBlack,
         FinModelBlackShifted, SABR, SABRShifted, FinModelHW,
@@ -288,7 +288,7 @@ class IborSwaption:
 
     ###########################################################################
 
-    def cash_settled_value(self, value_dt: Date, discount_curve, swap_rate: float, model):
+    def cash_settled_value(self, value_dt: Date, discount_curve: DiscountCurve, swap_rate: float, model: Model):
         """Valuation of a Ibor European-style swaption using a cash settled
         approach which is a market convention that used Black's model and that
         discounts all of the future payments at a flat swap rate. Note that the

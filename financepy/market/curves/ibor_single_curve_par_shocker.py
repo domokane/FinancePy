@@ -19,7 +19,7 @@ class IborSingleCurveParShocker:
     and provides methods to apply bumps that return bumped curves
     """
 
-    def __init__(self, base_curve: IborSingleCurve):
+    def __init__(self, base_curve: IborSingleCurve) -> None:
         """
         Init with a base curve to be bumped. Bumps do not affect this curve.
 
@@ -39,7 +39,7 @@ class IborSingleCurveParShocker:
         """
         return len(self._benchmarks_report)
 
-    def apply_bump_to_benchmark(self, benchmark_idx: int, bump_size=1.0 * G_BASIS_POINT):
+    def apply_bump_to_benchmark(self, benchmark_idx: int, bump_size: float=1.0 * G_BASIS_POINT):
         """
         Apply a shock of a given size to a given bechmark.
         Indexing is per the benchmark report

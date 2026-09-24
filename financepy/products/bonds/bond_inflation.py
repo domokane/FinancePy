@@ -35,7 +35,7 @@ class BondInflation(Bond):
         base_cpi_value: float,  # CPI value at issue
         num_ex_dividend_days: int = 0,
         cal_type: CalendarTypes = CalendarTypes.NONE,
-    ):
+    ) -> None:
         """Create InflationBond object by providing Maturity, Frequency,
         coupon, frequency and the accrual convention type. You must also supply
         the base CPI used for all coupon and principal related calculations.

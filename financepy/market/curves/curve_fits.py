@@ -54,7 +54,7 @@ class CurveFitMethod:
 class CurveFitCubicPolynomial(CurveFitMethod):
     """Polynomial curve fitting."""
 
-    def __init__(self, power=3, t_scale=1.0):
+    def __init__(self, power=3, t_scale=1.0) -> None:
         self.name = "Polynomial (" + str(power) + ")"
         self.power = power
         self.t_scale = t_scale
@@ -97,7 +97,7 @@ class CurveFitCubicPolynomial(CurveFitMethod):
 class CurveFitQuarticPolynomial(CurveFitMethod):
     """Polynomial curve fitting."""
 
-    def __init__(self, power=4, t_scale=1.0):
+    def __init__(self, power=4, t_scale=1.0) -> None:
         self.name = "Polynomial (" + str(power) + ")"
         self.power = power
         self.t_scale = t_scale
@@ -140,7 +140,7 @@ class CurveFitQuarticPolynomial(CurveFitMethod):
 class CurveFitQuinticPolynomial(CurveFitMethod):
     """Polynomial curve fitting."""
 
-    def __init__(self, power=5, t_scale=1.0):
+    def __init__(self, power=5, t_scale=1.0) -> None:
         self.name = "Polynomial (" + str(power) + ")"
         self.power = power
         self.t_scale = t_scale
@@ -183,7 +183,7 @@ class CurveFitQuinticPolynomial(CurveFitMethod):
 class CurveFitNelsonSiegel(CurveFitMethod):
     """Nelson-Siegel parametric fit."""
 
-    def __init__(self, beta1=0.03, beta2=-0.02, beta3=0.02, tau=2.0, bounds=None):
+    def __init__(self, beta1=0.03, beta2=-0.02, beta3=0.02, tau=2.0, bounds=None) -> None:
         self.name = "Nelson-Siegel"
         self.beta_1 = beta1
         self.beta_2 = beta2
@@ -255,7 +255,7 @@ class CurveFitNelsonSiegelSvensson(CurveFitMethod):
         tau1=2.0,
         tau2=5.0,
         bounds=None,
-    ):
+    ) -> None:
 
         self.name = "Svensson"
         self.beta_1 = beta1
@@ -349,7 +349,7 @@ class CurveFitNelsonSiegelSvensson(CurveFitMethod):
 class CurveFitBSpline(CurveFitMethod):
     """B-Spline curve fitting."""
 
-    def __init__(self, power=3, knot_years=None, t_max=50.0):
+    def __init__(self, power=3, knot_years=None, t_max=50.0) -> None:
         self.name = "B-Spline"
         self.power = power
         self.t_min = 0.0

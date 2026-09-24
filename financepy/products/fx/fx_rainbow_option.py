@@ -16,6 +16,9 @@ from ...products.fx.fx_option import FXOption
 from ...utils.helpers import check_argument_types
 from ...utils.check_values import check_curve_dt
 
+from ...models.models import Model
+from ...market.curves.discount_curve import DiscountCurve
+
 ########################################################################################
 
 
@@ -67,15 +70,15 @@ def payoff_value(s, payoff_type_value, payoff_params):
 
 def value_mc_fast(
     t,
-    stock_prices,
+    stock_prices: float,
     r,
-    foreign_rates,
-    volatilities,
+    foreign_rates: float,
+    volatilities: np.ndarray,
     betas,
-    num_assets,
+    num_assets: int,
     payoff_type,
     payoff_params,
-    num_paths=10000,
+    num_paths: int=10000,
     seed=4242,
 ):
 
@@ -113,7 +116,7 @@ class FXRainbowOption(FXOption):
         payoff_type: FXRainbowOptionTypes,
         payoff_params: np.ndarray,
         num_assets: int,
-    ):
+    ) -> None:
 
         check_argument_types(self.__init__, locals())
 
@@ -126,7 +129,7 @@ class FXRainbowOption(FXOption):
 
     ###########################################################################
 
-    def validate(self, stock_prices, foreign_rates, volatilities, betas):
+    def validate(self, stock_prices: float, foreign_rates: float, volatilities: np.ndarray, betas):
 
         if len(stock_prices) != self.num_assets:
             raise FinError("Stock prices must be a vector of length " + str(self.num_assets))
@@ -142,7 +145,7 @@ class FXRainbowOption(FXOption):
 
     ###########################################################################
 
-    def validate_payoff(self, payoff_type, payoff_params, num_assets):
+    def validate_payoff(self, payoff_type, payoff_params, num_assets: int):
 
         num_params = 0
 
@@ -173,12 +176,12 @@ class FXRainbowOption(FXOption):
 
     def value(
         self,
-        value_dt,
-        stock_prices,
-        domestic_curve,
-        foreign_rates,
-        volatilities,
-        betas,
+        value_dt: Date,
+        stock_prices: np.ndarray,
+        domestic_curve: DiscountCurve,
+        foreign_rates: np.ndarray,
+        volatilities: np.ndarray,
+        betas: np.ndarray,
     ):
 
         if isinstance(value_dt, Date) is False:
@@ -262,14 +265,14 @@ class FXRainbowOption(FXOption):
 
     def value_mc(
         self,
-        value_dt,
-        expiry_dt,
-        stock_prices,
-        discount_curve,
-        foreign_rates,
-        volatilities,
+        value_dt: Date,
+        expiry_dt: Date,
+        stock_prices: float,
+        discount_curve: DiscountCurve,
+        foreign_rates: float,
+        volatilities: np.ndarray,
         betas,
-        num_paths=10000,
+        num_paths: int=10000,
         seed=4242,
     ):
 

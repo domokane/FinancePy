@@ -55,7 +55,7 @@ class EquitySwap:
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
         end_of_month: bool = False,
-    ):
+    ) -> None:
         """Create an equity swap contract given the contract effective date,
         its maturity, underlying price and quantity, day count convention and
         return type and other details. The equity leg parameters have default
@@ -130,7 +130,7 @@ class EquitySwap:
         index_curve: DiscountCurve = None,
         dividend_curve: DiscountCurve = None,
         current_price: float = None,
-        first_fixing_rate=None,
+        first_fixing_rate: float=None,
     ):
         """Value the Equity swap on a valuation date."""
 

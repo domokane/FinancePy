@@ -16,10 +16,6 @@ from ...utils.global_types import OptionTypes
 from ...utils.global_types import FXDeltaMethodTypes
 from ...utils.check_values import check_curve_dt
 
-# from ...products.fx.FinFXModelTypes import FinFXModel
-# from ...products.fx.FinFXModelTypes import FinFXModelBlackScholes
-# from ...products.fx.FinFXModelTypes import FinFXModelSABR
-
 from ...models.equity_crr_tree import crr_tree_val_avg
 from ...models.sabr import vol_function_sabr
 from ...models.sabr import SABR
@@ -31,12 +27,16 @@ from ...utils.helpers import check_argument_types, label_to_string
 
 from ...utils.math import normcdf
 
+from ...models.model import Model
+from ...market.curves.discount_curve import DiscountCurve
+
+
 ########################################################################################
 # TODO: Refactor code to use FinBlackScholesAnalytic
 ########################################################################################
 
 
-def f(volatility, *args):
+def f(volatility: float, *args):
     """This is the objective function used in the determination of the FX
     Option implied volatility which is computed in the class below."""
 
@@ -59,7 +59,7 @@ def f(volatility, *args):
 ########################################################################################
 
 
-def fvega(volatility, *args):
+def fvega(volatility: float, *args):
     """This is the derivative of the objective function with respect to the
     option volatility. It is used to speed up the determination of the FX
     Option implied volatility which is computed in the class below."""
@@ -188,7 +188,7 @@ class FXVanillaOption:
         notional: float,
         prem_currency: str,
         spot_days: int = 0,
-    ):
+    ) -> None:
         """Create the FX Vanilla Option object. Inputs include expiry date,
         strike, currency pair, OPTION_TYPE (call or put), notional and the
         currency of the notional. And adjustment for spot days is enabled. All
@@ -245,11 +245,11 @@ class FXVanillaOption:
 
     def value(
         self,
-        value_dt,
-        spot_fx_rate,  # 1 unit of foreign in domestic
-        domestic_curve,
-        foreign_curve,
-        model,
+        value_dt: Date,
+        spot_fx_rate: float,  # 1 unit of foreign in domestic
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
+        model: Model,
     ):
         """This function calculates the value of the option using a specified
         model with the resulting value being in domestic i.e. ccy2 terms.
@@ -389,11 +389,11 @@ class FXVanillaOption:
 
     def delta_bump(
         self,
-        value_dt,
-        spot_fx_rate,
-        ccy1_discount_curve,
-        ccy2_discount_curve,
-        model,
+        value_dt: Date,
+        spot_fx_rate: float,
+        ccy1_discount_curve: DiscountCurve,
+        ccy2_discount_curve: DiscountCurve,
+        model: Model,
     ):
         """Calculation of the FX option delta by bumping the spot FX rate by
         1 cent of its value. This gives the FX spot delta. For speed we prefer
@@ -423,7 +423,7 @@ class FXVanillaOption:
 
     ###########################################################################
 
-    def delta(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
+    def delta(self, value_dt: Date, spot_fx_rate: float, domestic_curve: DiscountCurve, foreign_curve: DiscountCurve, model: Model):
         """Calculation of the FX Option delta. There are several definitions
         of delta and so we are required to return a dictionary of values. The
         definitions can be found on Page 44 of Foreign Exchange Option Pricing
@@ -523,11 +523,11 @@ class FXVanillaOption:
 
     def gamma(
         self,
-        value_dt,
-        spot_fx_rate,  # value of a unit of foreign in domestic currency
-        domestic_curve,
-        foreign_curve,
-        model,
+        value_dt: Date,
+        spot_fx_rate: float,  # value of a unit of foreign in domestic currency
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
+        model: Model,
     ):
         """This function calculates the FX Option Gamma using spot delta."""
 
@@ -582,11 +582,11 @@ class FXVanillaOption:
 
     def vega(
         self,
-        value_dt,
-        spot_fx_rate,  # value of a unit of foreign in domestic currency
-        domestic_curve,
-        foreign_curve,
-        model,
+        value_dt: Date,
+        spot_fx_rate: float,  # value of a unit of foreign in domestic currency
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
+        model: Model,
     ):
         """This function calculates the FX Option Vega using the spot delta."""
 
@@ -640,11 +640,11 @@ class FXVanillaOption:
 
     def theta(
         self,
-        value_dt,
-        spot_fx_rate,  # value of a unit of foreign in domestic currency
-        domestic_curve,
-        foreign_curve,
-        model,
+        value_dt: Date,
+        spot_fx_rate: float,  # value of a unit of foreign in domestic currency
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
+        model: Model,
     ):
         """This function calculates the time decay of the FX option."""
 
@@ -705,7 +705,13 @@ class FXVanillaOption:
 
     ###########################################################################
 
-    def implied_volatility(self, value_dt, stock_price, discount_curve, dividend_curve, price):
+    def implied_volatility(self,
+                           value_dt: Date,
+                           spot_fx_rate: float,  # value of a unit of foreign in domestic currency
+                           domestic_curve: DiscountCurve,
+                           foreign_curve: DiscountCurve,
+                           model: Model,
+                           price: float):
         """This function determines the implied volatility of an FX option
         given a price and the other option details. It uses a one-dimensional
         Newton root search algorith to determine the implied volatility."""
@@ -713,9 +719,9 @@ class FXVanillaOption:
         argtuple = (
             self,
             value_dt,
-            stock_price,
-            discount_curve,
-            dividend_curve,
+            spot_fx_rate,
+            domestic_curve,
+            foreign_curve,
             price,
         )
 
@@ -732,16 +738,15 @@ class FXVanillaOption:
 
     ###########################################################################
 
-    def value_mc(
-        self,
-        value_dt,
-        spot_fx_rate,
-        domestic_curve,
-        foreign_curve,
-        model,
-        num_paths=10000,
-        seed=4242,
-    ):
+    def value_mc(self,
+                 value_dt: Date,
+                 spot_fx_rate: float,  # value of a unit of foreign in domestic currency
+                 domestic_curve: DiscountCurve,
+                 foreign_curve: DiscountCurve,
+                 model: Model,
+                 num_paths: int=10000,
+                 seed=4242,
+                 ):
         """Calculate the value of an FX Option using Monte Carlo methods.
         This function can be used to validate the risk measures calculated
         above or used as the starting code for a model exotic FX product that

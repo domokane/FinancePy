@@ -50,7 +50,7 @@ class EquityOneTouchOption(EquityOption):
         opt_type: TouchOptionTypes,
         barrier_price: float,
         payment_size: float = 1.0,
-    ):
+    ) -> None:
         """Create the one touch option by defining its expiry date and the
         barrier level and a payment size if it is a cash ."""
 
@@ -69,7 +69,7 @@ class EquityOneTouchOption(EquityOption):
         stock_price: Union[float, np.ndarray],
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Equity One-Touch Option valuation using the Black-Scholes model
         assuming a continuous (American) barrier from value date to expiry.
@@ -304,7 +304,7 @@ class EquityOneTouchOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         num_paths: int = 10000,
         num_steps_per_year: int = 252,
         seed: int = 4242,

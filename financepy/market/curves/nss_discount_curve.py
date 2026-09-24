@@ -35,7 +35,7 @@ class NSSDiscountCurve(DiscountCurve):
         tau_1: float,
         tau_2: float,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):
+    ) -> None:
         """Create an NSSDiscountCurve object by passing in curve valuation
         date plus the 4 different beta values and the 2 tau values. The zero
         rates produced by this parametrisation have an implicit compounding

@@ -10,7 +10,7 @@ from ...utils.helpers import label_to_string
 class EquityModel:
     """This is a parent class for equity models."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
 
@@ -39,7 +39,7 @@ class EquityModel:
 
 
 class EquityModelHeston(EquityModel):
-    def __init__(self, volatility, mean_reversion):
+    def __init__(self, volatility: float, mean_reversion) -> None:
         self.parent_type = EquityModel
         self.volatility = volatility
         self.mean_reversion = mean_reversion

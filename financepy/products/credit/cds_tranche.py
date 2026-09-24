@@ -61,7 +61,7 @@ class CDSTranche:
         cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
 
         check_argument_types(self.__init__, locals())
 
@@ -101,14 +101,14 @@ class CDSTranche:
 
     def value_bc(
         self,
-        value_dt,
-        issuer_curves,
+        value_dt: Date,
+        issuer_curves: list[DiscountCurve],
         upfront,
-        running_cpn,
+        running_cpn: float,
         corr1,
         corr2,
-        num_points=50,
-        model=FinLossDistributionBuilder.RECURSION,
+        num_points: int=50,
+        model: Model=FinLossDistributionBuilder.RECURSION,
     ):
 
         check_curve_dt(value_dt, *issuer_curves)

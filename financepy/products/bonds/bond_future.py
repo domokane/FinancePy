@@ -25,7 +25,7 @@ class BondFuture:
     last_delivery_dt : Date
         The last delivery date of the futures contract.
     contract_size : int
-        Contract size in currency units (e.g. \$100,000).
+        Contract size in currency units (e.g. USD 100,000).
     cpn : float
         Contract standard coupon rate, used for conversion factor calculations.
     """
@@ -37,7 +37,7 @@ class BondFuture:
         last_delivery_dt: Date,
         contract_size: int,
         cpn: float,
-    ):
+    ) -> None:
         """
         Initialize BondFuture instance.
 

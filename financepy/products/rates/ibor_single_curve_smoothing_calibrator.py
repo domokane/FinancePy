@@ -19,7 +19,7 @@ class IborSingleCurveSmoothingCalibrator(object):
     the benchmarks is not exact.
     """
 
-    def __init__(self, ibor_curve: IborSingleCurve):
+    def __init__(self, ibor_curve: IborSingleCurve) -> None:
         """
         Initialize with an (unbuilt) ibor curve. Note that this curve is not modified
         during fitting as we take a deep copy

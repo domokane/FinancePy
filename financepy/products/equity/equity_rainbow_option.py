@@ -79,15 +79,15 @@ def payoff_value(s, payoff_type_value, payoff_params):
 
 def value_mc_fast(
     t,
-    stock_prices,
+    stock_prices: float,
     r,
     qs,
-    volatilities,
-    corr_matrix,
-    num_assets,
+    volatilities: np.ndarray,
+    corr_matrix: np.ndarray,
+    num_assets: int,
     payoff_type,
     payoff_params,
-    num_paths,
+    num_paths: int,
     seed=4242,
 ):
 
@@ -114,15 +114,15 @@ def value_mc_fast(
 
 def value_mc_fast_cv(
     t,
-    stock_prices,
+    stock_prices: float,
     r,
     qs,
-    volatilities,
-    corr_matrix,
-    num_assets,
+    volatilities: np.ndarray,
+    corr_matrix: np.ndarray,
+    num_assets: int,
     payoff_type,
     payoff_params,
-    num_paths,
+    num_paths: int,
     seed=4242,
 ):
     """Monte Carlo rainbow option valuation using antithetic paths and
@@ -333,7 +333,7 @@ class EquityRainbowOption(EquityOption):
         payoff_type: EquityRainbowOptionTypes,
         payoff_params: List[float],
         num_assets: int,
-    ):
+    ) -> None:
 
         check_argument_types(self.__init__, locals())
 
@@ -346,7 +346,7 @@ class EquityRainbowOption(EquityOption):
 
     ###########################################################################
 
-    def _validate_payoff(self, payoff_type, payoff_params, num_assets):
+    def _validate_payoff(self, payoff_type, payoff_params, num_assets: int):
 
         num_params = 0
 
@@ -467,13 +467,13 @@ class EquityRainbowOption(EquityOption):
 
     def value_mc(
         self,
-        value_dt,
-        stock_prices,
-        discount_curve,
-        dividend_curves,
-        volatilities,
-        corr_matrix,
-        num_paths,
+        value_dt: Date,
+        stock_prices: float,
+        discount_curve: DiscountCurve,
+        dividend_curves: list[DiscountCurve],
+        volatilities: np.ndarray,
+        corr_matrix: np.ndarray,
+        num_paths: int,
         seed=4242,
     ):
 
@@ -513,13 +513,13 @@ class EquityRainbowOption(EquityOption):
 
     def value_mc_cv(
         self,
-        value_dt,
-        stock_prices,
-        discount_curve,
-        dividend_curves,
-        volatilities,
-        corr_matrix,
-        num_paths,
+        value_dt: Date,
+        stock_prices: float,
+        discount_curve: DiscountCurve,
+        dividend_curves: list[DiscountCurve],
+        volatilities: np.ndarray,
+        corr_matrix: np.ndarray,
+        num_paths: int,
         seed=4242,
     ):
 

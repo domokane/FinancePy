@@ -11,7 +11,7 @@ class TensionSpline(object):
 
     ####################################################################################
 
-    def __init__(self, x, y, sigma):
+    def __init__(self, x, y, sigma: float) -> None:
         self._x = np.atleast_1d(x).astype(float)
         self._y = np.atleast_1d(y).astype(float)
         self._sigma = max(sigma, 1e-2)

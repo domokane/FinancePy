@@ -36,7 +36,7 @@ class EquityAmericanOption(EquityOption):
         strike_price: float,
         opt_type: OptionTypes,
         num_options: float = 1.0,
-    ):
+    ) -> None:
         """Class for American style options on simple vanilla calls and puts.
         Specify the expiry date, strike price, whether the option is a call or
         put and the number of options."""

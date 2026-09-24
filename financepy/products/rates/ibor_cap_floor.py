@@ -69,7 +69,7 @@ class IborCapFloor:
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
-    ):
+    ) -> None:
         """Initialise IborCapFloor object."""
 
         check_argument_types(self.__init__, locals())
@@ -125,7 +125,7 @@ class IborCapFloor:
 
     ###########################################################################
 
-    def value(self, value_dt, libor_curve, model):
+    def value(self, value_dt: Date, libor_curve: DiscountCurve, model: Model):
         """Value the cap or floor using the chosen model which specifies
         the volatility of the Ibor rate to the cap start date."""
 
@@ -210,7 +210,7 @@ class IborCapFloor:
 
     ###########################################################################
 
-    def value_caplet_floor_let(self, value_dt, caplet_start_dt, caplet_end_dt, libor_curve, model):
+    def value_caplet_floor_let(self, value_dt: Date, caplet_start_dt: Date, caplet_end_dt: Date, libor_curve: DiscountCurve, model: Model):
         """Value the caplet or floorlet using a specific model."""
 
         check_curve_dt(value_dt, libor_curve)

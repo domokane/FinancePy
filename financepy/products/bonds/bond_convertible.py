@@ -50,7 +50,7 @@ class BondConvertible:
         put_prices: np.ndarray,  # list of put prices
         accrual_dc_type: DayCountTypes,  # day count type for accrued
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-    ):
+    ) -> None:
         """Create BondConvertible object by providing the bond Maturity
         date, coupon, frequency type, accrual convention type and then all
         the details regarding the conversion option including the list of the

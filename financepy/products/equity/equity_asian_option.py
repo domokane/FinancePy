@@ -84,7 +84,7 @@ class EquityAsianOption:
         strike_price: float,
         opt_type: OptionTypes,
         num_obs_per_year: int = 100,
-    ):
+    ) -> None:
         """Create an EquityAsian option object which takes a start date for
         the averaging, an expiry date, a strike price, an OPTION_TYPE and a
         number of observations."""
@@ -110,7 +110,7 @@ class EquityAsianOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         method: AsianOptionValuationTypes,
         accrued_average: float = None,
     ):
@@ -164,7 +164,7 @@ class EquityAsianOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         num_paths: int,
         seed: int,
         accrued_average: float,
@@ -214,8 +214,8 @@ class EquityAsianOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,  # Model
-        num_paths,  # Numpaths integer
+        model: Model,  # Model
+        num_paths: int,  # Numpaths integer
         seed,
         accrued_average,
     ):
@@ -262,8 +262,8 @@ class EquityAsianOption:
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,  # Model
-        num_paths,  # Numpaths integer
+        model: Model,  # Model
+        num_paths: int,  # Numpaths integer
         seed,
         accrued_average,
     ):

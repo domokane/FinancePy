@@ -38,7 +38,7 @@ class DiscountCurve:
         df_values: Union[list, np.ndarray] = None,
         interp_type: InterpTypes = InterpTypes.FLAT_FWD_RATES,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):
+    ) -> None:
         """Create the discount curve from a vector of times and discount
         factors with an anchor date and specify an interpolation scheme. As we
         are explicitly linking dates and discount factors, we do not need to

@@ -38,7 +38,7 @@ class EquityBasketOption:
         strike_price: float,
         opt_type: OptionTypes,
         num_assets: int,
-    ):
+    ) -> None:
         """Define the EquityBasket option by specifying its expiry date,
         its strike price, whether it is a put or call, and the number of
         underlying stocks in the basket."""
@@ -52,7 +52,7 @@ class EquityBasketOption:
 
     ###########################################################################
 
-    def _validate(self, stock_prices, dividend_yields, volatilities, correlations):
+    def _validate(self, stock_prices: float, dividend_yields, volatilities: np.ndarray, correlations: np.ndarray):
 
         if len(stock_prices) != self.num_assets:
             raise FinError("Stock prices must have a length " + str(self.num_assets))

@@ -193,7 +193,7 @@ financepy.products.bonds.bond
 <div class="signature">
 
 <code>
-Bond(issue_dt: financepy.utils.date.Date, maturity_dt: financepy.utils.date.Date, coupon: float, freq_type: financepy.utils.frequency.FrequencyTypes, accrual_dc_type: financepy.utils.day_count.DayCountTypes, ex_div_days: int = 0, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type=&lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type=&lt;DateGenRuleTypes.BACKWARD: 2&gt;, cpn_type=&lt;CouponType.FIXED: 0&gt;)
+Bond(issue_dt: financepy.utils.date.Date, maturity_dt: financepy.utils.date.Date, coupon: float, freq_type: financepy.utils.frequency.FrequencyTypes, accrual_dc_type: financepy.utils.day_count.DayCountTypes, ex_div_days: int = 0, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type=&lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type=&lt;DateGenRuleTypes.BACKWARD: 2&gt;, cpn_type=&lt;CouponType.FIXED: 0&gt;) -&gt; None
 </code>
 
 </div>
@@ -213,7 +213,7 @@ size that are paid on known dts plus a payment of par at maturity.</div>
 <div class="signature">
 
 <code>
-times(self, settle_dt, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;)
+times(self, settle_dt: financepy.utils.date.Date, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;)
 </code>
 
 </div>
@@ -231,7 +231,7 @@ times(self, settle_dt, curve_dc_type: financepy.utils.day_count.DayCountTypes = 
 <div class="signature">
 
 <code>
-flows(self, settle_dt)
+flows(self, settle_dt: financepy.utils.date.Date)
 </code>
 
 </div>
@@ -268,7 +268,7 @@ while payment dates are calendar adjusted. Flows are on payment dates</div>
 <div class="signature">
 
 <code>
-dirty_price_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+dirty_price_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
 </code>
 
 </div>
@@ -288,7 +288,7 @@ a number of standard conventions for calculating the YTM.</div>
 <div class="signature">
 
 <code>
-dirty_price_from_ytm_vector(self, settle_dts: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, &lt;class &#x27;list&#x27;&gt;), ytms: (&lt;class &#x27;float&#x27;&gt;, &lt;class &#x27;list&#x27;&gt;, &lt;class &#x27;numpy.ndarray&#x27;&gt;), convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+dirty_price_from_ytm_vector(self, settle_dts: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, &lt;class &#x27;list&#x27;&gt;), ytms: (&lt;class &#x27;float&#x27;&gt;, &lt;class &#x27;list&#x27;&gt;, &lt;class &#x27;numpy.ndarray&#x27;&gt;), convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
 </code>
 
 </div>
@@ -324,7 +324,7 @@ forward_price(self, settle_dt: financepy.utils.date.Date, forward_dt: financepy.
 <div class="signature">
 
 <code>
-principal(self, settle_dt: financepy.utils.date.Date, ytm: float, face: float, convention: financepy.utils.global_types.YTMCalcType)
+principal(self, settle_dt: financepy.utils.date.Date, ytm: float, face: float, convention: financepy.products.bonds.bond.YTMCalcType)
 </code>
 
 </div>
@@ -344,7 +344,7 @@ future Ibor rates.</div>
 <div class="signature">
 
 <code>
-dollar_duration(self, settle_dt: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, typing.List), ytm: (&lt;class &#x27;float&#x27;&gt;, typing.List), convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+dollar_duration(self, settle_dt: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, typing.List), ytm: (&lt;class &#x27;float&#x27;&gt;, typing.List), convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
 </code>
 
 </div>
@@ -369,7 +369,7 @@ where DV01 is the positive dirty-price change for a +1bp yield shift.</div>
 <div class="signature">
 
 <code>
-dv01(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+dv01(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
 </code>
 
 </div>
@@ -388,7 +388,7 @@ Bloomberg-style DV01 / PV01 is positive for a long fixed-rate bond.</div>
 <div class="signature">
 
 <code>
-macaulay_duration(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+macaulay_duration(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
 </code>
 
 </div>
@@ -407,7 +407,7 @@ given its yield to maturity.</div>
 <div class="signature">
 
 <code>
-modified_duration(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+modified_duration(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
 </code>
 
 </div>
@@ -426,7 +426,7 @@ date given its yield to maturity.</div>
 <div class="signature">
 
 <code>
-theta(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;, day_step: int = 1)
+theta(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;, day_step: int = 1)
 </code>
 
 </div>
@@ -445,7 +445,7 @@ i.e. the settlement date, forward by day_step days.</div>
 <div class="signature">
 
 <code>
-key_rate_durations_zero_tent(self, settle_dt: financepy.utils.date.Date, zero_curve, key_rate_tenors: list = None, shift: float = None)
+key_rate_durations_zero_tent(self, settle_dt: financepy.utils.date.Date, zero_curve: financepy.market.curves.discount_curve.DiscountCurve, key_rate_tenors: list = None, shift: float = None)
 </code>
 
 </div>
@@ -539,7 +539,7 @@ tuple of (numpy array of float, numpy array of float)
 <div class="signature">
 
 <code>
-convexity_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+convexity_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
 </code>
 
 </div>
@@ -559,7 +559,7 @@ as 1/P_D partial 2 P_D / partial dy 2</div>
 <div class="signature">
 
 <code>
-clean_price_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+clean_price_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
 </code>
 
 </div>
@@ -616,7 +616,7 @@ dirty_price_from_discount_curve(self, settle_dt: financepy.utils.date.Date, disc
 <div class="signature">
 
 <code>
-yield_to_maturity(self, settle_dt: financepy.utils.date.Date, clean_price: int | float | list | numpy.ndarray, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.US_TREASURY: 3&gt;)
+yield_to_maturity(self, settle_dt: financepy.utils.date.Date, clean_price: int | float | list | numpy.ndarray, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.US_TREASURY: 3&gt;)
 </code>
 
 </div>
@@ -800,7 +800,7 @@ the recovery fraction of the par amount is paid at default.</div>
 <div class="signature">
 
 <code>
-calc_ror(self, begin_dt: financepy.utils.date.Date, end_dt: financepy.utils.date.Date, begin_ytm: float, end_ytm: float, convention: financepy.utils.global_types.YTMCalcType = &lt;YTMCalcType.US_STREET: 2&gt;)
+calc_ror(self, begin_dt: financepy.utils.date.Date, end_dt: financepy.utils.date.Date, begin_ytm: float, end_ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.US_STREET: 2&gt;)
 </code>
 
 </div>
@@ -909,6 +909,61 @@ attributes -- see the documentation for details.</div>
 
 
 </section>
+
+<section>
+
+<h2>YTMCalcType</h2>
+
+<div class="signature">
+
+<code>
+YTMCalcType(*values)
+</code>
+
+</div>
+
+<div class="inheritance">Inherits from: Enum</div>
+
+<div class="docstring">Create a collection of name/value pairs.
+
+Example enumeration:
+
+&gt;&gt;&gt; class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+
+Access them by:
+
+- attribute access:
+
+  &gt;&gt;&gt; Color.RED
+  &lt;Color.RED: 1&gt;
+
+- value lookup:
+
+  &gt;&gt;&gt; Color(1)
+  &lt;Color.RED: 1&gt;
+
+- name lookup:
+
+  &gt;&gt;&gt; Color[&#x27;RED&#x27;]
+  &lt;Color.RED: 1&gt;
+
+Enumerations can be iterated over, and know how many members they have:
+
+&gt;&gt;&gt; len(Color)
+3
+
+&gt;&gt;&gt; list(Color)
+[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
+
+Methods can be added to enumerations, and members can have their own
+attributes -- see the documentation for details.</div>
+
+
+
+</section>
 <h1>Functions</h1>
 <div class="member">
 
@@ -949,7 +1004,7 @@ validate_yield(ytm)
 <div class="signature">
 
 <code>
-vectorise_price(price)
+vectorise_price(price: float)
 </code>
 
 </div>

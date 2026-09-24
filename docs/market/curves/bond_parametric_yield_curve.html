@@ -193,7 +193,7 @@ financepy.market.curves.bond_parametric_yield_curve
 <div class="signature">
 
 <code>
-BondParametricYieldCurve(settle_dt: financepy.utils.date.Date, bonds: list, ylds: numpy.ndarray | list, curve_fit_type: financepy.market.curves.curve_fits.CurveFitTypes, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;)
+BondParametricYieldCurve(settle_dt: financepy.utils.date.Date, bonds: list, ylds: numpy.ndarray | list, curve_fit_type: financepy.market.curves.curve_fits.CurveFitTypes, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;) -&gt; None
 </code>
 
 </div>
@@ -211,7 +211,7 @@ BondParametricYieldCurve(settle_dt: financepy.utils.date.Date, bonds: list, ylds
 <div class="signature">
 
 <code>
-interp_yield(self, maturity_dt)
+interp_yield(self, maturity_dt: financepy.utils.date.Date)
 </code>
 
 </div>

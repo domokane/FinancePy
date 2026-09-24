@@ -31,20 +31,13 @@ import pandas as pd
 
 from financepy.utils.date import Date
 from financepy.utils.date import from_datetime
-from financepy.utils.date_format import DateFormatTypes
-from financepy.utils.date_format import set_date_format
-from financepy.utils.format_graphs import set_plot_style
 
-from financepy.market.curves import BondBootstrapDiscountCurve
+from financepy.market.curves.bond_bootstrap_discount_curve import BondBootstrapDiscountCurve
 from financepy.market.curves.interpolator import InterpTypes
 
-from financepy.products.bonds import BondMarkets
-from financepy.products.bonds import get_bond_market_conventions
+from financepy.products.bonds.bond_market import BondMarkets
+from financepy.products.bonds.bond_market import get_bond_market_conventions
 from financepy.products.bonds.bond import Bond
-
-set_date_format(DateFormatTypes.UK_LONG)
-set_plot_style()
-
 
 # ============================================================================
 # 1. LOAD UK GILT MARKET DATA

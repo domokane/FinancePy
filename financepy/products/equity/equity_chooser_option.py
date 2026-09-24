@@ -80,7 +80,7 @@ class EquityChooserOption(EquityOption):
         put_expiry_dt: Date,
         call_strike_price: float,
         put_strike_price: float,
-    ):
+    ) -> None:
         """Create the EquityChooserOption by passing in the chooser date
         and then the put and call expiry dates as well as the corresponding put
         and call strike prices."""
@@ -107,7 +107,7 @@ class EquityChooserOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
     ):
         """Value the complex chooser option using an approach by Rubinstein
         (1991). See also Haug page 129 for complex chooser options."""
@@ -247,7 +247,7 @@ class EquityChooserOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model,
+        model: Model,
         num_paths: int = 10000,
         seed: int = 4242,
     ):
@@ -341,7 +341,7 @@ class EquityChooserOption(EquityOption):
 
     ###########################################################################
 
-    def value_dt_on_choose_dt(self, value_dt, stock_price, discount_curve, dividend_curve, model):
+    def value_dt_on_choose_dt(self, value_dt: Date, stock_price: float, discount_curve: DiscountCurve, dividend_curve: DiscountCurve, model: Model):
 
         stock_price = np.asarray(stock_price, dtype=float)
 

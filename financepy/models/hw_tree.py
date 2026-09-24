@@ -1,5 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+from typing import Any, Dict, List, Optional, Union
 from math import ceil
 
 import numpy as np
@@ -25,11 +26,7 @@ J_MAX_LIMIT = 0.184
 ########################################################################################
 
 
-
 ########################################################################################
-
-
-from typing import Any, Dict, List, Optional, Union
 
 
 def option_exercise_types_to_int(option_exercise_type: Any) -> int:
@@ -1427,12 +1424,12 @@ class HWTree:
 
         time_step = int(t_mat / self.dt) + 1
 
-        p = 0.0
+        df = 0.0
         for i in range(0, num_nodes):
             ad = self.qq[time_step, i]
-            p += ad
-        zero_rate = -np.log(p) / t_mat
-        return p, zero_rate
+            df += ad
+        zero_rate = -np.log(df) / t_mat
+        return df, zero_rate
 
     ####################################################################################
 

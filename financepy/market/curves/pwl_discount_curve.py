@@ -33,7 +33,7 @@ class PWLDiscountCurve(DiscountCurve):
         zero_rates: Union[list, np.ndarray],
         freq_type: FrequencyTypes = FrequencyTypes.CONTINUOUS,
         curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F,
-    ):
+    ) -> None:
         """Curve is defined by a vector of increasing times and zero rates."""
 
         check_argument_types(self.__init__, locals())

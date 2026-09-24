@@ -193,7 +193,7 @@ financepy.market.curves.ibor_single_curve
 <div class="signature">
 
 <code>
-IborSingleCurve(anchor_dt: financepy.utils.date.Date, ibor_deposits: list, ibor_fras: list, ibor_swaps: list, interp_type: financepy.utils.global_types.InterpTypes = &lt;InterpTypes.FLAT_FWD_RATES: 1&gt;, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;, check_refit_flag: bool = False, do_build: bool = True, **kwargs)
+IborSingleCurve(anchor_dt: financepy.utils.date.Date, ibor_deposits: list, ibor_fras: list, ibor_swaps: list, interp_type: financepy.market.curves.interpolator.InterpTypes = &lt;InterpTypes.FLAT_FWD_RATES: 1&gt;, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;, check_refit_flag: bool = False, do_build: bool = True, **kwargs) -&gt; None
 </code>
 
 </div>
@@ -288,6 +288,24 @@ check_refit(self, depo_tol, fra_tol, swap_tol)
 
 
 <div class="docstring">Ensure that the Ibor curve refits the calibration instruments.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_calibration_instruments</h4>
+
+
+<div class="signature">
+
+<code>
+print_calibration_instruments(self)
+</code>
+
+</div>
+
+
+<div class="docstring">Print out the details of the Ibor curve.</div>
 
 </div>
 

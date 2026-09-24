@@ -53,7 +53,7 @@ class BondFRN:
         freq_type: FrequencyTypes,
         accrual_dc_type: DayCountTypes,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
-    ):
+    ) -> None:
         """Create FinFloatingRateNote object given its maturity date, its
         quoted margin, coupon frequency, DAY COUNT TYPE. Face is the size of
         the position and par is the notional on which price is quoted."""

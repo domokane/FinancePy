@@ -22,9 +22,9 @@ class FXOption:
         self,
         value_dt: Date,
         spot_fx_rate: float,
-        domestic_curve,
-        foreign_curve,
-        model,
+        domestic_curve: DiscountCurve,
+        foreign_curve: DiscountCurve,
+        model: Model,
     ):
         """Calculate the option value."""
 
@@ -33,7 +33,7 @@ class FXOption:
 
     ###########################################################################
 
-    def delta(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
+    def delta(self, value_dt: Date, spot_fx_rate: float, domestic_curve: DiscountCurve, foreign_curve: DiscountCurve, model: Model):
         """Calculate the option delta (FX rate sensitivity) by adding on a
         small bump and calculating the change in the option price."""
 
@@ -53,7 +53,7 @@ class FXOption:
 
     ###########################################################################
 
-    def gamma(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
+    def gamma(self, value_dt: Date, spot_fx_rate: float, domestic_curve: DiscountCurve, foreign_curve: DiscountCurve, model: Model):
         """Calculate the option gamma (delta sensitivity) by adding on a
         small bump and calculating the change in the option delta."""
 
@@ -76,7 +76,7 @@ class FXOption:
 
     ###########################################################################
 
-    def vega(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
+    def vega(self, value_dt: Date, spot_fx_rate: float, domestic_curve: DiscountCurve, foreign_curve: DiscountCurve, model: Model):
         """Calculate the option vega (volatility sensitivity) by adding on a
         small bump and calculating the change in the option price."""
 
@@ -104,7 +104,7 @@ class FXOption:
 
     ###########################################################################
 
-    def theta(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
+    def theta(self, value_dt: Date, spot_fx_rate: float, domestic_curve: DiscountCurve, foreign_curve: DiscountCurve, model: Model):
         """Calculate the option theta (calendar time sensitivity) by moving
         forward one day and calculating the change in the option price."""
 
@@ -136,7 +136,7 @@ class FXOption:
 
     ###########################################################################
 
-    def rho(self, value_dt, spot_fx_rate, domestic_curve, foreign_curve, model):
+    def rho(self, value_dt: Date, spot_fx_rate: float, domestic_curve: DiscountCurve, foreign_curve: DiscountCurve, model: Model):
         """Calculate the option rho (interest rate sensitivity) by perturbing
         the discount curve and revaluing."""
 

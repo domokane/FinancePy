@@ -47,7 +47,7 @@ class IborDeposit:
         notional: float = 100.0,  # Amount borrowed
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,  # Maturity date
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.MODIFIED_FOLLOWING,
-    ):
+    ) -> None:
         """Create a Libor deposit object which takes the start date when
         the amount of notional is borrowed, a maturity date or a tenor and the
         deposit rate. If a tenor is used then this is added to the start
@@ -93,7 +93,7 @@ class IborDeposit:
 
     ####################################################################################
 
-    def value(self, value_dt: Date, libor_curve):
+    def value(self, value_dt: Date, libor_curve: DiscountCurve):
         """Determine the value of an existing Libor Deposit contract given a
         valuation date and a Libor curve. This is simply the PV of the future
         repayment plus interest discounted on the current Libor curve."""

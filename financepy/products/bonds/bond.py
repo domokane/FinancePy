@@ -125,7 +125,7 @@ def validate_price(px):
 ###############################################################################
 
 
-def vectorise_price(price):
+def vectorise_price(price: float):
 
     if isinstance(price, int):
         price = float(price)
@@ -160,7 +160,7 @@ class Bond:
         bd_type=BusDayAdjustTypes.FOLLOWING,
         dg_type=DateGenRuleTypes.BACKWARD,
         cpn_type=CouponType.FIXED,
-    ):
+    ) -> None:
         """Create Bond object by providing the issue date, maturity Date,
         coupon frequency, annualised coupon, the accrual convention type, face
         amount and the number of ex-dividend days. A calendar type is used
@@ -272,7 +272,7 @@ class Bond:
 
     ############################################################################
 
-    def times(self, settle_dt, curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F):
+    def times(self, settle_dt: Date, curve_dc_type: DayCountTypes = DayCountTypes.ACT_365F):
         """Years from settlement to payments using day count convention"""
         times = times_from_dates(settle_dt, self.payment_dts, curve_dc_type)
 
@@ -283,7 +283,7 @@ class Bond:
 
     ############################################################################
 
-    def flows(self, settle_dt):
+    def flows(self, settle_dt: Date):
         """Times from settlement to payments"""
         n_flows = len(self.flow_amounts)
         flows = []
@@ -806,7 +806,7 @@ class Bond:
     def key_rate_durations_zero_tent(
         self,
         settle_dt: Date,
-        zero_curve,
+        zero_curve: DiscountCurve,
         key_rate_tenors: list = None,
         shift: float = None,
     ):
@@ -923,7 +923,7 @@ class Bond:
         # Helper: build a bumped discount curve wrapper
         # ------------------------------------------------------------------
         class BumpedZeroTentCurve:
-            def __init__(self, base_curve, settle_dt, tenors, node_index, bump):
+            def __init__(self, base_curve: DiscountCurve, settle_dt: Date, tenors, node_index: int, bump: float) -> None:
                 self.base_curve = base_curve
                 self.settle_dt = settle_dt
                 self.tenors = tenors
@@ -1025,7 +1025,7 @@ class Bond:
         lin_zero_interp = InterpTypes.LINEAR_ZERO_RATES
         us_street = YTMCalcType.US_STREET
 
-        def build_par_curve(rate_vec):
+        def build_par_curve(rate_vec: float):
             """Construct BondZeroCurve from par bonds implied by rate_vec."""
             par_bonds = []
             clean_prices = []

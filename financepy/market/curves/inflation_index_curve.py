@@ -35,7 +35,7 @@ class InflationIndexCurve:
         index_dts: list,
         index_values: Union[list, np.ndarray],
         lag_in_months: int = 3,
-    ):
+    ) -> None:
 
         check_argument_types(self.__init__, locals())
 

@@ -449,8 +449,7 @@ def test_fin_fx_vanilla_option_hull_example():
         )["v"]
 
         implied_vol = call_option.implied_volatility(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, value
-        )
+            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model, value)
 
         test_cases.print(spot_fx_rate, value, volatility, implied_vol)
 
