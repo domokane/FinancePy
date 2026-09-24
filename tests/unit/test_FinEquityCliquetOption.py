@@ -38,4 +38,7 @@ def test_equity_cliquet_option():
 
     v = cliquet_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
-    assert_close(v, 34.531)
+    # 12 quarterly forward-start options from 1 Jan 2015. The previous expected
+    # value of 34.531 included a spurious one-day option (1 Jan to 2 Jan 2014)
+    # produced by regenerating the schedule from its adjusted termination date.
+    assert_close(v, 34.136)

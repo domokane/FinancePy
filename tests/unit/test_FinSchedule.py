@@ -187,3 +187,41 @@ def test_forward_end_stub():
     adjusted_dts = schedule.adjusted_dts
     assert len(adjusted_dts) == 5
     check_frequency(schedule)
+
+
+########################################################################################
+
+
+def test_generate_is_idempotent_when_termination_date_is_adjusted():
+    """Calling generate() again must give the same dates as the first call, which
+    the constructor makes. The termination date falls on a Saturday so that it is
+    business day adjusted; stepping back from the adjusted date would shift the
+    unadjusted dates and add a spurious short stub."""
+    d1 = Date(1, 7, 2026)
+    d2 = Date(1, 7, 2028)  # Saturday
+    schedule = Schedule(
+        d1,
+        d2,
+        FrequencyTypes.SEMI_ANNUAL,
+        CalendarTypes.WEEKEND,
+        BusDayAdjustTypes.FOLLOWING,
+        DateGenRuleTypes.BACKWARD,
+        termination_date_adjust,
+    )
+    first = list(schedule.adjusted_dts)
+    expected = [
+        Date(1, 7, 2026),
+        Date(1, 1, 2027),
+        Date(1, 7, 2027),
+        Date(3, 1, 2028),
+        Date(3, 7, 2028),
+    ]
+    assert first == expected
+    assert schedule.generate() == expected
+    assert schedule.generate() == expected
+    assert schedule.schedule_dts() == expected
+    assert schedule.termination_dt == Date(3, 7, 2028)
+
+    # Products build a schedule and call generate() on it, e.g. the swap legs
+    schedule = Schedule(d1, d2, FrequencyTypes.QUARTERLY)
+    assert schedule.generate() == list(schedule.adjusted_dts)
