@@ -76,7 +76,7 @@ class FXDigitalOption:
         self.notional = notional
 
         if opt_type not in [OptionTypes.DIGITAL_CALL, OptionTypes.DIGITAL_PUT]:
-            raise FinError("Unknown Digital Option Type:" + opt_type)
+            raise FinError("Unknown Digital Option Type:" + str(opt_type))
 
         self.opt_type = opt_type
         self.spot_days = spot_days
