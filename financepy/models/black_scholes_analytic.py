@@ -907,6 +907,14 @@ def bjerksund_stensland_value(s, t, k, r, q, v, opt_type_value):
 
     b = r - q
 
+    # With a cost of carry at or above the riskless rate (for a call, a dividend
+    # yield of zero or less), early exercise is never optimal and the American
+    # value equals the European one. The trigger price below is undefined in that
+    # case: beta equals one so b_infty = k * beta / (beta - 1) divides by zero.
+    european = european_value(s, t, k, r, q, v, OptionTypes.EUROPEAN_CALL.value)
+    if b >= r:
+        return european
+
     ####################################################################################
 
     def phi(ss, tt, gamma, hh, xx):
@@ -946,7 +954,11 @@ def bjerksund_stensland_value(s, t, k, r, q, v, opt_type_value):
         + k * phi(s, t, 0.0, k, x_t)
     )
 
-    return value
+    # The flat-boundary strategy of Bjerksund-Stensland is a lower bound on the
+    # American value, as is the European value. As the cost of carry approaches
+    # the riskless rate the trigger price diverges and the approximation loses
+    # accuracy, so keep the tighter of the two bounds.
+    return max(value, european)
 
 
 ###############################################################################

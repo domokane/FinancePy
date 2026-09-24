@@ -1,5 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import pytest
 from pytest import approx
 
 from financepy.products.equity.equity_american_option import EquityAmericanOption
@@ -203,3 +204,51 @@ def test_black_scholes_fd():
     v = eu_option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
 
     assert v == approx(6.7493, 1e-1)
+
+
+########################################################################################
+
+
+def test_bjerksund_stensland_zero_dividend_equals_european():
+    """With no dividend yield an American call is never exercised early, so the
+    Bjerksund-Stensland value must equal the European value instead of failing on
+    a zero division in the trigger price."""
+    from financepy.models.black_scholes_analytic import (
+        bjerksund_stensland_value,
+        european_value,
+    )
+
+    s, t, k, r, v = 100.0, 1.0, 105.0, 0.05, 0.30
+    call = OptionTypes.AMERICAN_CALL.value
+    put = OptionTypes.AMERICAN_PUT.value
+    euro_call = european_value(s, t, k, r, 0.0, v, OptionTypes.EUROPEAN_CALL.value)
+
+    assert bjerksund_stensland_value(s, t, k, r, 0.0, v, call) == pytest.approx(
+        euro_call
+    )
+    # Negative dividend yield (cost of carry above the riskless rate)
+    assert bjerksund_stensland_value(s, t, k, r, -0.01, v, call) == pytest.approx(
+        european_value(s, t, k, r, -0.01, v, OptionTypes.EUROPEAN_CALL.value)
+    )
+    # The put-call transformation maps a put with a zero rate to the same case
+    euro_put = european_value(s, t, k, 0.0, 0.02, v, OptionTypes.EUROPEAN_PUT.value)
+    assert bjerksund_stensland_value(s, t, k, 0.0, 0.02, v, put) == pytest.approx(
+        euro_put
+    )
+
+
+def test_bjerksund_stensland_never_below_european():
+    """The approximation is a lower bound on the American value and must not fall
+    below the European value as the dividend yield approaches zero."""
+    from financepy.models.black_scholes_analytic import (
+        bjerksund_stensland_value,
+        european_value,
+    )
+
+    s, t, k, r, v = 100.0, 1.0, 105.0, 0.05, 0.30
+    for q in (1.0e-12, 1.0e-6, 1.0e-3, 0.01, 0.03, 0.05, 0.08):
+        american = bjerksund_stensland_value(
+            s, t, k, r, q, v, OptionTypes.AMERICAN_CALL.value
+        )
+        european = european_value(s, t, k, r, q, v, OptionTypes.EUROPEAN_CALL.value)
+        assert american >= european - 1.0e-12
