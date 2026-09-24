@@ -79,6 +79,10 @@ class Schedule:
 
         self.effective_dt = effective_dt
         self.termination_dt = termination_dt
+        # The termination date passed in, before any business day adjustment.
+        # generate() steps back from this date so that it can be called more
+        # than once and always produce the same schedule.
+        self._unadjusted_termination_dt = termination_dt
 
         if first_dt is None:
             self.first_dt = effective_dt
@@ -140,6 +144,11 @@ class Schedule:
         calendar = Calendar(self.cal_type)
         frequency = annual_frequency(self.freq_type)
         num_months = int(12 / frequency)
+
+        # Always step from the unadjusted termination date. A previous call may
+        # have replaced self.termination_dt with its business day adjusted
+        # version, and stepping from that shifts every unadjusted date.
+        self.termination_dt = self._unadjusted_termination_dt
 
         unadjusted_schedule_dts = []
         self.adjusted_dts = []
