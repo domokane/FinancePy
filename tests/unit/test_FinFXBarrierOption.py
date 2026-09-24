@@ -6,7 +6,7 @@ from financepy.products.fx.fx_barrier_option import FXBarrierOption
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.global_types import GBMNumericalSchemeTypes
 from financepy.utils.global_types import ProcessTypes
-from financepy.utils.global_types import FXBarrierTypes
+from financepy.utils.global_types import BarrierTypes
 
 
 value_dt = Date(1, 1, 2015)
@@ -16,7 +16,7 @@ volatility = 0.20
 dom_interest_rate = 0.05
 for_interest_rate = 0.02
 
-notional = 100.0
+notional = 1.0
 notional_currency = "USD"
 
 drift = dom_interest_rate - for_interest_rate
@@ -36,7 +36,7 @@ k = 100.0
 def test_down_and_out_call():
 
     spot_fx_rate = 50
-    opt_type = FXBarrierTypes.DOWN_AND_OUT_CALL
+    opt_type = BarrierTypes.DOWN_AND_OUT_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -45,8 +45,8 @@ def test_down_and_out_call():
         opt_type,
         b,
         num_obs_per_year,
-        notional,
         notional_currency,
+        notional,
     )
 
     value = barrier_option.value(
@@ -77,7 +77,7 @@ def test_down_and_out_call():
 def test_down_and_in_call():
 
     spot_fx_rate = 100
-    opt_type = FXBarrierTypes.DOWN_AND_IN_CALL
+    opt_type = BarrierTypes.DOWN_AND_IN_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -86,8 +86,8 @@ def test_down_and_in_call():
         opt_type,
         b,
         num_obs_per_year,
-        notional,
         notional_currency,
+        notional,
     )
 
     value = barrier_option.value(
@@ -118,7 +118,7 @@ def test_down_and_in_call():
 def test_up_and_out_call():
 
     spot_fx_rate = 50
-    opt_type = FXBarrierTypes.UP_AND_OUT_CALL
+    opt_type = BarrierTypes.UP_AND_OUT_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -127,8 +127,8 @@ def test_up_and_out_call():
         opt_type,
         b,
         num_obs_per_year,
-        notional,
         notional_currency,
+        notional,
     )
 
     value = barrier_option.value(
@@ -159,7 +159,7 @@ def test_up_and_out_call():
 def test_up_and_in_call():
 
     spot_fx_rate = 100
-    opt_type = FXBarrierTypes.UP_AND_IN_CALL
+    opt_type = BarrierTypes.UP_AND_IN_CALL
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -168,8 +168,8 @@ def test_up_and_in_call():
         opt_type,
         b,
         num_obs_per_year,
-        notional,
         notional_currency,
+        notional,
     )
 
     value = barrier_option.value(
@@ -200,7 +200,7 @@ def test_up_and_in_call():
 def test_up_and_out_put():
 
     spot_fx_rate = 50
-    opt_type = FXBarrierTypes.UP_AND_OUT_PUT
+    opt_type = BarrierTypes.UP_AND_OUT_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -209,8 +209,8 @@ def test_up_and_out_put():
         opt_type,
         b,
         num_obs_per_year,
-        notional,
         notional_currency,
+        notional,
     )
 
     value = barrier_option.value(
@@ -241,7 +241,7 @@ def test_up_and_out_put():
 def test_up_and_in_put():
 
     spot_fx_rate = 100
-    opt_type = FXBarrierTypes.UP_AND_IN_PUT
+    opt_type = BarrierTypes.UP_AND_IN_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -250,8 +250,8 @@ def test_up_and_in_put():
         opt_type,
         b,
         num_obs_per_year,
-        notional,
         notional_currency,
+        notional,
     )
 
     value = barrier_option.value(
@@ -282,7 +282,7 @@ def test_up_and_in_put():
 def test_down_and_out_put():
 
     spot_fx_rate = 50
-    opt_type = FXBarrierTypes.DOWN_AND_OUT_PUT
+    opt_type = BarrierTypes.DOWN_AND_OUT_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -291,8 +291,8 @@ def test_down_and_out_put():
         opt_type,
         b,
         num_obs_per_year,
-        notional,
         notional_currency,
+        notional,
     )
 
     value = barrier_option.value(
@@ -323,7 +323,7 @@ def test_down_and_out_put():
 def test_down_and_in_put():
 
     spot_fx_rate = 100
-    opt_type = FXBarrierTypes.DOWN_AND_IN_PUT
+    opt_type = BarrierTypes.DOWN_AND_IN_PUT
 
     barrier_option = FXBarrierOption(
         expiry_dt,
@@ -332,8 +332,8 @@ def test_down_and_in_put():
         opt_type,
         b,
         num_obs_per_year,
-        notional,
         notional_currency,
+        notional,
     )
 
     value = barrier_option.value(

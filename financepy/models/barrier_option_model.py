@@ -284,16 +284,16 @@ def _fx_barrier_price_array(
     return values
 
 
-def fx_barrier_value(
-    spot_fx_rate,
+def barrier_option_value(
     strike_fx_rate: float,
     barrier_level: float,
     time_to_expiry: float,
+    spot_fx_rate,
     domestic_df: float,
     foreign_df: float,
     volatility: float,
-    num_obs_per_year: int,
     barrier_type: int,
+    num_obs_per_year: int,
 ):
     """Price scalar or array-valued FX spots while preserving input shape."""
 

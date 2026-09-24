@@ -13,13 +13,14 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.global_types import GBMNumericalSchemeTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
-from ...models.equity_barrier_option_bs import value_equity_barrier_option_bs
+from ...models.barrier_option_model import barrier_option_value
 from ...models.barrier_option_mc import value_barrier_option_mc
 from ...models.process_simulator import ProcessTypes
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
 from ...utils.check_values import check_strike_price
 from ...utils.helpers import option_years
+from ...models.model import Model
 
 # TODO: SOME REDESIGN ON THE MONTE CARLO PROCESS IS PROBABLY NEEDED
 
@@ -83,16 +84,16 @@ class EquityBarrierOption(EquityOption):
 
         values = []
 
-        r = discount_curve.zero_rate_cc(self.expiry_dt)
-        q = dividend_curve.zero_rate_cc(self.expiry_dt)
+        df = discount_curve.df(self.expiry_dt)
+        dq = dividend_curve.df(self.expiry_dt)
 
-        values = value_equity_barrier_option_bs(
-            t_exp,
+        values = barrier_option_value(
             self.strike_price,
             self.barrier_level,
+            t_exp,
             stock_price,
-            r,
-            q,
+            df,
+            dq,
             model.volatility,
             self.barrier_type.value,
             self.num_obs_per_year,
@@ -114,7 +115,7 @@ class EquityBarrierOption(EquityOption):
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model: Model,
-        num_obs_per_year: int=252,
+        num_obs_per_year: int = 252,
         num_paths: int = 10000,
         seed: int = 42,
     ):

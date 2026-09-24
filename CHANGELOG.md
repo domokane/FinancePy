@@ -1,12 +1,16 @@
 ## CHANGE LOG
 24 Sep 2026
 List of changes
+- PR on FX OneTouch options
+- Unified FX and Equity Barrier option analytic models
+
+24 Sep 2026
+List of changes
 - Comprehensive addition of type annotations to all public class functions for the documentation
 - Corrected some import issues in examples following removal of .init wildcard imports
 - Made set_plot_tyle() calculate inside initial load to enforce common plotting format_graphs
 - Import set_date_format function automatically
 - Added FX Barrier, FXAmerican and FXDigital examples
--
 
 23 Sep 2026
 List of changes
