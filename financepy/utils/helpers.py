@@ -272,7 +272,7 @@ def input_time(dt: Date, curve):
         return check(t)
     elif isinstance(dt, np.ndarray):
         t = dt
-        if np.any(t) < 0:
+        if np.any(t < 0):
             raise FinError("Date is before curve value date.")
         t = np.maximum(small, t)
         return t

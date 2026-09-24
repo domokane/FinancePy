@@ -330,3 +330,42 @@ def test_vega_theta():
     theta = call_option.theta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(theta, 4) == -0.0504
+
+
+########################################################################################
+
+
+def test_negative_volatility_raises():
+
+    # gamma/vega/theta each used to skip their negative-volatility guard
+    # because "if np.any(vol) < 0.0:" checks the truth value of np.any(vol)
+    # against 0.0 (always False) instead of checking "np.any(vol < 0.0)".
+    # A negative volatility should be rejected, not silently priced.
+
+    value_dt = Date(1, 1, 2015)
+    expiry_dt = value_dt.add_months(4)
+    spot_fx_rate = 1.60
+    dom_interest_rate = 0.08
+    for_interest_rate = 0.11
+    domestic_curve = FlatDiscountCurve(value_dt, dom_interest_rate)
+    foreign_curve = FlatDiscountCurve(value_dt, for_interest_rate)
+
+    model = BlackScholes(-0.1411)
+
+    call_option = FXVanillaOption(
+        expiry_dt,
+        1.6,
+        "EURUSD",
+        OptionTypes.EUROPEAN_CALL,
+        1000000,
+        "USD",
+    )
+
+    for greek in ("gamma", "vega", "theta"):
+        try:
+            getattr(call_option, greek)(
+                value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            )
+            assert False, f"{greek} should have raised for negative volatility"
+        except Exception as e:
+            assert "Volatility should not be negative" in str(e)
