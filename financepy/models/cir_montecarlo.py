@@ -4,7 +4,7 @@ import numpy as np
 from numba import njit, float64, int64
 
 from ..utils.helpers import label_to_string
-from ..utils.global_types import CIRNumericalSchemeTypes
+from ..models.process_simulator import CIRNumericalSchemeTypes
 
 
 class CIRMonteCarlo:

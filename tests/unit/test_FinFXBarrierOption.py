@@ -4,9 +4,9 @@ from financepy.utils.date import Date
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.fx.fx_barrier_option import FXBarrierOption
 from financepy.models.black_scholes import BlackScholes
-from financepy.utils.global_types import GBMNumericalSchemeTypes
-from financepy.utils.global_types import ProcessTypes
 from financepy.utils.global_types import BarrierTypes
+from financepy.models.process_simulator import GBMNumericalSchemeTypes
+from financepy.models.process_simulator import ProcessTypes
 
 
 value_dt = Date(1, 1, 2015)

@@ -35,8 +35,8 @@ from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.format_graphs import set_plot_style
 
-from financepy.market.curves import BondParametricYieldCurve
-from financepy.market.curves import CurveFitTypes
+from financepy.market.curves.bond_parametric_yield_curve import BondParametricYieldCurve
+from financepy.market.curves.curve_fits import CurveFitTypes
 
 from financepy.products.bonds.bond import Bond
 
@@ -59,15 +59,9 @@ print("=" * 100)
 # for each bond.
 # ============================================================================
 
-path = os.path.join(
-    os.path.dirname(__file__),
-    "./data/gilt_bond_prices.txt",
-)
+path = os.path.join(os.path.dirname(__file__), "./data/gilt_bond_prices.txt")
 
-bond_dataframe = pd.read_csv(
-    path,
-    sep="\t",
-)
+bond_dataframe = pd.read_csv(path, sep="\t")
 
 bond_dataframe["mid"] = 0.5 * (bond_dataframe["bid"] + bond_dataframe["ask"])
 
@@ -93,49 +87,41 @@ ylds = []
 
 print("\n" + "-" * 82)
 
-print(f"{'MATURITY':<18}" f"{'COUPON (%)':>14}" f"{'CLEAN PRICE':>18}" f"{'YIELD (%)':>16}")
+print(
+    f"{'MATURITY':<18}"
+    f"{'COUPON (%)':>14}"
+    f"{'CLEAN PRICE':>18}"
+    f"{'YIELD (%)':>16}"
+)
 
 print("-" * 82)
 
 for _, bond_row in bond_dataframe.iterrows():
 
-    date_string = bond_row["maturity"]
+    date_string = str(bond_row["maturity"])
 
-    mat_date_time = dt.datetime.strptime(
-        date_string,
-        "%d-%b-%y",
-    )
+    mat_date_time = dt.datetime.strptime(date_string, "%d-%b-%y")
 
-    maturity_dt = from_datetime(
-        mat_date_time,
-    )
+    maturity_dt = from_datetime(mat_date_time)
 
-    issue_dt = Date(
-        maturity_dt.d,
-        maturity_dt.m,
-        2000,
-    )
+    issue_dt = Date(maturity_dt.d, maturity_dt.m, 2000)
 
-    coupon = bond_row["coupon"] / 100.0
-    clean_price = bond_row["mid"]
+    coupon = float(bond_row["coupon"]) / 100.0
+    clean_price = float(bond_row["mid"])
 
-    bond = Bond(
-        issue_dt,
-        maturity_dt,
-        coupon,
-        freq_type,
-        dc_type,
-    )
+    bond = Bond(issue_dt, maturity_dt, coupon, freq_type, dc_type)
 
-    yld = bond.yield_to_maturity(
-        settle_dt,
-        clean_price,
-    )
+    yld = bond.yield_to_maturity(settle_dt, clean_price)
 
     bonds.append(bond)
     ylds.append(yld)
 
-    print(f"{str(maturity_dt):<18}" f"{coupon * 100.0:14.6f}" f"{clean_price:18.6f}" f"{yld * 100.0:16.6f}")
+    print(
+        f"{str(maturity_dt):<18}"
+        f"{coupon * 100.0:14.6f}"
+        f"{clean_price:18.6f}"
+        f"{yld * 100.0:16.6f}"
+    )
 
 print("-" * 82)
 
@@ -146,16 +132,9 @@ print("-" * 82)
 
 fit_type = CurveFitTypes.CUBIC_POLYNOMIAL
 
-fitted_curve1 = BondParametricYieldCurve(
-    settle_dt,
-    bonds,
-    ylds,
-    fit_type,
-)
+fitted_curve1 = BondParametricYieldCurve(settle_dt, bonds, ylds, fit_type)
 
-fitted_curve1.plot(
-    "GBP Yield Curve - Cubic Polynomial",
-)
+fitted_curve1.plot("GBP Yield Curve - Cubic Polynomial")
 
 
 # ============================================================================
@@ -164,16 +143,9 @@ fitted_curve1.plot(
 
 fit_type = CurveFitTypes.QUINTIC_POLYNOMIAL
 
-fitted_curve2 = BondParametricYieldCurve(
-    settle_dt,
-    bonds,
-    ylds,
-    fit_type,
-)
+fitted_curve2 = BondParametricYieldCurve(settle_dt, bonds, ylds, fit_type)
 
-fitted_curve2.plot(
-    "GBP Yield Curve - Quintic Polynomial",
-)
+fitted_curve2.plot("GBP Yield Curve - Quintic Polynomial")
 
 
 # ============================================================================
@@ -182,16 +154,9 @@ fitted_curve2.plot(
 
 fit_type = CurveFitTypes.NELSON_SIEGEL
 
-fitted_curve3 = BondParametricYieldCurve(
-    settle_dt,
-    bonds,
-    ylds,
-    fit_type,
-)
+fitted_curve3 = BondParametricYieldCurve(settle_dt, bonds, ylds, fit_type)
 
-fitted_curve3.plot(
-    "GBP Yield Curve - Nelson-Siegel",
-)
+fitted_curve3.plot("GBP Yield Curve - Nelson-Siegel")
 
 
 # ============================================================================
@@ -200,16 +165,9 @@ fitted_curve3.plot(
 
 fit_type = CurveFitTypes.NELSON_SIEGEL_SVENSSON
 
-fitted_curve4 = BondParametricYieldCurve(
-    settle_dt,
-    bonds,
-    ylds,
-    fit_type,
-)
+fitted_curve4 = BondParametricYieldCurve(settle_dt, bonds, ylds, fit_type)
 
-fitted_curve4.plot(
-    "GBP Yield Curve - Nelson-Siegel-Svensson",
-)
+fitted_curve4.plot("GBP Yield Curve - Nelson-Siegel-Svensson")
 
 
 # ============================================================================
@@ -218,16 +176,9 @@ fitted_curve4.plot(
 
 fit_type = CurveFitTypes.BSPLINE
 
-fitted_curve5 = BondParametricYieldCurve(
-    settle_dt,
-    bonds,
-    ylds,
-    fit_type,
-)
+fitted_curve5 = BondParametricYieldCurve(settle_dt, bonds, ylds, fit_type)
 
-fitted_curve5.plot(
-    "GBP Yield Curve - B-Spline",
-)
+fitted_curve5.plot("GBP Yield Curve - B-Spline")
 
 
 # ============================================================================
@@ -317,15 +268,9 @@ print("\n" + "=" * 100)
 print("3. INTERPOLATED YIELD - B-SPLINE")
 print("=" * 100)
 
-maturity_dt = Date(
-    19,
-    9,
-    2030,
-)
+maturity_dt = Date(19, 9, 2030)
 
-interp_yield = fitted_curve5.interp_yield(
-    maturity_dt,
-)
+interp_yield = fitted_curve5.interp_yield(maturity_dt)
 
 print(f"{'Maturity Date':<30}" f"{str(maturity_dt):>20}")
 

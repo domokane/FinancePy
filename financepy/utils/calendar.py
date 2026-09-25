@@ -319,6 +319,7 @@ easter_monday_day = [
     105,
 ]
 
+
 @lru_cache(maxsize=None)
 def _warn_incomplete_calendar(calendar_name: str, year: int):
     warnings.warn(
@@ -327,6 +328,7 @@ def _warn_incomplete_calendar(calendar_name: str, year: int):
         RuntimeWarning,
         stacklevel=3,
     )
+
 
 class BusDayAdjustTypes(Enum):
     """Enum for business day adjustment types."""
@@ -846,7 +848,7 @@ class Calendar:
 
         if dt == em.add_days(-3):  # Good Friday
             return True
-        
+
         if dt == em:  # Easter Monday
             return True
 
@@ -860,10 +862,10 @@ class Calendar:
             return True
 
         # REMOVED AS BEING SYDNEY ONLY
-        #if m == 8 and d < 8 and weekday == Date.MON:  # BANK holiday
+        # if m == 8 and d < 8 and weekday == Date.MON:  # BANK holiday
         #    return True
 
-        #if m == 10 and d < 8 and weekday == Date.MON:  # BANK holiday
+        # if m == 10 and d < 8 and weekday == Date.MON:  # BANK holiday
         #    return True
 
         if m == 12 and d == 25:  # Xmas
@@ -891,93 +893,93 @@ class Calendar:
     def holiday_sydney(self, dt: Date, day_in_year: int, weekday: int):
         """
         Sydney / NSW banking calendar.
-    
+
         Weekends are handled separately by is_business_day().
-    
+
         Includes NSW public holidays relevant to Sydney banking,
         plus the NSW Bank Holiday on the first Monday in August.
         """
-    
+
         m = dt.m
         d = dt.d
         y = dt.y
-    
+
         # --------------------------------------------------------------
         # New Year's Day
         # --------------------------------------------------------------
-    
+
         if m == 1 and d == 1:
             return True
-    
+
         # Additional day when Jan 1 falls on weekend
         if m == 1 and d == 2 and weekday == Date.MON:
             return True
-    
+
         if m == 1 and d == 3 and weekday == Date.MON:
             return True
-    
+
         # --------------------------------------------------------------
         # Australia Day
         # Jan 26; when weekend -> following Monday
         # --------------------------------------------------------------
-    
+
         if m == 1 and d == 26:
             return True
-    
+
         if (
             m == 1
             and d == 27
             and weekday == Date.MON
         ):
             return True
-    
+
         if (
             m == 1
             and d == 28
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Easter
         # --------------------------------------------------------------
-    
+
         em = self.easter_monday(y)
-    
+
         if dt == em.add_days(-3):  # Good Friday
             return True
-    
+
         if dt == em:  # Easter Monday
             return True
-    
+
         # --------------------------------------------------------------
         # ANZAC Day
         #
         # NSW normally observes 25 April itself.
         # There was an additional NSW holiday in 2026 and 2027.
         # --------------------------------------------------------------
-    
+
         if m == 4 and d == 25:
             return True
-    
+
         if y == 2026 and m == 4 and d == 27:
             return True
-    
+
         if y == 2027 and m == 4 and d == 26:
             return True
-    
+
         # --------------------------------------------------------------
         # King's Birthday
         # Second Monday in June
         # --------------------------------------------------------------
-    
+
         if (
             m == 6
             and 8 <= d <= 14
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # NSW Bank Holiday
         # First Monday in August
@@ -986,33 +988,33 @@ class Calendar:
         # and certain financial institutions are closed.
         # Relevant for a Sydney banking calendar.
         # --------------------------------------------------------------
-    
+
         if (
             m == 8
             and 1 <= d <= 7
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Labour Day
         # First Monday in October
         # --------------------------------------------------------------
-    
+
         if (
             m == 10
             and 1 <= d <= 7
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Christmas Day
         # --------------------------------------------------------------
-    
+
         if m == 12 and d == 25:
             return True
-    
+
         # Additional day when Christmas falls on weekend
         if (
             m == 12
@@ -1020,14 +1022,14 @@ class Calendar:
             and weekday in (Date.MON, Date.TUE)
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Boxing Day
         # --------------------------------------------------------------
-    
+
         if m == 12 and d == 26:
             return True
-    
+
         # Additional Boxing Day holiday
         if (
             m == 12
@@ -1035,7 +1037,7 @@ class Calendar:
             and weekday in (Date.MON, Date.TUE)
         ):
             return True
-    
+
         return False
 
     ###########################################################################
@@ -1043,56 +1045,56 @@ class Calendar:
     def holiday_australia_rits(self, dt: Date, weekday: int):
         """
         RITS settlement calendar.
-    
+
         RITS is open when banks are generally open in either Sydney
         or Melbourne. It is closed on weekends and on holidays
         observed in both NSW and Victoria.
-    
+
         Weekends are handled separately by is_business_day().
         """
-    
+
         m = dt.m
         d = dt.d
         y = dt.y
-    
+
         # --------------------------------------------------------------
         # New Year's Day
         # --------------------------------------------------------------
-    
+
         if m == 1 and d == 1:
             return True
-    
+
         if m == 1 and d == 2 and weekday == Date.MON:
             return True
-    
+
         if m == 1 and d == 3 and weekday == Date.MON:
             return True
-    
+
         # --------------------------------------------------------------
         # Australia Day
         # --------------------------------------------------------------
-    
+
         if m == 1 and d == 26:
             return True
-    
+
         if m == 1 and d == 27 and weekday == Date.MON:
             return True
-    
+
         if m == 1 and d == 28 and weekday == Date.MON:
             return True
-    
+
         # --------------------------------------------------------------
         # Easter
         # --------------------------------------------------------------
-    
+
         em = self.easter_monday(y)
-    
+
         if dt == em.add_days(-3):  # Good Friday
             return True
-    
+
         if dt == em:  # Easter Monday
             return True
-    
+
         # --------------------------------------------------------------
         # ANZAC Day
         #
@@ -1100,50 +1102,50 @@ class Calendar:
         # Sydney-only additional holidays must NOT automatically
         # close RITS.
         # --------------------------------------------------------------
-    
+
         if m == 4 and d == 25:
             return True
-    
+
         # --------------------------------------------------------------
         # King's Birthday
         # Second Monday in June
         # --------------------------------------------------------------
-    
+
         if (
             m == 6
             and 8 <= d <= 14
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Christmas
         # --------------------------------------------------------------
-    
+
         if m == 12 and d == 25:
             return True
-    
+
         if (
             m == 12
             and d == 27
             and weekday in (Date.MON, Date.TUE)
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Boxing Day
         # --------------------------------------------------------------
-    
+
         if m == 12 and d == 26:
             return True
-    
+
         if (
             m == 12
             and d == 28
             and weekday in (Date.MON, Date.TUE)
         ):
             return True
-    
+
         return False
 
     ###########################################################################
@@ -1156,11 +1158,11 @@ class Calendar:
     ):
         """
         AUD FX settlement calendar.
-    
+
         An AUD FX value date must be a Sydney banking business day.
         Weekends are handled separately by is_business_day().
         """
-    
+
         return self.holiday_sydney(
             dt,
             day_in_year,
@@ -1185,12 +1187,12 @@ class Calendar:
 
         # One-off or moved bank holidays.
         special_holidays = {
-                (2020, 5, 8),   # Early May bank holiday moved for VE Day
-                (2022, 6, 2),   # Spring bank holiday moved from 30 May
-                (2022, 6, 3),   # Platinum Jubilee
-                (2022, 9, 19),  # State funeral of Queen Elizabeth II
-                (2023, 5, 8),   # Coronation of King Charles III
-            }
+            (2020, 5, 8),   # Early May bank holiday moved for VE Day
+            (2022, 6, 2),   # Spring bank holiday moved from 30 May
+            (2022, 6, 3),   # Platinum Jubilee
+            (2022, 9, 19),  # State funeral of Queen Elizabeth II
+            (2023, 5, 8),   # Coronation of King Charles III
+        }
 
         if (y, m, d) in special_holidays:
             return True
@@ -1208,7 +1210,7 @@ class Calendar:
 
         if dt == em.add_days(-3):  # Good Friday
             return True
-        
+
         if dt == em:  # Easter Monday
             return True
 
@@ -1258,7 +1260,7 @@ class Calendar:
 
         if dt == em.add_days(-3):  # Good Friday
             return True
-        
+
         if dt == em:  # Easter Monday
             return True
 
@@ -1299,53 +1301,53 @@ class Calendar:
     def holiday_singapore(self, dt: Date, weekday: int):
         """
         Singapore banking / public holiday calendar.
-    
+
         Intended for:
           - SGD derivatives
           - Singapore banking business days
           - SGD settlement
-    
+
         Weekends are handled separately by is_business_day().
-    
+
         Moving religious holidays are maintained from the official
         Singapore Ministry of Manpower annual holiday calendar.
         """
-    
+
         m = dt.m
         d = dt.d
         y = dt.y
-    
+
         # --------------------------------------------------------------
         # Fixed-date holidays
         # --------------------------------------------------------------
-    
+
         # New Year's Day
         if m == 1 and d == 1:
             return True
-    
+
         # Labour Day
         if m == 5 and d == 1:
             return True
-    
+
         # National Day
         if m == 8 and d == 9:
             return True
-    
+
         # Christmas Day
         if m == 12 and d == 25:
             return True
-    
+
         # --------------------------------------------------------------
         # Good Friday
         # --------------------------------------------------------------
-    
+
         if dt == self.easter_monday(y).add_days(-3):
             return True
-    
+
         # --------------------------------------------------------------
         # Annual moving holidays
         # --------------------------------------------------------------
-    
+
         special_holidays = {
             2025: {
                 (1, 29), (1, 30),   # Chinese New Year
@@ -1354,7 +1356,7 @@ class Calendar:
                 (6, 7),             # Hari Raya Haji
                 (10, 20),           # Deepavali
             },
-    
+
             2026: {
                 (2, 17), (2, 18),   # Chinese New Year
                 (3, 21),            # Hari Raya Puasa
@@ -1365,7 +1367,7 @@ class Calendar:
                 (11, 8),            # Deepavali
                 (11, 9),            # Deepavali observed
             },
-    
+
             2027: {
                 (2, 6), (2, 7),     # Chinese New Year
                 (2, 8),             # CNY observed
@@ -1375,7 +1377,7 @@ class Calendar:
                 (10, 28),           # Deepavali
             },
         }
-    
+
         if y not in special_holidays:
             pass
 #            _warn_incomplete_calendar("Hong Kong", y)
@@ -1402,7 +1404,7 @@ class Calendar:
 
         if dt == em.add_days(-3):  # Good Friday
             return True
-        
+
         if dt == em:  # Easter Monday
             return True
 
@@ -1448,7 +1450,7 @@ class Calendar:
 
         if dt == em.add_days(-3):  # Good Friday
             return True
-        
+
         if dt == em:  # Easter Monday
             return True
 
@@ -1494,7 +1496,7 @@ class Calendar:
 
         if dt == em.add_days(-3):  # Good Friday
             return True
-        
+
         if dt == em:  # Easter Monday
             return True
 
@@ -1523,130 +1525,130 @@ class Calendar:
     def holiday_zurich(self, dt: Date, weekday: int):
         """
         Zurich / CHF currency holiday calendar.
-    
+
         Intended for:
           - SARON
           - CHF OIS / swaps
           - CHF money-market settlement
-    
+
         Weekends are handled separately by is_business_day().
         """
-    
+
         m = dt.m
         d = dt.d
         y = dt.y
-    
+
         # New Year's Day
         if m == 1 and d == 1:
             return True
-    
+
         # Berchtold's Day
         if m == 1 and d == 2:
             return True
-    
+
         # Good Friday
         if dt == self.easter_monday(y).add_days(-3):
             return True
-    
+
         # Easter Monday
         if dt == self.easter_monday(y):
             return True
-    
+
         # Labour Day
         if m == 5 and d == 1:
             return True
-    
+
         # Ascension Day
         if dt == self.easter_monday(y).add_days(38):
             return True
-    
+
         # Whit Monday / Pentecost Monday
         if dt == self.easter_monday(y).add_days(49):
             return True
-    
+
         # Swiss National Day
         if m == 8 and d == 1:
             return True
-    
+
         # Christmas Day
         if m == 12 and d == 25:
             return True
-    
+
         # St Stephen's Day
         if m == 12 and d == 26:
             return True
-    
+
         return False
 
     ###########################################################################
 
     @lru_cache(maxsize=None)
     def _japan_holiday_set(self, y: int):
-    
+
         if y < 1980 or y > 2099:
             raise FinError(
                 f"Japan calendar supports years 1980-2099; got {y}"
             )
-    
+
         national = set()
-    
+
         def add(m, d):
             national.add((m, d))
-    
+
         def nth_monday(month, n):
             first = datetime.date(y, month, 1)
             offset = (0 - first.weekday()) % 7
             return 1 + offset + 7 * (n - 1)
-    
+
         def vernal_equinox_day():
             return int(
                 20.8431
                 + 0.242194 * (y - 1980)
                 - int((y - 1980) / 4)
             )
-    
+
         def autumnal_equinox_day():
             return int(
                 23.2488
                 + 0.242194 * (y - 1980)
                 - int((y - 1980) / 4)
             )
-    
+
         # --------------------------------------------------------------
         # National holidays
         # --------------------------------------------------------------
-    
+
         add(1, 1)
-    
+
         # Coming of Age Day
         if y >= 2000:
             add(1, nth_monday(1, 2))
         else:
             add(1, 15)
-    
+
         # National Foundation Day
         add(2, 11)
-    
+
         # Emperor's Birthday
         if 1989 <= y <= 2018:
             add(12, 23)
         elif y >= 2020:
             add(2, 23)
-    
+
         # Vernal Equinox
         add(3, vernal_equinox_day())
-    
+
         # Showa / Greenery / former Emperor's Birthday
         add(4, 29)
-    
+
         # Golden Week
         add(5, 3)
-    
+
         if y >= 2007:
             add(5, 4)
-    
+
         add(5, 5)
-    
+
         # Marine Day
         if y == 2020:
             add(7, 23)
@@ -1656,13 +1658,13 @@ class Calendar:
             add(7, nth_monday(7, 3))
         elif y >= 1996:
             add(7, 20)
-    
+
         # Sports Day special moves
         if y == 2020:
             add(7, 24)
         elif y == 2021:
             add(7, 23)
-    
+
         # Mountain Day
         if y == 2020:
             add(8, 10)
@@ -1670,66 +1672,66 @@ class Calendar:
             add(8, 8)
         elif y >= 2016:
             add(8, 11)
-    
+
         # Respect for the Aged Day
         if y >= 2003:
             add(9, nth_monday(9, 3))
         else:
             add(9, 15)
-    
+
         # Autumnal Equinox
         add(9, autumnal_equinox_day())
-    
+
         # Sports / Health and Sports Day
         if y not in (2020, 2021):
             if y >= 2000:
                 add(10, nth_monday(10, 2))
             else:
                 add(10, 10)
-    
+
         # Culture Day
         add(11, 3)
-    
+
         # Labour Thanksgiving Day
         add(11, 23)
-    
+
         # --------------------------------------------------------------
         # 2019 Imperial one-offs
         # --------------------------------------------------------------
-    
+
         if y == 2019:
             add(5, 1)
             add(10, 22)
-    
+
         # --------------------------------------------------------------
         # Citizens' holidays
         #
         # A weekday between two national holidays becomes a holiday.
         # Example: 22-Sep-2026.
         # --------------------------------------------------------------
-    
+
         day = datetime.date(y, 1, 2)
         end = datetime.date(y, 12, 31)
-    
+
         citizens = set()
-    
+
         while day < end:
             key = (day.month, day.day)
-    
+
             if key not in national:
                 prev_day = day - datetime.timedelta(days=1)
                 next_day = day + datetime.timedelta(days=1)
-    
+
                 if (
                     (prev_day.month, prev_day.day) in national
                     and (next_day.month, next_day.day) in national
                 ):
                     citizens.add(key)
-    
+
             day += datetime.timedelta(days=1)
-    
+
         national.update(citizens)
-    
+
         # --------------------------------------------------------------
         # Substitute holidays
         #
@@ -1738,20 +1740,20 @@ class Calendar:
         #
         # Example: 3-May-2026 -> 6-May-2026.
         # --------------------------------------------------------------
-    
+
         original_holidays = sorted(
             datetime.date(y, m, d)
             for m, d in national
         )
-    
+
         substitutes = set()
-    
+
         for holiday in original_holidays:
             if holiday.weekday() != 6:  # Sunday
                 continue
-    
+
             substitute = holiday + datetime.timedelta(days=1)
-    
+
             while (
                 substitute.year == y
                 and (
@@ -1760,21 +1762,20 @@ class Calendar:
                 )
             ):
                 substitute += datetime.timedelta(days=1)
-    
+
             if substitute.year == y:
                 substitutes.add(
                     (substitute.month, substitute.day)
                 )
-    
+
         national.update(substitutes)
-    
+
         # --------------------------------------------------------------
         # BOJ-specific closures
         # --------------------------------------------------------------
-    
+
         return frozenset(national)
 
-    
     def holiday_japan(self, dt: Date, weekday: int):
         """Japanese statutory public holidays. Weekends handled separately."""
         return (dt.m, dt.d) in self._japan_holiday_set(dt.y)
@@ -1783,17 +1784,16 @@ class Calendar:
 
     @lru_cache(maxsize=None)
     def _tokyo_holiday_set(self, y: int):
-    
+
         tokyo = set(self._japan_holiday_set(y))
-    
+
         # BOJ-specific year-end closures
         tokyo.add((1, 2))
         tokyo.add((1, 3))
         tokyo.add((12, 31))
-    
+
         return frozenset(tokyo)
-    
-    
+
     def holiday_tokyo(self, dt: Date, weekday: int):
         return (dt.m, dt.d) in self._tokyo_holiday_set(dt.y)
 
@@ -1802,9 +1802,9 @@ class Calendar:
     def holiday_new_zealand(self, dt: Date, day_in_year: int, weekday: int):
         """
         New Zealand public / banking holiday calendar.
-    
+
         Weekends are handled separately by is_business_day().
-    
+
         Includes:
           - New Year's Day and day after New Year's Day
           - Waitangi Day
@@ -1816,97 +1816,97 @@ class Calendar:
           - Labour Day
           - Christmas Day
           - Boxing Day
-    
+
         Provincial anniversary days are deliberately excluded.
         """
-    
+
         m = dt.m
         d = dt.d
         y = dt.y
-    
+
         # --------------------------------------------------------------
         # New Year
         #
         # Jan 1 and Jan 2 are holidays.
         # If they fall on Sat/Sun, observed on Mon/Tue.
         # --------------------------------------------------------------
-    
+
         if m == 1 and d in (1, 2):
             return True
-    
+
         # Jan 1 Saturday -> Jan 3 Monday
         # Jan 2 Sunday   -> Jan 4 Tuesday
         if m == 1 and d == 3 and weekday == Date.MON:
             return True
-    
+
         if m == 1 and d == 4 and weekday in (Date.MON, Date.TUE):
             return True
-    
+
         # --------------------------------------------------------------
         # Waitangi Day
         # February 6
         #
         # Since 2014, Mondayised when falling on weekend.
         # --------------------------------------------------------------
-    
+
         if m == 2 and d == 6:
             return True
-    
+
         if y >= 2014:
             if m == 2 and d == 7 and weekday == Date.MON:
                 return True
-    
+
             if m == 2 and d == 8 and weekday == Date.MON:
                 return True
-    
+
         # --------------------------------------------------------------
         # Easter
         # --------------------------------------------------------------
-    
+
         em = self.easter_monday(y)
-    
+
         if dt == em.add_days(-3):  # Good Friday
             return True
-    
+
         if dt == em:  # Easter Monday
             return True
-    
+
         # --------------------------------------------------------------
         # ANZAC Day
         # April 25
         #
         # Since 2014, Mondayised when falling on weekend.
         # --------------------------------------------------------------
-    
+
         if m == 4 and d == 25:
             return True
-    
+
         if y >= 2014:
             if m == 4 and d == 26 and weekday == Date.MON:
                 return True
-    
+
             if m == 4 and d == 27 and weekday == Date.MON:
                 return True
-    
+
         # --------------------------------------------------------------
         # King's / Queen's Birthday
         # First Monday in June
         # --------------------------------------------------------------
-    
+
         if (
             m == 6
             and 1 <= d <= 7
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Matariki
         #
         # Dates are prescribed annually and do not follow a simple
         # Gregorian rule, so use an explicit table.
         # --------------------------------------------------------------
-    
+
         matariki = {
             2022: (6, 24),
             2023: (7, 14),
@@ -1940,42 +1940,41 @@ class Calendar:
             2051: (6, 30),
             2052: (6, 21),
         }
-    
+
         if y in matariki:
             mm, dd = matariki[y]
-        
+
             if m == mm and d == dd:
                 return True
-
 
         # --------------------------------------------------------------
         # Labour Day
         # Fourth Monday in October
         # --------------------------------------------------------------
-    
+
         if (
             m == 10
             and 22 <= d <= 28
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Christmas / Boxing Day
         #
         # Dec 25 and Dec 26.
         # Weekend holidays are observed on Mon/Tue.
         # --------------------------------------------------------------
-    
+
         if m == 12 and d in (25, 26):
             return True
-    
+
         if m == 12 and d == 27 and weekday in (Date.MON, Date.TUE):
             return True
-    
+
         if m == 12 and d == 28 and weekday in (Date.MON, Date.TUE):
             return True
-    
+
         return False
 
     ###########################################################################
@@ -2106,76 +2105,76 @@ class Calendar:
     def holiday_us_government_securities(self, dt: Date, weekday: int):
         """
         U.S. Government Securities / SIFMA calendar.
-    
+
         Intended for:
           - U.S. Treasury / government securities market
           - SOFR-related business-day logic
-    
+
         Weekends are handled separately by is_business_day().
-    
+
         NOTE:
         SIFMA recommendations can change and exceptional dates occur.
         Keep year-specific overrides for authoritative market closures.
         """
-    
+
         m = dt.m
         d = dt.d
         y = dt.y
-    
+
         # --------------------------------------------------------------
         # Explicit full-close / SOFR holiday overrides
         # --------------------------------------------------------------
-    
+
         special_holidays = {
             # 2026
             (2026, 4, 3),   # Good Friday - no SOFR publication
             (2026, 7, 3),   # Independence Day observed / SIFMA close
-    
+
             # Add future exceptional dates from SIFMA / NY Fed here.
         }
-    
+
         if (y, m, d) in special_holidays:
             return True
-    
+
         # --------------------------------------------------------------
         # New Year's Day
         # --------------------------------------------------------------
-    
+
         if m == 1 and d == 1:
             return True
-    
+
         # Friday observation when Jan 1 falls Saturday
         if m == 12 and d == 31 and weekday == Date.FRI:
             return True
-    
+
         # Monday observation when Jan 1 falls Sunday
         if m == 1 and d == 2 and weekday == Date.MON:
             return True
-    
+
         # --------------------------------------------------------------
         # Martin Luther King Jr. Day
         # Third Monday in January
         # --------------------------------------------------------------
-    
+
         if (
             m == 1
             and 15 <= d <= 21
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Presidents Day
         # Third Monday in February
         # --------------------------------------------------------------
-    
+
         if (
             m == 2
             and 15 <= d <= 21
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Good Friday
         #
@@ -2193,22 +2192,22 @@ class Calendar:
         # Memorial Day
         # Last Monday in May
         # --------------------------------------------------------------
-    
+
         if (
             m == 5
             and 25 <= d <= 31
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Juneteenth
         # --------------------------------------------------------------
-    
+
         if y >= 2022:
             if m == 6 and d == 19:
                 return True
-    
+
             # June 19 Saturday -> Friday June 18
             if (
                 m == 6
@@ -2216,7 +2215,7 @@ class Calendar:
                 and weekday == Date.FRI
             ):
                 return True
-    
+
             # June 19 Sunday -> Monday June 20
             if (
                 m == 6
@@ -2224,108 +2223,108 @@ class Calendar:
                 and weekday == Date.MON
             ):
                 return True
-    
+
         # --------------------------------------------------------------
         # Independence Day
         # --------------------------------------------------------------
-    
+
         if m == 7 and d == 4:
             return True
-    
+
         if (
             m == 7
             and d == 3
             and weekday == Date.FRI
         ):
             return True
-    
+
         if (
             m == 7
             and d == 5
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Labor Day
         # First Monday in September
         # --------------------------------------------------------------
-    
+
         if (
             m == 9
             and 1 <= d <= 7
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Columbus Day / Indigenous Peoples' Day
         # Second Monday in October
         #
         # U.S. government securities market closes.
         # --------------------------------------------------------------
-    
+
         if (
             m == 10
             and 8 <= d <= 14
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Veterans Day
         # --------------------------------------------------------------
-    
+
         if m == 11 and d == 11:
             return True
-    
+
         if (
             m == 11
             and d == 10
             and weekday == Date.FRI
         ):
             return True
-    
+
         if (
             m == 11
             and d == 12
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Thanksgiving
         # Fourth Thursday in November
         # --------------------------------------------------------------
-    
+
         if (
             m == 11
             and 22 <= d <= 28
             and weekday == Date.THU
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Christmas
         # --------------------------------------------------------------
-    
+
         if m == 12 and d == 25:
             return True
-    
+
         if (
             m == 12
             and d == 24
             and weekday == Date.FRI
         ):
             return True
-    
+
         if (
             m == 12
             and d == 26
             and weekday == Date.MON
         ):
             return True
-    
+
         return False
 
     ###########################################################################
@@ -2333,23 +2332,23 @@ class Calendar:
     def holiday_us_federal_reserve(self, dt: Date, weekday: int):
         """
         Federal Reserve Bank business-day calendar.
-    
+
         Intended for:
           - Federal Reserve Bank business days
           - Fedwire / National Settlement Service
           - EFFR / OBFR publication calendar
-    
+
         Weekends are handled separately by is_business_day().
-    
+
         Important:
           - Saturday holidays are NOT observed on Friday by Federal Reserve Banks.
           - Sunday holidays ARE observed on Monday.
         """
-    
+
         m = dt.m
         d = dt.d
         y = dt.y
-    
+
         # --------------------------------------------------------------
         # New Year's Day
         # Jan 1.
@@ -2357,53 +2356,53 @@ class Calendar:
         # If Sunday -> Monday Jan 2.
         # If Saturday -> no Friday observation for Federal Reserve Banks.
         # --------------------------------------------------------------
-    
+
         if m == 1 and d == 1:
             return True
-    
+
         if (
             m == 1
             and d == 2
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Martin Luther King Jr. Day
         # Third Monday in January
         # --------------------------------------------------------------
-    
+
         if (
             m == 1
             and 15 <= d <= 21
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Washington's Birthday
         # Third Monday in February
         # --------------------------------------------------------------
-    
+
         if (
             m == 2
             and 15 <= d <= 21
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Memorial Day
         # Last Monday in May
         # --------------------------------------------------------------
-    
+
         if (
             m == 5
             and 25 <= d <= 31
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Juneteenth
         # Federal holiday since 2021.
@@ -2411,58 +2410,58 @@ class Calendar:
         # Sunday -> Monday.
         # Saturday -> no Friday observation for Federal Reserve Banks.
         # --------------------------------------------------------------
-    
+
         if y >= 2021:
             if m == 6 and d == 19:
                 return True
-    
+
             if (
                 m == 6
                 and d == 20
                 and weekday == Date.MON
             ):
                 return True
-    
+
         # --------------------------------------------------------------
         # Independence Day
         # --------------------------------------------------------------
-    
+
         if m == 7 and d == 4:
             return True
-    
+
         if (
             m == 7
             and d == 5
             and weekday == Date.MON
         ):
             return True
-    
+
         # Do NOT close Friday July 3 when July 4 is Saturday.
-    
+
         # --------------------------------------------------------------
         # Labor Day
         # First Monday in September
         # --------------------------------------------------------------
-    
+
         if (
             m == 9
             and 1 <= d <= 7
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Columbus Day
         # Second Monday in October
         # --------------------------------------------------------------
-    
+
         if (
             m == 10
             and 8 <= d <= 14
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Veterans Day
         # Nov 11.
@@ -2470,45 +2469,45 @@ class Calendar:
         # Sunday -> Monday.
         # Saturday -> no Friday observation for Federal Reserve Banks.
         # --------------------------------------------------------------
-    
+
         if m == 11 and d == 11:
             return True
-    
+
         if (
             m == 11
             and d == 12
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Thanksgiving
         # Fourth Thursday in November
         # --------------------------------------------------------------
-    
+
         if (
             m == 11
             and 22 <= d <= 28
             and weekday == Date.THU
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Christmas
         # --------------------------------------------------------------
-    
+
         if m == 12 and d == 25:
             return True
-    
+
         if (
             m == 12
             and d == 26
             and weekday == Date.MON
         ):
             return True
-    
+
         # Again: no Friday Dec 24 observation when Dec 25 is Saturday.
-    
+
         return False
 
     ###########################################################################
@@ -2533,7 +2532,6 @@ class Calendar:
         if m == 2 and d >= 15 and d < 22 and weekday == Date.MON:  # GW
             return True
 
-
         if m == 5 and d >= 25 and d <= 31 and weekday == Date.MON:  # MD
             return True
 
@@ -2541,10 +2539,10 @@ class Calendar:
         if y >= 2021:
             if m == 6 and d == 19:
                 return True
-    
+
             if m == 6 and d == 18 and weekday == Date.FRI:
                 return True
-    
+
             if m == 6 and d == 20 and weekday == Date.MON:
                 return True
 
@@ -2667,34 +2665,34 @@ class Calendar:
     def holiday_toronto(self, dt: Date, weekday: int):
         """
         Toronto banking calendar.
-    
+
         Intended for:
           - CORRA
           - CAD OIS / swaps
           - Toronto banking business-day conventions
-    
+
         Weekends are handled separately by is_business_day().
         """
-    
+
         m = dt.m
         d = dt.d
         y = dt.y
-    
+
         # --------------------------------------------------------------
         # New Year's Day
         # --------------------------------------------------------------
-    
+
         if m == 1 and d == 1:
             return True
-    
+
         if m == 1 and d == 2 and weekday == Date.MON:
             return True
-    
+
         # --------------------------------------------------------------
         # Family Day
         # Third Monday in February (Ontario)
         # --------------------------------------------------------------
-    
+
         if (
             y >= 2008
             and m == 2
@@ -2702,34 +2700,34 @@ class Calendar:
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Good Friday
         # --------------------------------------------------------------
-    
+
         if dt == self.easter_monday(y).add_days(-3):
             return True
-    
+
         # --------------------------------------------------------------
         # Victoria Day
         #
         # Monday preceding May 25
         # --------------------------------------------------------------
-    
+
         if (
             m == 5
             and 18 <= d <= 24
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Canada Day
         # --------------------------------------------------------------
-    
+
         if m == 7 and d == 1:
             return True
-    
+
         # July 1 Saturday -> Monday July 3
         if (
             m == 7
@@ -2737,7 +2735,7 @@ class Calendar:
             and weekday == Date.MON
         ):
             return True
-    
+
         # July 1 Sunday -> Monday July 2
         if (
             m == 7
@@ -2745,33 +2743,33 @@ class Calendar:
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Civic Holiday
         # First Monday in August
         #
         # Ontario / Toronto banking holiday.
         # --------------------------------------------------------------
-    
+
         if (
             m == 8
             and 1 <= d <= 7
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Labour Day
         # First Monday in September
         # --------------------------------------------------------------
-    
+
         if (
             m == 9
             and 1 <= d <= 7
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # National Day for Truth and Reconciliation
         # September 30
@@ -2779,43 +2777,43 @@ class Calendar:
         # Include if your Toronto/CORRA convention treats Schedule I
         # banks as closed on this date.
         # --------------------------------------------------------------
-    
+
         if y >= 2021 and m == 9 and d == 30:
             return True
-    
+
         # --------------------------------------------------------------
         # Thanksgiving
         # Second Monday in October
         # --------------------------------------------------------------
-    
+
         if (
             m == 10
             and 8 <= d <= 14
             and weekday == Date.MON
         ):
             return True
-    
+
         # --------------------------------------------------------------
         # Remembrance Day
         # --------------------------------------------------------------
-    
+
         if m == 11 and d == 11:
             return True
-    
+
         # --------------------------------------------------------------
         # Christmas Day
         # --------------------------------------------------------------
-    
+
         if m == 12 and d == 25:
             return True
-    
+
         # --------------------------------------------------------------
         # Boxing Day
         # --------------------------------------------------------------
-    
+
         if m == 12 and d == 26:
             return True
-    
+
         # Observed Christmas / Boxing Day
         if (
             m == 12
@@ -2823,7 +2821,7 @@ class Calendar:
             and weekday in (Date.MON, Date.TUE)
         ):
             return True
-    
+
         return False
 
     ###########################################################################
@@ -2845,7 +2843,7 @@ class Calendar:
 
         if dt == em.add_days(-3):  # Good Friday
             return True
-        
+
         if dt == em:  # Easter Monday
             return True
 
@@ -2880,64 +2878,64 @@ class Calendar:
     def holiday_hong_kong(self, dt: Date, weekday: int):
         """
         Hong Kong banking / general holiday calendar.
-    
+
         Intended for:
           - HKD derivatives
           - Hong Kong banking business days
           - HKD settlement
-    
+
         Weekends are handled separately by is_business_day().
-    
+
         Lunar and substitution holidays should be maintained
         from the official gazetted Hong Kong holiday calendar.
         """
-    
+
         m = dt.m
         d = dt.d
         y = dt.y
-    
+
         # --------------------------------------------------------------
         # Fixed-date holidays
         # --------------------------------------------------------------
-    
+
         # New Year's Day
         if m == 1 and d == 1:
             return True
-    
+
         # Labour Day
         if m == 5 and d == 1:
             return True
-    
+
         # HKSAR Establishment Day
         if m == 7 and d == 1:
             return True
-    
+
         # National Day
         if m == 10 and d == 1:
             return True
-    
+
         # Christmas Day
         if m == 12 and d == 25:
             return True
-    
+
         # --------------------------------------------------------------
         # Easter holidays
         # --------------------------------------------------------------
-    
+
         em = self.easter_monday(y)
-    
+
         # Good Friday
         if dt == em.add_days(-3):
             return True
-    
+
         # Day following Good Friday
         if dt == em.add_days(-2):
             return True
-    
+
         # Easter Monday
         if dt == em:
             return True
-    
+
         # --------------------------------------------------------------
         # Year-specific Hong Kong holidays
         #
@@ -2945,56 +2943,56 @@ class Calendar:
         # Tuen Ng, Mid-Autumn, Chung Yeung and substitution
         # days are best taken from gazetted annual calendars.
         # --------------------------------------------------------------
-    
+
         special_holidays = {
-    
+
             2026: {
                 # Lunar New Year
                 (2, 17),
                 (2, 18),
                 (2, 19),
-    
+
                 # Ching Ming substitution / Easter interaction
                 (4, 6),
                 (4, 7),
-    
+
                 # Birthday of the Buddha substitution
                 (5, 25),
-    
+
                 # Tuen Ng Festival
                 (6, 19),
-    
+
                 # Day following Mid-Autumn Festival
                 (9, 26),
-    
+
                 # Chung Yeung substitution
                 (10, 19),
-    
+
                 # First weekday after Christmas
                 (12, 26),
             },
-    
+
             2027: {
                 # Lunar New Year
                 (2, 6),
                 (2, 8),
                 (2, 9),
-    
+
                 # Ching Ming
                 (4, 5),
-    
+
                 # Birthday of the Buddha
                 (5, 13),
-    
+
                 # Tuen Ng Festival
                 (6, 9),
-    
+
                 # Day following Mid-Autumn Festival
                 (9, 16),
-    
+
                 # Chung Yeung Festival
                 (10, 8),
-    
+
                 # First weekday after Christmas
                 (12, 27),
             },
@@ -3026,7 +3024,7 @@ class Calendar:
 
         if dt == em.add_days(-3):  # Good Friday
             return True
-        
+
         if dt == em:  # Easter Monday
             return True
 
@@ -3074,7 +3072,7 @@ class Calendar:
 
         if year < 1901 or year > 2100:
             raise FinError(
-            f"Easter calculation only supported for years 1901-2100: {year}")
+                f"Easter calculation only supported for years 1901-2100: {year}")
 
         em_days = easter_monday_day[year - 1901]
         start_dt = Date(1, 1, year)

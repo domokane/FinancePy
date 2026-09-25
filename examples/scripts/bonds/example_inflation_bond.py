@@ -39,11 +39,11 @@ import matplotlib.pyplot as plt
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
-from financepy.utils.global_types import YTMCalcType
+from financepy.products.bonds.bond import YTMCalcType
 from financepy.utils.format_graphs import set_plot_style
 
-from financepy.products.inflation.inflation_bond import InflationBond
-from financepy.products.inflation.inflation_index_curve import (
+from financepy.products.bonds.bond_inflation import BondInflation
+from financepy.market.curves.inflation_index_curve import (
     InflationIndexCurve,
 )
 
@@ -104,7 +104,7 @@ base_cpi_value = 218.08532
 ex_div_days = 0
 
 
-bond = InflationBond(
+bond = BondInflation(
     issue_dt,
     maturity_dt,
     coupon,
@@ -436,7 +436,7 @@ ref_cpi_value_2 = 244.65884
 ex_div_days_2 = 0
 
 
-bond_2 = InflationBond(
+bond_2 = BondInflation(
     issue_dt_2,
     maturity_dt_2,
     coupon_2,

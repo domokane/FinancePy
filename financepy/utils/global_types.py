@@ -7,37 +7,13 @@
 from enum import Enum
 
 ########################################################################################
-
-
-class LMMModelTypes(Enum):
-
-    ONE_FACTOR = 1
-    HW_M_FACTOR = 2
-    FULL_N_FACTOR = 3
+# Types are usuall located in the code where they are used
+# However where types are shared across different asset classes we put them here
 
 
 class BlackTypes(Enum):
     ANALYTICAL = 1
     CRR_TREE = 2
-
-
-class HestonNumericalSchemeTypes(Enum):
-    EULER = 1
-    EULERLOG = 2
-    QUADEXP = 3
-
-
-class CIRNumericalSchemeTypes(Enum):
-    EULER = 1
-    LOGNORMAL = 2
-    MILSTEIN = 3
-    KAHLJACKEL = 4
-    EXACT = 5
-
-
-class GBMNumericalSchemeTypes(Enum):
-    NORMAL = 1
-    ANTITHETIC = 2
 
 
 class VolFuncTypes(Enum):
@@ -64,33 +40,11 @@ class BlackScholesTypes(Enum):
     PSOR = 7
 
 
-class ProcessTypes(Enum):
-
-    GBM_PROCESS = 1
-    CIR_PROCESS = 2
-    HESTON_PROCESS = 3
-    VASICEK_PROCESS = 4
-    CEV_PROCESS = 5
-    JUMP_DIFFUSION_PROCESS = 6
-
-
-class VasicekNumericalSchemeTypes(Enum):
-    NORMAL = 1
-    ANTITHETIC = 2
-
-
 class OISCompoundingTypes(Enum):
     COMPOUNDED = 1
     OVERNIGHT_COMPOUNDED_ANNUAL_RATE = 2
     AVERAGED = 3
     AVERAGED_DAILY = 4
-
-
-class HWEuropeanCalcTypes(Enum):
-
-    JAMSHIDIAN = 1
-    EXPIRY_ONLY = 2
-    EXPIRY_TREE = 3
 
 
 class FXATMMethodTypes(Enum):

@@ -25,9 +25,6 @@ from financepy.utils.global_types import SwapTypes
 # FINANCEPY EXAMPLES - IborSingleCurve
 # ============================================================================
 
-
-PLOT_GRAPHS = False
-
 ########################################################################################
 
 
@@ -67,24 +64,11 @@ def future_tofra_rate(price, convexity):
 
 ########################################################################################
 
-
-def test_interpolation_timing():
-
-    for interp_type in InterpTypes:
-        start = time.perf_counter()
-        test_bloomberg_pricing_example(interp_type)
-        elapsed = time.perf_counter() - start
-#        print(f"{interp_type}: {elapsed:.6f} seconds")
-
-
-########################################################################################
-
 # ============================================================================
 # 1. BLOOMBERG PRICING EXAMPLE
 # ============================================================================
 # What this section demonstrates:
 # Values the instrument using the supplied market data/model inputs. The surrounding comparison shows how the valuation responds to those assumptions.
-
 print("\n" + "=" * 78)
 print("1. BLOOMBERG PRICING EXAMPLE")
 print("=" * 78)
@@ -104,6 +88,8 @@ deposit_rate = 0.0231381
 maturity_dt = settle_dt.add_months(3)
 depo = IborDeposit(settle_dt, maturity_dt, deposit_rate, depo_dcc_type)
 depos.append(depo)
+
+interp_type = InterpTypes.FLAT_FWD_RATES
 
 futs = []
 fut = IborFuture(value_dt, 1)
@@ -318,26 +304,25 @@ print(
 # swaps[0].print_fixed_leg_pv()
 # swaps[0].print_float_leg_pv()
 
-if PLOT_GRAPHS:
-    plt.figure(figsize=(7, 4))
+plt.figure(figsize=(7, 4))
 
-    years = np.linspace(0, 50, 500)
-    dates = settle_dt.add_years(years)
-    fwds = libor_curve.fwd_rate_inst(dates)
-    plt.plot(years, fwds * 100.0, label="Fwd Rate")
-    plt.title(interp_type)
-    plt.xlabel("Years")
-    plt.legend()
+years = np.linspace(0, 50, 500)
+dates = settle_dt.add_years(years)
+fwds = libor_curve.fwd_rate_inst(dates)
+plt.plot(years, fwds * 100.0, label="Fwd Rate")
+plt.title(interp_type)
+plt.xlabel("Years")
+plt.legend()
 
-    years = np.linspace(0, 50, 500)
-    dates = settle_dt.add_years(years)
-    zeros = libor_curve.zero_rate(dates)
-    plt.plot(years, zeros * 100, label="Zero Rate")
-    plt.title(interp_type)
-    plt.xlabel("Years")
-    plt.ylabel("Rate")
-    plt.legend()
-    plt.show()
+years = np.linspace(0, 50, 500)
+dates = settle_dt.add_years(years)
+zeros = libor_curve.zero_rate(dates)
+plt.plot(years, zeros * 100, label="Zero Rate")
+plt.title(interp_type)
+plt.xlabel("Years")
+plt.ylabel("Rate")
+plt.legend()
+plt.show()
 
 # ============================================================================
 # 2. DERIVATIVE PRICING EXAMPLE
@@ -971,45 +956,45 @@ dates = spot_dt.add_years(times)
 zero_rates = libor_curve.zero_rate(dates)
 fwd_rates = libor_curve.fwd_rate_inst(dates)
 
-if PLOT_GRAPHS:
-    plt.figure(figsize=(8, 6))
-    plt.plot(times, zero_rates * 100, label="zero rates")
-    plt.plot(times, fwd_rates * 100, label="fwd rates")
-    plt.xlabel("Times")
-    plt.ylabel("CC forward rates")
-    plt.legend()
+plt.figure(figsize=(8, 6))
+plt.plot(times, zero_rates * 100, label="zero rates")
+plt.plot(times, fwd_rates * 100, label="fwd rates")
+plt.xlabel("Times")
+plt.ylabel("CC forward rates")
+plt.legend()
 
-    print("==============================================================")
-    for fra in fras:
-        print(fra)
-    print("==============================================================")
+print("==============================================================")
+for fra in fras:
+    print(fra)
+print("==============================================================")
 
-    end_dt = spot_dt
+end_dt = spot_dt
+df = libor_curve.df(end_dt)
+print(end_dt, df)
+
+end_dt = settle_dt
+df = libor_curve.df(end_dt)
+print(end_dt, df)
+
+end_dt = Date(20, 6, 2018)
+df = libor_curve.df(end_dt)
+print(end_dt, df)
+
+for depo in depos:
+    end_dt = depo.maturity_dt
     df = libor_curve.df(end_dt)
     print(end_dt, df)
 
-    end_dt = settle_dt
+for fra in fras:
+    end_dt = fra.maturity_dt
     df = libor_curve.df(end_dt)
     print(end_dt, df)
 
-    end_dt = Date(20, 6, 2018)
+for swap in swaps:
+    end_dt = swap.maturity_dt
     df = libor_curve.df(end_dt)
     print(end_dt, df)
 
-    for depo in depos:
-        end_dt = depo.maturity_dt
-        df = libor_curve.df(end_dt)
-        print(end_dt, df)
-
-    for fra in fras:
-        end_dt = fra.maturity_dt
-        df = libor_curve.df(end_dt)
-        print(end_dt, df)
-
-    for swap in swaps:
-        end_dt = swap.maturity_dt
-        df = libor_curve.df(end_dt)
-        print(end_dt, df)
-
-    swap.print_fixed_leg_pv(spot_dt)
-    swap.print_float_leg_pv(spot_dt)
+v = swap.value(value_dt, libor_curve)
+swap.print_fixed_leg_pv()
+swap.print_float_leg_pv()

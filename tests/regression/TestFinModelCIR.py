@@ -6,7 +6,7 @@ import numpy as np
 import add_fp_to_path
 
 from financepy.models.cir_montecarlo import zero_price_mc, zero_price
-from financepy.utils.global_types import CIRNumericalSchemeTypes
+from financepy.models.process_simulator import CIRNumericalSchemeTypes
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)

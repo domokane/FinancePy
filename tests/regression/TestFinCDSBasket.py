@@ -2,6 +2,7 @@
 
 import time
 import numpy as np
+from os.path import dirname, join
 
 import add_fp_to_path
 

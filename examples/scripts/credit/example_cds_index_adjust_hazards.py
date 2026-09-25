@@ -33,7 +33,7 @@ from financepy.utils.format_graphs import set_plot_style
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 
 from helpers import build_ibor_curve
-from helpers import load_heterogeneous_spread_curves
+from helpers import load_heterogeneous_issuer_curves
 
 # ============================================================================
 # OUTPUT FORMAT
@@ -128,7 +128,7 @@ print("\n" + LINE)
 print("2. LOAD SINGLE-NAME CDS CURVES")
 print(LINE)
 
-issuer_curves = load_heterogeneous_spread_curves(value_dt, step_in_dt, libor_curve)
+issuer_curves = load_heterogeneous_issuer_curves(value_dt, step_in_dt, libor_curve)
 
 
 num_credits = len(issuer_curves)

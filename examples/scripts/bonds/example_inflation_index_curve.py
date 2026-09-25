@@ -28,12 +28,9 @@ import datetime as dt
 import matplotlib.pyplot as plt
 
 from financepy.utils.date import Date
-from financepy.products.inflation.inflation_index_curve import (
+from financepy.market.curves.inflation_index_curve import (
     InflationIndexCurve,
 )
-from financepy.utils.format_graphs import set_plot_style
-
-set_plot_style()
 
 # ============================================================================
 # GLOBAL OUTPUT FORMAT

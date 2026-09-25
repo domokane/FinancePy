@@ -8,7 +8,7 @@ from ...utils.error import FinError
 from ...utils.global_types import BarrierTypes
 from ...products.fx.fx_option import FXOption
 from ...models.process_simulator import ProcessTypes
-from ...utils.global_types import GBMNumericalSchemeTypes
+from ...models.process_simulator import GBMNumericalSchemeTypes
 from ...models.barrier_option_mc import value_barrier_option_mc
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date

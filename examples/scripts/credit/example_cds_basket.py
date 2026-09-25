@@ -43,7 +43,7 @@ from financepy.products.credit.cds_basket import CDSBasket
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 
 from helpers import build_ibor_curve
-from helpers import load_homogeneous_spread_curves
+from helpers import build_homogeneous_issuer_curves
 
 # ============================================================================
 # GLOBAL OUTPUT FORMAT
@@ -156,7 +156,7 @@ spd_5yr = 0.0025
 spd_7yr = 0.0034
 spd_10yr = 0.0046
 
-issuer_curves = load_homogeneous_spread_curves(
+issuer_curves = build_homogeneous_issuer_curves(
     value_dt,
     libor_curve,
     spd_3yr,

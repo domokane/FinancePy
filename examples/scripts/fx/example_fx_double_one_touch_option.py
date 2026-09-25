@@ -5,7 +5,7 @@
 
 import numpy as np
 
-from financepy.products.fx import FXDoubleOneTouchOption
+from financepy.products.fx.fx_double_one_touch_option import FXDoubleOneTouchOption
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
@@ -20,11 +20,7 @@ DEBUG_FLAG = False
 ########################################################################################
 
 
-
-
 ##################################################################################
-
-
 
 
 ########################################################################################
@@ -199,4 +195,3 @@ for option_type in [DoubleBarrierTypes.KNOCK_OUT, DoubleBarrierTypes.KNOCK_IN]:
             print("=================================")
             print("OPT_TYPE", "L", "U", "SIGMA", "VALUE", "VALUE_MC")
             print(option_type, k1, k2, sigma, v, v_mc)
-

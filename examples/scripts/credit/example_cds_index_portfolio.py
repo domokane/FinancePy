@@ -5,7 +5,7 @@
 # Copyright (C) 2018-2026 Dominic O'Kane
 #
 
-from helpers import load_heterogeneous_spread_curves
+from helpers import load_heterogeneous_issuer_curves
 from helpers import build_ibor_curve
 import matplotlib.pyplot as plt
 import numpy as np
@@ -40,7 +40,7 @@ maturity_5yr = trade_dt.next_cds_date(60)
 maturity_7yr = trade_dt.next_cds_date(84)
 maturity_10yr = trade_dt.next_cds_date(120)
 
-issuer_curves = load_heterogeneous_spread_curves(value_dt, step_in_dt, libor_curve)
+issuer_curves = load_heterogeneous_issuer_curves(value_dt, step_in_dt, libor_curve)
 
 print(f"{'Number of Issuers':<30}: {len(issuer_curves)}")
 

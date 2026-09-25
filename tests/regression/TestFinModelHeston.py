@@ -7,7 +7,9 @@ import add_fp_to_path
 import matplotlib.pyplot as plt
 
 from financepy.models.heston import Heston, HestonValueTypes
-from financepy.utils.global_types import OptionTypes, HestonNumericalSchemeTypes
+from financepy.utils.global_types import OptionTypes
+from financepy.models.process_simulator import HestonNumericalSchemeTypes
+
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
 from financepy.utils.date import Date
 

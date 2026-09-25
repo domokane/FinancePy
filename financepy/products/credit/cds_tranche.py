@@ -32,11 +32,10 @@ from ...market.curves.cds_curve import CDSCurve
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import InterpTypes, interpolate
 
-
 ########################################################################################
 
 
-class FinLossDistributionBuilder(Enum):
+class DefaultLossDbnAlgoTypes(Enum):
     RECURSION = 1
     ADJUSTED_BINOMIAL = 2
     GAUSSIAN = 3
@@ -109,7 +108,7 @@ class CDSTranche:
         corr1,
         corr2,
         num_points: int = 50,
-        algorithm: FinLossDistributionBuilder = FinLossDistributionBuilder.RECURSION,
+        algorithm: DefaultLossDbnAlgoTypes = DefaultLossDbnAlgoTypes.RECURSION,
     ):
 
         check_curve_dt(value_dt, *issuer_curves)
@@ -173,9 +172,11 @@ class CDSTranche:
                 v_times = issuer_curve._times
                 q_row = issuer_curve._qs
                 recovery_rates[j] = issuer_curve.recovery_rate
-                q_vector[j] = interpolate(t, v_times, q_row, InterpTypes.FLAT_FWD_RATES.value)
+                q_vector[j] = interpolate(
+                    t, v_times, q_row, InterpTypes.FLAT_FWD_RATES.value
+                )
 
-            if algorithm == FinLossDistributionBuilder.RECURSION:
+            if algorithm == DefaultLossDbnAlgoTypes.RECURSION:
 
                 qt1[i] = tranche_surv_prob_recursion(
                     0.0,
@@ -197,7 +198,7 @@ class CDSTranche:
                     num_points,
                 )
 
-            elif algorithm == FinLossDistributionBuilder.ADJUSTED_BINOMIAL:
+            elif algorithm == DefaultLossDbnAlgoTypes.ADJUSTED_BINOMIAL:
 
                 qt1[i] = tranche_surv_prob_adj_binomial(
                     0.0,
@@ -219,7 +220,7 @@ class CDSTranche:
                     num_points,
                 )
 
-            elif algorithm == FinLossDistributionBuilder.GAUSSIAN:
+            elif algorithm == DefaultLossDbnAlgoTypes.GAUSSIAN:
 
                 qt1[i] = tranch_surv_prob_gaussian(
                     0.0,
@@ -241,11 +242,15 @@ class CDSTranche:
                     num_points,
                 )
 
-            elif algorithm == FinLossDistributionBuilder.LHP:
+            elif algorithm == DefaultLossDbnAlgoTypes.LHP:
 
-                qt1[i] = tr_surv_prob_lhp(0.0, k1, num_credits, q_vector, recovery_rates, beta_1)
+                qt1[i] = tr_surv_prob_lhp(
+                    0.0, k1, num_credits, q_vector, recovery_rates, beta_1
+                )
 
-                qt2[i] = tr_surv_prob_lhp(0.0, k2, num_credits, q_vector, recovery_rates, beta_2)
+                qt2[i] = tr_surv_prob_lhp(
+                    0.0, k2, num_credits, q_vector, recovery_rates, beta_2
+                )
 
             else:
                 raise FinError("Unknown model type only full and AdjBinomial allowed")
@@ -265,7 +270,9 @@ class CDSTranche:
         tranche_curve.set_times(tranche_times)
         tranche_curve.set_qs(tranche_surv_curve)
 
-        prot_leg_pv = self.cds_contract.prot_leg_pv(value_dt, tranche_curve, curve_recovery)
+        prot_leg_pv = self.cds_contract.prot_leg_pv(
+            value_dt, tranche_curve, curve_recovery
+        )
         risky_pv01 = self.cds_contract.rpv01(value_dt, tranche_curve)[CLEAN]
 
         mtm = self.notional * (prot_leg_pv - upfront - risky_pv01 * running_cpn)

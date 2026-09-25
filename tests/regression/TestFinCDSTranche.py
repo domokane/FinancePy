@@ -15,7 +15,7 @@ from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_tranche import CDSTranche
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
+from financepy.products.credit.cds_tranche import DefaultLossDbnAlgoTypes
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -210,7 +210,7 @@ def test_cds_tranche():
 
     test_cases.header("METHOD", "TIME", "NumPoints", "k_1", "k_2", "Sprd")
 
-    for method in FinLossDistributionBuilder:
+    for method in DefaultLossDbnAlgoTypes:
         for tranche in tranches:
             for num_points in [40]:
                 start = time.time()
@@ -261,7 +261,7 @@ def test_cds_tranche():
 
     test_cases.header("METHOD", "TIME", "NumPoints", "k_1", "k_2", "Sprd")
 
-    for method in FinLossDistributionBuilder:
+    for method in DefaultLossDbnAlgoTypes:
         for tranche in tranches:
             for num_points in [40]:
                 start = time.time()

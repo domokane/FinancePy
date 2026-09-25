@@ -4,16 +4,46 @@ from math import sqrt, exp, log
 
 from numba import njit, float64, int64
 import numba as nb
-
 import numpy as np
 
 from ..utils.error import FinError
 from ..utils.math import norminvcdf
-from ..utils.global_types import ProcessTypes
-from ..utils.global_types import GBMNumericalSchemeTypes
-from ..utils.global_types import VasicekNumericalSchemeTypes
-from ..utils.global_types import CIRNumericalSchemeTypes
-from ..utils.global_types import HestonNumericalSchemeTypes
+
+from enum import Enum
+
+
+class ProcessTypes(Enum):
+
+    GBM_PROCESS = 1
+    CIR_PROCESS = 2
+    HESTON_PROCESS = 3
+    VASICEK_PROCESS = 4
+    CEV_PROCESS = 5
+    JUMP_DIFFUSION_PROCESS = 6
+
+
+class HestonNumericalSchemeTypes(Enum):
+    EULER = 1
+    EULERLOG = 2
+    QUADEXP = 3
+
+
+class CIRNumericalSchemeTypes(Enum):
+    EULER = 1
+    LOGNORMAL = 2
+    MILSTEIN = 3
+    KAHLJACKEL = 4
+    EXACT = 5
+
+
+class GBMNumericalSchemeTypes(Enum):
+    NORMAL = 1
+    ANTITHETIC = 2
+
+
+class VasicekNumericalSchemeTypes(Enum):
+    NORMAL = 1
+    ANTITHETIC = 2
 
 
 ########################################################################################
@@ -255,7 +285,6 @@ def get_heston_paths(
 ########################################################################################
 
 
-
 ########################################################################################
 
 
@@ -351,7 +380,6 @@ def get_vasicek_paths(
 
 
 ########################################################################################
-
 
 
 ########################################################################################

@@ -5,7 +5,7 @@ import numpy as np
 
 from financepy.utils.math import scale
 from financepy.market.curves.discount_curve import DiscountCurve
-from financepy.utils.global_types import InterpTypes
+from financepy.market.curves.interpolator import InterpTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 
@@ -16,8 +16,6 @@ from financepy.utils.date import Date
 PLOT_GRAPHS = True
 
 ########################################################################################
-
-
 
 
 ###############################################################################
@@ -116,4 +114,3 @@ for interp in InterpTypes:
         plt.xlabel("Time (years)")
         plt.ylabel("Fwd Rate (%)")
         plt.legend(loc="lower right", frameon=False)
-

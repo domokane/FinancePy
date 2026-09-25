@@ -5,9 +5,9 @@ from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_barrier_option import EquityBarrierOption
 from financepy.products.equity.equity_barrier_option import BarrierTypes
-from financepy.utils.global_types import GBMNumericalSchemeTypes
 from financepy.models.process_simulator import ProcessTypes
-from financepy.utils.global_vars import G_DAYS_IN_YEAR
+from financepy.models.process_simulator import GBMNumericalSchemeTypes
+
 
 value_dt = Date(1, 1, 2015)
 expiry_dt = Date(1, 1, 2016)

@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from financepy.utils.global_types import CIRNumericalSchemeTypes
+from financepy.models.process_simulator import CIRNumericalSchemeTypes
 
 from financepy.models.cir_montecarlo import (
     CIRMonteCarlo,

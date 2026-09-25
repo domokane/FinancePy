@@ -1,9 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import numpy as np
 
-from financepy.utils.global_types import CIRNumericalSchemeTypes
 from financepy.models.cir_montecarlo import zero_price_mc, zero_price
+from financepy.models.process_simulator import CIRNumericalSchemeTypes
 
 r0 = 0.05
 a = 0.20
@@ -58,14 +57,14 @@ def test_model_cir():
         CIRNumericalSchemeTypes.KAHLJACKEL.value,
     )
     p_mc5 = zero_price_mc(
-        r0, 
-        a, 
-        b, 
-        sigma, 
-        t, 
-        dt, 
-        num_paths, 
-        seed, 
+        r0,
+        a,
+        b,
+        sigma,
+        t,
+        dt,
+        num_paths,
+        seed,
         CIRNumericalSchemeTypes.EXACT.value
     )
 

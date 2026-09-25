@@ -56,7 +56,7 @@ import numpy as np
 from financepy.utils.date import Date
 from financepy.products.credit.cds_tranche import (
     CDSTranche,
-    FinLossDistributionBuilder,
+    DefaultLossDbnAlgoTypes,
 )
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 from financepy.utils.format_graphs import set_plot_style
@@ -266,7 +266,6 @@ spd_10yr = 0.0046
 
 issuer_curves = build_homogeneous_issuer_curves(
     value_dt,
-    step_in_dt,
     libor_curve,
     spd_3yr,
     spd_5yr,
@@ -335,7 +334,7 @@ print("-" * 95)
 
 homogeneous_results = {}
 
-for method in FinLossDistributionBuilder:
+for method in DefaultLossDbnAlgoTypes:
 
     method_results = []
 
@@ -440,7 +439,7 @@ print("-" * 95)
 
 heterogeneous_results = {}
 
-for method in FinLossDistributionBuilder:
+for method in DefaultLossDbnAlgoTypes:
 
     method_results = []
 
@@ -598,7 +597,7 @@ print("\n" + LINE)
 print("6. HOMOGENEOUS VERSUS HETEROGENEOUS PORTFOLIOS")
 print(LINE)
 
-for method in FinLossDistributionBuilder:
+for method in DefaultLossDbnAlgoTypes:
 
     plt.figure(
         figsize=(10, 6),
@@ -663,7 +662,7 @@ print("\n" + LINE)
 print("7. HETEROGENEITY EFFECT")
 print(LINE)
 
-for method in FinLossDistributionBuilder:
+for method in DefaultLossDbnAlgoTypes:
 
     spread_difference = heterogeneous_results[method] - homogeneous_results[method]
 
@@ -764,7 +763,7 @@ correlations = np.linspace(
 )
 
 methods = list(
-    FinLossDistributionBuilder,
+    DefaultLossDbnAlgoTypes,
 )
 
 correlation_method = methods[0]

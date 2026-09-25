@@ -7,7 +7,7 @@ import add_fp_to_path
 
 from financepy.utils.date import Date
 from financepy.models.hw_tree import HWTree
-from financepy.utils.global_types import HWEuropeanCalcTypes
+from financepy.models.hw_tree import HWEuropeanCalcTypes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.bonds.bond import Bond
 from financepy.utils.frequency import FrequencyTypes

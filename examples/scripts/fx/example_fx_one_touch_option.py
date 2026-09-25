@@ -4,7 +4,7 @@
 # Allow this example to run directly from its category folder.
 
 from financepy.utils.global_types import TouchOptionTypes
-from financepy.products.fx import FXOneTouchOption
+from financepy.products.fx.fx_one_touch_option import FXOneTouchOption
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.utils.date import Date
@@ -18,13 +18,9 @@ DEBUG_FLAG = False
 ########################################################################################
 
 
-
-
 #        print(up_type, v, v_mc)
 
 ########################################################################################
-
-
 
 
 ########################################################################################
@@ -184,4 +180,3 @@ if DEBUG_FLAG:
     print("Delta: ", d)
     print("Gamma:", g)
     print("Vega:", v)
-

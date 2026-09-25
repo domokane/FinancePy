@@ -205,7 +205,7 @@ class ZeroRatesDiscountCurve(DiscountCurve):
         for dt, rate in zip(self._zero_dts, self._zero_rates):
             s += label_to_string(str(dt), f"{rate:12.8f}")
 
-        s += label_to_string("CURVE DC_TYPE", self.dc_type)
+        s += label_to_string("CURVE DC_TYPE", self.curve_dc_type)
 
         s += "\n"
         s += super().__repr__()

@@ -2,11 +2,11 @@
 
 import add_fp_to_path
 
-from financepy.utils.global_types import VasicekNumericalSchemeTypes
-from financepy.utils.global_types import CIRNumericalSchemeTypes
-from financepy.utils.global_types import HestonNumericalSchemeTypes
-from financepy.utils.global_types import GBMNumericalSchemeTypes
-from financepy.utils.global_types import ProcessTypes
+from financepy.models.process_simulator import VasicekNumericalSchemeTypes
+from financepy.models.process_simulator import CIRNumericalSchemeTypes
+from financepy.models.process_simulator import HestonNumericalSchemeTypes
+from financepy.models.process_simulator import GBMNumericalSchemeTypes
+from financepy.models.process_simulator import ProcessTypes
 from financepy.models.process_simulator import ProcessSimulator
 from FinTestCases import FinTestCases, global_test_case_mode
 

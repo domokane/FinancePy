@@ -10,12 +10,12 @@ from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.global_types import BarrierTypes
 from ...utils.helpers import label_to_string, check_argument_types
-from ...utils.global_types import GBMNumericalSchemeTypes
+from ...models.process_simulator import GBMNumericalSchemeTypes
+from ...models.process_simulator import ProcessTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
 from ...models.barrier_option_model import barrier_option_value
 from ...models.barrier_option_mc import value_barrier_option_mc
-from ...models.process_simulator import ProcessTypes
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
 from ...utils.check_values import check_strike_price

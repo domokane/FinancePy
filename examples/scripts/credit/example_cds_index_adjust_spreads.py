@@ -31,7 +31,7 @@ from financepy.utils.format_graphs import set_plot_style
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 
 from helpers import build_ibor_curve
-from helpers import load_heterogeneous_spread_curves
+from helpers import load_heterogeneous_issuer_curves
 
 # ============================================================================
 # 1. CDS INDEX ADJUST SPREADS
@@ -81,7 +81,7 @@ single_name_maturities = [
 # 1.3 LOAD SINGLE-NAME CDS MARKET DATA
 # ============================================================================
 
-issuer_curves = load_heterogeneous_spread_curves(value_dt, step_in_dt, libor_curve)
+issuer_curves = load_heterogeneous_issuer_curves(value_dt, step_in_dt, libor_curve)
 
 print(f"{'Number of issuer curves':<30}: {len(issuer_curves)}")
 

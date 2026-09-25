@@ -1,4 +1,25 @@
 ## CHANGE LOG
+25 Sep 2026
+Notable changes
+- *** New policy on importing enumerated types from global_types
+      Only those types that are shared by multiple options or other modules will be global
+      The rest will be local. I reverse the previous changes as follows:
+- Moved ProcessTypes back into ProcessSimulator
+- Moved CIRNumericalSchemeTypes back into ProcessSimulator
+- Moved HestonNumericalSchemeTypes back into ProcessSimulator
+- Moved CIRNumericalSchemeTypes back into ProcessSimulator
+- Moved VasicekNumericalSchemeTypes back into ProcessSimulator
+- Moved HWEuropeanCalcTypes back into HW_Tree
+- Repaired all notebooks and scripts affected
+Other changes
+- Moved run script for regression tests into the scripts folder
+- Fixed all example notebooks that broke due to change in imports policy (wildcards only work for utils folder)
+- Fixed all example scripts that broke due to change in imports policy (wildcards only work for utils folder)
+- Fixed bug in print function of zero_rates_discount_curve
+- Type checking CDS functions to take only CDSCurve
+- Added overloads to Date class to avoid lots of pylint confusion
+- Renamed FinLossDistributionBuilder to DefaultLossDbnAlgoTypes
+
 24 Sep 2026
 List of changes
 - PR on FX OneTouch options

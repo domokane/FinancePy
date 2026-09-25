@@ -10,7 +10,7 @@ from scipy import integrate
 import numpy as np
 
 from ..utils.global_types import OptionTypes
-from ..utils.global_types import HestonNumericalSchemeTypes
+from ..models.process_simulator import HestonNumericalSchemeTypes
 from ..utils.math import norminvcdf
 from ..utils.error import FinError
 from ..models.black_scholes_analytic import implied_volatility
@@ -488,7 +488,7 @@ class Heston:
 
         return v
 
-    ####################################@#@#############################################
+    #################################### @#@#############################################
     # Gatheral book page 19 with definition of x given on page 16 and noting
     # that the value C is a forward value and so needs to be discounted
     ####################################################################################

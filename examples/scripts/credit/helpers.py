@@ -331,9 +331,16 @@ def load_heterogeneous_issuer_curves(
 
 
 def build_homogeneous_issuer_curves(
-    value_dt, step_in_dt, libor_curve, cds_spd_3yr, cds_spd_5yr, cds_spd_7yr, cds_spd_10yr, num_credits
+    value_dt,
+    libor_curve,
+    cds_spd_3yr,
+    cds_spd_5yr,
+    cds_spd_7yr,
+    cds_spd_10yr,
+    num_credits
 ):
 
+    step_in_dt = value_dt.add_days(1)
     maturity_3yr = step_in_dt.next_cds_date(36)
     maturity_5yr = step_in_dt.next_cds_date(60)
     maturity_7yr = step_in_dt.next_cds_date(84)

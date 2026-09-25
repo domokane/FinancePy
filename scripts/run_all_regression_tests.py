@@ -3,37 +3,37 @@
 ########################################################################################
 
 from financepy.utils.error import FinError
-from financepy.utils.date_format import set_date_format, DateFormatTypes
+from financepy.utils.date_format import DateFormatTypes, set_date_format
 import financepy
-import add_fp_to_path
 import glob
-from os.path import dirname, basename, join
-import traceback
-import time
-
 import sys
+import time
+import traceback
+from os.path import basename, join
 from pathlib import Path
 
-repo_root = Path(__file__).resolve().parents[2]
+# Ensure we import FinancePy from this repository
+repo_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(repo_root))
 
+print("These tests run against local repo and not installed FinancePy. They are mainly used for local development work.\n")
 
 print("FinancePy imported successfully from:", financepy.__file__)
+print()
 
-
-# This only works if I have an init.py in the parent folder
 set_date_format(DateFormatTypes.UK_LONG)
 
 ###############################################################################
 
 
 def main(start_index=0, end_index=None):
-    """Loop over test cases"""
+    scripts_dir = Path(__file__).resolve().parent
+    test_folder = scripts_dir.parent / "tests" / "regression"
 
-    # I put this here to get the library loaded and header printed before loop
-    test_folder = dirname(__file__)
-    print("Looking in folder:", test_folder)
+    sys.path.insert(0, str(test_folder))
+
     modules = sorted(glob.glob(join(test_folder, "Test*.py")))
+
     num_modules = len(modules)
 
     if end_index is None or end_index > num_modules:

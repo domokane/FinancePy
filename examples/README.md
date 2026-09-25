@@ -1,3 +1,10 @@
+# UNDER CONSTRUCTION 
+
+I am currently updating examples to be one per product, model or utility 
+They will initially be available as python scripts 
+They are intended to be educational and also provide basic tests 
+The notebooks will also be replaced by new product specific notebooks. 
+
 # FinancePy Examples
 
 This directory contains executable Python examples demonstrating how to use FinancePy.

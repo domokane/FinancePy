@@ -1,11 +1,11 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import numpy as np
+import pytest
 
 from financepy.utils.date import Date
-from financepy.products.equity.equity_vanilla_option import EquityVanillaOption
-from financepy.utils.global_types import OptionTypes, HestonNumericalSchemeTypes
+from financepy.utils.global_types import OptionTypes
 from financepy.models.heston import Heston
+
 
 # Reference see table 4.1 of Rouah book
 value_dt = Date(1, 1, 2015)
@@ -24,9 +24,6 @@ num_paths = 20000
 stock_price = 100.0
 
 ########################################################################################
-
-
-import pytest
 
 
 def test_heston():

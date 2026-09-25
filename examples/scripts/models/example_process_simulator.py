@@ -4,17 +4,14 @@
 # Allow this example to run directly from its category folder.
 
 
-
-from financepy.utils.global_types import VasicekNumericalSchemeTypes
-from financepy.utils.global_types import CIRNumericalSchemeTypes
-from financepy.utils.global_types import HestonNumericalSchemeTypes
-from financepy.utils.global_types import GBMNumericalSchemeTypes
-from financepy.utils.global_types import ProcessTypes
+import time
+from financepy.models.process_simulator import VasicekNumericalSchemeTypes
+from financepy.models.process_simulator import CIRNumericalSchemeTypes
+from financepy.models.process_simulator import HestonNumericalSchemeTypes
+from financepy.models.process_simulator import ProcessTypes
 from financepy.models.process_simulator import ProcessSimulator
 
 ########################################################################################
-
-
 
 
 ########################################################################################
@@ -29,7 +26,6 @@ print("\n" + "=" * 78)
 print("1. FIN PROCESS SIMULATOR")
 print("=" * 78)
 
-import time
 
 # ============================================================================
 # FINANCEPY EXAMPLES - ProcessSimulator
@@ -180,4 +176,3 @@ elapsed = end - start
 print("CIR", elapsed)
 if print_paths:
     print(paths)
-

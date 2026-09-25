@@ -39,7 +39,7 @@ from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 
 
 from helpers import build_ibor_curve
-from helpers import load_heterogeneous_spread_curves
+from helpers import load_heterogeneous_issuer_curves
 
 LINE = "=" * 100
 SUBLINE = "-" * 100
@@ -94,7 +94,7 @@ print("\n" + LINE)
 print("2. BUILD SINGLE-NAME ISSUER CURVES")
 print(LINE)
 
-issuer_curves = load_heterogeneous_spread_curves(value_dt, step_in_dt, libor_curve)
+issuer_curves = load_heterogeneous_issuer_curves(value_dt, step_in_dt, libor_curve)
 
 print(f"{'Number of Issuers':<30}: {len(issuer_curves)}")
 

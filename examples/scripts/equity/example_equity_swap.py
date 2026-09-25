@@ -244,7 +244,7 @@ index_curve_first = FlatDiscountCurve(
 )
 
 index_alpha_first = DayCount(
-    index_curve_first.time_dc_type
+    index_curve_first.curve_dc_type
 ).year_frac(
     effective_dt_1y,
     maturity_dt_1y,
@@ -263,7 +263,7 @@ index_curve_period = FlatDiscountCurve(
 )
 
 index_alpha_period = DayCount(
-    index_curve_period.dc_type
+    index_curve_period.curve_dc_type
 ).year_frac(
     value_dt_1y,
     maturity_dt_1y,

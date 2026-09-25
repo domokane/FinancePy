@@ -18,8 +18,8 @@ def main():
     parser.add_argument(
         "--timeout",
         type=int,
-        default=120,
-        help="Maximum runtime per example in seconds (default: 120).",
+        default=300,
+        help="Maximum runtime per example in seconds (default: 300).",
     )
 
     parser.add_argument(
@@ -40,10 +40,11 @@ def main():
     #   examples_dir = examples
     #
     scripts_dir = Path(__file__).resolve().parent
-    examples_dir = scripts_dir.parent
+
+    examples_dir = scripts_dir.parent / "examples" / "scripts"
 
     # Find all example*.py files below examples/scripts.
-    scripts = sorted(scripts_dir.rglob("example_*.py"))
+    scripts = sorted(examples_dir.rglob("example_*.py"))
 
     if not scripts:
         print(f"No example*.py files found in {scripts_dir}")
@@ -91,8 +92,8 @@ def main():
 
         try:
             result = subprocess.run(
-                [sys.executable, "-m", module],
-                cwd=examples_dir,
+                [sys.executable, str(script)],
+                cwd=script.parent,
                 env=env,
                 timeout=args.timeout,
                 capture_output=True,
@@ -124,11 +125,22 @@ def main():
                 if args.fail_fast:
                     break
 
-        except subprocess.TimeoutExpired:
+        except subprocess.TimeoutExpired as exc:
             elapsed = time.perf_counter() - start
             timed_out.append((relative, elapsed))
 
             print(f"\nTIMEOUT ({elapsed:.2f}s): {relative}")
+
+            if exc.stdout:
+                print("\nSTDOUT:")
+                print(exc.stdout)
+
+            if exc.stderr:
+                print("\nSTDERR:")
+                print(exc.stderr)
+
+            if args.fail_fast:
+                break
 
         except KeyboardInterrupt:
             print("\n\nInterrupted by user.")

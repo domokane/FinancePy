@@ -3,7 +3,7 @@
 from financepy.utils.date import Date
 from financepy.products.credit.cds_tranche import CDSTranche
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
-from financepy.products.credit.cds_tranche import FinLossDistributionBuilder
+from financepy.products.credit.cds_tranche import DefaultLossDbnAlgoTypes
 
 from .helpers import (
     build_ibor_curve,
@@ -60,19 +60,19 @@ def test_homogeneous():
 
     assert round(intrinsic_spd, 3) == 23.977
 
-    method = FinLossDistributionBuilder.RECURSION
+    method = DefaultLossDbnAlgoTypes.RECURSION
     v = tranche1.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 3) == 582.505
 
-    method = FinLossDistributionBuilder.ADJUSTED_BINOMIAL
+    method = DefaultLossDbnAlgoTypes.ADJUSTED_BINOMIAL
     v = tranche3.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 3) == 29.980
 
-    method = FinLossDistributionBuilder.GAUSSIAN
+    method = DefaultLossDbnAlgoTypes.GAUSSIAN
     v = tranche5.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 3) == 4.583
 
-    method = FinLossDistributionBuilder.LHP
+    method = DefaultLossDbnAlgoTypes.LHP
     v = tranche7.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 2) == 39.96
 
@@ -90,18 +90,18 @@ def test_heterogeneous():
 
     assert round(intrinsic_spd, 4) == 34.331
 
-    method = FinLossDistributionBuilder.RECURSION
+    method = DefaultLossDbnAlgoTypes.RECURSION
     v = tranche1.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 3) == 868.479
 
-    method = FinLossDistributionBuilder.ADJUSTED_BINOMIAL
+    method = DefaultLossDbnAlgoTypes.ADJUSTED_BINOMIAL
     v = tranche2.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 2) == 173.47
 
-    method = FinLossDistributionBuilder.GAUSSIAN
+    method = DefaultLossDbnAlgoTypes.GAUSSIAN
     v = tranche4.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 4) == 16.1757
 
-    method = FinLossDistributionBuilder.LHP
+    method = DefaultLossDbnAlgoTypes.LHP
     v = tranche6.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
     assert round(v[3] * 10000, 3) == 0.338

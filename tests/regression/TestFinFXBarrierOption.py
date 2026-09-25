@@ -9,8 +9,6 @@ from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.fx.fx_barrier_option import FXBarrierOption
 from financepy.utils.global_types import BarrierTypes
 from financepy.models.black_scholes import BlackScholes
-from financepy.utils.global_types import GBMNumericalSchemeTypes
-from financepy.models.process_simulator import ProcessTypes
 
 from FinTestCases import FinTestCases, global_test_case_mode
 

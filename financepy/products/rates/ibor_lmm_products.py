@@ -25,7 +25,6 @@ from ...utils.error import FinError
 from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 
-from ...utils.global_types import LMMModelTypes
 from ...models.lmm_mc import lmm_simulate_fwds_1f
 from ...models.lmm_mc import lmm_simulate_fwds_mf
 from ...models.lmm_mc import lmm_simulate_fwds_nf
@@ -38,10 +37,18 @@ from ...utils.global_types import SwapTypes
 from ...utils.global_types import CapFloorTypes
 
 from ...market.curves.discount_curve import DiscountCurve
-from ...models.model import Model
 from ...utils.check_values import check_curve_dt
 
 from financepy.market.volatility.ibor_cap_vol_curve import IborCapVolCurve
+
+from enum import Enum
+
+
+class LMMModelTypes(Enum):
+
+    ONE_FACTOR = 1
+    HW_M_FACTOR = 2
+    FULL_N_FACTOR = 3
 
 ########################################################################################
 

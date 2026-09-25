@@ -18,6 +18,7 @@ from financepy.products.equity.equity_asian_option import (
 )
 from financepy.utils.global_types import OptionTypes
 
+num_replications = 10
 
 # ============================================================================
 # 1. ASIAN OPTION VALUATION METHODS
@@ -989,7 +990,6 @@ option = EquityAsianOption(
 )
 
 num_paths = 10000
-num_replications = 100
 seed_start = 1000
 
 values_mc = []
@@ -1097,7 +1097,6 @@ print("13. MONTE CARLO IMPLEMENTATION CONSISTENCY")
 print("=" * 78)
 
 num_paths = 10000
-num_replications = 100
 seed_start = 1000
 
 values_mc = []
@@ -1337,13 +1336,10 @@ num_obs_per_year_list = [
     100,
     252,
     500,
-    1000,
-    2000,
 ]
 
 
 num_paths = 10000
-num_replications = 50
 seed_start = 2000
 
 results = []
