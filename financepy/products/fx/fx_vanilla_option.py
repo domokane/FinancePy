@@ -236,7 +236,7 @@ class FXVanillaOption:
             and opt_type != OptionTypes.AMERICAN_CALL
             and opt_type != OptionTypes.AMERICAN_PUT
         ):
-            raise FinError("Unknown OPTION_TYPE:" + opt_type)
+            raise FinError("Unknown OPTION_TYPE:" + str(opt_type))
 
         self.opt_type = opt_type
         self.spot_days = spot_days
