@@ -18,3 +18,6 @@ from .schedule import *
 from .error import *
 
 __all__ = [name for name in globals() if not name.startswith("_")]
+
+from .format_graphs import *
+set_plot_style()

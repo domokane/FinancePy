@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>ibor ibor x ccy swap - FinancePy</title>
+
+
+<style>
+
+:root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --text: #172033;
+    --muted: #667085;
+    --border: #e3e8ef;
+    --primary: #3157a4;
+    --primary-dark: #243f78;
+    --primary-soft: #eef3ff;
+    --accent: #0f766e;
+    --code-bg: #f4f7fb;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+}
+
+header {
+    background: linear-gradient(135deg, #172554 0%, #274690 100%);
+    color: white;
+    padding: 26px max(32px, calc((100vw - 1180px) / 2));
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+}
+
+header p {
+    margin: 5px 0 0;
+    color: #dbe5ff;
+    font-size: 14px;
+}
+
+main {
+    max-width: 1180px;
+    margin: 28px auto 56px;
+    padding: 38px 48px 72px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+nav {
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
+}
+
+nav a, a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover { text-decoration: underline; }
+
+h1, h2, h3, h4 {
+    color: var(--text);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+}
+
+main > h1 {
+    margin: 0 0 14px;
+    font-size: 30px;
+}
+
+main > h1:not(:first-of-type) {
+    margin-top: 64px;
+    padding: 12px 0 10px;
+    color: var(--primary-dark);
+    font-size: 23px;
+    border-bottom: 2px solid #d9e3f7;
+}
+
+h2 {
+    margin: 38px 0 14px;
+    padding-bottom: 8px;
+    font-size: 21px;
+    border-bottom: 1px solid var(--border);
+}
+
+h3 {
+    margin: 28px 0 12px;
+    font-size: 17px;
+    color: var(--primary-dark);
+}
+
+h4 {
+    margin: 28px 0 9px;
+    font-size: 16px;
+}
+
+code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: .94em;
+}
+
+pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    line-height: 1.5;
+}
+
+.signature {
+    background: var(--code-bg);
+    border: 1px solid #dce4f0;
+    border-left: 4px solid var(--primary);
+    border-radius: 7px;
+    padding: 14px 16px;
+    margin: 10px 0 18px;
+    overflow-x: auto;
+    color: #24324a;
+}
+
+.signature code {
+    white-space: pre;
+    font-size: 13.5px;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.68;
+    color: #344054;
+    max-width: 92ch;
+}
+
+.member {
+    margin: 0 0 26px;
+    padding: 2px 0 22px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.member:last-child { border-bottom: 0; }
+
+.inheritance {
+    display: inline-block;
+    color: var(--muted);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin: 0 0 16px;
+    font-size: 13px;
+}
+
+.source-name {
+    display: inline-block;
+    margin: 0 0 24px;
+    padding: 5px 9px;
+    color: #475467;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: "SFMono-Regular", Consolas, "Courier New", monospace;
+    font-size: 12.5px;
+}
+
+.enum-members {
+    display: grid;
+    gap: 7px;
+    margin: 12px 0 26px;
+}
+
+.enum-members > div {
+    padding: 8px 11px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.enum-members code:first-child {
+    color: var(--primary-dark);
+    font-weight: 650;
+}
+
+.package-list,
+.module-list { line-height: 1.9; }
+
+.module-list ul {
+    columns: 2;
+    column-gap: 32px;
+    padding-left: 22px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 17px 18px;
+    background: var(--surface);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .03);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+
+.card:hover {
+    transform: translateY(-1px);
+    border-color: #cbd7eb;
+    box-shadow: 0 5px 16px rgba(16, 24, 40, .06);
+}
+
+.card h3 { margin: 0 0 6px; }
+.card p { margin: 0; color: var(--muted); font-size: 13px; }
+
+.generated {
+    margin-top: 64px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    color: #98a2b3;
+    font-size: 12.5px;
+}
+
+@media (max-width: 760px) {
+    header { padding: 22px 20px; }
+    main {
+        margin: 0;
+        padding: 28px 20px 56px;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .module-list ul { columns: 1; }
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../../index.html">FinancePy</a> &rsaquo; <a href="../../index.html">products</a> &rsaquo; <a href="../index.html">rates</a> &rsaquo; <a href="index.html">swaps</a> &rsaquo; ibor ibor x ccy swap</nav>
+<h1>ibor ibor x ccy swap</h1>
+
+<p class="source-name">
+financepy.products.rates.swaps.ibor_ibor_x_ccy_swap
+</p>
+<h1>Class</h1>
+<section>
+
+<h2>IborIborXCcySwap</h2>
+
+
+<div class="signature">
+
+<code>IborIborXCcySwap(
+    effective_dt: Date,
+    term_dt_or_tenor: Date | str,
+    fixed_leg_type: SwapTypes,
+    fixed_cpn: float,
+    fixed_freq_type: FrequencyTypes,
+    fixed_dc_type: DayCountTypes,
+    float_spread: float = 0.0,
+    float_freq_type: FrequencyTypes = &lt;FrequencyTypes.QUARTERLY: 4&gt;,
+    float_dc_type: DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;,
+    notional: float = 1000000,
+    cal_type: CalendarTypes | list | tuple = &lt;CalendarTypes.WEEKEND: 2&gt;,
+    bd_type: BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;,
+    dg_type: DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;,
+)</code>
+
+</div>
+
+
+
+
+<div class="docstring">Class for managing a cross currency swap contract. This is a contract
+in which a fixed or floating payment leg in one currency is exchanged for a
+series of fixed or floating rates in a second currency. There is an
+exchange of par. The contract is entered into at zero initial cost and it
+lasts from a start date to a specified maturity date.
+
+The value of the contract is the NPV of the two cpn streams. Discounting
+is done on a supplied discount discount (1 for each leg) which is separate
+from the curve from which the implied index rates are extracted.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(
+    self,
+    value_dt,
+    discount_curve,
+    index_curve,
+    first_fixing_rate = None,
+    principal = 0.0,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">Value the interest rate swap on a value date given a single Ibor
+discount curve.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fixed_dts</h4>
+
+
+<div class="signature">
+
+<code>
+fixed_dts(
+    self,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">return a vector of the fixed leg payment dates</div>
+
+</div>
+
+<div class="member">
+
+<h4>float_dts</h4>
+
+
+<div class="signature">
+
+<code>
+float_dts(
+    self,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">return a vector of the fixed leg payment dates</div>
+
+</div>
+
+<div class="member">
+
+<h4>pv01</h4>
+
+
+<div class="signature">
+
+<code>
+pv01(
+    self,
+    value_dt,
+    discount_curve,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the value of 1 basis point cpn on the fixed leg.</div>
+
+</div>
+
+<div class="member">
+
+<h4>swap_rate</h4>
+
+
+<div class="signature">
+
+<code>
+swap_rate(
+    self,
+    value_dt,
+    discount_curve,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the fixed leg cpn that makes the swap worth zero.
+If the valuation date is before the swap payments start then this
+is the forward swap rate as it starts in the future. The swap rate
+is then a forward swap rate and so we use a forward discount
+factor. If the swap fixed leg has begun then we have a spot
+starting swap.</div>
+
+</div>
+
+<div class="member">
+
+<h4>fixed_leg_value</h4>
+
+
+<div class="signature">
+
+<code>
+fixed_leg_value(
+    self,
+    value_dt,
+    discount_curve,
+    principal = 0.0,
+)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>cash_settled_pv01</h4>
+
+
+<div class="signature">
+
+<code>
+cash_settled_pv01(
+    self,
+    value_dt,
+    flat_swap_rate,
+    freq_type,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">Calculate the forward value of an annuity of a forward starting
+swap using a single flat discount rate equal to the swap rate. This is
+used in the pricing of a cash-settled swaption in the IborSwaption
+class. This method does not affect the standard valuation methods.</div>
+
+</div>
+
+<div class="member">
+
+<h4>float_leg_value</h4>
+
+
+<div class="signature">
+
+<code>
+float_leg_value(
+    self,
+    value_dt,
+    discount_curve,
+    index_curve,
+    first_fixing_rate = None,
+    principal = 0.0,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">Value the floating leg with payments from an index curve and
+discounting based on a supplied discount curve. The valuation date can
+be the today date. In this case the price of the floating leg will not
+be par (assuming we added on a principal repayment). This is only the
+case if we set the valuation date to be the swap&#x27;s actual settlement
+date.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_fixed_leg_pv</h4>
+
+
+<div class="signature">
+
+<code>
+print_fixed_leg_pv(
+    self,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">Prints the fixed leg dates, accrual factors, discount factors,
+cash amounts, their present value and their cumulative PV using the
+last valuation performed.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_fixed_leg_flows</h4>
+
+
+<div class="signature">
+
+<code>
+print_fixed_leg_flows(
+    self,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">Prints the fixed leg amounts without any valuation details. Shows
+the dates and sizes of the promised fixed leg flows.</div>
+
+</div>
+
+<div class="member">
+
+<h4>print_float_leg_pv</h4>
+
+
+<div class="signature">
+
+<code>
+print_float_leg_pv(
+    self,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">Prints the floating leg dates, accrual factors, discount factors,
+forward libor rates, implied cash amounts, their present value and
+their cumulative PV using the last valuation performed.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

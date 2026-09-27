@@ -10,157 +10,258 @@
     content="width=device-width, initial-scale=1"
 >
 
-<title>Ibor Benchmarks Report - FinancePy</title>
+<title>ibor benchmarks report - FinancePy</title>
 
 
 <style>
 
+:root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --text: #172033;
+    --muted: #667085;
+    --border: #e3e8ef;
+    --primary: #3157a4;
+    --primary-dark: #243f78;
+    --primary-soft: #eef3ff;
+    --accent: #0f766e;
+    --code-bg: #f4f7fb;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    color: #222;
-    background: #ffffff;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
 }
 
 header {
-    background: #20232a;
+    background: linear-gradient(135deg, #172554 0%, #274690 100%);
     color: white;
-    padding: 20px 40px;
+    padding: 26px max(32px, calc((100vw - 1180px) / 2));
+    border-bottom: 1px solid rgba(255,255,255,.12);
 }
 
 header h1 {
     margin: 0;
     font-size: 28px;
+    letter-spacing: -0.02em;
+    color: #ffffff;
 }
 
 header p {
-    margin: 8px 0 0 0;
-    color: #cccccc;
+    margin: 5px 0 0;
+    color: #dbe5ff;
+    font-size: 14px;
 }
 
 main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px 40px 80px 40px;
+    max-width: 1180px;
+    margin: 28px auto 56px;
+    padding: 38px 48px 72px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
 }
 
 nav {
-    margin-bottom: 30px;
-    font-size: 95%;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
 }
 
-nav a {
-    margin-right: 6px;
-}
-
-a {
-    color: #0057a8;
+nav a, a {
+    color: var(--primary);
     text-decoration: none;
 }
 
-a:hover {
-    text-decoration: underline;
+a:hover { text-decoration: underline; }
+
+h1, h2, h3, h4 {
+    color: var(--text);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
 }
 
-h1 {
-    margin-top: 0;
+main > h1 {
+    margin: 0 0 14px;
+    font-size: 30px;
+}
+
+main > h1:not(:first-of-type) {
+    margin-top: 64px;
+    padding: 12px 0 10px;
+    color: var(--primary-dark);
+    font-size: 23px;
+    border-bottom: 2px solid #d9e3f7;
 }
 
 h2 {
-    margin-top: 40px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #dddddd;
+    margin: 38px 0 14px;
+    padding-bottom: 8px;
+    font-size: 21px;
+    border-bottom: 1px solid var(--border);
 }
 
 h3 {
-    margin-top: 30px;
+    margin: 28px 0 12px;
+    font-size: 17px;
+    color: var(--primary-dark);
 }
 
 h4 {
-    margin-top: 24px;
-    margin-bottom: 8px;
+    margin: 28px 0 9px;
+    font-size: 16px;
 }
 
 code {
-    font-family: Consolas, "Courier New", monospace;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: .94em;
 }
 
 pre {
-    background: #f5f5f5;
-    border: 1px solid #dddddd;
-    border-radius: 4px;
-    padding: 14px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
     overflow-x: auto;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .signature {
-    background: #f5f5f5;
-    border-left: 4px solid #777777;
-    padding: 12px;
-    margin: 10px 0 18px 0;
+    background: var(--code-bg);
+    border: 1px solid #dce4f0;
+    border-left: 4px solid var(--primary);
+    border-radius: 7px;
+    padding: 14px 16px;
+    margin: 10px 0 18px;
     overflow-x: auto;
+    color: #24324a;
+}
+
+.signature code {
+    white-space: pre;
+    font-size: 13.5px;
 }
 
 .docstring {
     white-space: pre-wrap;
-    line-height: 1.5;
-}
-
-.package-list,
-.module-list {
-    line-height: 1.9;
+    line-height: 1.68;
+    color: #344054;
+    max-width: 92ch;
 }
 
 .member {
-    margin-bottom: 35px;
+    margin: 0 0 26px;
+    padding: 2px 0 22px;
+    border-bottom: 1px solid #edf0f4;
 }
 
+.member:last-child { border-bottom: 0; }
+
 .inheritance {
-    color: #555555;
-    margin: 8px 0 14px 0;
+    display: inline-block;
+    color: var(--muted);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin: 0 0 16px;
+    font-size: 13px;
 }
 
 .source-name {
-    color: #666666;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 90%;
+    display: inline-block;
+    margin: 0 0 24px;
+    padding: 5px 9px;
+    color: #475467;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: "SFMono-Regular", Consolas, "Courier New", monospace;
+    font-size: 12.5px;
+}
+
+.enum-members {
+    display: grid;
+    gap: 7px;
+    margin: 12px 0 26px;
+}
+
+.enum-members > div {
+    padding: 8px 11px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.enum-members code:first-child {
+    color: var(--primary-dark);
+    font-weight: 650;
+}
+
+.package-list,
+.module-list { line-height: 1.9; }
+
+.module-list ul {
+    columns: 2;
+    column-gap: 32px;
+    padding-left: 22px;
 }
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(220px, 1fr)
-    );
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 14px;
     margin-top: 20px;
 }
 
 .card {
-    border: 1px solid #dddddd;
-    border-radius: 5px;
-    padding: 16px;
-    background: #fafafa;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 17px 18px;
+    background: var(--surface);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .03);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
 
-.card h3 {
-    margin-top: 0;
-    margin-bottom: 8px;
+.card:hover {
+    transform: translateY(-1px);
+    border-color: #cbd7eb;
+    box-shadow: 0 5px 16px rgba(16, 24, 40, .06);
 }
 
-.card p {
-    margin-bottom: 0;
-    color: #555555;
-}
+.card h3 { margin: 0 0 6px; }
+.card p { margin: 0; color: var(--muted); font-size: 13px; }
 
 .generated {
-    margin-top: 60px;
-    padding-top: 15px;
-    border-top: 1px solid #dddddd;
-    color: #777777;
-    font-size: 90%;
+    margin-top: 64px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    color: #98a2b3;
+    font-size: 12.5px;
+}
+
+@media (max-width: 760px) {
+    header { padding: 22px 20px; }
+    main {
+        margin: 0;
+        padding: 28px 20px 56px;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .module-list ul { columns: 1; }
 }
 
 </style>
@@ -179,8 +280,8 @@ pre {
 </header>
 
 <main>
-<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Rates</a> &rsaquo; Ibor Benchmarks Report</nav>
-<h1>Ibor Benchmarks Report</h1>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">products</a> &rsaquo; <a href="index.html">rates</a> &rsaquo; ibor benchmarks report</nav>
+<h1>ibor benchmarks report</h1>
 
 <p class="source-name">
 financepy.products.rates.ibor_benchmarks_report
@@ -193,7 +294,13 @@ financepy.products.rates.ibor_benchmarks_report
 <div class="signature">
 
 <code>
-benchmarks_report(benchmarks, value_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, index_curve: financepy.market.curves.discount_curve.DiscountCurve = None, include_objects=False)
+benchmarks_report(
+    benchmarks,
+    value_dt: Date,
+    discount_curve: DiscountCurve,
+    index_curve: DiscountCurve = None,
+    include_objects = False,
+)
 </code>
 
 </div>
@@ -213,7 +320,11 @@ spots</div>
 <div class="signature">
 
 <code>
-dataframe_to_benchmarks(df: pandas.core.frame.DataFrame, asof_date: financepy.utils.date.Date, calendar_type: financepy.utils.calendar.CalendarTypes)
+dataframe_to_benchmarks(
+    df: pandas.core.frame.DataFrame,
+    asof_date: Date,
+    calendar_type: CalendarTypes,
+)
 </code>
 
 </div>
@@ -243,7 +354,10 @@ Returns:
 <div class="signature">
 
 <code>
-ibor_benchmarks_report(ibor_curve: financepy.products.rates.ibor_single_curve.IborSingleCurve, include_objects=False)
+ibor_benchmarks_report(
+    ibor_curve: IborSingleCurve,
+    include_objects = False,
+)
 </code>
 
 </div>

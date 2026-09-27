@@ -10,157 +10,258 @@
     content="width=device-width, initial-scale=1"
 >
 
-<title>Discount Curve - FinancePy</title>
+<title>discount curve - FinancePy</title>
 
 
 <style>
 
+:root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --text: #172033;
+    --muted: #667085;
+    --border: #e3e8ef;
+    --primary: #3157a4;
+    --primary-dark: #243f78;
+    --primary-soft: #eef3ff;
+    --accent: #0f766e;
+    --code-bg: #f4f7fb;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    color: #222;
-    background: #ffffff;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
 }
 
 header {
-    background: #20232a;
+    background: linear-gradient(135deg, #172554 0%, #274690 100%);
     color: white;
-    padding: 20px 40px;
+    padding: 26px max(32px, calc((100vw - 1180px) / 2));
+    border-bottom: 1px solid rgba(255,255,255,.12);
 }
 
 header h1 {
     margin: 0;
     font-size: 28px;
+    letter-spacing: -0.02em;
+    color: #ffffff;
 }
 
 header p {
-    margin: 8px 0 0 0;
-    color: #cccccc;
+    margin: 5px 0 0;
+    color: #dbe5ff;
+    font-size: 14px;
 }
 
 main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px 40px 80px 40px;
+    max-width: 1180px;
+    margin: 28px auto 56px;
+    padding: 38px 48px 72px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
 }
 
 nav {
-    margin-bottom: 30px;
-    font-size: 95%;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
 }
 
-nav a {
-    margin-right: 6px;
-}
-
-a {
-    color: #0057a8;
+nav a, a {
+    color: var(--primary);
     text-decoration: none;
 }
 
-a:hover {
-    text-decoration: underline;
+a:hover { text-decoration: underline; }
+
+h1, h2, h3, h4 {
+    color: var(--text);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
 }
 
-h1 {
-    margin-top: 0;
+main > h1 {
+    margin: 0 0 14px;
+    font-size: 30px;
+}
+
+main > h1:not(:first-of-type) {
+    margin-top: 64px;
+    padding: 12px 0 10px;
+    color: var(--primary-dark);
+    font-size: 23px;
+    border-bottom: 2px solid #d9e3f7;
 }
 
 h2 {
-    margin-top: 40px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #dddddd;
+    margin: 38px 0 14px;
+    padding-bottom: 8px;
+    font-size: 21px;
+    border-bottom: 1px solid var(--border);
 }
 
 h3 {
-    margin-top: 30px;
+    margin: 28px 0 12px;
+    font-size: 17px;
+    color: var(--primary-dark);
 }
 
 h4 {
-    margin-top: 24px;
-    margin-bottom: 8px;
+    margin: 28px 0 9px;
+    font-size: 16px;
 }
 
 code {
-    font-family: Consolas, "Courier New", monospace;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: .94em;
 }
 
 pre {
-    background: #f5f5f5;
-    border: 1px solid #dddddd;
-    border-radius: 4px;
-    padding: 14px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
     overflow-x: auto;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .signature {
-    background: #f5f5f5;
-    border-left: 4px solid #777777;
-    padding: 12px;
-    margin: 10px 0 18px 0;
+    background: var(--code-bg);
+    border: 1px solid #dce4f0;
+    border-left: 4px solid var(--primary);
+    border-radius: 7px;
+    padding: 14px 16px;
+    margin: 10px 0 18px;
     overflow-x: auto;
+    color: #24324a;
+}
+
+.signature code {
+    white-space: pre;
+    font-size: 13.5px;
 }
 
 .docstring {
     white-space: pre-wrap;
-    line-height: 1.5;
-}
-
-.package-list,
-.module-list {
-    line-height: 1.9;
+    line-height: 1.68;
+    color: #344054;
+    max-width: 92ch;
 }
 
 .member {
-    margin-bottom: 35px;
+    margin: 0 0 26px;
+    padding: 2px 0 22px;
+    border-bottom: 1px solid #edf0f4;
 }
 
+.member:last-child { border-bottom: 0; }
+
 .inheritance {
-    color: #555555;
-    margin: 8px 0 14px 0;
+    display: inline-block;
+    color: var(--muted);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin: 0 0 16px;
+    font-size: 13px;
 }
 
 .source-name {
-    color: #666666;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 90%;
+    display: inline-block;
+    margin: 0 0 24px;
+    padding: 5px 9px;
+    color: #475467;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: "SFMono-Regular", Consolas, "Courier New", monospace;
+    font-size: 12.5px;
+}
+
+.enum-members {
+    display: grid;
+    gap: 7px;
+    margin: 12px 0 26px;
+}
+
+.enum-members > div {
+    padding: 8px 11px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.enum-members code:first-child {
+    color: var(--primary-dark);
+    font-weight: 650;
+}
+
+.package-list,
+.module-list { line-height: 1.9; }
+
+.module-list ul {
+    columns: 2;
+    column-gap: 32px;
+    padding-left: 22px;
 }
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(220px, 1fr)
-    );
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 14px;
     margin-top: 20px;
 }
 
 .card {
-    border: 1px solid #dddddd;
-    border-radius: 5px;
-    padding: 16px;
-    background: #fafafa;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 17px 18px;
+    background: var(--surface);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .03);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
 
-.card h3 {
-    margin-top: 0;
-    margin-bottom: 8px;
+.card:hover {
+    transform: translateY(-1px);
+    border-color: #cbd7eb;
+    box-shadow: 0 5px 16px rgba(16, 24, 40, .06);
 }
 
-.card p {
-    margin-bottom: 0;
-    color: #555555;
-}
+.card h3 { margin: 0 0 6px; }
+.card p { margin: 0; color: var(--muted); font-size: 13px; }
 
 .generated {
-    margin-top: 60px;
-    padding-top: 15px;
-    border-top: 1px solid #dddddd;
-    color: #777777;
-    font-size: 90%;
+    margin-top: 64px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    color: #98a2b3;
+    font-size: 12.5px;
+}
+
+@media (max-width: 760px) {
+    header { padding: 22px 20px; }
+    main {
+        margin: 0;
+        padding: 28px 20px 56px;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .module-list ul { columns: 1; }
 }
 
 </style>
@@ -179,24 +280,30 @@ pre {
 </header>
 
 <main>
-<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Market</a> &rsaquo; <a href="index.html">Curves</a> &rsaquo; Discount Curve</nav>
-<h1>Discount Curve</h1>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">market</a> &rsaquo; <a href="index.html">curves</a> &rsaquo; discount curve</nav>
+<h1>discount curve</h1>
 
 <p class="source-name">
 financepy.market.curves.discount_curve
 </p>
-<h1>Classes</h1>
+<h1>Class</h1>
 <section>
 
 <h2>DiscountCurve</h2>
 
+
 <div class="signature">
 
-<code>
-DiscountCurve(anchor_dt: financepy.utils.date.Date, df_dates: list = None, df_values: list | numpy.ndarray = None, interp_type: financepy.market.curves.interpolator.InterpTypes = &lt;InterpTypes.FLAT_FWD_RATES: 1&gt;, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;) -&gt; None
-</code>
+<code>DiscountCurve(
+    anchor_dt: Date,
+    df_dates: list = None,
+    df_values: list | numpy.ndarray = None,
+    interp_type: InterpTypes = &lt;InterpTypes.FLAT_FWD_RATES: 1&gt;,
+    curve_dc_type: DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;,
+) -&gt; None</code>
 
 </div>
+
 
 
 
@@ -213,7 +320,10 @@ interpolating between these fixed points.</div>
 <div class="signature">
 
 <code>
-set_times(self, times: numpy.ndarray)
+set_times(
+    self,
+    times: numpy.ndarray,
+)
 </code>
 
 </div>
@@ -231,7 +341,10 @@ set_times(self, times: numpy.ndarray)
 <div class="signature">
 
 <code>
-set_dfs(self, dfs: numpy.ndarray)
+set_dfs(
+    self,
+    dfs: numpy.ndarray,
+)
 </code>
 
 </div>
@@ -249,7 +362,10 @@ set_dfs(self, dfs: numpy.ndarray)
 <div class="signature">
 
 <code>
-set_last_df(self, df)
+set_last_df(
+    self,
+    df,
+)
 </code>
 
 </div>
@@ -267,7 +383,11 @@ set_last_df(self, df)
 <div class="signature">
 
 <code>
-fit(self, times: numpy.ndarray, dfs: numpy.ndarray)
+fit(
+    self,
+    times: numpy.ndarray,
+    dfs: numpy.ndarray,
+)
 </code>
 
 </div>
@@ -285,7 +405,14 @@ fit(self, times: numpy.ndarray, dfs: numpy.ndarray)
 <div class="signature">
 
 <code>
-fwd_rate(self, start_dt: list | financepy.utils.date.Date, date_or_tenor: financepy.utils.date.Date | str | list, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;, comp_type: financepy.utils.compounding.CompoundingTypes = &lt;CompoundingTypes.MMKT: 1&gt;, freq_type: financepy.utils.frequency.FrequencyTypes = None)
+fwd_rate(
+    self,
+    start_dt: list | financepy.utils.date.Date,
+    date_or_tenor: Date | str | list,
+    accrual_dc_type: DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;,
+    comp_type: CompoundingTypes = &lt;CompoundingTypes.MMKT: 1&gt;,
+    freq_type: FrequencyTypes = None,
+)
 </code>
 
 </div>
@@ -306,7 +433,14 @@ self.curve_dc_type is used for curve time conversion / interpolation.</div>
 <div class="signature">
 
 <code>
-fwd_rate_t(self, start_t: float | list | numpy.ndarray, end_t: float | list | numpy.ndarray, accrual: float | list | numpy.ndarray = None, comp_type: financepy.utils.compounding.CompoundingTypes = &lt;CompoundingTypes.MMKT: 1&gt;, freq_type: financepy.utils.frequency.FrequencyTypes = None)
+fwd_rate_t(
+    self,
+    start_t: float | list | numpy.ndarray,
+    end_t: float | list | numpy.ndarray,
+    accrual: float | list | numpy.ndarray = None,
+    comp_type: CompoundingTypes = &lt;CompoundingTypes.MMKT: 1&gt;,
+    freq_type: FrequencyTypes = None,
+)
 </code>
 
 </div>
@@ -324,7 +458,11 @@ fwd_rate_t(self, start_t: float | list | numpy.ndarray, end_t: float | list | nu
 <div class="signature">
 
 <code>
-fwd_rate_inst(self, dts: financepy.utils.date.Date | list, dt: float = 1e-06)
+fwd_rate_inst(
+    self,
+    dts: Date | list,
+    dt: float = 1e-06,
+)
 </code>
 
 </div>
@@ -342,7 +480,11 @@ fwd_rate_inst(self, dts: financepy.utils.date.Date | list, dt: float = 1e-06)
 <div class="signature">
 
 <code>
-fwd_rate_inst_t(self, t: float | list | numpy.ndarray, dt: float = 0.0001)
+fwd_rate_inst_t(
+    self,
+    t: float | list | numpy.ndarray,
+    dt: float = 0.0001,
+)
 </code>
 
 </div>
@@ -366,7 +508,11 @@ using a central finite difference.</div>
 <div class="signature">
 
 <code>
-zero_rate(self, maturity_dt: list | financepy.utils.date.Date, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;)
+zero_rate(
+    self,
+    maturity_dt: list | financepy.utils.date.Date,
+    freq_type: FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;,
+)
 </code>
 
 </div>
@@ -384,7 +530,10 @@ zero_rate(self, maturity_dt: list | financepy.utils.date.Date, freq_type: financ
 <div class="signature">
 
 <code>
-curve_years(self, maturity_dt: list | financepy.utils.date.Date)
+curve_years(
+    self,
+    maturity_dt: list | financepy.utils.date.Date,
+)
 </code>
 
 </div>
@@ -402,7 +551,11 @@ curve_years(self, maturity_dt: list | financepy.utils.date.Date)
 <div class="signature">
 
 <code>
-fwd_zero_rate_cc(self, start_dt: financepy.utils.date.Date, end_dt: financepy.utils.date.Date)
+fwd_zero_rate_cc(
+    self,
+    start_dt: Date,
+    end_dt: Date,
+)
 </code>
 
 </div>
@@ -420,7 +573,10 @@ fwd_zero_rate_cc(self, start_dt: financepy.utils.date.Date, end_dt: financepy.ut
 <div class="signature">
 
 <code>
-zero_rate_cc(self, maturity_dt: list | financepy.utils.date.Date)
+zero_rate_cc(
+    self,
+    maturity_dt: list | financepy.utils.date.Date,
+)
 </code>
 
 </div>
@@ -438,7 +594,10 @@ zero_rate_cc(self, maturity_dt: list | financepy.utils.date.Date)
 <div class="signature">
 
 <code>
-zero_rate_cc_t(self, t)
+zero_rate_cc_t(
+    self,
+    t,
+)
 </code>
 
 </div>
@@ -456,7 +615,11 @@ zero_rate_cc_t(self, t)
 <div class="signature">
 
 <code>
-zero_rate_t(self, t, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;)
+zero_rate_t(
+    self,
+    t,
+    freq_type: FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;,
+)
 </code>
 
 </div>
@@ -474,7 +637,13 @@ zero_rate_t(self, t, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;F
 <div class="signature">
 
 <code>
-swap_rate(self, effective_dt: financepy.utils.date.Date, maturity_dt: list | financepy.utils.date.Date, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;)
+swap_rate(
+    self,
+    effective_dt: Date,
+    maturity_dt: list | financepy.utils.date.Date,
+    freq_type: FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;,
+    accrual_dc_type: DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;,
+)
 </code>
 
 </div>
@@ -492,7 +661,13 @@ swap_rate(self, effective_dt: financepy.utils.date.Date, maturity_dt: list | fin
 <div class="signature">
 
 <code>
-swap_rate_old(self, effective_dt: financepy.utils.date.Date, maturity_dt: list | financepy.utils.date.Date, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;)
+swap_rate_old(
+    self,
+    effective_dt: Date,
+    maturity_dt: list | financepy.utils.date.Date,
+    freq_type: FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;,
+    accrual_dc_type: DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;,
+)
 </code>
 
 </div>
@@ -512,7 +687,13 @@ rate except that we do not do any business day adjustments.</div>
 <div class="signature">
 
 <code>
-par_rate(self, effective_dt: financepy.utils.date.Date, maturity_dt: list | financepy.utils.date.Date, freq_type: financepy.utils.frequency.FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;, accrual_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;)
+par_rate(
+    self,
+    effective_dt: Date,
+    maturity_dt: list | financepy.utils.date.Date,
+    freq_type: FrequencyTypes = &lt;FrequencyTypes.ANNUAL: 1&gt;,
+    accrual_dc_type: DayCountTypes = &lt;DayCountTypes.THIRTY_E_360: 2&gt;,
+)
 </code>
 
 </div>
@@ -532,7 +713,11 @@ rate except that we do not do any business day adjustments.</div>
 <div class="signature">
 
 <code>
-par_rate_simple_t(self, t_maturity, freq=2)
+par_rate_simple_t(
+    self,
+    t_maturity,
+    freq = 2,
+)
 </code>
 
 </div>
@@ -559,7 +744,12 @@ freq : int
 <div class="signature">
 
 <code>
-par_rate_t(self, t_start: float, payment_times: numpy.ndarray, accrual_factors: numpy.ndarray)
+par_rate_t(
+    self,
+    t_start: float,
+    payment_times: numpy.ndarray,
+    accrual_factors: numpy.ndarray,
+)
 </code>
 
 </div>
@@ -577,7 +767,10 @@ par_rate_t(self, t_start: float, payment_times: numpy.ndarray, accrual_factors: 
 <div class="signature">
 
 <code>
-df(self, dt: list | financepy.utils.date.Date)
+df(
+    self,
+    dt: list | financepy.utils.date.Date,
+)
 </code>
 
 </div>
@@ -597,7 +790,10 @@ to years.</div>
 <div class="signature">
 
 <code>
-df_t(self, t: float | numpy.ndarray)
+df_t(
+    self,
+    t: float | numpy.ndarray,
+)
 </code>
 
 </div>
@@ -616,7 +812,10 @@ vector of times. Discourage usage in favour of passing in dates.</div>
 <div class="signature">
 
 <code>
-bump_parallel(self, bump_size: float)
+bump_parallel(
+    self,
+    bump_size: float,
+)
 </code>
 
 </div>
@@ -636,7 +835,13 @@ curve. This is used for interest rate risk.</div>
 <div class="signature">
 
 <code>
-bump_bucket(self, bucket_start: float, bucket_end: float, bump_size: float, interp_type=None)
+bump_bucket(
+    self,
+    bucket_start: float,
+    bucket_end: float,
+    bump_size: float,
+    interp_type = None,
+)
 </code>
 
 </div>
@@ -655,7 +860,10 @@ only between bucket_start and bucket_end years.</div>
 <div class="signature">
 
 <code>
-survival_prob(self, dt: financepy.utils.date.Date) -&gt; float
+survival_prob(
+    self,
+    dt: Date,
+) -&gt; float
 </code>
 
 </div>
@@ -676,7 +884,14 @@ analogous to a discount factor.</div>
 <div class="signature">
 
 <code>
-plot(self, title, times: numpy.ndarray = None, ymin: float = None, ymax: float = None, filename: str = None)
+plot(
+    self,
+    title,
+    times: numpy.ndarray = None,
+    ymin: float = None,
+    ymax: float = None,
+    filename: str = None,
+)
 </code>
 
 </div>

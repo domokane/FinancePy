@@ -10,157 +10,258 @@
     content="width=device-width, initial-scale=1"
 >
 
-<title>Models - FinancePy</title>
+<title>models - FinancePy</title>
 
 
 <style>
 
+:root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --text: #172033;
+    --muted: #667085;
+    --border: #e3e8ef;
+    --primary: #3157a4;
+    --primary-dark: #243f78;
+    --primary-soft: #eef3ff;
+    --accent: #0f766e;
+    --code-bg: #f4f7fb;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    color: #222;
-    background: #ffffff;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
 }
 
 header {
-    background: #20232a;
+    background: linear-gradient(135deg, #172554 0%, #274690 100%);
     color: white;
-    padding: 20px 40px;
+    padding: 26px max(32px, calc((100vw - 1180px) / 2));
+    border-bottom: 1px solid rgba(255,255,255,.12);
 }
 
 header h1 {
     margin: 0;
     font-size: 28px;
+    letter-spacing: -0.02em;
+    color: #ffffff;
 }
 
 header p {
-    margin: 8px 0 0 0;
-    color: #cccccc;
+    margin: 5px 0 0;
+    color: #dbe5ff;
+    font-size: 14px;
 }
 
 main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px 40px 80px 40px;
+    max-width: 1180px;
+    margin: 28px auto 56px;
+    padding: 38px 48px 72px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
 }
 
 nav {
-    margin-bottom: 30px;
-    font-size: 95%;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
 }
 
-nav a {
-    margin-right: 6px;
-}
-
-a {
-    color: #0057a8;
+nav a, a {
+    color: var(--primary);
     text-decoration: none;
 }
 
-a:hover {
-    text-decoration: underline;
+a:hover { text-decoration: underline; }
+
+h1, h2, h3, h4 {
+    color: var(--text);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
 }
 
-h1 {
-    margin-top: 0;
+main > h1 {
+    margin: 0 0 14px;
+    font-size: 30px;
+}
+
+main > h1:not(:first-of-type) {
+    margin-top: 64px;
+    padding: 12px 0 10px;
+    color: var(--primary-dark);
+    font-size: 23px;
+    border-bottom: 2px solid #d9e3f7;
 }
 
 h2 {
-    margin-top: 40px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #dddddd;
+    margin: 38px 0 14px;
+    padding-bottom: 8px;
+    font-size: 21px;
+    border-bottom: 1px solid var(--border);
 }
 
 h3 {
-    margin-top: 30px;
+    margin: 28px 0 12px;
+    font-size: 17px;
+    color: var(--primary-dark);
 }
 
 h4 {
-    margin-top: 24px;
-    margin-bottom: 8px;
+    margin: 28px 0 9px;
+    font-size: 16px;
 }
 
 code {
-    font-family: Consolas, "Courier New", monospace;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: .94em;
 }
 
 pre {
-    background: #f5f5f5;
-    border: 1px solid #dddddd;
-    border-radius: 4px;
-    padding: 14px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
     overflow-x: auto;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .signature {
-    background: #f5f5f5;
-    border-left: 4px solid #777777;
-    padding: 12px;
-    margin: 10px 0 18px 0;
+    background: var(--code-bg);
+    border: 1px solid #dce4f0;
+    border-left: 4px solid var(--primary);
+    border-radius: 7px;
+    padding: 14px 16px;
+    margin: 10px 0 18px;
     overflow-x: auto;
+    color: #24324a;
+}
+
+.signature code {
+    white-space: pre;
+    font-size: 13.5px;
 }
 
 .docstring {
     white-space: pre-wrap;
-    line-height: 1.5;
-}
-
-.package-list,
-.module-list {
-    line-height: 1.9;
+    line-height: 1.68;
+    color: #344054;
+    max-width: 92ch;
 }
 
 .member {
-    margin-bottom: 35px;
+    margin: 0 0 26px;
+    padding: 2px 0 22px;
+    border-bottom: 1px solid #edf0f4;
 }
 
+.member:last-child { border-bottom: 0; }
+
 .inheritance {
-    color: #555555;
-    margin: 8px 0 14px 0;
+    display: inline-block;
+    color: var(--muted);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin: 0 0 16px;
+    font-size: 13px;
 }
 
 .source-name {
-    color: #666666;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 90%;
+    display: inline-block;
+    margin: 0 0 24px;
+    padding: 5px 9px;
+    color: #475467;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: "SFMono-Regular", Consolas, "Courier New", monospace;
+    font-size: 12.5px;
+}
+
+.enum-members {
+    display: grid;
+    gap: 7px;
+    margin: 12px 0 26px;
+}
+
+.enum-members > div {
+    padding: 8px 11px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.enum-members code:first-child {
+    color: var(--primary-dark);
+    font-weight: 650;
+}
+
+.package-list,
+.module-list { line-height: 1.9; }
+
+.module-list ul {
+    columns: 2;
+    column-gap: 32px;
+    padding-left: 22px;
 }
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(220px, 1fr)
-    );
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 14px;
     margin-top: 20px;
 }
 
 .card {
-    border: 1px solid #dddddd;
-    border-radius: 5px;
-    padding: 16px;
-    background: #fafafa;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 17px 18px;
+    background: var(--surface);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .03);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
 
-.card h3 {
-    margin-top: 0;
-    margin-bottom: 8px;
+.card:hover {
+    transform: translateY(-1px);
+    border-color: #cbd7eb;
+    box-shadow: 0 5px 16px rgba(16, 24, 40, .06);
 }
 
-.card p {
-    margin-bottom: 0;
-    color: #555555;
-}
+.card h3 { margin: 0 0 6px; }
+.card p { margin: 0; color: var(--muted); font-size: 13px; }
 
 .generated {
-    margin-top: 60px;
-    padding-top: 15px;
-    border-top: 1px solid #dddddd;
-    color: #777777;
-    font-size: 90%;
+    margin-top: 64px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    color: #98a2b3;
+    font-size: 12.5px;
+}
+
+@media (max-width: 760px) {
+    header { padding: 22px 20px; }
+    main {
+        margin: 0;
+        padding: 28px 20px 56px;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .module-list ul { columns: 1; }
 }
 
 </style>
@@ -179,8 +280,8 @@ pre {
 </header>
 
 <main>
-<nav><a href="../index.html">FinancePy</a> &rsaquo; Models</nav>
-<h1>Models</h1>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; models</nav>
+<h1>models</h1>
 
 <p class="source-name">
 financepy.models
@@ -194,271 +295,265 @@ financepy.models
 
 <li>
 <a href="bachelier.html">
-Bachelier
+bachelier
+</a>
+</li>
+
+<li>
+<a href="barrier_option_mc.html">
+barrier option mc
+</a>
+</li>
+
+<li>
+<a href="barrier_option_model.html">
+barrier option model
 </a>
 </li>
 
 <li>
 <a href="bdt_tree.html">
-Bdt Tree
+bdt tree
 </a>
 </li>
 
 <li>
 <a href="bk_tree.html">
-Bk Tree
+bk tree
 </a>
 </li>
 
 <li>
 <a href="black.html">
-Black
+black
 </a>
 </li>
 
 <li>
 <a href="black_scholes.html">
-Black Scholes
-</a>
-</li>
-
-<li>
-<a href="black_scholes_analytic.html">
-Black Scholes Analytic
+black scholes
 </a>
 </li>
 
 <li>
 <a href="black_scholes_hedging_sim.html">
-Black Scholes Hedging Sim
+black scholes hedging sim
 </a>
 </li>
 
 <li>
 <a href="black_scholes_mc.html">
-Black Scholes Mc
+black scholes mc
 </a>
 </li>
 
 <li>
 <a href="black_scholes_mc_tests.html">
-Black Scholes Mc Tests
+black scholes mc tests
 </a>
 </li>
 
 <li>
 <a href="black_shifted.html">
-Black Shifted
+black shifted
 </a>
 </li>
 
 <li>
 <a href="bs_digital_option.html">
-Bs Digital Option
+bs digital option
 </a>
 </li>
 
 <li>
 <a href="cev.html">
-Cev
+cev
 </a>
 </li>
 
 <li>
 <a href="cir_montecarlo.html">
-Cir Montecarlo
+cir montecarlo
 </a>
 </li>
 
 <li>
 <a href="dupire.html">
-Dupire
+dupire
 </a>
 </li>
 
 <li>
 <a href="equity_asian_option_bs.html">
-Equity Asian Option Bs
-</a>
-</li>
-
-<li>
-<a href="equity_barrier_option_mc.html">
-Equity Barrier Option Mc
+equity asian option bs
 </a>
 </li>
 
 <li>
 <a href="equity_chooser_bs.html">
-Equity Chooser Bs
+equity chooser bs
 </a>
 </li>
 
 <li>
 <a href="equity_compound_option_bs.html">
-Equity Compound Option Bs
+equity compound option bs
 </a>
 </li>
 
 <li>
 <a href="equity_crr_tree.html">
-Equity Crr Tree
+equity crr tree
 </a>
 </li>
 
 <li>
 <a href="equity_lsmc.html">
-Equity Lsmc
+equity lsmc
 </a>
 </li>
 
 <li>
 <a href="finite_difference.html">
-Finite Difference
+finite difference
 </a>
 </li>
 
 <li>
 <a href="finite_difference_psor.html">
-Finite Difference Psor
-</a>
-</li>
-
-<li>
-<a href="fx_barrier_model.html">
-Fx Barrier Model
+finite difference psor
 </a>
 </li>
 
 <li>
 <a href="gauss_copula.html">
-Gauss Copula
+gauss copula
 </a>
 </li>
 
 <li>
 <a href="gauss_copula_lhplus.html">
-Gauss Copula Lhplus
+gauss copula lhplus
 </a>
 </li>
 
 <li>
 <a href="heston.html">
-Heston
+heston
 </a>
 </li>
 
 <li>
 <a href="hw_tree.html">
-Hw Tree
+hw tree
 </a>
 </li>
 
 <li>
 <a href="implied_volatility_surface.html">
-Implied Volatility Surface
+implied volatility surface
 </a>
 </li>
 
 <li>
 <a href="lmm_mc.html">
-Lmm Mc
+lmm mc
 </a>
 </li>
 
 <li>
 <a href="lognormal_mixture_model.html">
-Lognormal Mixture Model
+lognormal mixture model
 </a>
 </li>
 
 <li>
 <a href="lognormal_mixture_surface.html">
-Lognormal Mixture Surface
+lognormal mixture surface
 </a>
 </li>
 
 <li>
 <a href="merton_firm.html">
-Merton Firm
+merton firm
 </a>
 </li>
 
 <li>
 <a href="merton_firm_mkt.html">
-Merton Firm Mkt
+merton firm mkt
 </a>
 </li>
 
 <li>
 <a href="merton_jump_diffusion.html">
-Merton Jump Diffusion
+merton jump diffusion
 </a>
 </li>
 
 <li>
 <a href="model.html">
-Model
+model
 </a>
 </li>
 
 <li>
 <a href="option_implied_dbn.html">
-Option Implied Dbn
+option implied dbn
 </a>
 </li>
 
 <li>
 <a href="process_simulator.html">
-Process Simulator
+process simulator
 </a>
 </li>
 
 <li>
 <a href="rates_ho_lee.html">
-Rates Ho Lee
+rates ho lee
 </a>
 </li>
 
 <li>
 <a href="sabr.html">
-Sabr
+sabr
 </a>
 </li>
 
 <li>
 <a href="sabr_shifted.html">
-Sabr Shifted
+sabr shifted
 </a>
 </li>
 
 <li>
 <a href="ssvi_surface.html">
-Ssvi Surface
+ssvi surface
 </a>
 </li>
 
 <li>
 <a href="student_t_copula.html">
-Student T Copula
+student t copula
 </a>
 </li>
 
 <li>
 <a href="svi.html">
-Svi
+svi
 </a>
 </li>
 
 <li>
 <a href="svi_surface.html">
-Svi Surface
+svi surface
 </a>
 </li>
 
 <li>
 <a href="vasicek_mc.html">
-Vasicek Mc
+vasicek mc
 </a>
 </li>
 

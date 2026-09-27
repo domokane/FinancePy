@@ -32,8 +32,8 @@ def test_convergence_fn():
     expiry_dt = Date(1, 1, 2015)
     stock_price = 100.0
     volatility = 0.20
-    interest_rate = 0.30
-    dividend_yield = 0.10
+    interest_rate = 0.03
+    dividend_yield = 0.02
     num_obs_per_year = 120
     accrued_avg = None
     k = 100
@@ -51,16 +51,17 @@ def test_convergence_fn():
         num_obs_per_year,
     )
 
-    test_cases.header("K", "Geometric", "Turnbull_Wakeman", "Curran", "MC", "FastMC", "FastMC_CV")
+    test_cases.header("K", "Geometric", "Turnbull_Wakeman",
+                      "Curran", "MC", "FastMC", "FastMC_CV")
 
+    values_geometric = []
     values_turnbull = []
     values_curran = []
-    values_geometric = []
     values_mc = []
     values_mc_fast = []
     values_mc_fast_cv = []
 
-    num_paths_list = [500, 1000, 2000, 3000, 4000, 5000, 10000, 20000, 50000]
+    num_paths_list = [5000, 10000, 20000, 30000, 40000, 50000]
 
     for num_paths in num_paths_list:
 
@@ -104,7 +105,7 @@ def test_convergence_fn():
             discount_curve,
             dividend_curve,
             model,
-            AsianOptionValuationTypes.GEOMETRIC,
+            AsianOptionValuationTypes.KEMNA_VORST,
             accrued_avg,
         )
 
@@ -148,7 +149,7 @@ def test_convergence_fn():
     if PLOT_FLAG:
 
         x = num_paths_list
-        plt.figure(figsize=(8, 6))
+        plt.figure()
         plt.plot(x, values_geometric, label="Geometric")
         plt.plot(x, values_turnbull, label="Turbull_Wakeman")
         plt.plot(x, values_curran, label="Curran")
@@ -169,8 +170,8 @@ def test_time_evolution_fn():
     expiry_dt = Date(1, 1, 2016)
     stock_price = 100.0
     volatility = 0.20
-    interest_rate = 0.30
-    dividend_yield = 0.10
+    interest_rate = 0.05
+    dividend_yield = 0.02
     num_obs_per_year = 100
     accrued_avg = None
     k = 100
@@ -247,7 +248,7 @@ def test_time_evolution_fn():
             discount_curve,
             dividend_curve,
             model,
-            AsianOptionValuationTypes.GEOMETRIC,
+            AsianOptionValuationTypes.KEMNA_VORST,
             accrued_avg,
         )
 
@@ -289,7 +290,7 @@ def test_time_evolution_fn():
     if PLOT_FLAG is True:
 
         x = [(dt-value_dt)/365 for dt in value_dts]
-        plt.figure(figsize=(8, 6))
+        plt.figure()
         plt.plot(x, values_geometric, label="Geometric")
         plt.plot(x, values_turnbull, label="Turbull_Wakeman")
         plt.plot(x, values_curran, label="Curran")
@@ -310,8 +311,8 @@ def test_mc_timings_fn():
     expiry_dt = Date(1, 1, 2015)
     stock_price = 100.0
     volatility = 0.20
-    interest_rate = 0.30
-    dividend_yield = 0.10
+    interest_rate = 0.05
+    dividend_yield = 0.02
     num_obs_per_year = 120
     accrued_avg = None
     k = 100
@@ -339,7 +340,7 @@ def test_mc_timings_fn():
     tvalues_mc_fast = []
     tvalues_mc_fast_cv = []
 
-    num_paths_list = [100, 500, 1000, 2000, 3000, 4000, 5000]
+    num_paths_list = [1000, 2000, 3000, 4000, 5000, 10000]
 
     for num_paths in num_paths_list:
 
@@ -408,12 +409,10 @@ def test_mc_timings_fn():
             t_mc_fast_cv,
         )
 
-    ########################################################################################
-
     if PLOT_FLAG:
 
         x = num_paths_list
-        plt.figure(figsize=(8, 6))
+        plt.figure()
         plt.plot(x, values_mc, label="Basic MC")
         plt.plot(x, values_mc_fast, label="MC_Fast")
         plt.plot(x, values_mc_fast_cv, label="MC_Fast CV")
@@ -421,9 +420,73 @@ def test_mc_timings_fn():
         plt.xlabel("Number of Paths")
         plt.show()
 
+    ########################################################################################
+
+
+def test_r_equals_q_fn():
+
+    value_dt = Date(1, 1, 2014)
+    start_averaging_date = Date(1, 6, 2014)
+    expiry_dt = Date(1, 1, 2015)
+
+    stock_price = 100.0
+    volatility = 0.20
+
+    interest_rate = 0.05
+    dividend_yield = 0.05
+
+    num_obs_per_year = 120
+    k = 100.0
+
+    model = BlackScholes(volatility)
+
+    discount_curve = FlatDiscountCurve(
+        value_dt,
+        interest_rate,
+    )
+
+    dividend_curve = FlatDiscountCurve(
+        value_dt,
+        dividend_yield,
+    )
+
+    asian_option = EquityAsianOption(
+        start_averaging_date,
+        expiry_dt,
+        k,
+        OptionTypes.EUROPEAN_CALL,
+        num_obs_per_year,
+    )
+
+    test_cases.header(
+        "METHOD",
+        "VALUE",
+    )
+
+    for method in [
+        AsianOptionValuationTypes.KEMNA_VORST,
+        AsianOptionValuationTypes.TURNBULL_WAKEMAN,
+        AsianOptionValuationTypes.CURRAN,
+    ]:
+
+        value = asian_option.value(
+            value_dt,
+            stock_price,
+            discount_curve,
+            dividend_curve,
+            model,
+            method,
+            None,
+        )
+
+        test_cases.print(
+            str(method),
+            value,
+        )
+
 
 test_convergence_fn()
 test_mc_timings_fn()
 test_time_evolution_fn()
-
+test_r_equals_q_fn()
 test_cases.compare_test_cases()

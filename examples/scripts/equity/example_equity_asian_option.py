@@ -18,7 +18,7 @@ from financepy.products.equity.equity_asian_option import (
 )
 from financepy.utils.global_types import OptionTypes
 
-num_replications = 10
+num_replications = 100
 
 # ============================================================================
 # 1. ASIAN OPTION VALUATION METHODS
@@ -48,8 +48,8 @@ stock_price = 100.0
 strike_price = 100.0
 
 volatility = 0.20
-interest_rate = 0.30
-dividend_yield = 0.10
+interest_rate = 0.05
+dividend_yield = 0.02
 
 num_obs_per_year = 120
 num_paths = 1000
@@ -86,7 +86,7 @@ value_geometric = asian_option.value(
     discount_curve,
     dividend_curve,
     model,
-    AsianOptionValuationTypes.GEOMETRIC,
+    AsianOptionValuationTypes.KEMNA_VORST,
     accrued_average,
 )
 
@@ -208,21 +208,27 @@ print("3. MONTE CARLO CONVERGENCE")
 print("=" * 78)
 
 num_paths_list = [
-    1000,
     2000,
+    3000,
+    4000,
     5000,
     6000,
     8000,
     10000,
+    20000,
+    30000,
+    40000,
+    50000,
+    100000
 ]
 
-mc_values = []
 mc_fast_values = []
+mc_fast_cv_values = []
 
 print(
     f"{'PATHS':>10s}"
     f"{'MC':>18s}"
-    f"{'MC FAST':>18s}"
+    f"{'MC CV':>18s}"
     f"{'TW':>18s}"
     f"{'CURRAN':>18s}"
 )
@@ -230,17 +236,6 @@ print(
 print("-" * 82)
 
 for paths in num_paths_list:
-
-    value_mc_test = asian_option.value_mc(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-        paths,
-        seed,
-        accrued_average,
-    )
 
     value_mc_fast_test = asian_option.value_mc_fast(
         value_dt,
@@ -253,13 +248,24 @@ for paths in num_paths_list:
         accrued_average,
     )
 
-    mc_values.append(value_mc_test)
+    value_mc_fast_cv_test = asian_option.value_mc_fast_cv(
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        model,
+        paths,
+        seed,
+        accrued_average,
+    )
+
     mc_fast_values.append(value_mc_fast_test)
+    mc_fast_cv_values.append(value_mc_fast_cv_test)
 
     print(
         f"{paths:10d}"
-        f"{value_mc_test:18.8f}"
         f"{value_mc_fast_test:18.8f}"
+        f"{value_mc_fast_cv_test:18.8f}"
         f"{value_turnbull:18.8f}"
         f"{value_curran:18.8f}"
     )
@@ -280,30 +286,67 @@ print("\n" + "=" * 78)
 print("4. PLOT MONTE CARLO CONVERGENCE")
 print("=" * 78)
 
-plt.figure(figsize=(9, 6))
+plt.figure()
 
 plt.plot(
     num_paths_list,
-    mc_values,
+    mc_fast_values,
     marker="o",
     label="Monte Carlo",
 )
 
 plt.plot(
     num_paths_list,
-    mc_fast_values,
+    mc_fast_cv_values,
     marker="o",
-    label="Monte Carlo Fast",
+    label="Monte Carlo Control Variate",
 )
 
-plt.axhline(
-    value_turnbull,
-    linestyle="--",
+plt.plot(
+    num_paths_list,
+    np.full(len(num_paths_list), value_geometric),
+    linestyle="-",
+    label="Kemna-Vorst",
+)
+
+plt.plot(
+    num_paths_list,
+    np.full(len(num_paths_list), value_turnbull),
+    linestyle=":",
     label="Turnbull-Wakeman",
 )
 
-plt.axhline(
-    value_curran,
+plt.plot(
+    num_paths_list,
+    np.full(len(num_paths_list), value_curran),
+    linestyle="--",
+    label="Curran",
+)
+
+plt.xlabel("Number of Paths")
+plt.ylabel("Asian Option Value")
+plt.title("Asian Option Monte Carlo Convergence")
+
+plt.xscale("log")
+
+plt.grid(True)
+plt.legend()
+plt.show()
+
+# NOW JUST SHOW DETAILS ZOOMED IN
+
+plt.figure()
+
+plt.plot(
+    num_paths_list,
+    mc_fast_cv_values,
+    marker="o",
+    label="Monte Carlo CV",
+)
+
+plt.plot(
+    num_paths_list,
+    np.full(len(num_paths_list), value_curran),
     linestyle="--",
     label="Curran",
 )
@@ -464,7 +507,7 @@ num_paths_stock = 10000
 
 print(
     f"{'STOCK':>10s}"
-    f"{'TURNBULL':>18s}"
+    f"{'TURNBULL-WAKEMAN':>18s}"
     f"{'CURRAN':>18s}"
     f"{'MONTE CARLO':>18s}"
 )
@@ -634,7 +677,7 @@ mc_vol_values = []
 
 print(
     f"{'VOLATILITY':>12s}"
-    f"{'TURNBULL':>18s}"
+    f"{'TURNBULL-WAKEMAN':>18s}"
     f"{'CURRAN':>18s}"
     f"{'MONTE CARLO':>18s}"
 )
@@ -706,7 +749,7 @@ plt.plot(
     volatilities,
     turnbull_vol_values,
     marker="o",
-    label="Turnbull-Wakeman",
+    label="TW Discrete",
 )
 
 plt.plot(
@@ -756,8 +799,8 @@ expiry_dt_time = Date(1, 1, 2016)
 
 stock_price_time = 100.0
 volatility_time = 0.20
-interest_rate_time = 0.30
-dividend_yield_time = 0.10
+interest_rate_time = 0.05
+dividend_yield_time = 0.02
 
 num_obs_per_year_time = 100
 strike_price_time = 100.0
@@ -795,8 +838,8 @@ num_paths_time = 10000
 
 print(
     f"{'DATE':>15s}"
-    f"{'GEOMETRIC':>18s}"
-    f"{'TURNBULL':>18s}"
+    f"{'KEMNA-VORST':>18s}"
+    f"{'TURNBULL-WAKEMAN':>18s}"
     f"{'CURRAN':>18s}"
     f"{'MONTE CARLO':>18s}"
 )
@@ -821,7 +864,7 @@ for time_value_dt in value_dts:
         time_discount_curve,
         time_dividend_curve,
         model_time,
-        AsianOptionValuationTypes.GEOMETRIC,
+        AsianOptionValuationTypes.KEMNA_VORST,
         accrued_average_time,
     )
 
@@ -908,7 +951,7 @@ plt.plot(
     plot_dates,
     time_geometric_values,
     marker="o",
-    label="Geometric",
+    label="Kemna-Vorst",
 )
 
 plt.plot(
@@ -1208,7 +1251,7 @@ print(
 )
 
 print(
-    f"{'MC Fast CV':<18s}"
+    f"{'MC CV':<18s}"
     f"{mean_mc_cv:14.8f}"
     f"{std_mc_cv:14.8f}"
     f"{se_mc_cv:14.8f}"
@@ -1296,7 +1339,7 @@ print(
 )
 
 print(
-    f"{'MC Fast CV':<24s}"
+    f"{'MC CV':<24s}"
     f"{mean_mc_cv:14.8f}"
     f"{0.0:18.8f}"
 )
@@ -1471,7 +1514,7 @@ plt.errorbar(
     yerr=1.96 * cv_se,
     marker="o",
     capsize=3,
-    label="MC Fast CV (95% CI)",
+    label="MC CV (95% CI)",
 )
 
 plt.plot(
@@ -1504,7 +1547,7 @@ print(
     f"{'MC CV':>14s}"
     f"{'CV-FAST':>14s}"
     f"{'CURRAN':>14s}"
-    f"{'TW':>14s}"
+    f"{'TURNBULL-WAKEMAN':>14s}"
 )
 
 print("-" * 80)

@@ -36,7 +36,7 @@ import pkgutil
 import shutil
 import sys
 from pathlib import Path
-
+from enum import Enum
 
 ###############################################################################
 # DIRECTORIES
@@ -168,6 +168,10 @@ pre {
     overflow-x: auto;
 }
 
+.signature code {
+    white-space: pre;
+}
+
 .docstring {
     white-space: pre-wrap;
     line-height: 1.5;
@@ -265,28 +269,84 @@ def is_public_name(name: str) -> bool:
 
 
 def get_docstring(obj) -> str:
-    """Return a cleaned docstring."""
+    """Return an object's own cleaned docstring."""
 
-    doc = inspect.getdoc(obj)
+    if inspect.isclass(obj):
+        doc = obj.__dict__.get("__doc__")
+    else:
+        doc = getattr(obj, "__doc__", None)
 
-    if doc is None:
+    if not doc:
         return ""
 
-    return doc
+    return inspect.cleandoc(doc)
 
 
 ###############################################################################
 
 
+def short_annotation(annotation) -> str:
+    """Return a compact display name for a type annotation."""
+
+    text = inspect.formatannotation(annotation)
+
+    # Shorten FinancePy-qualified type names.
+    if text.startswith("financepy."):
+        text = text.split(".")[-1]
+
+    return text
+
+
+def format_parameter(param) -> str:
+    """Format a parameter using compact type annotations."""
+
+    text = param.name
+
+    if param.kind is inspect.Parameter.VAR_POSITIONAL:
+        text = "*" + text
+
+    elif param.kind is inspect.Parameter.VAR_KEYWORD:
+        text = "**" + text
+
+    if param.annotation is not inspect.Parameter.empty:
+        text += f": {short_annotation(param.annotation)}"
+
+    if param.default is not inspect.Parameter.empty:
+        text += f" = {param.default!r}"
+
+    return text
+
+
 def get_signature(obj) -> str:
-    """Return an object's signature if available."""
+    """Return an object's signature with one parameter per line."""
 
     try:
-        return str(inspect.signature(obj))
+        sig = inspect.signature(obj)
     except (TypeError, ValueError):
         return ""
 
+    params = list(sig.parameters.values())
 
+    if not params:
+        result = "()"
+    else:
+        lines = ["("]
+
+        for param in params:
+            lines.append(
+                f"    {format_parameter(param)},"
+            )
+
+        lines.append(")")
+        result = "\n".join(lines)
+
+    if sig.return_annotation is not inspect.Signature.empty:
+        result += (
+            f" -> {short_annotation(sig.return_annotation)}"
+        )
+
+    return result
+    
 ###############################################################################
 
 
@@ -500,11 +560,18 @@ def get_module_classes(module):
         if not is_public_name(name):
             continue
 
-        # Do not document imported classes.
         if obj.__module__ != module.__name__:
             continue
 
         classes.append((name, obj))
+
+    # Enums first, then ordinary classes.
+    classes.sort(
+        key=lambda item: (
+            not issubclass(item[1], Enum),
+            item[0],
+        )
+    )
 
     return classes
 
@@ -674,8 +741,41 @@ def format_method(name: str, method) -> str:
 def format_class(name: str, cls) -> str:
     """Generate HTML documentation for a class."""
 
-    signature = get_signature(cls)
     docstring = get_docstring(cls)
+
+    # Enums are API constants rather than normally constructed classes.
+    # Show their members instead of Enum's implementation-level
+    # constructor signature and inheritance information.
+    if issubclass(cls, Enum):
+
+        members_html = "<h3>Members</h3>\n"
+
+        members_html += '<div class="enum-members">\n'
+
+        for member_name, member in cls.__members__.items():
+            members_html += (
+                "<div>"
+                f"<code>{escape(member_name)}</code>"
+                f" = <code>{escape(member.value)}</code>"
+                "</div>\n"
+            )
+
+        members_html += "</div>"
+
+        return f"""
+<section>
+
+<h2>{escape(name)}</h2>
+
+{format_docstring(docstring)}
+
+{members_html}
+
+</section>
+"""
+
+    # Normal classes.
+    signature = get_signature(cls)
 
     bases = [
         base.__name__
@@ -712,18 +812,24 @@ def format_class(name: str, cls) -> str:
                 method,
             )
 
+    signature_html = ""
+
+    if signature:
+
+        signature_html = f"""
+<div class="signature">
+
+<code>{escape(name)}{escape(signature)}</code>
+
+</div>
+"""
+
     return f"""
 <section>
 
 <h2>{escape(name)}</h2>
 
-<div class="signature">
-
-<code>
-{escape(name)}{escape(signature)}
-</code>
-
-</div>
+{signature_html}
 
 {inheritance_html}
 
@@ -733,8 +839,6 @@ def format_class(name: str, cls) -> str:
 
 </section>
 """
-
-
 ###############################################################################
 # BREADCRUMBS
 ###############################################################################
@@ -871,14 +975,45 @@ def generate_module_page(
 
     if classes:
 
-        body += "<h1>Classes</h1>"
+        enum_types = [
+            (name, cls)
+            for name, cls in classes
+            if issubclass(cls, Enum)
+        ]
 
-        for class_name, cls in classes:
+        normal_classes = [
+            (name, cls)
+            for name, cls in classes
+            if not issubclass(cls, Enum)
+        ]
 
-            body += format_class(
-                class_name,
-                cls,
+        if enum_types:
+
+            body += "<h1>Types</h1>"
+
+            for class_name, cls in enum_types:
+
+                body += format_class(
+                    class_name,
+                    cls,
+                )
+
+        if normal_classes:
+
+            heading = (
+                "Class"
+                if len(normal_classes) == 1
+                else "Classes"
             )
+
+            body += f"<h1>{heading}</h1>"
+
+            for class_name, cls in normal_classes:
+
+                body += format_class(
+                    class_name,
+                    cls,
+                )
 
     if functions:
 

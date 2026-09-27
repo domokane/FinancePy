@@ -10,157 +10,258 @@
     content="width=device-width, initial-scale=1"
 >
 
-<title>Bond - FinancePy</title>
+<title>bond - FinancePy</title>
 
 
 <style>
 
+:root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --text: #172033;
+    --muted: #667085;
+    --border: #e3e8ef;
+    --primary: #3157a4;
+    --primary-dark: #243f78;
+    --primary-soft: #eef3ff;
+    --accent: #0f766e;
+    --code-bg: #f4f7fb;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    color: #222;
-    background: #ffffff;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
 }
 
 header {
-    background: #20232a;
+    background: linear-gradient(135deg, #172554 0%, #274690 100%);
     color: white;
-    padding: 20px 40px;
+    padding: 26px max(32px, calc((100vw - 1180px) / 2));
+    border-bottom: 1px solid rgba(255,255,255,.12);
 }
 
 header h1 {
     margin: 0;
     font-size: 28px;
+    letter-spacing: -0.02em;
+    color: #ffffff;
 }
 
 header p {
-    margin: 8px 0 0 0;
-    color: #cccccc;
+    margin: 5px 0 0;
+    color: #dbe5ff;
+    font-size: 14px;
 }
 
 main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px 40px 80px 40px;
+    max-width: 1180px;
+    margin: 28px auto 56px;
+    padding: 38px 48px 72px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
 }
 
 nav {
-    margin-bottom: 30px;
-    font-size: 95%;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
 }
 
-nav a {
-    margin-right: 6px;
-}
-
-a {
-    color: #0057a8;
+nav a, a {
+    color: var(--primary);
     text-decoration: none;
 }
 
-a:hover {
-    text-decoration: underline;
+a:hover { text-decoration: underline; }
+
+h1, h2, h3, h4 {
+    color: var(--text);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
 }
 
-h1 {
-    margin-top: 0;
+main > h1 {
+    margin: 0 0 14px;
+    font-size: 30px;
+}
+
+main > h1:not(:first-of-type) {
+    margin-top: 64px;
+    padding: 12px 0 10px;
+    color: var(--primary-dark);
+    font-size: 23px;
+    border-bottom: 2px solid #d9e3f7;
 }
 
 h2 {
-    margin-top: 40px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #dddddd;
+    margin: 38px 0 14px;
+    padding-bottom: 8px;
+    font-size: 21px;
+    border-bottom: 1px solid var(--border);
 }
 
 h3 {
-    margin-top: 30px;
+    margin: 28px 0 12px;
+    font-size: 17px;
+    color: var(--primary-dark);
 }
 
 h4 {
-    margin-top: 24px;
-    margin-bottom: 8px;
+    margin: 28px 0 9px;
+    font-size: 16px;
 }
 
 code {
-    font-family: Consolas, "Courier New", monospace;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: .94em;
 }
 
 pre {
-    background: #f5f5f5;
-    border: 1px solid #dddddd;
-    border-radius: 4px;
-    padding: 14px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
     overflow-x: auto;
-    line-height: 1.4;
+    line-height: 1.5;
 }
 
 .signature {
-    background: #f5f5f5;
-    border-left: 4px solid #777777;
-    padding: 12px;
-    margin: 10px 0 18px 0;
+    background: var(--code-bg);
+    border: 1px solid #dce4f0;
+    border-left: 4px solid var(--primary);
+    border-radius: 7px;
+    padding: 14px 16px;
+    margin: 10px 0 18px;
     overflow-x: auto;
+    color: #24324a;
+}
+
+.signature code {
+    white-space: pre;
+    font-size: 13.5px;
 }
 
 .docstring {
     white-space: pre-wrap;
-    line-height: 1.5;
-}
-
-.package-list,
-.module-list {
-    line-height: 1.9;
+    line-height: 1.68;
+    color: #344054;
+    max-width: 92ch;
 }
 
 .member {
-    margin-bottom: 35px;
+    margin: 0 0 26px;
+    padding: 2px 0 22px;
+    border-bottom: 1px solid #edf0f4;
 }
 
+.member:last-child { border-bottom: 0; }
+
 .inheritance {
-    color: #555555;
-    margin: 8px 0 14px 0;
+    display: inline-block;
+    color: var(--muted);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin: 0 0 16px;
+    font-size: 13px;
 }
 
 .source-name {
-    color: #666666;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 90%;
+    display: inline-block;
+    margin: 0 0 24px;
+    padding: 5px 9px;
+    color: #475467;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: "SFMono-Regular", Consolas, "Courier New", monospace;
+    font-size: 12.5px;
+}
+
+.enum-members {
+    display: grid;
+    gap: 7px;
+    margin: 12px 0 26px;
+}
+
+.enum-members > div {
+    padding: 8px 11px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.enum-members code:first-child {
+    color: var(--primary-dark);
+    font-weight: 650;
+}
+
+.package-list,
+.module-list { line-height: 1.9; }
+
+.module-list ul {
+    columns: 2;
+    column-gap: 32px;
+    padding-left: 22px;
 }
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(
-        auto-fit,
-        minmax(220px, 1fr)
-    );
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 14px;
     margin-top: 20px;
 }
 
 .card {
-    border: 1px solid #dddddd;
-    border-radius: 5px;
-    padding: 16px;
-    background: #fafafa;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 17px 18px;
+    background: var(--surface);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .03);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
 
-.card h3 {
-    margin-top: 0;
-    margin-bottom: 8px;
+.card:hover {
+    transform: translateY(-1px);
+    border-color: #cbd7eb;
+    box-shadow: 0 5px 16px rgba(16, 24, 40, .06);
 }
 
-.card p {
-    margin-bottom: 0;
-    color: #555555;
-}
+.card h3 { margin: 0 0 6px; }
+.card p { margin: 0; color: var(--muted); font-size: 13px; }
 
 .generated {
-    margin-top: 60px;
-    padding-top: 15px;
-    border-top: 1px solid #dddddd;
-    color: #777777;
-    font-size: 90%;
+    margin-top: 64px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    color: #98a2b3;
+    font-size: 12.5px;
+}
+
+@media (max-width: 760px) {
+    header { padding: 22px 20px; }
+    main {
+        margin: 0;
+        padding: 28px 20px 56px;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .module-list ul { columns: 1; }
 }
 
 </style>
@@ -179,24 +280,67 @@ pre {
 </header>
 
 <main>
-<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">Products</a> &rsaquo; <a href="index.html">Bonds</a> &rsaquo; Bond</nav>
-<h1>Bond</h1>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">products</a> &rsaquo; <a href="index.html">bonds</a> &rsaquo; bond</nav>
+<h1>bond</h1>
 
 <p class="source-name">
 financepy.products.bonds.bond
 </p>
-<h1>Classes</h1>
+<h1>Types</h1>
+<section>
+
+<h2>CouponType</h2>
+
+<p><em>No description available.</em></p>
+
+<h3>Members</h3>
+<div class="enum-members">
+<div><code>FIXED</code> = <code>0</code></div>
+<div><code>ACCRUED</code> = <code>1</code></div>
+</div>
+
+</section>
+
+<section>
+
+<h2>YTMCalcType</h2>
+
+<p><em>No description available.</em></p>
+
+<h3>Members</h3>
+<div class="enum-members">
+<div><code>ZERO</code> = <code>0</code></div>
+<div><code>UK_DMO</code> = <code>1</code></div>
+<div><code>US_STREET</code> = <code>2</code></div>
+<div><code>US_TREASURY</code> = <code>3</code></div>
+<div><code>CFETS</code> = <code>4</code></div>
+<div><code>CALCULUS</code> = <code>5</code></div>
+</div>
+
+</section>
+<h1>Class</h1>
 <section>
 
 <h2>Bond</h2>
 
+
 <div class="signature">
 
-<code>
-Bond(issue_dt: financepy.utils.date.Date, maturity_dt: financepy.utils.date.Date, coupon: float, freq_type: financepy.utils.frequency.FrequencyTypes, accrual_dc_type: financepy.utils.day_count.DayCountTypes, ex_div_days: int = 0, cal_type: financepy.utils.calendar.CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;, bd_type=&lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, dg_type=&lt;DateGenRuleTypes.BACKWARD: 2&gt;, cpn_type=&lt;CouponType.FIXED: 0&gt;) -&gt; None
-</code>
+<code>Bond(
+    issue_dt: Date,
+    maturity_dt: Date,
+    coupon: float,
+    freq_type: FrequencyTypes,
+    accrual_dc_type: DayCountTypes,
+    ex_div_days: int = 0,
+    cal_type: CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;,
+    bd_type = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;,
+    dg_type = &lt;DateGenRuleTypes.BACKWARD: 2&gt;,
+    cpn_type = &lt;CouponType.FIXED: 0&gt;,
+) -&gt; None</code>
 
 </div>
+
 
 
 
@@ -213,7 +357,11 @@ size that are paid on known dts plus a payment of par at maturity.</div>
 <div class="signature">
 
 <code>
-times(self, settle_dt: financepy.utils.date.Date, curve_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;)
+times(
+    self,
+    settle_dt: Date,
+    curve_dc_type: DayCountTypes = &lt;DayCountTypes.ACT_365F: 7&gt;,
+)
 </code>
 
 </div>
@@ -231,7 +379,10 @@ times(self, settle_dt: financepy.utils.date.Date, curve_dc_type: financepy.utils
 <div class="signature">
 
 <code>
-flows(self, settle_dt: financepy.utils.date.Date)
+flows(
+    self,
+    settle_dt: Date,
+)
 </code>
 
 </div>
@@ -249,7 +400,12 @@ flows(self, settle_dt: financepy.utils.date.Date)
 <div class="signature">
 
 <code>
-reset_flows(self, cpn_dts: List[financepy.utils.date.Date], payment_dts: List[financepy.utils.date.Date], flow_amounts: numpy.ndarray)
+reset_flows(
+    self,
+    cpn_dts: List[financepy.utils.date.Date],
+    payment_dts: List[financepy.utils.date.Date],
+    flow_amounts: numpy.ndarray,
+)
 </code>
 
 </div>
@@ -268,7 +424,12 @@ while payment dates are calendar adjusted. Flows are on payment dates</div>
 <div class="signature">
 
 <code>
-dirty_price_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+dirty_price_from_ytm(
+    self,
+    settle_dt: Date,
+    ytm: float,
+    convention: YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;,
+)
 </code>
 
 </div>
@@ -288,7 +449,12 @@ a number of standard conventions for calculating the YTM.</div>
 <div class="signature">
 
 <code>
-dirty_price_from_ytm_vector(self, settle_dts: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, &lt;class &#x27;list&#x27;&gt;), ytms: (&lt;class &#x27;float&#x27;&gt;, &lt;class &#x27;list&#x27;&gt;, &lt;class &#x27;numpy.ndarray&#x27;&gt;), convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+dirty_price_from_ytm_vector(
+    self,
+    settle_dts: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, &lt;class &#x27;list&#x27;&gt;),
+    ytms: (&lt;class &#x27;float&#x27;&gt;, &lt;class &#x27;list&#x27;&gt;, &lt;class &#x27;numpy.ndarray&#x27;&gt;),
+    convention: YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;,
+)
 </code>
 
 </div>
@@ -306,7 +472,14 @@ dirty_price_from_ytm_vector(self, settle_dts: (&lt;class &#x27;financepy.utils.d
 <div class="signature">
 
 <code>
-forward_price(self, settle_dt: financepy.utils.date.Date, forward_dt: financepy.utils.date.Date, clean_price: float, repo_rate: float, repo_dc_type: financepy.utils.day_count.DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;)
+forward_price(
+    self,
+    settle_dt: Date,
+    forward_dt: Date,
+    clean_price: float,
+    repo_rate: float,
+    repo_dc_type: DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;,
+)
 </code>
 
 </div>
@@ -324,7 +497,13 @@ forward_price(self, settle_dt: financepy.utils.date.Date, forward_dt: financepy.
 <div class="signature">
 
 <code>
-principal(self, settle_dt: financepy.utils.date.Date, ytm: float, face: float, convention: financepy.products.bonds.bond.YTMCalcType)
+principal(
+    self,
+    settle_dt: Date,
+    ytm: float,
+    face: float,
+    convention: YTMCalcType,
+)
 </code>
 
 </div>
@@ -344,7 +523,12 @@ future Ibor rates.</div>
 <div class="signature">
 
 <code>
-dollar_duration(self, settle_dt: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, typing.List), ytm: (&lt;class &#x27;float&#x27;&gt;, typing.List), convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+dollar_duration(
+    self,
+    settle_dt: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, typing.List),
+    ytm: (&lt;class &#x27;float&#x27;&gt;, typing.List),
+    convention: YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;,
+)
 </code>
 
 </div>
@@ -369,7 +553,12 @@ where DV01 is the positive dirty-price change for a +1bp yield shift.</div>
 <div class="signature">
 
 <code>
-dv01(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+dv01(
+    self,
+    settle_dt: Date,
+    ytm: float,
+    convention: YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;,
+)
 </code>
 
 </div>
@@ -388,7 +577,12 @@ Bloomberg-style DV01 / PV01 is positive for a long fixed-rate bond.</div>
 <div class="signature">
 
 <code>
-macaulay_duration(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+macaulay_duration(
+    self,
+    settle_dt: Date,
+    ytm: float,
+    convention: YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;,
+)
 </code>
 
 </div>
@@ -407,7 +601,12 @@ given its yield to maturity.</div>
 <div class="signature">
 
 <code>
-modified_duration(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+modified_duration(
+    self,
+    settle_dt: Date,
+    ytm: float,
+    convention: YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;,
+)
 </code>
 
 </div>
@@ -426,7 +625,13 @@ date given its yield to maturity.</div>
 <div class="signature">
 
 <code>
-theta(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;, day_step: int = 1)
+theta(
+    self,
+    settle_dt: Date,
+    ytm: float,
+    convention: YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;,
+    day_step: int = 1,
+)
 </code>
 
 </div>
@@ -445,7 +650,13 @@ i.e. the settlement date, forward by day_step days.</div>
 <div class="signature">
 
 <code>
-key_rate_durations_zero_tent(self, settle_dt: financepy.utils.date.Date, zero_curve: financepy.market.curves.discount_curve.DiscountCurve, key_rate_tenors: list = None, shift: float = None)
+key_rate_durations_zero_tent(
+    self,
+    settle_dt: Date,
+    zero_curve: DiscountCurve,
+    key_rate_tenors: list = None,
+    shift: float = None,
+)
 </code>
 
 </div>
@@ -500,7 +711,14 @@ For t = 0, the bump is taken to be zero.</div>
 <div class="signature">
 
 <code>
-key_rate_durations(self, settle_dt: financepy.utils.date.Date, ytm: float, key_rate_tenors: list = None, shift: float = None, rates: list = None)
+key_rate_durations(
+    self,
+    settle_dt: Date,
+    ytm: float,
+    key_rate_tenors: list = None,
+    shift: float = None,
+    rates: list = None,
+)
 </code>
 
 </div>
@@ -539,7 +757,12 @@ tuple of (numpy array of float, numpy array of float)
 <div class="signature">
 
 <code>
-convexity_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+convexity_from_ytm(
+    self,
+    settle_dt: Date,
+    ytm: float,
+    convention: YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;,
+)
 </code>
 
 </div>
@@ -559,7 +782,12 @@ as 1/P_D partial 2 P_D / partial dy 2</div>
 <div class="signature">
 
 <code>
-clean_price_from_ytm(self, settle_dt: financepy.utils.date.Date, ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;)
+clean_price_from_ytm(
+    self,
+    settle_dt: Date,
+    ytm: float,
+    convention: YTMCalcType = &lt;YTMCalcType.UK_DMO: 1&gt;,
+)
 </code>
 
 </div>
@@ -578,7 +806,11 @@ function is vectorised with respect to the yield input.</div>
 <div class="signature">
 
 <code>
-clean_price_from_discount_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve)
+clean_price_from_discount_curve(
+    self,
+    settle_dt: Date,
+    discount_curve: DiscountCurve,
+)
 </code>
 
 </div>
@@ -598,7 +830,11 @@ not to the settlement date.</div>
 <div class="signature">
 
 <code>
-dirty_price_from_discount_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve)
+dirty_price_from_discount_curve(
+    self,
+    settle_dt: Date,
+    discount_curve: DiscountCurve,
+)
 </code>
 
 </div>
@@ -616,7 +852,12 @@ dirty_price_from_discount_curve(self, settle_dt: financepy.utils.date.Date, disc
 <div class="signature">
 
 <code>
-yield_to_maturity(self, settle_dt: financepy.utils.date.Date, clean_price: int | float | list | numpy.ndarray, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.US_TREASURY: 3&gt;)
+yield_to_maturity(
+    self,
+    settle_dt: Date,
+    clean_price: int | float | list | numpy.ndarray,
+    convention: YTMCalcType = &lt;YTMCalcType.US_TREASURY: 3&gt;,
+)
 </code>
 
 </div>
@@ -635,7 +876,11 @@ yield relationship using a one-dimensional root solver.</div>
 <div class="signature">
 
 <code>
-current_yield(self, settle_dt: financepy.utils.date.Date, clean_price: float | list | numpy.ndarray)
+current_yield(
+    self,
+    settle_dt: Date,
+    clean_price: float | list | numpy.ndarray,
+)
 </code>
 
 </div>
@@ -653,7 +898,11 @@ current_yield(self, settle_dt: financepy.utils.date.Date, clean_price: float | l
 <div class="signature">
 
 <code>
-accrued_interest(self, settle_dt: financepy.utils.date.Date, face: float = 100.0)
+accrued_interest(
+    self,
+    settle_dt: Date,
+    face: float = 100.0,
+)
 </code>
 
 </div>
@@ -679,7 +928,17 @@ for business days.</div>
 <div class="signature">
 
 <code>
-asset_swap_spread(self, settle_dt: financepy.utils.date.Date, clean_price: float, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, swap_float_day_count_convention_type=&lt;DayCountTypes.ACT_360: 8&gt;, swap_float_frequency_type=&lt;FrequencyTypes.SEMI_ANNUAL: 2&gt;, swap_float_calendar_type=&lt;CalendarTypes.WEEKEND: 2&gt;, swap_float_bus_day_adjust_rule_type=&lt;BusDayAdjustTypes.FOLLOWING: 2&gt;, swap_float_date_gen_rule_type=&lt;DateGenRuleTypes.BACKWARD: 2&gt;)
+asset_swap_spread(
+    self,
+    settle_dt: Date,
+    clean_price: float,
+    discount_curve: DiscountCurve,
+    swap_float_day_count_convention_type = &lt;DayCountTypes.ACT_360: 8&gt;,
+    swap_float_frequency_type = &lt;FrequencyTypes.SEMI_ANNUAL: 2&gt;,
+    swap_float_calendar_type = &lt;CalendarTypes.WEEKEND: 2&gt;,
+    swap_float_bus_day_adjust_rule_type = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;,
+    swap_float_date_gen_rule_type = &lt;DateGenRuleTypes.BACKWARD: 2&gt;,
+)
 </code>
 
 </div>
@@ -699,7 +958,12 @@ respect to the clean price.</div>
 <div class="signature">
 
 <code>
-z_spread(self, settle_dt: financepy.utils.date.Date, clean_price: float, discount_curve: financepy.market.curves.discount_curve.DiscountCurve)
+z_spread(
+    self,
+    settle_dt: Date,
+    clean_price: float,
+    discount_curve: DiscountCurve,
+)
 </code>
 
 </div>
@@ -718,7 +982,12 @@ is a Ibor curve that is passed in.</div>
 <div class="signature">
 
 <code>
-dirty_price_from_oas(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, oas: float)
+dirty_price_from_oas(
+    self,
+    settle_dt: Date,
+    discount_curve: DiscountCurve,
+    oas: float,
+)
 </code>
 
 </div>
@@ -737,7 +1006,12 @@ to the curve.</div>
 <div class="signature">
 
 <code>
-option_adjusted_spread(self, settle_dt: financepy.utils.date.Date, clean_price: float, discount_curve: financepy.market.curves.discount_curve.DiscountCurve)
+option_adjusted_spread(
+    self,
+    settle_dt: Date,
+    clean_price: float,
+    discount_curve: DiscountCurve,
+)
 </code>
 
 </div>
@@ -756,7 +1030,13 @@ and the discount relative to which the spread is to be computed.</div>
 <div class="signature">
 
 <code>
-dirty_price_from_survival_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, survival_curve: financepy.market.curves.discount_curve.DiscountCurve, recovery_rate: float)
+dirty_price_from_survival_curve(
+    self,
+    settle_dt: Date,
+    discount_curve: DiscountCurve,
+    survival_curve: DiscountCurve,
+    recovery_rate: float,
+)
 </code>
 
 </div>
@@ -780,7 +1060,13 @@ end payment present values.</div>
 <div class="signature">
 
 <code>
-clean_price_from_survival_curve(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, survival_curve: financepy.market.curves.discount_curve.DiscountCurve, recovery_rate: float)
+clean_price_from_survival_curve(
+    self,
+    settle_dt: Date,
+    discount_curve: DiscountCurve,
+    survival_curve: DiscountCurve,
+    recovery_rate: float,
+)
 </code>
 
 </div>
@@ -800,7 +1086,14 @@ the recovery fraction of the par amount is paid at default.</div>
 <div class="signature">
 
 <code>
-calc_ror(self, begin_dt: financepy.utils.date.Date, end_dt: financepy.utils.date.Date, begin_ytm: float, end_ytm: float, convention: financepy.products.bonds.bond.YTMCalcType = &lt;YTMCalcType.US_STREET: 2&gt;)
+calc_ror(
+    self,
+    begin_dt: Date,
+    end_dt: Date,
+    begin_ytm: float,
+    end_ytm: float,
+    convention: YTMCalcType = &lt;YTMCalcType.US_STREET: 2&gt;,
+)
 </code>
 
 </div>
@@ -823,7 +1116,11 @@ IRR and the PnL.</div>
 <div class="signature">
 
 <code>
-print_payments(self, settle_dt: financepy.utils.date.Date, face: float = 100)
+print_payments(
+    self,
+    settle_dt: Date,
+    face: float = 100,
+)
 </code>
 
 </div>
@@ -842,7 +1139,12 @@ payment dates used in the analytic calculations for the bond.</div>
 <div class="signature">
 
 <code>
-npv(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market.curves.discount_curve.DiscountCurve, face: float = 100)
+npv(
+    self,
+    settle_dt: Date,
+    discount_curve: DiscountCurve,
+    face: float = 100,
+)
 </code>
 
 </div>
@@ -854,164 +1156,6 @@ npv(self, settle_dt: financepy.utils.date.Date, discount_curve: financepy.market
 
 
 </section>
-
-<section>
-
-<h2>CouponType</h2>
-
-<div class="signature">
-
-<code>
-CouponType(*values)
-</code>
-
-</div>
-
-<div class="inheritance">Inherits from: Enum</div>
-
-<div class="docstring">Create a collection of name/value pairs.
-
-Example enumeration:
-
-&gt;&gt;&gt; class Color(Enum):
-...     RED = 1
-...     BLUE = 2
-...     GREEN = 3
-
-Access them by:
-
-- attribute access:
-
-  &gt;&gt;&gt; Color.RED
-  &lt;Color.RED: 1&gt;
-
-- value lookup:
-
-  &gt;&gt;&gt; Color(1)
-  &lt;Color.RED: 1&gt;
-
-- name lookup:
-
-  &gt;&gt;&gt; Color[&#x27;RED&#x27;]
-  &lt;Color.RED: 1&gt;
-
-Enumerations can be iterated over, and know how many members they have:
-
-&gt;&gt;&gt; len(Color)
-3
-
-&gt;&gt;&gt; list(Color)
-[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
-
-Methods can be added to enumerations, and members can have their own
-attributes -- see the documentation for details.</div>
-
-
-
-</section>
-
-<section>
-
-<h2>YTMCalcType</h2>
-
-<div class="signature">
-
-<code>
-YTMCalcType(*values)
-</code>
-
-</div>
-
-<div class="inheritance">Inherits from: Enum</div>
-
-<div class="docstring">Create a collection of name/value pairs.
-
-Example enumeration:
-
-&gt;&gt;&gt; class Color(Enum):
-...     RED = 1
-...     BLUE = 2
-...     GREEN = 3
-
-Access them by:
-
-- attribute access:
-
-  &gt;&gt;&gt; Color.RED
-  &lt;Color.RED: 1&gt;
-
-- value lookup:
-
-  &gt;&gt;&gt; Color(1)
-  &lt;Color.RED: 1&gt;
-
-- name lookup:
-
-  &gt;&gt;&gt; Color[&#x27;RED&#x27;]
-  &lt;Color.RED: 1&gt;
-
-Enumerations can be iterated over, and know how many members they have:
-
-&gt;&gt;&gt; len(Color)
-3
-
-&gt;&gt;&gt; list(Color)
-[&lt;Color.RED: 1&gt;, &lt;Color.BLUE: 2&gt;, &lt;Color.GREEN: 3&gt;]
-
-Methods can be added to enumerations, and members can have their own
-attributes -- see the documentation for details.</div>
-
-
-
-</section>
-<h1>Functions</h1>
-<div class="member">
-
-<h3>validate_price</h3>
-
-<div class="signature">
-
-<code>
-validate_price(px)
-</code>
-
-</div>
-
-<p><em>No description available.</em></p>
-
-</div>
-
-<div class="member">
-
-<h3>validate_yield</h3>
-
-<div class="signature">
-
-<code>
-validate_yield(ytm)
-</code>
-
-</div>
-
-<p><em>No description available.</em></p>
-
-</div>
-
-<div class="member">
-
-<h3>vectorise_price</h3>
-
-<div class="signature">
-
-<code>
-vectorise_price(price: float)
-</code>
-
-</div>
-
-<p><em>No description available.</em></p>
-
-</div>
 
 <div class="generated">
 

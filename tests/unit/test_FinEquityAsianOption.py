@@ -12,8 +12,8 @@ start_averaging_dt = Date(1, 6, 2014)
 expiry_dt = Date(1, 1, 2015)
 stock_price = 100.0
 volatility = 0.20
-interest_rate = 0.30
-dividend_yield = 0.10
+interest_rate = 0.05
+dividend_yield = 0.02
 num_observations = 120  # daily as we have a half year
 accrued_avg = None
 k = 100
@@ -43,11 +43,11 @@ def test_geometric():
         discount_curve,
         dividend_curve,
         model,
-        AsianOptionValuationTypes.GEOMETRIC,
+        AsianOptionValuationTypes.KEMNA_VORST,
         accrued_avg,
     )
 
-    assert round(value_geometric, 4) == 12.4123
+    assert round(value_geometric, 4) == 6.9723
 
 
 ########################################################################################
@@ -65,7 +65,7 @@ def test_turnbull_wakeman():
         accrued_avg,
     )
 
-    assert round(value_turnbull_wakeman, 4) == 12.5381
+    assert round(value_turnbull_wakeman, 4) == 7.0895
 
 
 ########################################################################################
@@ -83,7 +83,7 @@ def test_curran():
         accrued_avg,
     )
 
-    assert round(value_curran, 4) == 12.6092
+    assert round(value_curran, 4) == 7.0857
 
 
 ########################################################################################
@@ -102,4 +102,4 @@ def test_mc():
         accrued_avg,
     )
 
-    assert round(value_mc, 3) == 12.608
+    assert round(value_mc, 3) == 7.059

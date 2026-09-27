@@ -100,7 +100,7 @@ def _g(oas, *args):
 ###############################################################################
 
 
-def validate_yield(ytm):
+def _validate_yield(ytm):
 
     ytms = []
 
@@ -117,7 +117,7 @@ def validate_yield(ytm):
 ###############################################################################
 
 
-def validate_price(px):
+def _validate_price(px):
     if px < 0.0 or px > 300.0:
         raise FinError("Price of " + str(px) + " must be between 0 and 300")
 
@@ -125,7 +125,7 @@ def validate_price(px):
 ###############################################################################
 
 
-def vectorise_price(price: float):
+def _vectorise_price(price: float):
 
     if isinstance(price, int):
         price = float(price)
@@ -375,7 +375,7 @@ class Bond:
         function is vectorised with respect to the yield input. It implements
         a number of standard conventions for calculating the YTM."""
 
-        validate_yield(ytm)
+        _validate_yield(ytm)
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
@@ -532,7 +532,7 @@ class Bond:
         else:
             ytm_list = [ytms]
 
-        validate_yield(ytms)
+        _validate_yield(ytms)
 
         num_dates = len(settle_dt_list)
         num_ytms = len(ytm_list)
@@ -652,7 +652,7 @@ class Bond:
         where DV01 is the positive dirty-price change for a +1bp yield shift.
         """
 
-        validate_yield(ytm)
+        _validate_yield(ytm)
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
@@ -673,8 +673,7 @@ class Bond:
         Bloomberg-style DV01 / PV01 is positive for a long fixed-rate bond.
         """
 
-        # Change in price for a
-        validate_yield(ytm)
+        _validate_yield(ytm)
 
         dy = 0.0001  # 1 bp
         p_0 = self.dirty_price_from_ytm(settle_dt, ytm, convention)
@@ -693,7 +692,7 @@ class Bond:
         """Calculate the Macaulay duration of the bond on a settlement date
         given its yield to maturity."""
 
-        validate_yield(ytm)
+        _validate_yield(ytm)
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
@@ -768,7 +767,7 @@ class Bond:
     ):
         """Calculate the modified duration of the bond on a settlement
         date given its yield to maturity."""
-        validate_yield(ytm)
+        _validate_yield(ytm)
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
@@ -789,7 +788,7 @@ class Bond:
     ):
         """Calculate the change in the dirty price due to moving calendar time
         i.e. the settlement date, forward by day_step days."""
-        validate_yield(ytm)
+        _validate_yield(ytm)
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
@@ -994,7 +993,7 @@ class Bond:
         tuple of (numpy array of float, numpy array of float)
             A tuple containing the key rate tenors and the key rate durations.
         """
-        validate_yield(ytm)
+        _validate_yield(ytm)
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
@@ -1087,7 +1086,7 @@ class Bond:
         """Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input. This is defined
         as 1/P_D partial 2 P_D / partial dy 2"""
-        validate_yield(ytm)
+        _validate_yield(ytm)
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
@@ -1109,7 +1108,7 @@ class Bond:
     ):
         """Calculate the bond clean price from the yield to maturity. This
         function is vectorised with respect to the yield input."""
-        validate_yield(ytm)
+        _validate_yield(ytm)
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
@@ -1201,7 +1200,7 @@ class Bond:
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
 
-        clean_prices = vectorise_price(clean_price)
+        clean_prices = _vectorise_price(clean_price)
 
         self.accrued_interest(settle_dt, 1.0)
 
@@ -1243,7 +1242,7 @@ class Bond:
         self.accrued_interest(settle_dt, 1.0)
         accrued_amount = self.accrued_int * self.par
 
-        clean_prices = vectorise_price(clean_price)
+        clean_prices = _vectorise_price(clean_price)
         dirty_prices = clean_prices + accrued_amount
         simple_ys = []
 

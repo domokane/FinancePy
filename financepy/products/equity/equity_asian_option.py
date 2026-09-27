@@ -15,13 +15,13 @@ from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 
-from ...models.equity_asian_option_mc import equity_asian_value_mc_fast_cv_numba
-from ...models.equity_asian_option_mc import equity_asian_value_mc_fast_numba
-from ...models.equity_asian_option_mc import equity_asian_value_mc_numba
+from ...models.asian_option_mc import asian_value_mc_fast_cv_numba
+from ...models.asian_option_mc import asian_value_mc_fast_numba
+from ...models.asian_option_mc import asian_value_mc_numba
 
-from ...models.equity_asian_option_bs import value_curran
-from ...models.equity_asian_option_bs import value_turnbull_wakeman
-from ...models.equity_asian_option_bs import value_geometric
+from ...models.asian_option_bs import value_asian_curran
+from ...models.asian_option_bs import value_asian_turnbull_wakeman_discrete
+from ...models.asian_option_bs import value_asian_kemna_vorst_geometric
 from ...models.model import Model
 
 from ...utils.check_values import check_curve_dt
@@ -34,37 +34,9 @@ from ...utils.helpers import option_years
 ########################################################################################
 
 class AsianOptionValuationTypes(Enum):
-    GEOMETRIC = 1
+    KEMNA_VORST = 1
     TURNBULL_WAKEMAN = 2
     CURRAN = 3
-
-########################################################################################
-# An Asian option on an arithmetic average and strike K has a payoff
-# Max(SA(T)-K,0) where SA is the arithmetic average
-# We define three dates
-# - Valuation date for which we want the price
-# - Start Averaging Date for when the averaging starts
-# - Expiry date for when the payoff is made and the option expires
-#
-# In the model we have
-# tv = is the time now
-# t0 = time to the start averaging date in years
-# t = time to the expiry date in years
-# tau = length of averaging period in years at the start of the option
-#
-# We can be before the start of the averaging period in which case t0 > 0
-# We can be after the start of the averaging period in which case we set t0=0
-# and we note that t <= tau
-#
-# If we are in the averaging period then we need to know the accrued average
-# I call this AA and the new average is now given by the accrued average
-# The option payoff is now Max( (AA x (tau-t) + SA(t0) x (t-t0))/tau - K,0)
-# This simplifies to
-#
-#  (1/tau) * Max( (AA x (tau-t) +  - K x tau + SA(t0) x (t-t0)),0)
-#  (1/tau) * Max( (AA x (tau-t) +  - K x tau + SA(t0) x (t-t0)),0)
-#
-########################################################################################
 
 
 ########################################################################################
@@ -76,7 +48,35 @@ class EquityAsianOption:
     before the option expires. The valuation is done for both an arithmetic and
     a geometric average but the former can only be done either using an
     analytical approximation of the arithmetic average distribution or by using
-    Monte-Carlo simulation."""
+    Monte-Carlo simulation.
+
+    An Asian option on an arithmetic average and strike K has a payoff
+    Max(SA(T)-K,0) where SA is the arithmetic average
+    We define three dates
+    - Valuation date for which we want the price
+    - Start Averaging Date for when the averaging starts
+    - Expiry date for when the payoff is made and the option expires
+
+    In the model we have
+    tv = is the time now
+    t0 = time to the start averaging date in years
+    t = time to the expiry date in years
+    tau = length of averaging period in years at the start of the option
+
+    We can be before the start of the averaging period in which case t0 > 0
+    We can be after the start of the averaging period in which case we set t0=0
+    and we note that t <= tau
+
+    If we are in the averaging period then we need to know the accrued average
+    I call this AA and the new average is now given by the accrued average
+    The option payoff is now Max( (AA x (tau-t) + SA(t0) x (t-t0))/tau - K,0)
+    This simplifies to
+
+     (1/tau) * Max( (AA x (tau-t) +  - K x tau + SA(t0) x (t-t0)),0)
+     (1/tau) * Max( (AA x (tau-t) +  - K x tau + SA(t0) x (t-t0)),0)
+     """
+
+    ##########################################################################
 
     def __init__(
         self,
@@ -118,9 +118,9 @@ class EquityAsianOption:
         """Calculate the value of an Asian option using one of the specified
         analytical approximations for an average rate option. These are the
         three enumerated values in the enum AsianOptionValuationTypes. The
-        choices of approximation are (i) GEOMETRIC - the average is a geometric
-        one as in paper by Kenna and Worst (1990), (ii) TURNBULL_WAKEMAN -
-        this is a value based on an edgeworth expansion of the moments of the
+        choices of approximation are (i) KEMNA-VORST - a geometric average is
+        used as in paper by Kenna and Worst (1990), (ii) TURNBULL_WAKEMAN -
+        this is a value based on the moments (I have discretised it) of the
         arithmetic average, and (iii) CURRAN - another approximative approach
         by Curran based on conditioning on the geometric mean price. Just
         choose the corresponding enumerated value to switch between these
@@ -144,14 +144,16 @@ class EquityAsianOption:
         n = self.num_obs_per_year
         opt_type_value = self.opt_type.value
 
-        if method == AsianOptionValuationTypes.GEOMETRIC:
-            v = value_geometric(t_avg, t_exp, k, n, opt_type_value, stock_price, r, q, model, accrued_average)
+        if method == AsianOptionValuationTypes.KEMNA_VORST:
+            v = value_asian_kemna_vorst_geometric(t_avg, t_exp, k, n, opt_type_value,
+                                                  stock_price, r, q, model, accrued_average)
 
         elif method == AsianOptionValuationTypes.TURNBULL_WAKEMAN:
-            v = value_turnbull_wakeman(t_avg, t_exp, k, n, opt_type_value, stock_price, r, q, model, accrued_average)
+            v = value_asian_turnbull_wakeman_discrete(t_avg, t_exp, k, n, opt_type_value,
+                                                      stock_price, r, q, model, accrued_average)
 
         elif method == AsianOptionValuationTypes.CURRAN:
-            v = value_curran(t_avg, t_exp, k, n, opt_type_value, stock_price, r, q, model, accrued_average)
+            v = value_asian_curran(t_avg, t_exp, k, n, opt_type_value, stock_price, r, q, model, accrued_average)
         else:
             raise FinError("Unknown valuation model")
 
@@ -190,7 +192,7 @@ class EquityAsianOption:
         k = self.strike_price
         n = self.num_obs_per_year
 
-        v = equity_asian_value_mc_numba(
+        v = asian_value_mc_numba(
             t_avg,
             t_exp,
             k,
@@ -238,7 +240,7 @@ class EquityAsianOption:
 
         volatility = model.volatility
 
-        v = equity_asian_value_mc_fast_numba(
+        v = asian_value_mc_fast_numba(
             t_avg,
             t_exp,
             k,
@@ -288,7 +290,7 @@ class EquityAsianOption:
         volatility = model.volatility
 
         # For control variate we price a Geometric average option exactly
-        v_g_exact = value_geometric(
+        v_g_exact = value_asian_kemna_vorst_geometric(
             t_avg,
             t_exp,
             k,
@@ -301,7 +303,7 @@ class EquityAsianOption:
             accrued_average,
         )
 
-        v = equity_asian_value_mc_fast_cv_numba(
+        v = asian_value_mc_fast_cv_numba(
             t_avg,
             t_exp,
             k,

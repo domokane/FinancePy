@@ -10,6 +10,8 @@ from ..utils.global_types import OptionTypes
 
 error_str = "In averaging period so need to enter accrued average."
 
+print("DO NOT USE THIS MODULE - USE ASIAN_OPTION_MC.py !!!")
+
 
 @njit(cache=True)
 def _validate_asian_mc_inputs(
@@ -89,6 +91,9 @@ def equity_asian_value_mc_numba(
         if accrued_average is None:
             raise FinError(error_str)
 
+        if accrued_average <= 0.0:
+            raise FinError("Accrued average must be positive.")
+
         k = (k * tau + accrued_average * t_avg) / t_exp
         multiplier = t_exp / tau
         t_avg = 0.0
@@ -151,7 +156,7 @@ def equity_asian_value_mc_numba(
 ########################################################################################
 
 
-@njit(cache=True, parallel=False)
+@njit(cache=True, parallel=False, fastmath=True)
 def equity_asian_value_mc_fast_numba(
     t_avg: float,
     t_exp: float,
@@ -192,6 +197,9 @@ def equity_asian_value_mc_fast_numba(
 
         if accrued_average is None:
             raise FinError(error_str)
+
+        if accrued_average <= 0.0:
+            raise FinError("Accrued average must be positive.")
 
         # Adjust strike for observations already accrued.
         k = (k * tau + accrued_average * t_avg) / t_exp
@@ -263,7 +271,7 @@ def equity_asian_value_mc_fast_numba(
 ########################################################################################
 
 
-@njit(cache=True, parallel=False)
+@njit(cache=True, parallel=False, fastmath=True)
 def equity_asian_value_mc_fast_cv_numba(
     t_avg: float,
     t_exp: float,
@@ -303,6 +311,9 @@ def equity_asian_value_mc_fast_cv_numba(
 
         if accrued_average is None:
             raise FinError(error_str)
+
+        if accrued_average <= 0.0:
+            raise FinError("Accrued average must be positive.")
 
         # Adjust strike for the accrued part of the average.
         k = (k * tau + accrued_average * t_avg) / t_exp
