@@ -163,7 +163,9 @@ class EquityVarianceSwap:
         if min_strike < strike_spacing:
             k = sstar
             klist = [sstar]
-            while k >= strike_spacing:
+            # keep the put strikes strictly positive: the log-contract weight is
+            # undefined at a zero strike
+            while k - strike_spacing > 0.0:
                 k -= strike_spacing
                 klist.append(k)
             put_k = np.array(klist)
@@ -178,10 +180,17 @@ class EquityVarianceSwap:
 
         self.call_strikes = call_k
 
-        option_total = 2.0 * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
+        # Demeterfi, Derman, Kamal and Zhou (1999), eq. (29), with a continuous
+        # dividend yield q: the drift of the log contract is (r - q) and the
+        # option portfolio is compounded at the riskless rate r.
+        option_total = (
+            2.0 * ((r - q) * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
+        )
 
-        self.call_wts = np.zeros(num_call_options)
-        self.put_wts = np.zeros(num_put_options)
+        # The number of puts may have been reduced above when the requested
+        # strikes would have gone below zero, so use the stored counts throughout.
+        self.call_wts = np.zeros(self.num_call_options)
+        self.put_wts = np.zeros(self.num_put_options)
 
         def f(x):
             return (2.0 / t_mat) * ((x - sstar) / sstar - np.log(x / sstar))
@@ -201,7 +210,7 @@ class EquityVarianceSwap:
             sum_wts += self.call_wts[n]
 
         pi_put = 0.0
-        for n in range(0, num_put_options):
+        for n in range(0, self.num_put_options):
             k = put_k[n]
             vol = volatility_curve.volatility(k)
             opt = EquityVanillaOption(self.maturity_dt, k, put_type)
@@ -210,7 +219,7 @@ class EquityVarianceSwap:
             pi_put += v * self.put_wts[n]
 
         pi_call = 0.0
-        for n in range(0, num_call_options):
+        for n in range(0, self.num_call_options):
             k = call_k[n]
             vol = volatility_curve.volatility(k)
             opt = EquityVanillaOption(self.maturity_dt, k, call_type)
@@ -219,7 +228,7 @@ class EquityVarianceSwap:
             pi_call += v * self.call_wts[n]
 
         pi = pi_call + pi_put
-        option_total += g * pi
+        option_total += np.exp(r * t_mat) * pi
         var = option_total
 
         return var
