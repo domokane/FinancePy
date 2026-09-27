@@ -126,3 +126,29 @@ def test_vanna():
 
 
 test_call_option()
+
+
+########################################################################################
+
+
+def test_monte_carlo_variants_agree_with_analytic():
+    """Every Monte Carlo implementation prices the same call within sampling error
+    of the closed form. The numpy, numba and parallel wrappers used to pass the
+    option type in the position of the interest rate and returned NaN."""
+    analytic = call_option.value(
+        value_date, stock_price, discount_curve, dividend_curve, model
+    )
+    variants = {
+        "value_mc": 200_000,
+        "value_mc_numpy_only": 200_000,
+        "value_mc_numba_only": 200_000,
+        "value_mc_numpy_numba": 200_000,
+        "value_mc_numba_parallel": 200_000,
+        "value_mc_nonumba_nonumpy": 20_000,
+    }
+    for name, num_paths in variants.items():
+        value = getattr(call_option, name)(
+            value_date, stock_price, discount_curve, dividend_curve, model, num_paths, 4242
+        )
+        assert math.isfinite(value), name
+        assert abs(value - analytic) < 0.20, (name, value, analytic)
