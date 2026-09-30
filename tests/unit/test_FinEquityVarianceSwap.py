@@ -136,3 +136,22 @@ def test_fair_strike_with_dividend_yield_and_zero_strike_grid():
         )
         assert np.isfinite(fair_var), (r, q)
         assert abs(fair_var - sigma**2) / sigma**2 < 0.01, (r, q, fair_var)
+
+
+def test_realised_variance_of_constant_log_returns():
+    """N prices give N - 1 returns. A series growing by the same log return every
+    day has a realised variance of 252 times that squared return."""
+    import numpy as np
+    import pytest
+
+    from financepy.products.equity.equity_variance_swap import EquityVarianceSwap
+    from financepy.utils.date import Date
+    from financepy.utils.error import FinError
+
+    swap = EquityVarianceSwap(Date(1, 1, 2026), Date(1, 1, 2027), 0.09)
+    daily = 0.01
+    closes = 100.0 * np.exp(daily * np.arange(11))
+    assert np.isclose(swap.realised_variance(closes), 252.0 * daily**2)
+    assert np.isclose(swap.realised_variance(closes[:2]), 252.0 * daily**2)
+    with pytest.raises(FinError):
+        swap.realised_variance(closes[:1])

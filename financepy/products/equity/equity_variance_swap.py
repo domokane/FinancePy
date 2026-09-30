@@ -256,7 +256,13 @@ class EquityVarianceSwap:
                 x = (close_prices[i] - close_prices[i - 1]) / close_prices[i - 1]
                 cum_x2 += x * x
 
-        var = cum_x2 * 252.0 / num_observations
+        # N prices give N - 1 returns: the market-standard realised variance
+        # is 252 / (N - 1) times the sum of the squared returns.
+        num_returns = num_observations - 1
+        if num_returns < 1:
+            raise FinError("At least two prices are needed for a realised variance")
+
+        var = cum_x2 * 252.0 / num_returns
         return var
 
     ###########################################################################
