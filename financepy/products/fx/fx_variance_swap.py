@@ -11,8 +11,7 @@ from ...utils.date import Date
 from ...utils.global_vars import ONE_MILLION
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import OptionTypes
-from .fx_vanilla_option import FXVanillaOption
-from ...models.black_scholes import BlackScholes
+from ...models.black_scholes_analytic import european_value
 from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.helpers import check_argument_types
@@ -165,7 +164,9 @@ class FinFXVarianceSwap:
         if min_strike < strike_spacing:
             k = sstar
             klist = [sstar]
-            while k >= strike_spacing:
+            # keep the put strikes strictly positive: the log-contract weight is
+            # undefined at a zero strike
+            while k - strike_spacing > 0.0:
                 k -= strike_spacing
                 klist.append(k)
             put_k = np.array(klist)
@@ -180,10 +181,17 @@ class FinFXVarianceSwap:
 
         self.call_strikes = call_k
 
-        option_total = 2.0 * (r * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
+        # Demeterfi, Derman, Kamal and Zhou (1999), eq. (29), with the foreign
+        # rate q in the role of a dividend yield: the drift of the log contract is
+        # (r - q) and the option portfolio is compounded at the domestic rate r.
+        option_total = (
+            2.0 * ((r - q) * t_mat - (s0 * g / sstar - 1.0) - np.log(sstar / s0)) / t_mat
+        )
 
-        self.call_wts = np.zeros(num_call_options)
-        self.put_wts = np.zeros(num_put_options)
+        # The number of puts may have been reduced above when the requested
+        # strikes would have gone below zero, so use the stored counts throughout.
+        self.call_wts = np.zeros(self.num_call_options)
+        self.put_wts = np.zeros(self.num_put_options)
 
         def f(x):
             return (2.0 / t_mat) * ((x - sstar) / sstar - np.log(x / sstar))
@@ -203,25 +211,21 @@ class FinFXVarianceSwap:
             sum_wts += self.call_wts[n]
 
         pi_put = 0.0
-        for n in range(0, num_put_options):
+        for n in range(0, self.num_put_options):
             k = put_k[n]
             vol = volatility_curve.volatility(k)
-            opt = FXVanillaOption(self.maturity_dt, k, put_type)
-            model = BlackScholes(vol)
-            v = opt.value(value_dt, s0, discount_curve, dividend_curve, model)
+            v = european_value(s0, t_mat, k, r, q, vol, put_type.value)
             pi_put += v * self.put_wts[n]
 
         pi_call = 0.0
-        for n in range(0, num_call_options):
+        for n in range(0, self.num_call_options):
             k = call_k[n]
             vol = volatility_curve.volatility(k)
-            opt = FXVanillaOption(self.maturity_dt, k, call_type)
-            model = BlackScholes(vol)
-            v = opt.value(value_dt, s0, discount_curve, dividend_curve, model)
+            v = european_value(s0, t_mat, k, r, q, vol, call_type.value)
             pi_call += v * self.call_wts[n]
 
         pi = pi_call + pi_put
-        option_total += g * pi
+        option_total += np.exp(r * t_mat) * pi
         var = option_total
 
         return var
@@ -249,7 +253,13 @@ class FinFXVarianceSwap:
                 x = (close_prices[i] - close_prices[i - 1]) / close_prices[i - 1]
                 cum_x2 += x * x
 
-        var = cum_x2 * 252.0 / num_observations
+        # N prices give N - 1 returns: the market-standard realised variance
+        # is 252 / (N - 1) times the sum of the squared returns.
+        num_returns = num_observations - 1
+        if num_returns < 1:
+            raise FinError("At least two prices are needed for a realised variance")
+
+        var = cum_x2 * 252.0 / num_returns
         return var
 
     ###########################################################################

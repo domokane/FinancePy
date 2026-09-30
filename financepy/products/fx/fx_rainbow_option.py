@@ -10,7 +10,7 @@ from ...utils.date import Date
 from ...utils.math import normcdf, M
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
-from ...models.gbm_process_simulator import get_assets_paths_times
+from ...models.gbm_process_simulator import get_assets_paths
 from ...products.fx.fx_option import FXOption
 
 from ...utils.helpers import check_argument_types
@@ -86,18 +86,25 @@ def value_mc_fast(
 
     mus = r - foreign_rates
 
-    num_time_steps = 2
-    s_all = get_assets_paths_times(
+    # One-factor model: the correlation between two rates is the product of
+    # their betas. The path generator takes the full correlation matrix.
+    betas = np.asarray(betas, dtype=float)
+    corr_matrix = np.outer(betas, betas)
+    np.fill_diagonal(corr_matrix, 1.0)
+
+    _, s_all = get_assets_paths(
         num_assets,
         num_paths,
-        num_time_steps,
         t,
         mus,
         stock_prices,
         volatilities,
-        betas,
+        corr_matrix,
         seed,
     )
+    # get_assets_paths returns (num_assets, num_paths); the payoff functions
+    # below work on (num_paths, num_assets)
+    s_all = s_all.T
 
     payoff = payoff_value(s_all, payoff_type.value, payoff_params)
     payoff = np.mean(payoff)
@@ -203,12 +210,14 @@ class FXRainbowOption(FXOption):
         # Use result by Stulz (1982) given by Haug Page 211
         t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
 
-        r = domestic_curve.zero_rate_cc(self.maturity_dt)
+        r = domestic_curve.zero_rate_cc(self.expiry_dt)
 
         q1 = foreign_rates[0]
         q2 = foreign_rates[1]
 
-        rho = betas[0] ** 2
+        # One-factor model: the correlation of the two rates is the product of
+        # their betas, as in the Monte Carlo valuation.
+        rho = betas[0] * betas[1]
         s1 = stock_prices[0]
         s2 = stock_prices[1]
         b1 = r - q1

@@ -149,7 +149,7 @@ class FXOption:
         v_bumped = self.value(
             value_dt,
             spot_fx_rate,
-            domestic_curve.bump(BUMP),
+            domestic_curve.bump_parallel(BUMP),
             foreign_curve,
             model,
         )
