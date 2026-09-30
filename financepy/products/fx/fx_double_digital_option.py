@@ -153,11 +153,16 @@ class FXDoubleDigitalOption:
             upper_d2 = (ln_s0_k2 + (mu - v2 / 2.0) * t_del) / den
 
             if self.prem_currency == self.for_name:
-                lower_digital = s0 * np.exp(-r_f * t_del) * normcdf_vect(-lower_d2)
-                upper_digital = s0 * np.exp(-r_f * t_del) * normcdf_vect(-upper_d2)
+                # One unit of foreign currency is an asset-or-nothing payoff: it is
+                # worth S0 exp(-r_f t) N(d1) in domestic currency, with d1 not d2.
+                lower_d1 = lower_d2 + den
+                upper_d1 = upper_d2 + den
+                lower_digital = s0 * for_df * normcdf_vect(-lower_d1)
+                upper_digital = s0 * for_df * normcdf_vect(-upper_d1)
             elif self.prem_currency == self.dom_name:
-                lower_digital = np.exp(-r_f * t_del) * normcdf_vect(-lower_d2)
-                upper_digital = np.exp(-r_f * t_del) * normcdf_vect(-upper_d2)
+                # A domestic cash payment is discounted at the domestic rate.
+                lower_digital = dom_df * normcdf_vect(-lower_d2)
+                upper_digital = dom_df * normcdf_vect(-upper_d2)
 
             v = (upper_digital - lower_digital) * self.notional
 
