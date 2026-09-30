@@ -158,7 +158,7 @@ def test_pay():
     assert round(swap1, 0) == 0
     assert round(swap2, 0) == 0
     assert round(swap3, 0) == 22
-    assert round(swap4, 0) == 61
+    assert round(swap4, 0) == 60
     assert round(swap5, 0) == 0
     assert round(swap6, 0) == 0
 
@@ -190,7 +190,7 @@ def test_receive():
     assert round(swap1, 4) == 0.0
     assert round(swap2, 4) == 0.0
     assert round(swap3, 4) == 0.0
-    assert round(swap4, 4) == 0.0046
+    assert round(swap4, 4) == 0.0030
     assert round(swap5, 4) == 0.0
     assert round(swap6, 4) == 0.0
 

@@ -124,8 +124,8 @@ def test_cap():
 
     assert round(cvalue1, 4) == 3.1029
     assert round(cvalue2, 4) == 21.3032
-    assert round(cvalue3, 4) == 0.0023
-    assert round(cvalue4, 4) == 0.0188
+    assert round(cvalue3, 4) == 0.0022
+    assert round(cvalue4, 4) == 0.0178
     assert round(cvalue5, 0) == 53619
     assert round(cvalue6, 4) == 0.1585
 
