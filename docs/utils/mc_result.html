@@ -10,7 +10,7 @@
     content="width=device-width, initial-scale=1"
 >
 
-<title>check values - FinancePy</title>
+<title>mc result - FinancePy</title>
 
 
 <style>
@@ -280,161 +280,37 @@ pre {
 </header>
 
 <main>
-<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">utils</a> &rsaquo; check values</nav>
-<h1>check values</h1>
+<nav><a href="../index.html">FinancePy</a> &rsaquo; <a href="index.html">utils</a> &rsaquo; mc result</nav>
+<h1>mc result</h1>
 
 <p class="source-name">
-financepy.utils.check_values
+financepy.utils.mc_result
 </p>
-<h1>Functions</h1>
-<div class="member">
+<div class="docstring">Created on Sun Sep 27 20:31:07 2026
 
-<h3>check_corr_matrix</h3>
+@author: Dominic</div><h1>Class</h1>
+<section>
 
-<div class="signature">
+<h2>MCResult</h2>
 
-<code>
-check_corr_matrix(
-    corr_matrix: numpy.ndarray,
-    num_assets: int,
-    tol = 1e-12,
-    positive_definite = False,
-)
-</code>
-
-</div>
-
-<div class="docstring">Check that an array is a valid correlation matrix.</div>
-
-</div>
-
-<div class="member">
-
-<h3>check_curve_dt</h3>
 
 <div class="signature">
 
-<code>
-check_curve_dt(
-    anchor_dt: Date,
-    *curves,
-)
-</code>
+<code>MCResult(
+    value: float,
+    std_err: float,
+) -&gt; None</code>
 
 </div>
 
-<div class="docstring">Check that curves are valid for the requested valuation date.</div>
 
-</div>
 
-<div class="member">
 
-<h3>check_num_paths</h3>
+<div class="docstring">Result from a Monte Carlo valuation.</div>
 
-<div class="signature">
 
-<code>
-check_num_paths(
-    num_paths: int,
-)
-</code>
 
-</div>
-
-<p><em>No description available.</em></p>
-
-</div>
-
-<div class="member">
-
-<h3>check_shapes</h3>
-
-<div class="signature">
-
-<code>
-check_shapes(
-    *args,
-)
-</code>
-
-</div>
-
-<div class="docstring">Allow scalars and equal-length vectors.</div>
-
-</div>
-
-<div class="member">
-
-<h3>check_stock_price</h3>
-
-<div class="signature">
-
-<code>
-check_stock_price(
-    stock_price: float,
-)
-</code>
-
-</div>
-
-<p><em>No description available.</em></p>
-
-</div>
-
-<div class="member">
-
-<h3>check_strike_price</h3>
-
-<div class="signature">
-
-<code>
-check_strike_price(
-    strike_price: float,
-)
-</code>
-
-</div>
-
-<p><em>No description available.</em></p>
-
-</div>
-
-<div class="member">
-
-<h3>check_t_exp</h3>
-
-<div class="signature">
-
-<code>
-check_t_exp(
-    value_dt: Date,
-    expiry_dt: Date,
-)
-</code>
-
-</div>
-
-<div class="docstring">Calculate time to expiry in years.</div>
-
-</div>
-
-<div class="member">
-
-<h3>check_volatility</h3>
-
-<div class="signature">
-
-<code>
-check_volatility(
-    volatility: float,
-)
-</code>
-
-</div>
-
-<p><em>No description available.</em></p>
-
-</div>
+</section>
 
 <div class="generated">
 

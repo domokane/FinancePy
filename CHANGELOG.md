@@ -1,5 +1,6 @@
 ## CHANGE LOG
 30 Sep 2026
+- Renamed functions in utils.stats.py to std_err and std_dev
 - Introduce MCResult to encapsulate monte carlo value and standard error
 - Applied MCResult to Asian options and Equity vanilla options
 - Fixed bug in Date class - __rsub__ was reversed in order

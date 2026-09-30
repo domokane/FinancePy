@@ -286,20 +286,6 @@ pre {
 <p class="source-name">
 financepy.products.equity.equity_option
 </p>
-<h1>Types</h1>
-<section>
-
-<h2>EquityOptionModelTypes</h2>
-
-<p><em>No description available.</em></p>
-
-<h3>Members</h3>
-<div class="enum-members">
-<div><code>BLACK_SCHOLES</code> = <code>1</code></div>
-<div><code>ANOTHER</code> = <code>2</code></div>
-</div>
-
-</section>
 <h1>Class</h1>
 <section>
 
@@ -315,8 +301,7 @@ financepy.products.equity.equity_option
 
 
 
-<div class="docstring">This class is a parent class for all equitu option classes that
-require any perturbatory risk.</div>
+<div class="docstring">Parent class for equity options requiring perturbatory risk.</div>
 
 <h3>Methods</h3>
 <div class="member">
@@ -334,6 +319,7 @@ value(
     discount_curve: DiscountCurve | float,
     dividend_curve: DiscountCurve | float,
     model: Model,
+    **kwargs,
 )
 </code>
 
@@ -359,14 +345,14 @@ delta(
     discount_curve: DiscountCurve,
     dividend_curve: DiscountCurve,
     model: Model,
+    **kwargs,
 )
 </code>
 
 </div>
 
 
-<div class="docstring">Calculation of option delta by perturbation of stock price and
-revaluation.</div>
+<div class="docstring">Calculate option delta by perturbation of stock price.</div>
 
 </div>
 
@@ -385,14 +371,14 @@ gamma(
     discount_curve: DiscountCurve,
     dividend_curve: DiscountCurve,
     model: Model,
+    **kwargs,
 )
 </code>
 
 </div>
 
 
-<div class="docstring">Calculation of option gamma by perturbation of stock price and
-revaluation.</div>
+<div class="docstring">Calculate option gamma by perturbation of stock price.</div>
 
 </div>
 
@@ -411,13 +397,14 @@ vega(
     discount_curve: DiscountCurve,
     dividend_curve: DiscountCurve,
     model: Model,
+    **kwargs,
 )
 </code>
 
 </div>
 
 
-<div class="docstring">Calculation of option vega by perturbing vol and revaluation.</div>
+<div class="docstring">Calculate option vega by perturbing volatility by 1%.</div>
 
 </div>
 
@@ -436,14 +423,14 @@ vanna(
     discount_curve: DiscountCurve,
     dividend_curve: DiscountCurve,
     model: Model,
+    **kwargs,
 )
 </code>
 
 </div>
 
 
-<div class="docstring">Calculation of option vanna by perturbing delta with respect to the
-stock price volatility.</div>
+<div class="docstring">Calculate option vanna by perturbing delta with respect to vol.</div>
 
 </div>
 
@@ -462,15 +449,14 @@ theta(
     discount_curve: DiscountCurve,
     dividend_curve: DiscountCurve,
     model: Model,
+    **kwargs,
 )
 </code>
 
 </div>
 
 
-<div class="docstring">Calculation of option theta by perturbing value date by one
-calendar date (not a business date) and then doing revaluation and
-calculating the difference divided by dt = 1 / G_DAYS_IN_YEAR.</div>
+<div class="docstring">Calculate option theta by moving valuation date one calendar day.</div>
 
 </div>
 
@@ -489,14 +475,14 @@ rho(
     discount_curve: DiscountCurve,
     dividend_curve: DiscountCurve,
     model: Model,
+    **kwargs,
 )
 </code>
 
 </div>
 
 
-<div class="docstring">Calculation of option rho by perturbing interest rate and
-revaluation.</div>
+<div class="docstring">Calculate option rho by perturbing the interest-rate curve.</div>
 
 </div>
 

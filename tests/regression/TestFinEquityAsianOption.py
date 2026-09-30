@@ -485,6 +485,86 @@ def test_r_equals_q_fn():
         )
 
 
+def test_asian_option_greeks():
+
+    value_dt = Date(1, 1, 2014)
+    start_averaging_date = Date(1, 6, 2014)
+    expiry_dt = Date(1, 1, 2015)
+
+    stock_price = 100.0
+    volatility = 0.20
+
+    interest_rate = 0.05
+    dividend_yield = 0.05
+
+    num_obs_per_year = 120
+    strike_price = 100.0
+
+    model = BlackScholes(volatility)
+
+    discount_curve = FlatDiscountCurve(
+        value_dt,
+        interest_rate,
+    )
+
+    dividend_curve = FlatDiscountCurve(
+        value_dt,
+        dividend_yield,
+    )
+
+    asian_option = EquityAsianOption(
+        start_averaging_date,
+        expiry_dt,
+        strike_price,
+        OptionTypes.EUROPEAN_CALL,
+        num_obs_per_year,
+    )
+
+    test_cases.header(
+        "METHOD",
+        "VALUE",
+    )
+
+    method = AsianOptionValuationTypes.CURRAN
+
+    value = asian_option.value(
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        model,
+        method=method,
+    )
+
+    value_up = asian_option.value(
+        value_dt,
+        stock_price+1e-4,
+        discount_curve,
+        dividend_curve,
+        model,
+        method=method,
+    )
+
+    delta_1 = (value_up - value)/1e-4
+
+    delta_2 = asian_option.delta(
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        model,
+        method=method,
+    )
+
+    assert (delta_1 == delta_2)
+
+    test_cases.print(
+        str(method),
+        value,
+    )
+
+
+test_asian_option_greeks()
 test_convergence_fn()
 test_mc_timings_fn()
 test_time_evolution_fn()

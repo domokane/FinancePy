@@ -28,7 +28,7 @@ echo.
 
 cd /d "%PROJECT_ROOT%"
 
-python "%PROJECT_ROOT%\scripts\generate_api_docs_pretty_caps_white_header.py"
+python "%PROJECT_ROOT%\scripts\generate_api_docs.py"
 
 if errorlevel 1 (
     echo.

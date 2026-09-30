@@ -320,7 +320,7 @@ financepy.products.equity.equity_asian_option
 </div>
 
 
-
+<div class="inheritance">Inherits from: EquityOption</div>
 
 <div class="docstring">Class for an Equity Asian Option. This is an option with a final payoff
 linked to the averaging of the stock price over some specified period
@@ -371,7 +371,7 @@ value(
     discount_curve: DiscountCurve,
     dividend_curve: DiscountCurve,
     model: Model,
-    method: AsianOptionValuationTypes,
+    method: AsianOptionValuationTypes = &lt;AsianOptionValuationTypes.CURRAN: 3&gt;,
     accrued_average: float = None,
 )
 </code>
@@ -413,7 +413,7 @@ value_mc(
     num_paths: int,
     seed: int,
     accrued_average: float,
-)
+) -&gt; MCResult
 </code>
 
 </div>
@@ -443,7 +443,7 @@ value_mc_fast(
     num_paths: int,
     seed,
     accrued_average,
-)
+) -&gt; MCResult
 </code>
 
 </div>
@@ -472,7 +472,7 @@ value_mc_fast_cv(
     num_paths: int,
     seed,
     accrued_average,
-)
+) -&gt; MCResult
 </code>
 
 </div>

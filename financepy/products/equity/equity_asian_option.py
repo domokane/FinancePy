@@ -32,8 +32,10 @@ from ...utils.check_values import check_num_paths
 
 from ...utils.helpers import option_years
 
+from .equity_option import EquityOption
 
 ########################################################################################
+
 
 class AsianOptionValuationTypes(Enum):
     KEMNA_VORST = 1
@@ -44,7 +46,7 @@ class AsianOptionValuationTypes(Enum):
 ########################################################################################
 
 
-class EquityAsianOption:
+class EquityAsianOption(EquityOption):
     """Class for an Equity Asian Option. This is an option with a final payoff
     linked to the averaging of the stock price over some specified period
     before the option expires. The valuation is done for both an arithmetic and
@@ -114,7 +116,7 @@ class EquityAsianOption:
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model: Model,
-        method: AsianOptionValuationTypes,
+        method: AsianOptionValuationTypes = AsianOptionValuationTypes.CURRAN,
         accrued_average: float = None,
     ):
         """Calculate the value of an Asian option using one of the specified

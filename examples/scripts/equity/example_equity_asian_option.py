@@ -192,7 +192,6 @@ plt.title(
 )
 plt.grid(True, axis="y")
 plt.xticks(rotation=20)
-plt.tight_layout()
 plt.show()
 
 
@@ -341,7 +340,6 @@ plt.ylabel("Asian Option Value")
 plt.title("Curran versus Monte Carlo CV by Observation Frequency")
 plt.grid(True)
 plt.legend()
-plt.tight_layout()
 plt.show()
 
 
@@ -359,30 +357,44 @@ plt.show()
 #
 # ============================================================================
 
+# ============================================================================
+# 5. DELTA THROUGH THE LIFE OF THE OPTION
+# ============================================================================
+#
+# Calculate Curran delta from the pre-averaging period, through the start of
+# averaging, and towards expiry.
+#
+# The stock price is held constant at 100. Once averaging has started, the
+# accrued average is also held at 100. This isolates the effect of time and
+# the shrinking remaining averaging period on delta.
+#
+# The x-axis is time to expiry in years rather than calendar date.
+# ============================================================================
+
 print("\n" + "=" * 78)
-print("4. CURRAN VERSUS MONTE CARLO CV THROUGH TIME")
+print("5. DELTA THROUGH THE LIFE OF THE OPTION")
 print("=" * 78)
 
-start_averaging_dt_time = Date(1, 1, 2015)
-expiry_dt_time = Date(1, 1, 2016)
+start_averaging_dt_delta = Date(1, 1, 2015)
+expiry_dt_delta = Date(1, 1, 2016)
 
-stock_price_time = 100.0
-strike_price_time = 100.0
-volatility_time = 0.20
-interest_rate_time = 0.05
-dividend_yield_time = 0.02
+stock_price_delta = 100.0
+strike_price_delta = 100.0
+volatility_delta = 0.20
+interest_rate_delta = 0.05
+dividend_yield_delta = 0.02
 
-option_time = EquityAsianOption(
-    start_averaging_dt_time,
-    expiry_dt_time,
-    strike_price_time,
+option_delta = EquityAsianOption(
+    start_averaging_dt_delta,
+    expiry_dt_delta,
+    strike_price_delta,
     OptionTypes.EUROPEAN_CALL,
     100,
 )
 
-model_time = BlackScholes(volatility_time)
+model_delta = BlackScholes(volatility_delta)
 
-value_dts = [
+value_dts_delta = [
     Date(1, 4, 2014),
     Date(1, 7, 2014),
     Date(1, 10, 2014),
@@ -395,111 +407,90 @@ value_dts = [
     Date(1, 12, 2015),
 ]
 
-curran_time_values = []
-mc_cv_time_values = []
-mc_cv_time_errors = []
+times_to_expiry = []
+delta_values = []
 
 print(
     f"{'DATE':>15s}"
-    f"{'CURRAN':>15s}"
-    f"{'MC CV':>15s}"
-    f"{'MC SE':>15s}"
-    f"{'DIFFERENCE':>15s}"
+    f"{'TIME':>15s}"
+    f"{'DELTA':>15s}"
 )
-print("-" * 75)
 
-for time_value_dt in value_dts:
+print("-" * 45)
+
+for time_value_dt in value_dts_delta:
 
     time_discount_curve = FlatDiscountCurve(
         time_value_dt,
-        interest_rate_time,
+        interest_rate_delta,
     )
 
     time_dividend_curve = FlatDiscountCurve(
         time_value_dt,
-        dividend_yield_time,
+        dividend_yield_delta,
     )
 
-    if time_value_dt <= start_averaging_dt_time:
-        accrued_average_time = None
+    if time_value_dt <= start_averaging_dt_delta:
+        accrued_average_delta = None
     else:
-        accrued_average_time = stock_price_time
+        accrued_average_delta = stock_price_delta
 
-    curran = option_time.value(
+    delta = option_delta.delta(
         time_value_dt,
-        stock_price_time,
+        stock_price_delta,
         time_discount_curve,
         time_dividend_curve,
-        model_time,
-        AsianOptionValuationTypes.CURRAN,
-        accrued_average_time,
+        model_delta,
+        method=AsianOptionValuationTypes.CURRAN,
+        accrued_average=accrued_average_delta,
     )
 
-    result_cv = option_time.value_mc_fast_cv(
-        time_value_dt,
-        stock_price_time,
-        time_discount_curve,
-        time_dividend_curve,
-        model_time,
-        num_paths,
-        seed,
-        accrued_average_time,
-    )
+    time_to_expiry = (
+        expiry_dt_delta - time_value_dt
+    ) / 365.0
 
-    curran_time_values.append(curran)
-    mc_cv_time_values.append(result_cv.value)
-    mc_cv_time_errors.append(result_cv.std_err)
+    times_to_expiry.append(time_to_expiry)
+    delta_values.append(delta)
 
     print(
         f"{str(time_value_dt):>15s}"
-        f"{curran:15.8f}"
-        f"{result_cv.value:15.8f}"
-        f"{result_cv.std_err:15.8f}"
-        f"{curran - result_cv.value:15.8f}"
+        f"{time_to_expiry:15.6f}"
+        f"{delta:15.8f}"
     )
 
-curran_time_values = np.asarray(curran_time_values)
-mc_cv_time_values = np.asarray(mc_cv_time_values)
-mc_cv_time_errors = np.asarray(mc_cv_time_errors)
+times_to_expiry = np.asarray(times_to_expiry)
+delta_values = np.asarray(delta_values)
 
-plot_dates = np.arange(len(value_dts))
-averaging_start_index = value_dts.index(start_averaging_dt_time)
+time_to_averaging_start = (
+    expiry_dt_delta - start_averaging_dt_delta
+) / 365.0
 
 plt.figure(figsize=(10, 6))
 
 plt.plot(
-    plot_dates,
-    curran_time_values,
+    times_to_expiry,
+    delta_values,
     marker="o",
-    label="Curran",
-)
-
-plt.errorbar(
-    plot_dates,
-    mc_cv_time_values,
-    yerr=1.96 * mc_cv_time_errors,
-    marker="o",
-    capsize=3,
-    label="Monte Carlo CV (95% CI)",
+    label="Curran Delta",
 )
 
 plt.axvline(
-    averaging_start_index,
+    time_to_averaging_start,
     linestyle="--",
     label="Averaging Starts",
 )
 
-plt.xticks(
-    plot_dates,
-    [str(dt) for dt in value_dts],
-    rotation=45,
-)
+plt.xlabel("Time to Expiry (Years)")
+plt.ylabel("Delta")
+plt.title("Asian Option Delta through Time")
 
-plt.xlabel("Valuation Date")
-plt.ylabel("Asian Option Value")
-plt.title("Curran versus Monte Carlo CV through Time")
 plt.grid(True)
 plt.legend()
+
+# Show chronological progression towards expiry:
+# large time-to-expiry -> zero
+plt.gca().invert_xaxis()
+
 plt.tight_layout()
 plt.show()
 
@@ -625,7 +616,6 @@ plt.ylabel("Asian Option Value")
 plt.title("Monte Carlo Convergence")
 plt.grid(True)
 plt.legend()
-plt.tight_layout()
 plt.show()
 
 
