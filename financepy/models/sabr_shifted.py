@@ -57,7 +57,7 @@ def vol_function_shifted_sabr(
     b = 1.0 - beta
     fkb = (f * k) ** b
     a = b**2 * alpha**2 / (24.0 * fkb)
-    b = 0.25 * rho * beta * nu * alpha / fkb**0.5
+    g = 0.25 * rho * beta * nu * alpha / fkb**0.5
     c = (2.0 - 3.0 * rho**2.0) * nu**2.0 / 24
     d = fkb**0.5
     v = b**2 * logfk**2 / 24.0
@@ -67,10 +67,10 @@ def vol_function_shifted_sabr(
     eps = 1e-07
 
     if abs(z) > eps:
-        vz = alpha * z * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w) * _x(rho, z))
+        vz = alpha * z * (1.0 + (a + g + c) * t) / (d * (1.0 + v + w) * _x(rho, z))
         return vz
 
-    v0 = alpha * (1.0 + (a + b + c) * t) / (d * (1.0 + v + w))
+    v0 = alpha * (1.0 + (a + g + c) * t) / (d * (1.0 + v + w))
     return v0
 
 

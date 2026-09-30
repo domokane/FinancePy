@@ -58,3 +58,21 @@ def test_shifted_sabr():
     ), "The method called 'value()' doesn't comply with Call-Put parity"
 
     # TODO: adding Call-Put parity test for all sensitivities
+
+
+########################################################################################
+
+
+def test_shifted_sabr_equals_sabr_on_shifted_rates():
+    from financepy.models.sabr import SABR
+
+    shift = 0.01
+    t = 5.0
+    for beta in [0.0, 0.5, 1.0]:
+        alpha = 0.25 * 0.03 ** (1.0 - beta)
+        shifted = SABRShifted(alpha, beta, -0.3, 0.4, shift)
+        unshifted = SABR(alpha, beta, -0.3, 0.4)
+        for k in [0.0, 0.01, 0.04, 0.07]:
+            vol = shifted.black_vol(0.02, k, t)
+            expected = unshifted.black_vol(0.02 + shift, k + shift, t)
+            assert abs(vol - expected) < 1e-14
