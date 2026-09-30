@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from financepy.utils.stats import mean, stdev, correlation
+from financepy.utils.stats import mean, standard_deviation, correlation
 
 seed = 1972
 np.random.seed(seed)
@@ -26,7 +26,7 @@ def test_mean():
 def test_stdev():
 
     np_result = x.std()
-    fp_result = stdev(x)
+    fp_result = standard_deviation(x)
     assert round(fp_result, 10) == round(np_result, 10)
 
 

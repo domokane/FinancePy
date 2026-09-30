@@ -407,7 +407,7 @@ def test_list_of_date():
 
     # Test finding date difference
     assert (Date(1, 1, 2019) - dates) == [Date(1, 1, 2019) - d for d in dates]
-    assert (dates - Date(1, 1, 2019)) == [Date(1, 1, 2019) - d for d in dates]
+    assert (dates - Date(1, 1, 2019)) == [d - Date(1, 1, 2019) for d in dates]
 
 
 import pytest
