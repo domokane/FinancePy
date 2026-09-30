@@ -147,8 +147,8 @@ def test_monte_carlo_variants_agree_with_analytic():
         "value_mc_nonumba_nonumpy": 20_000,
     }
     for name, num_paths in variants.items():
-        value = getattr(call_option, name)(
-            value_date, stock_price, discount_curve, dividend_curve, model, num_paths, 4242
-        )
-        assert math.isfinite(value), name
-        assert abs(value - analytic) < 0.20, (name, value, analytic)
+        mc_result = getattr(call_option, name)(
+            value_date, stock_price, discount_curve, dividend_curve,
+            model, num_paths=num_paths, seed=4242, use_sobol=False)
+        assert math.isfinite(mc_result.value), name
+        assert abs(mc_result.value - analytic) < 0.20, (name, mc_result.value, analytic)

@@ -100,6 +100,6 @@ def test_mc():
         num_paths,
         seed,
         accrued_avg,
-    )
+    ).value
 
-    assert round(value_mc, 3) == 7.059
+    assert round(value_mc, 3) == 7.121

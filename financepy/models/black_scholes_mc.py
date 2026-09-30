@@ -432,7 +432,7 @@ def value_mc_numba_noanti(
             payoff += max(k - s_1, 0.0)
 
     value = payoff * np.exp(-r * t) / num_paths
-    return value
+    return value, 0.0
 
 
 ########################################################################################
@@ -451,7 +451,13 @@ def value_mc_numba_parallel(
     seed: int,
     use_sobol: int,
 ) -> tuple[float, float]:
-    # No use of Numpy vectorisation but NUMBA
+    """Black-Scholes Monte Carlo valuation using Numba parallelisation.
+
+    Returns
+    -------
+    tuple[float, float]
+        Option value and Monte Carlo standard error.
+    """
 
     _validate_mc_inputs(
         t,
@@ -466,6 +472,7 @@ def value_mc_numba_parallel(
         return value_at_expiry(s, k, opt_type)
 
     np.random.seed(seed)
+
     mu = r - q
     v2 = v**2
     v_sqrt_t = v * np.sqrt(t)
@@ -477,28 +484,42 @@ def value_mc_numba_parallel(
 
     ss = s * np.exp((mu - v2 / 2.0) * t)
 
+    # Each entry contains the average payoff of an antithetic pair.
     payoffs = np.empty(num_paths)
 
     if opt_type == OptionTypes.EUROPEAN_CALL.value:
 
-        for i in prange(0, num_paths):
+        for i in prange(num_paths):
             s_1 = ss * np.exp(+g[i] * v_sqrt_t)
             s_2 = ss * np.exp(-g[i] * v_sqrt_t)
+
             payoff1 = max(s_1 - k, 0.0)
             payoff2 = max(s_2 - k, 0.0)
-            path_payoff = (payoff1 + payoff2) / 2.0
-            payoffs[i] = path_payoff
+
+            payoffs[i] = (payoff1 + payoff2) / 2.0
 
     else:
 
-        for i in prange(0, num_paths):
+        for i in prange(num_paths):
             s_1 = ss * np.exp(+g[i] * v_sqrt_t)
             s_2 = ss * np.exp(-g[i] * v_sqrt_t)
+
             payoff1 = max(k - s_1, 0.0)
             payoff2 = max(k - s_2, 0.0)
-            path_payoff = (payoff1 + payoff2) / 2.0
-            payoffs[i] = path_payoff
 
+            payoffs[i] = (payoff1 + payoff2) / 2.0
+
+    # Monte Carlo estimate
     average_payoff = np.mean(payoffs)
-    value = average_payoff * np.exp(-r * t)
-    return value
+
+    discount_factor = np.exp(-r * t)
+    value = average_payoff * discount_factor
+
+    # Standard error of the Monte Carlo estimator.
+    #
+    # Each element of payoffs is one antithetic-pair observation,
+    # so the effective sample size here is num_paths.
+    payoff_std = np.std(payoffs)
+    error = discount_factor * payoff_std / np.sqrt(num_paths)
+
+    return value, error
