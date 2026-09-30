@@ -6,7 +6,7 @@ import time
 import numpy as np
 
 
-from financepy.utils.stats import mean, stdev, correlation
+from financepy.utils.stats import mean, std_dev, correlation
 
 # ============================================================================
 # FINANCEPY EXAMPLES - Statistics
@@ -14,8 +14,6 @@ from financepy.utils.stats import mean, stdev, correlation
 
 
 ########################################################################################
-
-
 
 
 ########################################################################################
@@ -73,7 +71,7 @@ start = time.time()
 
 for l in range(0, 10):
     mean2 = mean(x)
-    sd2 = stdev(x)
+    sd2 = std_dev(x)
     print(l, mean2, sd2)
 
 end = time.time()
@@ -94,4 +92,3 @@ end = time.time()
 elapsed = end - start
 print("TIME")
 print(elapsed)
-

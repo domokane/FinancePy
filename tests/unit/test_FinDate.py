@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import pytest
+from financepy.utils.error import FinError
 import datetime
 import numpy as np
 
@@ -407,13 +409,7 @@ def test_list_of_date():
 
     # Test finding date difference
     assert (Date(1, 1, 2019) - dates) == [Date(1, 1, 2019) - d for d in dates]
-    assert (dates - Date(1, 1, 2019)) == [Date(1, 1, 2019) - d for d in dates]
-
-
-import pytest
-
-from financepy.utils.date import Date
-from financepy.utils.error import FinError
+    assert (dates - Date(1, 1, 2019)) == [d - Date(1, 1, 2019) for d in dates]
 
 
 @pytest.mark.parametrize(

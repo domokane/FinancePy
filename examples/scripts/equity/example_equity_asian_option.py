@@ -6,7 +6,7 @@
 # pricers. Monte Carlo methods return an MCResult containing:
 #
 #     result.value
-#     result.standard_error
+#     result.std_err
 #
 # ============================================================================
 
@@ -140,12 +140,12 @@ print(f"{'Curran':<25s}{value_curran:15.8f}{'-':>15s}")
 print(
     f"{'Monte Carlo':<25s}"
     f"{result_mc.value:15.8f}"
-    f"{result_mc.standard_error:15.8f}"
+    f"{result_mc.std_err:15.8f}"
 )
 print(
     f"{'Monte Carlo CV':<25s}"
     f"{result_mc_cv.value:15.8f}"
-    f"{result_mc_cv.standard_error:15.8f}"
+    f"{result_mc_cv.std_err:15.8f}"
 )
 
 
@@ -170,8 +170,8 @@ method_errors = [
     0.0,
     0.0,
     0.0,
-    1.96 * result_mc.standard_error,
-    1.96 * result_mc_cv.standard_error,
+    1.96 * result_mc.std_err,
+    1.96 * result_mc_cv.std_err,
 ]
 
 plt.figure(figsize=(10, 6))
@@ -208,13 +208,13 @@ difference = value_curran - result_mc_cv.value
 
 print(f"Curran value       : {value_curran:.8f}")
 print(f"MC CV value        : {result_mc_cv.value:.8f}")
-print(f"MC CV std error    : {result_mc_cv.standard_error:.8f}")
+print(f"MC CV std error    : {result_mc_cv.std_err:.8f}")
 print(f"Curran - MC CV     : {difference:.8f}")
 
-if result_mc_cv.standard_error > 0.0:
+if result_mc_cv.std_err > 0.0:
     print(
         f"Difference / MC SE : "
-        f"{difference / result_mc_cv.standard_error:.4f}"
+        f"{difference / result_mc_cv.std_err:.4f}"
     )
 
 
@@ -303,13 +303,13 @@ for observations in num_obs_list:
 
     curran_obs_values.append(curran)
     mc_cv_obs_values.append(result_cv.value)
-    mc_cv_obs_errors.append(result_cv.standard_error)
+    mc_cv_obs_errors.append(result_cv.std_err)
 
     print(
         f"{observations:10d}"
         f"{curran:15.8f}"
         f"{result_cv.value:15.8f}"
-        f"{result_cv.standard_error:15.8f}"
+        f"{result_cv.std_err:15.8f}"
         f"{curran - result_cv.value:15.8f}"
     )
 
@@ -448,13 +448,13 @@ for time_value_dt in value_dts:
 
     curran_time_values.append(curran)
     mc_cv_time_values.append(result_cv.value)
-    mc_cv_time_errors.append(result_cv.standard_error)
+    mc_cv_time_errors.append(result_cv.std_err)
 
     print(
         f"{str(time_value_dt):>15s}"
         f"{curran:15.8f}"
         f"{result_cv.value:15.8f}"
-        f"{result_cv.standard_error:15.8f}"
+        f"{result_cv.std_err:15.8f}"
         f"{curran - result_cv.value:15.8f}"
     )
 
@@ -564,16 +564,16 @@ for paths in num_paths_list:
     )
 
     mc_values.append(result_mc.value)
-    mc_errors.append(result_mc.standard_error)
+    mc_errors.append(result_mc.std_err)
     mc_cv_values.append(result_cv.value)
-    mc_cv_errors.append(result_cv.standard_error)
+    mc_cv_errors.append(result_cv.std_err)
 
     print(
         f"{paths:10d}"
         f"{result_mc.value:15.8f}"
-        f"{result_mc.standard_error:12.8f}"
+        f"{result_mc.std_err:12.8f}"
         f"{result_cv.value:15.8f}"
-        f"{result_cv.standard_error:12.8f}"
+        f"{result_cv.std_err:12.8f}"
     )
 
 mc_values = np.asarray(mc_values)
@@ -660,15 +660,15 @@ result_mc_cv = asian_option.value_mc_fast_cv(
 )
 
 variance_reduction = (
-    result_mc.standard_error
-    / result_mc_cv.standard_error
+    result_mc.std_err
+    / result_mc_cv.std_err
 ) ** 2
 
 print(f"Paths              : {num_paths}")
 print(f"MC value           : {result_mc.value:.10f}")
-print(f"MC standard error  : {result_mc.standard_error:.10f}")
+print(f"MC standard error  : {result_mc.std_err:.10f}")
 print(f"MC CV value        : {result_mc_cv.value:.10f}")
-print(f"MC CV standard error: {result_mc_cv.standard_error:.10f}")
+print(f"MC CV standard error: {result_mc_cv.std_err:.10f}")
 print(f"Variance reduction : {variance_reduction:.2f}x")
 
 
@@ -704,7 +704,7 @@ for test_seed in range(seed_start, seed_start + num_replications):
     )
 
     values.append(result.value)
-    reported_errors.append(result.standard_error)
+    reported_errors.append(result.std_err)
 
 values = np.asarray(values)
 reported_errors = np.asarray(reported_errors)

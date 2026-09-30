@@ -6,7 +6,7 @@ import numpy as np
 import add_fp_to_path
 
 from FinTestCases import FinTestCases, global_test_case_mode
-from financepy.utils.stats import mean, st_dev, correlation
+from financepy.utils.stats import mean, std_dev, correlation
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
@@ -58,7 +58,7 @@ def test_fin_statistics():
 
     for l in range(0, 10):
         mean2 = mean(x)
-        sd2 = st_dev(x)
+        sd2 = std_dev(x)
         test_cases.print(l, mean2, sd2)
 
     end = time.time()

@@ -5,7 +5,7 @@ from numba import njit
 
 from ..utils.error import FinError
 from ..utils.math import covar
-from ..utils.stats import standard_error
+from ..utils.stats import std_err
 from ..utils.global_types import OptionTypes
 
 
@@ -189,7 +189,7 @@ def asian_value_mc_numba(
 
     discount = multiplier * np.exp(-r * t_exp)
     value = discount * np.mean(payoffs)
-    error = discount * standard_error(payoffs)
+    error = discount * std_err(payoffs)
 
     return value, error
 
@@ -318,7 +318,7 @@ def asian_value_mc_fast_numba(
     payoff = (payoff_a_1 + payoff_a_2) / 2.0
     discount = multiplier * np.exp(-r * t_exp)
     value = discount * np.mean(payoff)
-    error = discount * standard_error(payoff)
+    error = discount * std_err(payoff)
 
     return value, error
 
@@ -477,6 +477,6 @@ def asian_value_mc_fast_cv_numba(
     )
 
     value = discount * np.mean(payoff_cv)
-    error = discount * standard_error(payoff_cv)
+    error = discount * std_err(payoff_cv)
 
     return value, error

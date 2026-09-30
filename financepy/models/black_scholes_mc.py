@@ -24,7 +24,7 @@ import numpy as np
 from numba import njit, prange
 from ..utils.global_types import OptionTypes
 from ..models.sobol import get_gaussian_sobol
-from ..utils.stats import standard_error
+from ..utils.stats import std_err
 from ..utils.error import FinError
 
 ########################################################################################
@@ -220,7 +220,7 @@ def value_mc_numpy_only(
 
     discount = np.exp(-r * t)
     value = discount * np.mean(payoffs)
-    error = discount * standard_error(payoffs)
+    error = discount * std_err(payoffs)
 
     return value, error
 
@@ -280,7 +280,7 @@ def value_mc_numpy_numba(
 
     discount = np.exp(-r * t)
     value = discount * np.mean(payoffs)
-    error = discount * standard_error(payoffs)
+    error = discount * std_err(payoffs)
 
     return value, error
 
