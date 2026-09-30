@@ -75,7 +75,7 @@ def test_convergence_fn():
             num_paths,
             seed,
             accrued_avg
-        )
+        ).value
 
         value_mc_fast = asian_option.value_mc_fast(
             value_dt,
@@ -86,7 +86,7 @@ def test_convergence_fn():
             num_paths,
             seed,
             accrued_avg,
-        )
+        ).value
 
         value_mc_fast_cv = asian_option.value_mc_fast_cv(
             value_dt,
@@ -97,7 +97,7 @@ def test_convergence_fn():
             num_paths,
             seed,
             accrued_avg,
-        )
+        ).value
 
         value_geometric = asian_option.value(
             value_dt,
@@ -229,7 +229,7 @@ def test_time_evolution_fn():
             num_paths,
             seed,
             accrued_avg,
-        )
+        ).value
 
         value_mc_cv = asian_option.value_mc(
             value_dt,
@@ -240,7 +240,7 @@ def test_time_evolution_fn():
             num_paths,
             seed,
             accrued_avg,
-        )
+        ).value
 
         value_geometric = asian_option.value(
             value_dt,
@@ -356,7 +356,7 @@ def test_mc_timings_fn():
             num_paths,
             seed,
             accrued_avg,
-        )
+        ).value
 
         end = time.time()
         t_mc = end - start
@@ -371,7 +371,7 @@ def test_mc_timings_fn():
             num_paths,
             seed,
             accrued_avg,
-        )
+        ).value
 
         end = time.time()
         t_mc_fast = end - start
@@ -386,7 +386,7 @@ def test_mc_timings_fn():
             num_paths,
             seed,
             accrued_avg,
-        )
+        ).value
 
         end = time.time()
         t_mc_fast_cv = end - start

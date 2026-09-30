@@ -22,6 +22,18 @@ def check_curve_dt(anchor_dt: Date, *curves):
 
 ###########################################################################
 
+def check_num_paths(num_paths: int):
+
+    if num_paths < 4:
+        raise FinError("Number of paths must be at least 4.")
+
+    if num_paths % 2 != 0:
+        raise FinError(
+            "Number of paths must be even when using antithetic variates."
+        )
+
+###########################################################################
+
 
 def check_t_exp(value_dt: Date, expiry_dt: Date):
     """Calculate time to expiry in years."""

@@ -25,7 +25,7 @@ def mean(x: float):
 
 
 @njit(float64(float64[:]), fastmath=True, cache=True, parallel=True)
-def stdev(x: ndarray):
+def standard_deviation(x: ndarray):
     """Calculate the standard deviation of a vector of numbers x."""
     n = len(x)
     m = mean(x)
@@ -40,10 +40,10 @@ def stdev(x: ndarray):
 
 
 @njit(float64(float64[:]), fastmath=True, cache=True)
-def stderr(x: ndarray):
+def standard_error(x: ndarray):
     """Calculate the standard error estimate of a vector of numbers x."""
     n = len(x)
-    s = stdev(x)
+    s = standard_deviation(x)
     serr = s / sqrt(n)
     return serr
 
@@ -54,7 +54,7 @@ def stderr(x: ndarray):
 @njit(float64(float64[:]), fastmath=True, cache=True)
 def var(x: ndarray):
     """Calculate the variance of a vector of numbers x."""
-    s = stdev(x)
+    s = standard_deviation(x)
     v = s * s
     return v
 
@@ -89,8 +89,8 @@ def correlation(x1: ndarray, x2: ndarray):
 
     m1 = mean(x1)
     m2 = mean(x2)
-    sd1 = stdev(x1)
-    sd2 = stdev(x2)
+    sd1 = standard_deviation(x1)
+    sd2 = standard_deviation(x2)
 
     prod = 0.0
     for i in nb.prange(n1):

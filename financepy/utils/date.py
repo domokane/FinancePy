@@ -11,7 +11,6 @@ import math
 from typing import overload
 
 
-from typing import Union
 from numba import njit
 
 import numpy as np
@@ -380,9 +379,13 @@ class Date:
 
     ####################################################################################
 
+    # @vectorisation_helper
+    # def __rsub__(self, other):
+    #     return self.excel_dt - other.excel_dt
+
     @vectorisation_helper
     def __rsub__(self, other):
-        return self.excel_dt - other.excel_dt
+        return other.excel_dt - self.excel_dt
 
     ####################################################################################
 

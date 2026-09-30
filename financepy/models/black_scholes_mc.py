@@ -17,11 +17,66 @@
 
 ########################################################################################
 
+import random
+import math
 import numpy as np
 
-from numba import njit, float64, int64, prange
+from numba import njit, prange
 from ..utils.global_types import OptionTypes
 from ..models.sobol import get_gaussian_sobol
+from ..utils.stats import standard_error
+from ..utils.error import FinError
+
+########################################################################################
+
+
+@njit(cache=True)
+def _validate_mc_inputs(
+    t_exp: float,
+    k: float,
+    option_type_value,
+    stock_price: float,
+    volatility: float,
+    num_path_pairs: int,
+) -> None:
+
+    if t_exp < 0.0:
+        raise FinError("Time to expiry must be positive.")
+
+    if k < 0.0:
+        raise FinError("Strike must be non-negative.")
+
+    if option_type_value != OptionTypes.EUROPEAN_CALL.value and option_type_value != OptionTypes.EUROPEAN_PUT.value:
+        raise FinError("Option type must be EUROPEAN call or put.")
+
+    if stock_price <= 0.0:
+        raise FinError("Stock price must be positive.")
+
+    if volatility < 0.0:
+        raise FinError("Volatility must be non-negative.")
+
+    if num_path_pairs < 2:
+        raise FinError("Number of path pairs must be 2 or more.")
+
+########################################################################################
+
+
+@njit(cache=True, fastmath=True, parallel=False)
+def value_at_expiry(
+    s: float,
+    k: float,
+    opt_type: int,
+):
+    """Value a European option exactly at expiry."""
+
+    if opt_type == OptionTypes.EUROPEAN_CALL.value:
+        value = max(s - k, 0.0)
+    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
+        value = max(k - s, 0.0)
+    else:
+        raise FinError("Option type must be EUROPEAN call or put.")
+
+    return value, 0.0
 
 ########################################################################################
 
@@ -37,48 +92,82 @@ def value_mc_nonumba_nonumpy(
     num_paths: int,
     seed: int,
     use_sobol: int,
-) -> float:
-    # SLOWEST - No use of NUMPY vectorisation or NUMBA
+) -> tuple[float, float]:
 
-    np.random.seed(seed)
+    _validate_mc_inputs(
+        t,
+        k,
+        opt_type,
+        s,
+        v,
+        num_paths,
+    )
+
+    if t == 0.0:
+        return value_at_expiry(s, k, opt_type)
+
+    random.seed(seed)
+
     mu = r - q
-    v2 = v**2
-    v_sqrt_t = v * np.sqrt(t)
-    payoff = 0.0
+    v2 = v * v
+    v_sqrt_t = v * math.sqrt(t)
 
+    ss = s * math.exp((mu - 0.5 * v2) * t)
+
+    # Generate Gaussian samples.
     if use_sobol == 1:
         g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
-        g = np.random.standard_normal(num_paths)
+        g = None
 
-    ss = s * np.exp((mu - v2 / 2.0) * t)
+    sum_payoff = 0.0
+    sum_payoff_sq = 0.0
 
-    if opt_type == OptionTypes.EUROPEAN_CALL.value:
+    for i in range(num_paths):
 
-        for i in range(0, num_paths):
-            s_1 = ss * np.exp(+g[i] * v_sqrt_t)
-            s_2 = ss * np.exp(-g[i] * v_sqrt_t)
-            payoff += max(s_1 - k, 0.0)
-            payoff += max(s_2 - k, 0.0)
+        if use_sobol == 1:
+            z = g[i]
+        else:
+            z = random.gauss(0.0, 1.0)
 
-    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
+        m = math.exp(z * v_sqrt_t)
 
-        for i in range(0, num_paths):
-            s_1 = ss * np.exp(+g[i] * v_sqrt_t)
-            s_2 = ss * np.exp(-g[i] * v_sqrt_t)
-            payoff += max(k - s_1, 0.0)
-            payoff += max(k - s_2, 0.0)
+        s_1 = ss * m
+        s_2 = ss / m
 
-    else:
-        return np.nan
+        if opt_type == OptionTypes.EUROPEAN_CALL.value:
+            payoff_1 = max(s_1 - k, 0.0)
+            payoff_2 = max(s_2 - k, 0.0)
+        else:
+            payoff_1 = max(k - s_1, 0.0)
+            payoff_2 = max(k - s_2, 0.0)
 
-    value = payoff * np.exp(-r * t) / num_paths / 2.0
-    return value
+        payoff = 0.5 * (payoff_1 + payoff_2)
 
+        sum_payoff += payoff
+        sum_payoff_sq += payoff * payoff
+
+    mean_payoff = sum_payoff / num_paths
+
+    variance = (sum_payoff_sq - num_paths * mean_payoff * mean_payoff)
+    variance = variance / (num_paths - 1)
+
+    # Protect against tiny negative values caused by floating-point rounding.
+    variance = max(variance, 0.0)
+
+    error = math.sqrt(variance / num_paths)
+
+    discount = math.exp(-r * t)
+
+    value = discount * mean_payoff
+    error = discount * error
+
+    return value, error
 
 ########################################################################################
 
 
+@njit(cache=True, fastmath=True, parallel=False)
 def value_mc_numpy_only(
     s: float,
     t: float,
@@ -90,8 +179,19 @@ def value_mc_numpy_only(
     num_paths: int,
     seed: int,
     use_sobol: int,
-) -> float:
-    # Use of NUMPY ONLY
+) -> tuple[float, float]:
+
+    _validate_mc_inputs(
+        t,
+        k,
+        opt_type,
+        s,
+        v,
+        num_paths,
+    )
+
+    if t == 0.0:
+        return value_at_expiry(s, k, opt_type)
 
     np.random.seed(seed)
     mu = r - q
@@ -108,40 +208,26 @@ def value_mc_numpy_only(
     s_1 = ss * m
     s_2 = ss / m
 
-    # Not sure if it is correct to do antithetics with sobols but why not ?
+    # Not sure if it is correct to do antithetics with sobols but why not ? Well ...
     if opt_type == OptionTypes.EUROPEAN_CALL.value:
-        payoff_a_1 = np.maximum(s_1 - k, 0.0)
-        payoff_a_2 = np.maximum(s_2 - k, 0.0)
-    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
-        payoff_a_1 = np.maximum(k - s_1, 0.0)
-        payoff_a_2 = np.maximum(k - s_2, 0.0)
+        payoffs_1 = np.maximum(s_1 - k, 0.0)
+        payoffs_2 = np.maximum(s_2 - k, 0.0)
     else:
-        return np.nan
+        payoffs_1 = np.maximum(k - s_1, 0.0)
+        payoffs_2 = np.maximum(k - s_2, 0.0)
 
-    payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
-    value = payoff * np.exp(-r * t) / 2.0
-    return value
+    payoffs = (payoffs_1 + payoffs_2)/2.0
 
+    discount = np.exp(-r * t)
+    value = discount * np.mean(payoffs)
+    error = discount * standard_error(payoffs)
+
+    return value, error
 
 ########################################################################################
 
 
-@njit(
-    float64(
-        float64,
-        float64,
-        float64,
-        float64,
-        float64,
-        float64,
-        int64,
-        int64,
-        int64,
-        int64,
-    ),
-    cache=True,
-    fastmath=True,
-)
+@njit(cache=True, fastmath=True, parallel=False)
 def value_mc_numpy_numba(
     s: float,
     t: float,
@@ -153,8 +239,19 @@ def value_mc_numpy_numba(
     num_paths: int,
     seed: int,
     use_sobol: int,
-) -> float:
-    # Use of NUMPY ONLY
+) -> tuple[float, float]:
+
+    _validate_mc_inputs(
+        t,
+        k,
+        opt_type,
+        s,
+        v,
+        num_paths,
+    )
+
+    if t == 0.0:
+        return value_at_expiry(s, k, opt_type)
 
     np.random.seed(seed)
     mu = r - q
@@ -173,38 +270,25 @@ def value_mc_numpy_numba(
 
     # Not sure if it is correct to do antithetics with sobols but why not ?
     if opt_type == OptionTypes.EUROPEAN_CALL.value:
-        payoff_a_1 = np.maximum(s_1 - k, 0.0)
-        payoff_a_2 = np.maximum(s_2 - k, 0.0)
-    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
-        payoff_a_1 = np.maximum(k - s_1, 0.0)
-        payoff_a_2 = np.maximum(k - s_2, 0.0)
+        payoffs_1 = np.maximum(s_1 - k, 0.0)
+        payoffs_2 = np.maximum(s_2 - k, 0.0)
     else:
-        return np.nan
+        payoffs_1 = np.maximum(k - s_1, 0.0)
+        payoffs_2 = np.maximum(k - s_2, 0.0)
 
-    payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
-    value = payoff * np.exp(-r * t) / 2.0
-    return value
+    payoffs = (payoffs_1 + payoffs_2) / 2.0
+
+    discount = np.exp(-r * t)
+    value = discount * np.mean(payoffs)
+    error = discount * standard_error(payoffs)
+
+    return value, error
 
 
 ########################################################################################
 
 
-@njit(
-    float64(
-        float64,
-        float64,
-        float64,
-        float64,
-        float64,
-        float64,
-        int64,
-        int64,
-        int64,
-        int64,
-    ),
-    fastmath=True,
-    cache=True,
-)
+@njit(cache=True, fastmath=True, parallel=False)
 def value_mc_numba_only(
     s: float,
     t: float,
@@ -216,66 +300,83 @@ def value_mc_numba_only(
     num_paths: int,
     seed: int,
     use_sobol: int,
-) -> float:
-    # No use of Numpy vectorisation but NUMBA
+) -> tuple[float, float]:
 
-    np.random.seed(seed)
+    _validate_mc_inputs(
+        t,
+        k,
+        opt_type,
+        s,
+        v,
+        num_paths,
+    )
+
+    if t == 0.0:
+        return value_at_expiry(s, k, opt_type)
+
+    random.seed(seed)
+
     mu = r - q
-    v2 = v**2
-    v_sqrt_t = v * np.sqrt(t)
-    payoff = 0.0
+    v2 = v * v
+    v_sqrt_t = v * math.sqrt(t)
 
+    ss = s * math.exp((mu - 0.5 * v2) * t)
+
+    # Generate Gaussian samples.
     if use_sobol == 1:
         g = get_gaussian_sobol(num_paths, 1)[:, 0]
     else:
-        g = np.random.standard_normal(num_paths)
+        g = None
 
-    ss = s * np.exp((mu - v2 / 2.0) * t)
+    sum_payoff = 0.0
+    sum_payoff_sq = 0.0
 
-    if opt_type == OptionTypes.EUROPEAN_CALL.value:
+    for i in range(num_paths):
 
-        for i in range(0, num_paths):
-            gg = g[i]
-            s_1 = ss * np.exp(+gg * v_sqrt_t)
-            s_2 = ss * np.exp(-gg * v_sqrt_t)
-            payoff += max(s_1 - k, 0.0)
-            payoff += max(s_2 - k, 0.0)
+        if use_sobol == 1:
+            z = g[i]
+        else:
+            z = random.gauss(0.0, 1.0)
 
-    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
+        m = math.exp(z * v_sqrt_t)
 
-        for i in range(0, num_paths):
-            gg = g[i]
-            s_1 = ss * np.exp(+gg * v_sqrt_t)
-            s_2 = ss * np.exp(-gg * v_sqrt_t)
-            payoff += max(k - s_1, 0.0)
-            payoff += max(k - s_2, 0.0)
+        s_1 = ss * m
+        s_2 = ss / m
 
-    else:
-        return np.nan
+        if opt_type == OptionTypes.EUROPEAN_CALL.value:
+            payoff_1 = max(s_1 - k, 0.0)
+            payoff_2 = max(s_2 - k, 0.0)
+        else:
+            payoff_1 = max(k - s_1, 0.0)
+            payoff_2 = max(k - s_2, 0.0)
 
-    value = payoff * np.exp(-r * t) / num_paths / 2.0
-    return value
+        payoff = 0.5 * (payoff_1 + payoff_2)
+
+        sum_payoff += payoff
+        sum_payoff_sq += payoff * payoff
+
+    mean_payoff = sum_payoff / num_paths
+
+    variance = (sum_payoff_sq - num_paths * mean_payoff * mean_payoff)
+    variance = variance / (num_paths - 1)
+
+    # Protect against tiny negative values caused by floating-point rounding.
+    variance = max(variance, 0.0)
+
+    error = math.sqrt(variance / num_paths)
+
+    discount = math.exp(-r * t)
+
+    value = discount * mean_payoff
+    error = discount * error
+
+    return value, error
 
 
 ########################################################################################
 
 
-@njit(
-    float64(
-        float64,
-        float64,
-        float64,
-        float64,
-        float64,
-        float64,
-        int64,
-        int64,
-        int64,
-        int64,
-    ),
-    fastmath=True,
-    cache=True,
-)
+@njit(cache=True, fastmath=True, parallel=False)
 def value_mc_numba_noanti(
     s: float,
     t: float,
@@ -287,9 +388,21 @@ def value_mc_numba_noanti(
     num_paths: int,
     seed: int,
     use_sobol: int,
-) -> float:
+) -> tuple[float, float]:
     # No use of Numpy vectorisation but NUMBA
     # No use of antithetic variables
+
+    _validate_mc_inputs(
+        t,
+        k,
+        opt_type,
+        s,
+        v,
+        num_paths,
+    )
+
+    if t == 0.0:
+        return value_at_expiry(s, k, opt_type)
 
     np.random.seed(seed)
     mu = r - q
@@ -311,15 +424,12 @@ def value_mc_numba_noanti(
             s_1 = ss * np.exp(+gg * v_sqrt_t)
             payoff += max(s_1 - k, 0.0)
 
-    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
+    else:
 
         for i in range(0, num_paths):
             gg = g[i]
             s_1 = ss * np.exp(+gg * v_sqrt_t)
             payoff += max(k - s_1, 0.0)
-
-    else:
-        return np.nan
 
     value = payoff * np.exp(-r * t) / num_paths
     return value
@@ -328,23 +438,7 @@ def value_mc_numba_noanti(
 ########################################################################################
 
 
-@njit(
-    float64(
-        float64,
-        float64,
-        float64,
-        float64,
-        float64,
-        float64,
-        int64,
-        int64,
-        int64,
-        int64,
-    ),
-    fastmath=True,
-    cache=True,
-    parallel=True,
-)
+@njit(cache=True, fastmath=True, parallel=True)
 def value_mc_numba_parallel(
     s: float,
     t: float,
@@ -356,8 +450,20 @@ def value_mc_numba_parallel(
     num_paths: int,
     seed: int,
     use_sobol: int,
-) -> float:
+) -> tuple[float, float]:
     # No use of Numpy vectorisation but NUMBA
+
+    _validate_mc_inputs(
+        t,
+        k,
+        opt_type,
+        s,
+        v,
+        num_paths,
+    )
+
+    if t == 0.0:
+        return value_at_expiry(s, k, opt_type)
 
     np.random.seed(seed)
     mu = r - q
@@ -383,7 +489,7 @@ def value_mc_numba_parallel(
             path_payoff = (payoff1 + payoff2) / 2.0
             payoffs[i] = path_payoff
 
-    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
+    else:
 
         for i in prange(0, num_paths):
             s_1 = ss * np.exp(+g[i] * v_sqrt_t)
@@ -392,9 +498,6 @@ def value_mc_numba_parallel(
             payoff2 = max(k - s_2, 0.0)
             path_payoff = (payoff1 + payoff2) / 2.0
             payoffs[i] = path_payoff
-
-    else:
-        return np.nan
 
     average_payoff = np.mean(payoffs)
     value = average_payoff * np.exp(-r * t)

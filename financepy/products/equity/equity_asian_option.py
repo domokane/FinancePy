@@ -8,7 +8,7 @@
 from enum import Enum
 
 from ...utils.error import FinError
-
+from ...utils.mc_result import MCResult
 from ...utils.global_types import OptionTypes
 
 from ...utils.helpers import check_argument_types, label_to_string
@@ -28,6 +28,8 @@ from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_volatility
 from ...utils.check_values import check_stock_price
 from ...utils.check_values import check_strike_price
+from ...utils.check_values import check_num_paths
+
 from ...utils.helpers import option_years
 
 
@@ -143,17 +145,18 @@ class EquityAsianOption:
         k = self.strike_price
         n = self.num_obs_per_year
         opt_type_value = self.opt_type.value
+        vol = model.volatility
 
         if method == AsianOptionValuationTypes.KEMNA_VORST:
             v = value_asian_kemna_vorst_geometric(t_avg, t_exp, k, n, opt_type_value,
-                                                  stock_price, r, q, model, accrued_average)
+                                                  stock_price, r, q, vol, accrued_average)
 
         elif method == AsianOptionValuationTypes.TURNBULL_WAKEMAN:
             v = value_asian_turnbull_wakeman_discrete(t_avg, t_exp, k, n, opt_type_value,
-                                                      stock_price, r, q, model, accrued_average)
+                                                      stock_price, r, q, vol, accrued_average)
 
         elif method == AsianOptionValuationTypes.CURRAN:
-            v = value_asian_curran(t_avg, t_exp, k, n, opt_type_value, stock_price, r, q, model, accrued_average)
+            v = value_asian_curran(t_avg, t_exp, k, n, opt_type_value, stock_price, r, q, vol, accrued_average)
         else:
             raise FinError("Unknown valuation model")
 
@@ -171,7 +174,7 @@ class EquityAsianOption:
         num_paths: int,
         seed: int,
         accrued_average: float,
-    ):
+    ) -> MCResult:
         """Monte Carlo valuation of the Asian Average option using standard
         Monte Carlo code enhanced by Numba. I have discontinued the use of this
         as it is both slow and has limited variance reduction."""
@@ -180,6 +183,7 @@ class EquityAsianOption:
         check_curve_dt(value_dt, dividend_curve)
         check_stock_price(stock_price)
         check_volatility(model.volatility)
+        check_num_paths(num_paths)
 
         t_exp = option_years(value_dt, self.expiry_dt)
         t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
@@ -192,7 +196,10 @@ class EquityAsianOption:
         k = self.strike_price
         n = self.num_obs_per_year
 
-        v = asian_value_mc_numba(
+        # We use antithetic so need to divide by 2
+        num_path_pairs = num_paths // 2
+
+        v, e = asian_value_mc_numba(
             t_avg,
             t_exp,
             k,
@@ -202,12 +209,12 @@ class EquityAsianOption:
             r,
             q,
             volatility,
-            num_paths,
+            num_path_pairs,
             seed,
             accrued_average,
         )
 
-        return v
+        return MCResult(v, e)
 
     ####################################################################################
 
@@ -221,13 +228,15 @@ class EquityAsianOption:
         num_paths: int,  # Numpaths integer
         seed,
         accrued_average,
-    ):
+    ) -> MCResult:
         """Monte Carlo valuation of the Asian Average option. This method uses
         a lot of Numpy vectorisation. It is also helped by Numba."""
 
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
         check_stock_price(stock_price)
+        check_volatility(model.volatility)
+        check_num_paths(num_paths)
 
         t_exp = option_years(value_dt, self.expiry_dt)
         t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
@@ -240,7 +249,10 @@ class EquityAsianOption:
 
         volatility = model.volatility
 
-        v = asian_value_mc_fast_numba(
+        # We use antithetic so need to divide by 2
+        num_path_pairs = num_paths // 2
+
+        v, e = asian_value_mc_fast_numba(
             t_avg,
             t_exp,
             k,
@@ -250,12 +262,12 @@ class EquityAsianOption:
             r,
             q,
             volatility,
-            num_paths,
+            num_path_pairs,
             seed,
             accrued_average,
         )
 
-        return v
+        return MCResult(v, e)
 
     ####################################################################################
 
@@ -269,7 +281,7 @@ class EquityAsianOption:
         num_paths: int,  # Numpaths integer
         seed,
         accrued_average,
-    ):
+    ) -> MCResult:
         """Monte Carlo valuation of the Asian Average option using a control
         variate method that improves accuracy and reduces the variance of the
         price. This uses Numpy and Numba. This is the standard MC pricer."""
@@ -277,6 +289,8 @@ class EquityAsianOption:
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
         check_stock_price(stock_price)
+        check_volatility(model.volatility)
+        check_num_paths(num_paths)
 
         t_exp = option_years(value_dt, self.expiry_dt)
         t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
@@ -299,11 +313,14 @@ class EquityAsianOption:
             stock_price,
             r,
             q,
-            model,
+            volatility,
             accrued_average,
         )
 
-        v = asian_value_mc_fast_cv_numba(
+        # We use antithetic so need to divide by 2
+        num_path_pairs = num_paths // 2
+
+        v, e = asian_value_mc_fast_cv_numba(
             t_avg,
             t_exp,
             k,
@@ -313,13 +330,13 @@ class EquityAsianOption:
             r,
             q,
             volatility,
-            num_paths,
+            num_path_pairs,
             seed,
             accrued_average,
             v_g_exact,
         )
 
-        return v
+        return MCResult(v, e)
 
     ####################################################################################
 

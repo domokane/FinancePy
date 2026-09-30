@@ -5,8 +5,9 @@ from numba import njit
 
 from ..utils.error import FinError
 from ..utils.math import covar
-
+from ..utils.stats import standard_error
 from ..utils.global_types import OptionTypes
+
 
 error_str = "In averaging period so need to enter accrued average."
 
@@ -19,10 +20,10 @@ def _validate_asian_mc_inputs(
     num_obs_per_year: int,
     stock_price: float,
     volatility: float,
-    num_paths: int,
+    num_path_pairs: int,
 ) -> None:
 
-    if t_exp <= 0.0:
+    if t_exp < 0.0:
         raise FinError("Time to expiry must be positive.")
 
     if t_avg >= t_exp:
@@ -40,11 +41,33 @@ def _validate_asian_mc_inputs(
     if volatility < 0.0:
         raise FinError("Volatility must be non-negative.")
 
-    if num_paths <= 0:
-        raise FinError("Number of paths must be positive.")
+    if num_path_pairs < 2:
+        raise FinError("Number of path pairs must be 2 or more.")
 
 
 ################################################################################
+
+@njit
+def _asian_payoff(
+    average,
+    k,
+    opt_type_value,
+):
+    """Return the payoff of an Asian option."""
+
+    if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
+        return max(average - k, 0.0)
+
+    elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
+        return max(k - average, 0.0)
+
+    else:
+        raise FinError(
+            "Unknown OPTION_TYPE " + str(opt_type_value)
+        )
+
+################################################################################
+
 
 @njit(cache=True, fastmath=True, parallel=False)
 def asian_value_mc_numba(
@@ -52,7 +75,7 @@ def asian_value_mc_numba(
     t_exp: float,
     k: float,
     num_obs_per_year: int,
-    opt_type: int,
+    opt_type_value: int,
     stock_price: float,
     interest_rate: float,
     dividend_yield: float,
@@ -60,9 +83,9 @@ def asian_value_mc_numba(
     num_paths_over_two: int,
     seed: int,
     accrued_average: float,
-) -> float:
+) -> tuple[float, float]:
 
-    if opt_type not in [
+    if opt_type_value not in [
         OptionTypes.EUROPEAN_CALL.value,
         OptionTypes.EUROPEAN_PUT.value,
     ]:
@@ -79,6 +102,22 @@ def asian_value_mc_numba(
         volatility,
         num_paths_over_two,
     )
+
+    if t_exp == 0.0:
+
+        if accrued_average is None:
+            raise FinError(
+                "Accrued average must be supplied at expiry."
+            )
+
+        v = _asian_payoff(
+            accrued_average,
+            k,
+            opt_type_value,
+        )
+
+        e = 0.0
+        return v, e
 
     # Start pricing here
     np.random.seed(seed)
@@ -105,12 +144,14 @@ def asian_value_mc_numba(
 
     dt = averaging_time / n
 
-    mu = interest_rate - dividend_yield
+    r = interest_rate
+    q = dividend_yield
+    mu = r - q
     v2 = volatility**2
 
-    payoff_a = 0.0
+    payoffs = np.empty(num_paths_over_two)
 
-    for _ in range(num_paths_over_two):
+    for ip in range(num_paths_over_two):
 
         # evolve stock price to start of averaging period
         g = np.random.normal()
@@ -137,18 +178,20 @@ def asian_value_mc_numba(
         s_1_arithmetic /= n
         s_2_arithmetic /= n
 
-        if opt_type == OptionTypes.EUROPEAN_CALL.value:
-            payoff_a += max(s_1_arithmetic - k, 0.0)
-            payoff_a += max(s_2_arithmetic - k, 0.0)
-        elif opt_type == OptionTypes.EUROPEAN_PUT.value:
-            payoff_a += max(k - s_1_arithmetic, 0.0)
-            payoff_a += max(k - s_2_arithmetic, 0.0)
+        if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
+            payoff_1 = max(s_1_arithmetic - k, 0.0)
+            payoff_2 = max(s_2_arithmetic - k, 0.0)
         else:
-            return np.nan
+            payoff_1 = max(k - s_1_arithmetic, 0.0)
+            payoff_2 = max(k - s_2_arithmetic, 0.0)
 
-    v_a = payoff_a * np.exp(-interest_rate * t_exp) / num_paths_over_two / 2.0
-    v_a = v_a * multiplier
-    return v_a
+        payoffs[ip] = (payoff_1 + payoff_2) / 2.0
+
+    discount = multiplier * np.exp(-r * t_exp)
+    value = discount * np.mean(payoffs)
+    error = discount * standard_error(payoffs)
+
+    return value, error
 
 
 ########################################################################################
@@ -160,7 +203,7 @@ def asian_value_mc_fast_numba(
     t_exp: float,
     k: float,
     num_obs_per_year: int,
-    opt_type: int,
+    opt_type_value: int,
     stock_price: float,
     interest_rate: float,
     dividend_yield: float,
@@ -168,7 +211,7 @@ def asian_value_mc_fast_numba(
     num_paths_over_two: int,
     seed: int,
     accrued_average: float,
-) -> float:
+) -> tuple[float, float]:
 
     _validate_asian_mc_inputs(
         t_avg,
@@ -180,12 +223,25 @@ def asian_value_mc_fast_numba(
         num_paths_over_two,
     )
 
+    if t_exp == 0.0:
+
+        if accrued_average is None:
+            raise FinError(
+                "Accrued average must be supplied at expiry."
+            )
+
+        v = _asian_payoff(accrued_average, k, opt_type_value,)
+        e = 0.0
+
+        return v, e
+
+    r = interest_rate
+    q = dividend_yield
     np.random.seed(seed)
-    mu = interest_rate - dividend_yield
+    mu = r - q
     s0 = stock_price
 
     v2 = volatility**2
-    r = interest_rate
     num_paths_over_two = int(num_paths_over_two)
 
     multiplier = 1.0
@@ -252,19 +308,19 @@ def asian_value_mc_fast_numba(
             s_1_arithmetic[ip] += s_1[ip] / n
             s_2_arithmetic[ip] += s_2[ip] / n
 
-    if opt_type == OptionTypes.EUROPEAN_CALL.value:
+    if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         payoff_a_1 = np.maximum(s_1_arithmetic - k, 0.0)
         payoff_a_2 = np.maximum(s_2_arithmetic - k, 0.0)
-    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
+    else:
         payoff_a_1 = np.maximum(k - s_1_arithmetic, 0.0)
         payoff_a_2 = np.maximum(k - s_2_arithmetic, 0.0)
-    else:
-        return np.nan
 
-    payoff_a = np.mean(payoff_a_1) + np.mean(payoff_a_2)
-    v_a = multiplier * payoff_a * np.exp(-r * t_exp) / 2.0
-    return v_a
+    payoff = (payoff_a_1 + payoff_a_2) / 2.0
+    discount = multiplier * np.exp(-r * t_exp)
+    value = discount * np.mean(payoff)
+    error = discount * standard_error(payoff)
 
+    return value, error
 
 ########################################################################################
 
@@ -275,7 +331,7 @@ def asian_value_mc_fast_cv_numba(
     t_exp: float,
     k: float,
     num_obs_per_year: int,
-    opt_type: int,
+    opt_type_value: int,
     stock_price: float,
     interest_rate: float,
     dividend_yield: float,
@@ -284,7 +340,7 @@ def asian_value_mc_fast_cv_numba(
     seed: int,
     accrued_average: float,
     v_g_exact: float,
-) -> float:
+) -> tuple[float, float]:
 
     _validate_asian_mc_inputs(
         t_avg,
@@ -295,6 +351,18 @@ def asian_value_mc_fast_cv_numba(
         volatility,
         num_paths_over_two,
     )
+
+    if t_exp == 0.0:
+
+        if accrued_average is None:
+            raise FinError(
+                "Accrued average must be supplied at expiry."
+            )
+
+        v = _asian_payoff(accrued_average, k, opt_type_value,)
+        e = 0.0
+
+        return v, e
 
     np.random.seed(seed)
 
@@ -377,37 +445,38 @@ def asian_value_mc_fast_cv_numba(
         s_2_arithmetic[ip] /= n
         s_2_geometric[ip] = np.exp(ln_s_2_geometric[ip] / n)
 
-    if opt_type == OptionTypes.EUROPEAN_CALL.value:
+    if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
         payoff_a_1 = np.maximum(s_1_arithmetic - k, 0.0)
         payoff_g_1 = np.maximum(s_1_geometric - k, 0.0)
         payoff_a_2 = np.maximum(s_2_arithmetic - k, 0.0)
         payoff_g_2 = np.maximum(s_2_geometric - k, 0.0)
-    elif opt_type == OptionTypes.EUROPEAN_PUT.value:
+    else:
         payoff_a_1 = np.maximum(k - s_1_arithmetic, 0.0)
         payoff_g_1 = np.maximum(k - s_1_geometric, 0.0)
         payoff_a_2 = np.maximum(k - s_2_arithmetic, 0.0)
         payoff_g_2 = np.maximum(k - s_2_geometric, 0.0)
-    else:
-        return np.nan
 
-    payoff_a = np.concatenate((payoff_a_1, payoff_a_2), axis=0)
-    payoff_g = np.concatenate((payoff_g_1, payoff_g_2), axis=0)
+    payoff_a_pair = (payoff_a_1 + payoff_a_2) / 2.0
+    payoff_g_pair = (payoff_g_1 + payoff_g_2) / 2.0
 
     # Now we do the control variate adjustment
-    m = covar(payoff_a, payoff_g)
+    m = covar(payoff_a_pair, payoff_g_pair)
 
     if np.abs(m[1][1]) < 1e-10:
         lam = 0.0
     else:
         lam = m[0][1] / m[1][1]
 
-    payoff_a_mean = np.mean(payoff_a)
-    payoff_g_mean = np.mean(payoff_g)
+    discount = multiplier * np.exp(-r * t_exp)
 
-    v_a = payoff_a_mean * np.exp(-r * t_exp) * multiplier
-    v_g = payoff_g_mean * np.exp(-r * t_exp) * multiplier
+    payoff_g_exact = v_g_exact / discount
 
-    epsilon = v_g_exact - v_g
-    v_a_cv = v_a + lam * epsilon
+    payoff_cv = (
+        payoff_a_pair
+        + lam * (payoff_g_exact - payoff_g_pair)
+    )
 
-    return v_a_cv
+    value = discount * np.mean(payoff_cv)
+    error = discount * standard_error(payoff_cv)
+
+    return value, error

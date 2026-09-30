@@ -13,13 +13,97 @@ from ..utils.math import normcdf
 from .asian_option_mc import error_str
 
 
+@njit(cache=True, parallel=False, fastmath=True)
 def _geom_sum(x, n):
     """Return sum(exp(j*x), j=0,...,n-1) stably."""
     if abs(x) < 1e-10:
         return float(n)
     return np.expm1(n * x) / np.expm1(x)
 
+##############################################################################
 
+
+@njit(cache=True, parallel=False, fastmath=True)
+def _asian_payoff(
+    average,
+    k,
+    opt_type_value,
+):
+    """Return the payoff of an Asian option."""
+
+    if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
+        return max(average - k, 0.0)
+
+    elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
+        return max(k - average, 0.0)
+
+    else:
+        raise FinError(
+            "Unknown OPTION_TYPE " + str(opt_type_value)
+        )
+
+##############################################################################
+
+
+@njit(cache=True, parallel=False, fastmath=True)
+def _validate_asian_inputs(
+    t_avg,
+    t_exp,
+    k,
+    num_obs_per_year,
+    opt_type_value,
+    stock_price,
+    volatility,
+    accrued_average,
+):
+    """Validate common inputs for Asian option valuation."""
+
+    if t_exp < 0.0:
+        raise FinError("Expiry time must be positive.")
+
+    if t_avg >= t_exp:
+        raise FinError(
+            "Averaging start time must be before expiry time."
+        )
+
+    if stock_price <= 0.0:
+        raise FinError("Stock price must be positive.")
+
+    if k <= 0.0:
+        raise FinError("Strike price must be positive.")
+
+    if volatility < 0.0:
+        raise FinError("Volatility must be non-negative.")
+
+    if num_obs_per_year <= 0:
+        raise FinError(
+            "Number of observations per year must be positive."
+        )
+
+    if opt_type_value not in (
+        OptionTypes.EUROPEAN_CALL.value,
+        OptionTypes.EUROPEAN_PUT.value,
+    ):
+        raise FinError(
+            "Option type must be EUROPEAN_CALL or EUROPEAN_PUT."
+        )
+
+    # t_avg < 0 means that valuation occurs after the
+    # averaging period has started.
+    if t_avg < 0.0:
+
+        if accrued_average is None:
+            raise FinError(error_str)
+
+        if accrued_average <= 0.0:
+            raise FinError(
+                "Accrued average must be positive."
+            )
+
+##############################################################################
+
+
+@njit(cache=True, parallel=False, fastmath=True)
 def value_asian_kemna_vorst_geometric(
     t_avg,
     t_exp,
@@ -29,7 +113,7 @@ def value_asian_kemna_vorst_geometric(
     stock_price,
     r,
     q,
-    model,
+    volatility,
     accrued_average,
 ):
     """Price a discretely sampled geometric-average Asian option
@@ -42,9 +126,32 @@ def value_asian_kemna_vorst_geometric(
     Carlo pricing of arithmetic-average Asian options.
     """
 
+    _validate_asian_inputs(
+        t_avg,
+        t_exp,
+        k,
+        num_obs_per_year,
+        opt_type_value,
+        stock_price,
+        volatility,
+        accrued_average,
+    )
+
+    if t_exp == 0.0:
+
+        if accrued_average is None:
+            raise FinError(
+                "Accrued average must be supplied at expiry."
+            )
+
+        return _asian_payoff(
+            accrued_average,
+            k,
+            opt_type_value,
+        )
+
     # the years to the start of the averaging period
     tau = t_exp - t_avg
-    volatility = model.volatility
     vol2 = volatility**2
     s0 = stock_price
     multiplier = 1.0
@@ -96,7 +203,7 @@ def value_asian_kemna_vorst_geometric(
 
 ####################################################################################
 
-
+@njit(cache=True, parallel=False, fastmath=True)
 def value_asian_curran(
     t_avg,
     t_exp,
@@ -106,7 +213,7 @@ def value_asian_curran(
     stock_price,
     r,
     q,
-    model,
+    volatility,
     accrued_average,
 ):
     """Price a discretely sampled arithmetic-average Asian option
@@ -124,10 +231,34 @@ def value_asian_curran(
         Conditioning on the Geometric Mean Price".
     """
 
+    _validate_asian_inputs(
+        t_avg,
+        t_exp,
+        k,
+        num_obs_per_year,
+        opt_type_value,
+        stock_price,
+        volatility,
+        accrued_average,
+    )
+
+    if t_exp == 0.0:
+
+        if accrued_average is None:
+            raise FinError(
+                "Accrued average must be supplied at expiry."
+            )
+
+        return _asian_payoff(
+            accrued_average,
+            k,
+            opt_type_value,
+        )
+
     tau = t_exp - t_avg
     multiplier = 1.0
 
-    sigma = model.volatility
+    sigma = volatility
     sigma2 = sigma * sigma
 
     s0 = stock_price
@@ -456,6 +587,7 @@ def value_asian_curran(
 ####################################################################################
 
 
+@njit(cache=True, parallel=False, fastmath=True)
 def value_asian_turnbull_wakeman_discrete(
     t_avg,
     t_exp,
@@ -465,7 +597,7 @@ def value_asian_turnbull_wakeman_discrete(
     stock_price,
     r,
     q,
-    model,
+    volatility,
     accrued_average,
 ):
     """Discrete-observation version of the Turnbull-Wakeman
@@ -479,10 +611,34 @@ def value_asian_turnbull_wakeman_discrete(
         t_avg + h, ..., t_avg + n*h = t_exp.
     """
 
+    _validate_asian_inputs(
+        t_avg,
+        t_exp,
+        k,
+        num_obs_per_year,
+        opt_type_value,
+        stock_price,
+        volatility,
+        accrued_average,
+    )
+
+    if t_exp == 0.0:
+
+        if accrued_average is None:
+            raise FinError(
+                "Accrued average must be supplied at expiry."
+            )
+
+        return _asian_payoff(
+            accrued_average,
+            k,
+            opt_type_value,
+        )
+
     tau = t_exp - t_avg
     multiplier = 1.0
 
-    sigma = model.volatility
+    sigma = volatility
     sigma2 = sigma * sigma
 
     s0 = stock_price
@@ -602,6 +758,7 @@ def value_asian_turnbull_wakeman_discrete(
 ####################################################################################
 
 
+@njit(cache=True, parallel=False, fastmath=True)
 def value_asian_turnbull_wakeman(
     t_avg,
     t_exp,

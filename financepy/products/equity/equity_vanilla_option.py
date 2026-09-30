@@ -12,6 +12,7 @@ from ...utils.error import FinError
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
 from ...utils.check_values import check_shapes
+from ...utils.mc_result import MCResult
 
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import check_argument_types, label_to_string
@@ -395,7 +396,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = value_mc_numpy_only(
+        v, e = value_mc_numpy_only(
             s0,
             t_exp,
             self.strike_price,
@@ -408,7 +409,7 @@ class EquityVanillaOption:
             use_sobol,
         )
 
-        return v
+        return MCResult(v, e)
 
     ###########################################################################
 
@@ -437,7 +438,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = value_mc_numba_only(
+        v, e = value_mc_numba_only(
             s0,
             t_exp,
             self.strike_price,
@@ -450,7 +451,7 @@ class EquityVanillaOption:
             use_sobol,
         )
 
-        return v
+        return MCResult(v, e)
 
     ###########################################################################
 
@@ -479,7 +480,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = value_mc_numba_parallel(
+        v, e = value_mc_numba_parallel(
             s0,
             t_exp,
             self.strike_price,
@@ -492,9 +493,7 @@ class EquityVanillaOption:
             use_sobol,
         )
 
-        #        _value_mc_NUMBA_ONLY.parallel_diagnostics(level=4)
-
-        return v
+        return MCResult(v, e)
 
     ###########################################################################
 
@@ -523,7 +522,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = value_mc_numpy_numba(
+        v, e = value_mc_numpy_numba(
             s0,
             t_exp,
             self.strike_price,
@@ -536,7 +535,7 @@ class EquityVanillaOption:
             use_sobol,
         )
 
-        return v
+        return MCResult(v, e)
 
     ###########################################################################
 
@@ -565,7 +564,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = value_mc_nonumba_nonumpy(
+        v, e = value_mc_nonumba_nonumpy(
             s0,
             t_exp,
             self.strike_price,
@@ -578,7 +577,7 @@ class EquityVanillaOption:
             use_sobol,
         )
 
-        return v
+        return MCResult(v, e)
 
     ###########################################################################
 
@@ -609,7 +608,7 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
-        v = value_mc_numba_only(
+        v, e = value_mc_numba_only(
             s0,
             t_exp,
             self.strike_price,
@@ -622,7 +621,7 @@ class EquityVanillaOption:
             use_sobol,
         )
 
-        return v
+        return MCResult(v, e)
 
     ###########################################################################
 

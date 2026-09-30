@@ -47,7 +47,8 @@ def test_equity_vanilla_option():
             dividend_curve,
             model,
             num_paths,
-        )
+        ).value
+
         end = time.time()
         duration = end - start
         test_cases.print(num_paths, value, value_mc, duration)
@@ -63,6 +64,7 @@ def test_equity_vanilla_option():
         "TIME",
     )
     use_sobol = True
+    seed = 1967
 
     for stock_price in stock_prices:
 
@@ -80,8 +82,9 @@ def test_equity_vanilla_option():
             dividend_curve,
             model,
             num_paths,
+            seed,
             use_sobol,
-        )
+        ).value
 
         use_sobol = True
         value_mc2 = call_option.value_mc(
@@ -91,8 +94,9 @@ def test_equity_vanilla_option():
             dividend_curve,
             model,
             num_paths,
+            seed,
             use_sobol,
-        )
+        ).value
 
         end = time.time()
         duration = end - start
@@ -125,8 +129,9 @@ def test_equity_vanilla_option():
             dividend_curve,
             model,
             num_paths,
+            seed,
             use_sobol,
-        )
+        ).value
 
         use_sobol = True
         value_mc2 = put_option.value_mc(
@@ -136,8 +141,9 @@ def test_equity_vanilla_option():
             dividend_curve,
             model,
             num_paths,
+            seed,
             use_sobol,
-        )
+        ).value
 
         end = time.time()
         duration = end - start

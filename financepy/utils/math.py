@@ -4,8 +4,7 @@
 
 
 # from math import exp, sqrt, fabs, log
-from numba import njit, boolean, int64, float64, vectorize, types
-from numba.extending import overload
+from numba import njit, boolean, int64, float64, vectorize
 
 import numpy as np
 from .error import FinError
