@@ -337,9 +337,14 @@ def interpolate(
     times = np.asarray(times, dtype=np.float64)
     dfs = np.asarray(dfs, dtype=np.float64)
     if isinstance(t, (float, np.float64)):
+        if not np.isfinite(t):
+            raise FinError("Interpolation times must be finite.")
         return _uinterpolate(float(t), times, dfs, int(method))
     if isinstance(t, np.ndarray):
-        return _vinterpolate(np.asarray(t, dtype=np.float64), times, dfs, int(method))
+        t = np.asarray(t, dtype=np.float64)
+        if not np.all(np.isfinite(t)):
+            raise FinError("Interpolation times must be finite.")
+        return _vinterpolate(t, times, dfs, int(method))
     raise FinError(f"Unknown input type {type(t)}")
 
 
