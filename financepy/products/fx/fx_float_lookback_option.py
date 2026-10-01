@@ -3,6 +3,7 @@
 ##############################################################################
 
 import numpy as np
+from scipy.special import log_ndtr
 
 from ...utils.math import normcdf
 from ...utils.global_vars import G_SMALL
@@ -99,8 +100,10 @@ class FXFloatLookbackOption(FXOption):
 
             if s_min == s0:
                 term = normcdf(-a1 + 2.0 * b * np.sqrt(t_exp) / v) - expbt * normcdf(-a1)
-            elif s0 < s_min and w < -100:
-                term = -expbt * normcdf(-a1)
+            elif -w * np.log(s0 / s_min) > 500.0:
+                log_weight = -w * np.log(s0 / s_min)
+                z = -a1 + 2.0 * b * np.sqrt(t_exp) / v
+                term = np.exp(log_weight + log_ndtr(z)) - expbt * normcdf(-a1)
             else:
                 term = ((s0 / s_min) ** (-w)) * normcdf(-a1 + 2.0 * b * np.sqrt(t_exp) / v) - expbt * normcdf(-a1)
 
