@@ -7,7 +7,7 @@ from scipy.optimize.linesearch import (
 )
 
 Inf = np.inf
-EPSILON = 1e-20
+EPSILON = 1.4901161193847656e-8
 
 _status_message = {
     "success": "Optimization terminated successfully.",
