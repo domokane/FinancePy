@@ -376,6 +376,10 @@ class Interpolator:
             raise FinError("times and dfs must be one-dimensional arrays.")
         if times.size != dfs.size:
             raise FinError("times and dfs must have the same length.")
+        if not np.all(np.isfinite(times)):
+            raise FinError("Curve times must be finite.")
+        if not np.all(np.isfinite(dfs)):
+            raise FinError("Discount factors must be finite.")
         if np.any(times < 0.0):
             raise FinError("Curve times must be non-negative.")
         if np.any(dfs <= 0.0):
@@ -447,6 +451,8 @@ class Interpolator:
         else:
             raise FinError(f"t is not a recognized type: {type(t)}")
 
+        if not np.all(np.isfinite(tvec)):
+            raise FinError("Interpolation times must be finite.")
         if np.any(tvec < 0.0):
             raise FinError("Interpolation times must be non-negative.")
 
