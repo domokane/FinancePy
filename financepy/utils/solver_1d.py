@@ -318,6 +318,9 @@ def newton(
     if maxiter < 1:
         raise FinError("maxiter must be greater than 0")
 
+    if args is None:
+        args = ()
+
     # Convert to float (don't use float(x0); this works also for complex x0)
     p0 = 1.0 * x0
     fun_calls = 0
@@ -325,12 +328,12 @@ def newton(
         # Newton-Raphson method
         for itr in range(maxiter):
             # first evaluate fval
-            fval = func(p0, args)
+            fval = func(p0, *args)
             fun_calls += 1
             # If fval is 0, a root has been found, then terminate
             if fval == 0:
                 return p0
-            fder = fprime(p0, args)
+            fder = fprime(p0, *args)
             fun_calls += 1
 
             #            print("==>", itr, p0, fval, fder)
@@ -347,7 +350,7 @@ def newton(
 
             newton_step = fval / fder
             if fprime2:
-                fder2 = fprime2(p0, args)
+                fder2 = fprime2(p0, *args)
                 fun_calls += 1
                 # Halley's method:
                 #   newton_step /= (1.0 - 0.5 * newton_step * fder2 / fder)
@@ -372,9 +375,9 @@ def newton(
             eps = 1e-4
             p1 = x0 * (1 + eps)
             p1 += eps if p1 >= 0 else -eps
-        q0 = func(p0, args)
+        q0 = func(p0, *args)
         fun_calls += 1
-        q1 = func(p1, args)
+        q1 = func(p1, *args)
         fun_calls += 1
         if abs(q1) < abs(q0):
             p0, p1, q0, q1 = p1, p0, q1, q0
