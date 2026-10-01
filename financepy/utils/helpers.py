@@ -496,13 +496,14 @@ def uniform_to_default_time(u, t, v):
             index = i
             break
 
-    if index == num_points + 1:
-        t1 = t[num_points - 1]
-        q1 = v[num_points - 1]
-        t2 = t[num_points]
-        q2 = v[num_points]
-        lam = np.log(q1 / q2) / (t2 - t1)
-        tau = t2 - np.log(u / q2) / lam
+    if index == 0:
+        # Extrapolate beyond the final curve node using its last forward hazard.
+        left = num_points - 2
+        right = num_points - 1
+        lam = np.log(v[left] / v[right]) / (t[right] - t[left])
+        if lam <= 0.0:
+            return 99999.0
+        tau = t[right] + np.log(v[right] / u) / lam
     else:
         t1 = t[index - 1]
         q1 = v[index - 1]
