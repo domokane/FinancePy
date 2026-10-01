@@ -291,7 +291,19 @@ def fmin_cg(
     #     "return_all": retall,
     # }
 
-    res = _minimize_cg(f, x0, args=fargs, jac=fprime, callback=callback)
+    res = _minimize_cg(
+        f,
+        x0,
+        args=fargs,
+        jac=fprime,
+        callback=callback,
+        gtol=gtol,
+        norm=norm,
+        eps=epsilon,
+        maxiter=maxiter,
+        disp=bool(disp),
+        return_all=bool(retall),
+    )
 
     if full_output:
         retlist = res["x"], res["fun"], res["nfev"], res["njev"], res["status"]
