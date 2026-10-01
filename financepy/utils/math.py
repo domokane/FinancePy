@@ -235,12 +235,19 @@ def heaviside(x: float):
 
 @njit(fastmath=True, cache=True)
 def frange(start: int, stop: int, step: int):
-    """Calculate a range of values from start in steps of size step. Ends as
-    soon as the value equals or exceeds stop."""
+    """Return inclusive integer steps from start toward stop."""
+    if step == 0:
+        raise FinError("Step cannot be zero")
+
     x = []
-    while start <= stop:
-        x.append(start)
-        start += step
+    if step > 0:
+        while start <= stop:
+            x.append(start)
+            start += step
+    else:
+        while start >= stop:
+            x.append(start)
+            start += step
 
     return x
 
