@@ -531,6 +531,9 @@ class Date:
         if isinstance(num_days, int) is False:
             raise FinError("Num days must be an integer")
 
+        if num_days == 0:
+            return self.add_days(0)
+
         positive_num_days = num_days > 0
         num_days = abs(num_days)
 
