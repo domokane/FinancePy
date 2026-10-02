@@ -191,7 +191,7 @@ The interface to each product has a value() function that will take a model and 
 
 I was a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and over 18 years of academic experience.
 
-Contact me at dominic.okane at edhec.edu.
+Contact me at okane.dominic at gmail.com.
 
 ## Dependencies
 
