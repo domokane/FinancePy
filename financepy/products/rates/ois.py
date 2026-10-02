@@ -153,12 +153,7 @@ class OIS:
     def pv01(self, value_dt: Date, discount_curve: DiscountCurve):
         """Calculate the value of 1 basis point cpn on the fixed leg."""
 
-        pv = self.fixed_leg.value(value_dt, discount_curve)
-        pv01 = pv / self.fixed_leg.cpn / self.fixed_leg.notional
-
-        # Needs to be positive even if it is a payer leg and/or cpn < 0
-        pv01 = np.abs(pv01)
-        return pv01
+        return self.fixed_leg.pv01(value_dt, discount_curve)
 
     ###########################################################################
 
@@ -173,6 +168,9 @@ class OIS:
         pv01 = self.pv01(value_dt, ois_curve)
 
         float_leg_value = self.float_leg.value(value_dt, ois_curve, ois_curve, first_fixing_rate)
+
+        if self.float_leg.leg_type == SwapTypes.PAY:
+            float_leg_value = -float_leg_value
 
         cpn = float_leg_value / pv01 / self.fixed_leg.notional
         return cpn
