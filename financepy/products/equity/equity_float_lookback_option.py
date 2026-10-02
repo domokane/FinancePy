@@ -83,6 +83,9 @@ class EquityFloatLookbackOption(EquityOption):
         if volatility < 0.0:
             raise FinError("Volatility must be non-negative.")
 
+        if t_exp < 0.0:
+            raise FinError("Expiry date must be after value date.")
+
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
@@ -99,6 +102,19 @@ class EquityFloatLookbackOption(EquityOption):
             smax = stock_min_max
             if smax < s0:
                 raise FinError("Smax must be greater than or equal to the stock price.")
+
+        if t_exp == 0.0:
+            if self.opt_type == OptionTypes.EUROPEAN_CALL:
+                return max(s0 - smin, 0.0)
+            return max(smax - s0, 0.0)
+
+        if volatility == 0.0:
+            terminal_stock = s0 * np.exp((r - q) * t_exp)
+            if self.opt_type == OptionTypes.EUROPEAN_CALL:
+                minimum = min(smin, s0, terminal_stock)
+                return np.exp(-r * t_exp) * (terminal_stock - minimum)
+            maximum = max(smax, s0, terminal_stock)
+            return np.exp(-r * t_exp) * (maximum - terminal_stock)
 
         if abs(r - q) < G_SMALL:
             q = r + G_SMALL
