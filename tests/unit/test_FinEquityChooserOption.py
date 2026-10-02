@@ -1,11 +1,50 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import numpy as np
+import pytest
+from financepy.utils.error import FinError
+from financepy.utils.global_types import OptionTypes
+from financepy.models.black_scholes_analytic import european_value
 
 from financepy.utils.date import Date
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_chooser_option import EquityChooserOption
+
+
+@pytest.mark.parametrize("value_dt", ["2026-01-01", Date(2, 4, 2026)])
+def test_mc_rejects_invalid_or_late_valuation_dates(value_dt):
+    """Invalid dates cannot reach negative Monte Carlo time intervals."""
+    curve = FlatDiscountCurve(Date(1, 1, 2026), 0.03)
+    option = EquityChooserOption(Date(1, 4, 2026), Date(1, 7, 2026), Date(1, 8, 2026), 100.0, 100.0)
+    with pytest.raises(FinError):
+        option.value_mc(value_dt, 100.0, curve, curve, BlackScholes(0.2))
+
+
+@pytest.mark.parametrize("wrong_curve", ["discount", "dividend"])
+def test_mc_rejects_curve_date_mismatch(wrong_curve):
+    """Both simulation curves must describe the requested valuation date."""
+    value_dt = Date(1, 1, 2026)
+    curve = FlatDiscountCurve(value_dt, 0.03)
+    wrong = FlatDiscountCurve(value_dt.add_days(1), 0.03)
+    option = EquityChooserOption(Date(1, 4, 2026), Date(1, 7, 2026), Date(1, 8, 2026), 100.0, 100.0)
+    discount = wrong if wrong_curve == "discount" else curve
+    dividend = wrong if wrong_curve == "dividend" else curve
+    with pytest.raises(FinError):
+        option.value_mc(value_dt, 100.0, discount, dividend, BlackScholes(0.2))
+
+
+def test_mc_on_choose_date_matches_independent_best_vanilla_option():
+    """At the decision date the holder chooses the more valuable vanilla."""
+    choose_dt = Date(1, 4, 2026)
+    call_expiry = Date(1, 7, 2026)
+    put_expiry = Date(1, 8, 2026)
+    option = EquityChooserOption(choose_dt, call_expiry, put_expiry, 100.0, 100.0)
+    discount = FlatDiscountCurve(choose_dt, 0.03)
+    dividend = FlatDiscountCurve(choose_dt, 0.01)
+    call = european_value(100.0, (call_expiry - choose_dt) / 365.0, 100.0, .03, .01, .2, OptionTypes.EUROPEAN_CALL.value)
+    put = european_value(100.0, (put_expiry - choose_dt) / 365.0, 100.0, .03, .01, .2, OptionTypes.EUROPEAN_PUT.value)
+    assert option.value_mc(choose_dt, 100.0, discount, dividend, BlackScholes(.2)) == pytest.approx(max(call, put))
 
 
 def assert_close(value, expected, tol=2.0e-3):
