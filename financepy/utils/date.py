@@ -221,6 +221,11 @@ class Date:
         if not START_YEAR <= y <= END_YEAR:
             raise FinError("Year outside supported range")
 
+        try:
+            datetime.time(hh, mm, ss)
+        except (TypeError, ValueError) as exc:
+            raise FinError("Invalid hour, minute or second") from exc
+
         # set fields
         self.y, self.m, self.d = y, m, d
         self.hh, self.mm, self.ss = hh, mm, ss
