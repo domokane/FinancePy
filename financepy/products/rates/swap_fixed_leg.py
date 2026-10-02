@@ -211,6 +211,13 @@ class SwapFixedLeg:
 
     ###########################################################################
 
+    def pv01(self, value_dt: Date, discount_curve: DiscountCurve):
+        """Discounted coupon annuity per unit notional, independent of coupon."""
+        self.value(value_dt, discount_curve)
+        return np.dot(self.year_fracs, self.payment_dfs)
+
+    ###########################################################################
+
     def _cashflow_report_from_cached_values(self):
         """After calling value(...) function, internal members store
         cashflow-by-cashflow values
