@@ -79,16 +79,17 @@ class EquityAmericanOption(EquityOption):
         t_exp = option_years(value_dt, self.expiry_dt)
         t_exp = np.maximum(t_exp, 1e-10)
 
-        s = stock_price
+        s = np.asarray(stock_price, dtype=float)
         k = self.strike_price
 
-        v = model.value(s, t_exp, k, r, q, self.opt_type)
-        v = v * self.num_options
-
-        if isinstance(s, float):
-            return v
+        if s.ndim == 0:
+            v = model.value(float(s), t_exp, k, r, q, self.opt_type)
         else:
-            return v[0]
+            v = np.asarray(
+                [model.value(float(spot), t_exp, k, r, q, self.opt_type) for spot in s]
+            )
+
+        return v * self.num_options
 
     ###########################################################################
 
