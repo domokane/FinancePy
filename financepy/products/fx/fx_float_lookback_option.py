@@ -84,6 +84,16 @@ class FXFloatLookbackOption(FXOption):
             if s_max < s0:
                 raise FinError("s_max must be greater than or equal to the stock price.")
 
+        if v == 0.0 or t_exp == 0.0:
+            terminal_spot = s0 * np.exp((r - q) * t_exp)
+            if self.opt_type == OptionTypes.EUROPEAN_CALL:
+                running_min = min(s_min, s0, terminal_spot)
+                return df * max(terminal_spot - running_min, 0.0)
+            if self.opt_type == OptionTypes.EUROPEAN_PUT:
+                running_max = max(s_max, s0, terminal_spot)
+                return df * max(running_max - terminal_spot, 0.0)
+            raise FinError("Unknown lookback option type:" + str(self.opt_type))
+
         if abs(r - q) < G_SMALL:
             q = r + G_SMALL
 
@@ -153,7 +163,6 @@ class FXFloatLookbackOption(FXOption):
 
         df = domestic_curve.df(self.expiry_dt)
 
-        num_time_steps = int(t_exp * num_steps_per_year)
         mu = r - q
 
         opt_type = self.opt_type
@@ -168,6 +177,16 @@ class FXFloatLookbackOption(FXOption):
             s_max = stock_min_max
             if s_max < stock_price:
                 raise FinError("s_max must be greater than or equal to the stock price.")
+
+        if t_exp < 0.0:
+            raise FinError("Valuation date after expiry date.")
+        if t_exp == 0.0:
+            if opt_type == OptionTypes.EUROPEAN_CALL:
+                return max(stock_price - s_min, 0.0)
+            if opt_type == OptionTypes.EUROPEAN_PUT:
+                return max(s_max - stock_price, 0.0)
+
+        num_time_steps = max(1, int(t_exp * num_steps_per_year))
 
         t_all, s_all = get_paths_times(num_paths, num_time_steps, t_exp, mu, stock_price, volatility, seed)
 

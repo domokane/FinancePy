@@ -185,7 +185,7 @@ class FXDoubleOneTouchOption(FXOption):
 
         np.random.seed(seed)
 
-        num_steps = int(num_steps_per_year * t_exp)
+        num_steps = max(1, int(num_steps_per_year * t_exp))
         dt = t_exp / num_steps
         nudt = (mu - 0.5 * sigma * sigma) * dt
         sigsdt = sigma * np.sqrt(dt)

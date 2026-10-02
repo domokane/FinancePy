@@ -68,6 +68,12 @@ class FXBarrierOption(FXOption):
             raise FinError("Valuation date is not a Date")
 
         t_exp = option_years(value_dt, self.expiry_dt)
+        if t_exp < 0.0:
+            raise FinError("Valuation date after expiry date")
+        if t_exp == 0.0:
+            raise FinError(
+                "Barrier status at expiry cannot be inferred from the current FX rate"
+            )
         check_curve_dt(value_dt, domestic_curve)
         check_curve_dt(value_dt, foreign_curve)
         check_stock_price(spot_fx_rate)
@@ -117,6 +123,12 @@ class FXBarrierOption(FXOption):
         check_curve_dt(value_dt, foreign_curve)
 
         t_exp = option_years(value_dt, self.expiry_dt)
+        if t_exp < 0.0:
+            raise FinError("Valuation date after expiry date")
+        if t_exp == 0.0:
+            raise FinError(
+                "Barrier status at expiry cannot be inferred from the current FX rate"
+            )
         r_d = domestic_curve.zero_rate_cc(self.expiry_dt)
         r_f = foreign_curve.zero_rate_cc(self.expiry_dt)
 

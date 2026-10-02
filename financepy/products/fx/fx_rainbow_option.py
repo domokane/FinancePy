@@ -48,13 +48,13 @@ def payoff_value(s, payoff_type_value, payoff_params):
         k = payoff_params[0]
         payoff = np.maximum(k - np.max(s, axis=1), 0.0)
     elif payoff_type_value == FXRainbowOptionTypes.CALL_ON_NTH.value:
-        n = payoff_params[0]
+        n = int(payoff_params[0])
         k = payoff_params[1]
         ssorted = np.sort(s)
         assetn = ssorted[:, -n]
         payoff = np.maximum(assetn - k, 0.0)
     elif payoff_type_value == FXRainbowOptionTypes.PUT_ON_NTH.value:
-        n = payoff_params[0]
+        n = int(payoff_params[0])
         k = payoff_params[1]
         ssorted = np.sort(s)
         assetn = ssorted[:, -n]
@@ -176,6 +176,13 @@ class FXRainbowOption(FXOption):
 
         if payoff_type == FXRainbowOptionTypes.CALL_ON_NTH or payoff_type == FXRainbowOptionTypes.PUT_ON_NTH:
             n = payoff_params[0]
+            if (
+                isinstance(n, (bool, np.bool_))
+                or not isinstance(n, (int, float, np.integer, np.floating))
+                or not np.isfinite(n)
+                or int(n) != n
+            ):
+                raise FinError("Nth parameter must be an integer rank")
             if n < 1 or n > num_assets:
                 raise FinError("Nth parameter must be 1 to " + str(num_assets))
 
