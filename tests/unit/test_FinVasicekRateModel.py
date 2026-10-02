@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import pytest
+
 from financepy.models.vasicek_mc import zero_price, zero_price_mc
 
 ########################################################################################
@@ -47,3 +49,12 @@ def test_fin_model_rates_vasicek():
     assert round(p, 4) == 0.7483
     assert round(p_mc, 4) == 0.7392
     assert round(p_mc2, 4) == 0.7471
+
+
+def test_vasicek_zero_price_is_stable_for_small_mean_reversion():
+    assert zero_price(0.05, 1.0e-7, 0.03, 0.01, 10.0) == pytest.approx(
+        0.6167242683325149, rel=2.0e-11
+    )
+    assert zero_price(0.05, 1.0e-8, 0.03, 0.01, 10.0) == pytest.approx(
+        0.6167242197654975, rel=2.0e-11
+    )
