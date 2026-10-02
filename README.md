@@ -22,8 +22,6 @@ You should see
 
 ```21-FEB-2026```
 
-Warning: You may notice that the library can take several seconds to import after the first install if you do a wildcard import of classes which rely on certain models. This is because financepy relies upon Numba to compile a lot of the models - resulting in calculation speeds similar to C/C++. This compile only takes place on the first import of the model and the compiled code is then cached on your machine. No further compilation will be required. As a consequence subsequent imports will be almost instant.
-
 ## Examples
 
 ### Example Code
