@@ -74,8 +74,8 @@ class IborFRA:
             calendar = Calendar(self.cal_type)
             maturity_dt = calendar.adjust(maturity_dt, self.bd_type)
 
-        if start_dt > maturity_dt:
-            raise FinError("Settlement date after maturity date")
+        if start_dt >= maturity_dt:
+            raise FinError("Start date must be before maturity date")
 
         self.start_dt = start_dt
         self.maturity_dt = maturity_dt
