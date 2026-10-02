@@ -120,6 +120,17 @@ class EquityBasketOption:
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         t_exp = option_years(value_dt, self.expiry_dt)
 
+        if t_exp < 0.0:
+            raise FinError("Value date is after option expiry date.")
+
+        if t_exp == 0.0:
+            basket_value = np.mean(s)
+            if self.opt_type == OptionTypes.EUROPEAN_CALL:
+                return max(basket_value - self.strike_price, 0.0)
+            if self.opt_type == OptionTypes.EUROPEAN_PUT:
+                return max(self.strike_price - basket_value, 0.0)
+            raise FinError("Unknown OPTION_TYPE")
+
         smean = 0.0
         for ia in range(0, self.num_assets):
             smean = smean + s[ia] * a[ia]
