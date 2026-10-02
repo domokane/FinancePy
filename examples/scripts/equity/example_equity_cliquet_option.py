@@ -4,510 +4,455 @@
 #
 # Copyright (C) 2018-2026 Dominic O'Kane
 #
-
-# Allow this example to run directly from its category folder.
+# Demonstrates:
+#   * call cliquets only
+#   * PRICE and RETURN payoff types
+#   * PERIODIC and MATURITY payment timing
+#   * independent Monte Carlo checks of the analytic valuation
+#
+# The Monte Carlo check assumes valuation on the cliquet start/reset date.
+# This avoids requiring historical reset fixings or already-realised payoffs.
+# ============================================================================
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 from financepy.utils.date import Date
 from financepy.utils.global_types import OptionTypes
+from financepy.utils.global_types import PaymentTimingTypes
+from financepy.utils.global_types import CliquetTypes
+from financepy.utils.frequency import FrequencyTypes
 
 from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
 from financepy.models.black_scholes import BlackScholes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.utils.frequency import FrequencyTypes
 
 
 # ============================================================================
-# 1. EQUITY CLIQUET OPTION
+# COMMON MARKET DATA
 # ============================================================================
-# What this section demonstrates:
-# Values a cliquet option using the supplied market data and model inputs.
-#
-# A cliquet consists of a sequence of forward-start options. At each reset
-# date a new option effectively begins, with its strike determined by the
-# stock level at that reset date.
 
-print("\n" + "=" * 78)
-print("1. EQUITY CLIQUET OPTION")
-print("=" * 78)
-
-start_dt = Date(1, 1, 2014)
+# Use value_dt == start_dt so every payoff/payment convention can be checked
+# without supplying historical reset fixings.
+value_dt = Date(1, 1, 2015)
+start_dt = value_dt
 final_expiry_dt = Date(1, 1, 2017)
 
+stock_price = 100.0
+volatility = 0.20
+interest_rate = 0.05
+dividend_yield = 0.02
 freq_type = FrequencyTypes.QUARTERLY
-opt_type = OptionTypes.EUROPEAN_CALL
-
-cliquet_option = EquityCliquetOption(
-    start_dt,
-    final_expiry_dt,
-    opt_type,
-    freq_type,
-)
-
-value_dt = Date(1, 1, 2015)
-
-stock_price = 100.0
-volatility = 0.20
-interest_rate = 0.05
-dividend_yield = 0.02
+notional = 1.0
 
 model = BlackScholes(volatility)
+discount_curve = FlatDiscountCurve(value_dt, interest_rate)
+dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
-discount_curve = FlatDiscountCurve(
-    value_dt,
-    interest_rate,
-)
+option_types = [
+    OptionTypes.EUROPEAN_CALL,
+]
 
-dividend_curve = FlatDiscountCurve(
-    value_dt,
-    dividend_yield,
-)
+payoff_types = [
+    CliquetTypes.PRICE,
+    CliquetTypes.RETURN,
+]
 
-value = cliquet_option.value(
-    value_dt,
-    stock_price,
-    discount_curve,
-    dividend_curve,
-    model,
-)
+payment_timings = [
+    PaymentTimingTypes.PERIODIC,
+    PaymentTimingTypes.MATURITY,
+]
 
-print("LABEL", "VALUE")
-print("FINANCEPY", value)
+
+def short_name(x):
+    """Return the enum member name without its class prefix."""
+    return getattr(x, "name", str(x).split(".")[-1])
 
 
 # ============================================================================
-# 2. CALL AND PUT CLIQUET OPTIONS
+# 1. ALL PAYOFF / PAYMENT-TIMING COMBINATIONS
 # ============================================================================
-# What this section demonstrates:
-# Compares otherwise identical call and put cliquet options.
-#
-# The comparison illustrates how the direction of the individual forward-
-# starting option payoffs affects the total cliquet value.
 
-print("\n" + "=" * 78)
-print("2. CALL AND PUT CLIQUET OPTIONS")
-print("=" * 78)
+print("\n" + "=" * 108)
+print("1. ANALYTIC VALUES - ALL CLIQUET CONFIGURATIONS")
+print("=" * 108)
 
 print(
-    f"{'OPTION TYPE':<20}"
-    f"{'VALUE':>16}"
+    f"{'OPTION':<12}"
+    f"{'PAYOFF':<12}"
+    f"{'PAYMENT':<12}"
+    f"{'VALUE':>18}"
 )
+print("-" * 54)
 
-print("-" * 36)
+for opt_type in option_types:
+    for payoff_type in payoff_types:
+        for payoff_timing in payment_timings:
 
-for opt_type in [
-    OptionTypes.EUROPEAN_CALL,
-    OptionTypes.EUROPEAN_PUT,
-]:
+            cliquet = EquityCliquetOption(
+                start_dt,
+                final_expiry_dt,
+                opt_type,
+                freq_type,
+                payoff_type,
+                payoff_timing,
+                notional,
+            )
 
-    cliquet_option = EquityCliquetOption(
-        start_dt,
-        final_expiry_dt,
-        opt_type,
-        freq_type,
-    )
+            value = cliquet.value(
+                value_dt,
+                stock_price,
+                discount_curve,
+                dividend_curve,
+                model,
+            )
 
-    value = cliquet_option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-    )
+            print(
+                f"{short_name(opt_type):<12}"
+                f"{short_name(payoff_type):<12}"
+                f"{short_name(payoff_timing):<12}"
+                f"{value:18.8f}"
+            )
 
+# ============================================================================
+# 2. MONTE CARLO VALIDATION OF ALL 4 CALL CONFIGURATIONS
+# ============================================================================
+
+print("\n" + "=" * 108)
+print("2. CALL CLIQUET: ANALYTIC VERSUS MONTE CARLO")
+print("=" * 108)
+
+num_paths = 500_000
+seed = 4242
+
+print(
+    f"{'OPTION':<12}"
+    f"{'PAYOFF':<12}"
+    f"{'PAYMENT':<12}"
+    f"{'ANALYTIC':>14}"
+    f"{'MC':>14}"
+    f"{'STD ERR':>12}"
+    f"{'DIFF':>14}"
+    f"{'Z':>10}"
+)
+print("-" * 110)
+
+mc_results = []
+
+for opt_type in option_types:
+    for payoff_type in payoff_types:
+        for payoff_timing in payment_timings:
+
+            cliquet = EquityCliquetOption(
+                start_dt,
+                final_expiry_dt,
+                opt_type,
+                freq_type,
+                payoff_type,
+                payoff_timing,
+                notional,
+            )
+
+            analytic = cliquet.value(
+                value_dt,
+                stock_price,
+                discount_curve,
+                dividend_curve,
+                model,
+            )
+
+            mc_result = cliquet.value_mc(
+                value_dt,
+                stock_price,
+                discount_curve,
+                dividend_curve,
+                model,
+                num_paths=num_paths,
+                seed=seed,
+            )
+
+            mc_value = mc_result.value
+            mc_stderr = mc_result.std_err
+
+            diff = mc_value - analytic
+            z_score = diff / mc_stderr if mc_stderr > 0.0 else np.nan
+            passed = abs(z_score) <= 3.0
+
+            mc_results.append(
+                (
+                    opt_type,
+                    payoff_type,
+                    payoff_timing,
+                    analytic,
+                    mc_value,
+                    mc_stderr,
+                    diff,
+                    z_score,
+                    passed,
+                )
+            )
+
+            print(
+                f"{short_name(opt_type):<12}"
+                f"{short_name(payoff_type):<12}"
+                f"{short_name(payoff_timing):<12}"
+                f"{analytic:14.8f}"
+                f"{mc_value:14.8f}"
+                f"{mc_stderr:12.8f}"
+                f"{diff:14.8f}"
+                f"{z_score:10.3f}"
+            )
+
+print("\n3-sigma MC checks:")
+for result in mc_results:
+    opt_type, payoff_type, payoff_timing, _, _, _, _, z_score, passed = result
+    status = "PASS" if passed else "FAIL"
     print(
-        f"{str(opt_type):<20}"
-        f"{value:16.8f}"
+        f"  {short_name(opt_type):<12} "
+        f"{short_name(payoff_type):<8} "
+        f"{short_name(payoff_timing):<10} "
+        f"Z={z_score:8.3f}  {status}"
     )
 
 
 # ============================================================================
-# 3. CLIQUET VALUE VERSUS STOCK PRICE
+# 3. VALUE VERSUS STOCK PRICE
 # ============================================================================
-# What this section demonstrates:
-# Shows how the cliquet value changes with the current stock price.
-#
-# This is particularly useful for a cliquet because its future strikes are
-# reset relative to future stock levels rather than being fixed today.
 
-print("\n" + "=" * 78)
+print("\n" + "=" * 108)
 print("3. CLIQUET VALUE VERSUS STOCK PRICE")
-print("=" * 78)
+print("=" * 108)
 
-stock_prices = np.linspace(
-    50.0,
-    150.0,
-    21,
-)
+stock_prices = np.linspace(50.0, 150.0, 21)
 
-call_option = EquityCliquetOption(
-    start_dt,
-    final_expiry_dt,
-    OptionTypes.EUROPEAN_CALL,
-    freq_type,
-)
+for payoff_type in payoff_types:
 
-put_option = EquityCliquetOption(
-    start_dt,
-    final_expiry_dt,
-    OptionTypes.EUROPEAN_PUT,
-    freq_type,
-)
+    plt.figure()
 
-call_values = []
-put_values = []
+    for payoff_timing in payment_timings:
 
-print(
-    f"{'STOCK':>10}"
-    f"{'CALL':>16}"
-    f"{'PUT':>16}"
-)
+        cliquet = EquityCliquetOption(
+            start_dt,
+            final_expiry_dt,
+            OptionTypes.EUROPEAN_CALL,
+            freq_type,
+            payoff_type,
+            payoff_timing,
+            notional,
+        )
 
-print("-" * 42)
+        values = []
 
-for stock_price in stock_prices:
+        for s in stock_prices:
+            values.append(
+                cliquet.value(
+                    value_dt,
+                    s,
+                    discount_curve,
+                    dividend_curve,
+                    model,
+                )
+            )
 
-    call_value = call_option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
+        plt.plot(
+            stock_prices,
+            values,
+            marker="o",
+            label=short_name(payoff_timing),
+        )
+
+    plt.xlabel("Stock Price")
+    plt.ylabel("Cliquet Option Value")
+    plt.title(
+        "Call Cliquet Value versus Stock Price - "
+        f"{short_name(payoff_type)}"
     )
-
-    put_value = put_option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-    )
-
-    call_values.append(call_value)
-    put_values.append(put_value)
-
-    print(
-        f"{stock_price:10.2f}"
-        f"{call_value:16.8f}"
-        f"{put_value:16.8f}"
-    )
-
-call_values = np.asarray(call_values)
-put_values = np.asarray(put_values)
-
-plt.figure()
-
-plt.plot(
-    stock_prices,
-    call_values,
-    marker="o",
-    label="Call Cliquet",
-)
-
-plt.plot(
-    stock_prices,
-    put_values,
-    marker="o",
-    label="Put Cliquet",
-)
-
-plt.xlabel("Stock Price")
-plt.ylabel("Cliquet Option Value")
-plt.title("Cliquet Option Value versus Stock Price")
-plt.grid(True)
-plt.legend()
-plt.show()
+    plt.grid(True)
+    plt.legend(title="Payment Timing")
+    plt.show()
 
 
 # ============================================================================
-# 4. CLIQUET VALUE VERSUS VOLATILITY
+# 4. VALUE VERSUS VOLATILITY
 # ============================================================================
-# What this section demonstrates:
-# Shows the sensitivity of the cliquet value to volatility.
-#
-# Since the cliquet contains a sequence of option-like payoffs, volatility is
-# an important determinant of its value.
 
-print("\n" + "=" * 78)
+print("\n" + "=" * 108)
 print("4. CLIQUET VALUE VERSUS VOLATILITY")
-print("=" * 78)
+print("=" * 108)
 
-stock_price = 100.0
+volatilities = np.linspace(0.05, 0.50, 10)
 
-volatilities = np.linspace(
-    0.05,
-    0.50,
-    10,
-)
+for payoff_type in payoff_types:
 
-call_values = []
-put_values = []
+    plt.figure()
 
-print(
-    f"{'VOLATILITY':>12}"
-    f"{'CALL':>16}"
-    f"{'PUT':>16}"
-)
+    for payoff_timing in payment_timings:
 
-print("-" * 44)
+        cliquet = EquityCliquetOption(
+            start_dt,
+            final_expiry_dt,
+            OptionTypes.EUROPEAN_CALL,
+            freq_type,
+            payoff_type,
+            payoff_timing,
+            notional,
+        )
 
-for volatility in volatilities:
+        values = []
 
-    model = BlackScholes(
-        volatility,
+        for vol in volatilities:
+            test_model = BlackScholes(vol)
+            values.append(
+                cliquet.value(
+                    value_dt,
+                    stock_price,
+                    discount_curve,
+                    dividend_curve,
+                    test_model,
+                )
+            )
+
+        plt.plot(
+            volatilities,
+            values,
+            marker="o",
+            label=short_name(payoff_timing),
+        )
+
+    plt.xlabel("Volatility")
+    plt.ylabel("Cliquet Option Value")
+    plt.title(
+        "Call Cliquet Value versus Volatility - "
+        f"{short_name(payoff_type)}"
     )
-
-    call_value = call_option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-    )
-
-    put_value = put_option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-    )
-
-    call_values.append(call_value)
-    put_values.append(put_value)
-
-    print(
-        f"{volatility:12.4f}"
-        f"{call_value:16.8f}"
-        f"{put_value:16.8f}"
-    )
-
-plt.figure()
-
-plt.plot(
-    volatilities,
-    call_values,
-    marker="o",
-    label="Call Cliquet",
-)
-
-plt.plot(
-    volatilities,
-    put_values,
-    marker="o",
-    label="Put Cliquet",
-)
-
-plt.xlabel("Volatility")
-plt.ylabel("Cliquet Option Value")
-plt.title("Cliquet Option Value versus Volatility")
-plt.grid(True)
-plt.legend()
-plt.show()
+    plt.grid(True)
+    plt.legend(title="Payment Timing")
+    plt.show()
 
 
 # ============================================================================
-# 5. CLIQUET VALUE VERSUS INTEREST RATE
+# 5. VALUE VERSUS INTEREST RATE
 # ============================================================================
-# What this section demonstrates:
-# Shows how the cliquet value responds to changes in the interest-rate curve
-# while holding the other market inputs fixed.
 
-print("\n" + "=" * 78)
+print("\n" + "=" * 108)
 print("5. CLIQUET VALUE VERSUS INTEREST RATE")
-print("=" * 78)
+print("=" * 108)
 
-volatility = 0.20
-model = BlackScholes(volatility)
+interest_rates = np.linspace(0.00, 0.10, 11)
 
-interest_rates = np.linspace(
-    0.00,
-    0.10,
-    11,
-)
+for payoff_type in payoff_types:
 
-call_values = []
-put_values = []
+    plt.figure()
 
-print(
-    f"{'RATE':>12}"
-    f"{'CALL':>16}"
-    f"{'PUT':>16}"
-)
+    for payoff_timing in payment_timings:
 
-print("-" * 44)
+        cliquet = EquityCliquetOption(
+            start_dt,
+            final_expiry_dt,
+            OptionTypes.EUROPEAN_CALL,
+            freq_type,
+            payoff_type,
+            payoff_timing,
+            notional,
+        )
 
-for interest_rate in interest_rates:
+        values = []
 
-    test_discount_curve = FlatDiscountCurve(
-        value_dt,
-        interest_rate,
+        for rate in interest_rates:
+            test_discount_curve = FlatDiscountCurve(value_dt, rate)
+            values.append(
+                cliquet.value(
+                    value_dt,
+                    stock_price,
+                    test_discount_curve,
+                    dividend_curve,
+                    model,
+                )
+            )
+
+        plt.plot(
+            interest_rates,
+            values,
+            marker="o",
+            label=short_name(payoff_timing),
+        )
+
+    plt.xlabel("Interest Rate")
+    plt.ylabel("Cliquet Option Value")
+    plt.title(
+        "Call Cliquet Value versus Interest Rate - "
+        f"{short_name(payoff_type)}"
     )
-
-    call_value = call_option.value(
-        value_dt,
-        stock_price,
-        test_discount_curve,
-        dividend_curve,
-        model,
-    )
-
-    put_value = put_option.value(
-        value_dt,
-        stock_price,
-        test_discount_curve,
-        dividend_curve,
-        model,
-    )
-
-    call_values.append(call_value)
-    put_values.append(put_value)
-
-    print(
-        f"{interest_rate:12.4f}"
-        f"{call_value:16.8f}"
-        f"{put_value:16.8f}"
-    )
-
-plt.figure()
-
-plt.plot(
-    interest_rates,
-    call_values,
-    marker="o",
-    label="Call Cliquet",
-)
-
-plt.plot(
-    interest_rates,
-    put_values,
-    marker="o",
-    label="Put Cliquet",
-)
-
-plt.xlabel("Interest Rate")
-plt.ylabel("Cliquet Option Value")
-plt.title("Cliquet Option Value versus Interest Rate")
-plt.grid(True)
-plt.legend()
-plt.show()
+    plt.grid(True)
+    plt.legend(title="Payment Timing")
+    plt.show()
 
 
 # ============================================================================
-# 6. CLIQUET VALUE VERSUS DIVIDEND YIELD
+# 6. VALUE VERSUS DIVIDEND YIELD
 # ============================================================================
-# What this section demonstrates:
-# Shows the effect of changing the dividend yield while keeping the other
-# market inputs fixed.
-#
-# Dividend yield changes the risk-neutral growth rate of the stock and
-# therefore affects the forward-start option components of the cliquet.
 
-print("\n" + "=" * 78)
+print("\n" + "=" * 108)
 print("6. CLIQUET VALUE VERSUS DIVIDEND YIELD")
-print("=" * 78)
+print("=" * 108)
 
-interest_rate = 0.05
+dividend_yields = np.linspace(0.00, 0.10, 11)
 
-discount_curve = FlatDiscountCurve(
-    value_dt,
-    interest_rate,
-)
+for payoff_type in payoff_types:
 
-dividend_yields = np.linspace(
-    0.00,
-    0.10,
-    11,
-)
+    plt.figure()
 
-call_values = []
-put_values = []
+    for payoff_timing in payment_timings:
 
-print(
-    f"{'DIV YIELD':>12}"
-    f"{'CALL':>16}"
-    f"{'PUT':>16}"
-)
+        cliquet = EquityCliquetOption(
+            start_dt,
+            final_expiry_dt,
+            OptionTypes.EUROPEAN_CALL,
+            freq_type,
+            payoff_type,
+            payoff_timing,
+            notional,
+        )
 
-print("-" * 44)
+        values = []
 
-for dividend_yield in dividend_yields:
+        for div_yield in dividend_yields:
+            test_dividend_curve = FlatDiscountCurve(value_dt, div_yield)
+            values.append(
+                cliquet.value(
+                    value_dt,
+                    stock_price,
+                    discount_curve,
+                    test_dividend_curve,
+                    model,
+                )
+            )
 
-    test_dividend_curve = FlatDiscountCurve(
-        value_dt,
-        dividend_yield,
+        plt.plot(
+            dividend_yields,
+            values,
+            marker="o",
+            label=short_name(payoff_timing),
+        )
+
+    plt.xlabel("Dividend Yield")
+    plt.ylabel("Cliquet Option Value")
+    plt.title(
+        "Call Cliquet Value versus Dividend Yield - "
+        f"{short_name(payoff_type)}"
     )
-
-    call_value = call_option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        test_dividend_curve,
-        model,
-    )
-
-    put_value = put_option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        test_dividend_curve,
-        model,
-    )
-
-    call_values.append(call_value)
-    put_values.append(put_value)
-
-    print(
-        f"{dividend_yield:12.4f}"
-        f"{call_value:16.8f}"
-        f"{put_value:16.8f}"
-    )
-
-plt.figure()
-
-plt.plot(
-    dividend_yields,
-    call_values,
-    marker="o",
-    label="Call Cliquet",
-)
-
-plt.plot(
-    dividend_yields,
-    put_values,
-    marker="o",
-    label="Put Cliquet",
-)
-
-plt.xlabel("Dividend Yield")
-plt.ylabel("Cliquet Option Value")
-plt.title("Cliquet Option Value versus Dividend Yield")
-plt.grid(True)
-plt.legend()
-plt.show()
+    plt.grid(True)
+    plt.legend(title="Payment Timing")
+    plt.show()
 
 
 # ============================================================================
-# 7. CLIQUET VALUE VERSUS RESET FREQUENCY
+# 7. VALUE VERSUS RESET FREQUENCY
 # ============================================================================
-# What this section demonstrates:
-# Compares cliquet values for different reset frequencies.
-#
-# Changing the frequency changes both the number and length of the
-# forward-start option periods making up the cliquet.
 
-print("\n" + "=" * 78)
+print("\n" + "=" * 108)
 print("7. CLIQUET VALUE VERSUS RESET FREQUENCY")
-print("=" * 78)
-
-dividend_yield = 0.02
-
-dividend_curve = FlatDiscountCurve(
-    value_dt,
-    dividend_yield,
-)
+print("=" * 108)
 
 frequencies = [
     FrequencyTypes.ANNUAL,
@@ -523,89 +468,51 @@ frequency_labels = [
     "Monthly",
 ]
 
-call_values = []
-put_values = []
+x = np.arange(len(frequencies))
 
-print(
-    f"{'FREQUENCY':<16}"
-    f"{'CALL':>16}"
-    f"{'PUT':>16}"
-)
+for payoff_type in payoff_types:
 
-print("-" * 48)
+    plt.figure()
 
-for frequency, label in zip(
-    frequencies,
-    frequency_labels,
-):
+    for payoff_timing in payment_timings:
 
-    call_option = EquityCliquetOption(
-        start_dt,
-        final_expiry_dt,
-        OptionTypes.EUROPEAN_CALL,
-        frequency,
+        values = []
+
+        for frequency in frequencies:
+            cliquet = EquityCliquetOption(
+                start_dt,
+                final_expiry_dt,
+                OptionTypes.EUROPEAN_CALL,
+                frequency,
+                payoff_type,
+                payoff_timing,
+                notional,
+            )
+
+            values.append(
+                cliquet.value(
+                    value_dt,
+                    stock_price,
+                    discount_curve,
+                    dividend_curve,
+                    model,
+                )
+            )
+
+        plt.plot(
+            x,
+            values,
+            marker="o",
+            label=short_name(payoff_timing),
+        )
+
+    plt.xticks(x, frequency_labels)
+    plt.xlabel("Reset Frequency")
+    plt.ylabel("Cliquet Option Value")
+    plt.title(
+        "Call Cliquet Value versus Reset Frequency - "
+        f"{short_name(payoff_type)}"
     )
-
-    put_option = EquityCliquetOption(
-        start_dt,
-        final_expiry_dt,
-        OptionTypes.EUROPEAN_PUT,
-        frequency,
-    )
-
-    call_value = call_option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-    )
-
-    put_value = put_option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-    )
-
-    call_values.append(call_value)
-    put_values.append(put_value)
-
-    print(
-        f"{label:<16}"
-        f"{call_value:16.8f}"
-        f"{put_value:16.8f}"
-    )
-
-x = np.arange(
-    len(frequencies),
-)
-
-plt.figure()
-
-plt.plot(
-    x,
-    call_values,
-    marker="o",
-    label="Call Cliquet",
-)
-
-plt.plot(
-    x,
-    put_values,
-    marker="o",
-    label="Put Cliquet",
-)
-
-plt.xticks(
-    x,
-    frequency_labels,
-)
-
-plt.xlabel("Reset Frequency")
-plt.ylabel("Cliquet Option Value")
-plt.title("Cliquet Option Value versus Reset Frequency")
-plt.grid(True)
-plt.legend()
-plt.show()
+    plt.grid(True)
+    plt.legend(title="Payment Timing")
+    plt.show()

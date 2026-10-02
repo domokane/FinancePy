@@ -90,7 +90,7 @@ class FXForward:
         check_curve_dt(value_dt, foreign_curve)
 
         if isinstance(value_dt, Date):
-            t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+            t = (self.delivery_dt - value_dt) / G_DAYS_IN_YEAR
         else:
             t = value_dt
 

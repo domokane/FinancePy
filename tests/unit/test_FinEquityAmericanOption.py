@@ -1,5 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+import pytest
+
 from financepy.utils.date import Date
 from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
@@ -22,6 +25,28 @@ discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 
 model = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
+
+
+@pytest.mark.parametrize("spot", [50, 50.0, np.int64(50), np.float64(50), np.array(50.0)])
+def test_scalar_spot_representations_return_one_price(spot):
+    """Python/NumPy scalar representations have the same contract value."""
+    option = EquityAmericanOption(expiry_dt, strike_price, OptionTypes.AMERICAN_PUT, 3.0)
+    value = option.value(value_dt, spot, discount_curve, dividend_curve, model)
+    assert np.ndim(value) == 0
+    assert round(value / 3.0, 3) == 7.257
+
+
+@pytest.mark.parametrize("opt_type", [OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT])
+def test_vector_spots_preserve_every_contract_price(opt_type):
+    """Each distinct spot retains its price and notional multiplier."""
+    spots = np.array([40.0, 50.0, 60.0])
+    option = EquityAmericanOption(expiry_dt, strike_price, opt_type, 3.0)
+    values = option.value(value_dt, spots, discount_curve, dividend_curve, model)
+    t = (expiry_dt - value_dt) / 365.0
+    expected = np.array([model.value(float(spot), t, strike_price, interest_rate, dividend_yield, opt_type) for spot in spots]) * 3.0
+    assert values.shape == spots.shape
+    assert len(set(values)) == 3
+    np.testing.assert_allclose(values, expected)
 
 ########################################################################################
 

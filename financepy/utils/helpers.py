@@ -26,15 +26,8 @@ def _func_name():
 ########################################################################################
 
 
-def option_years(value_dt: Date, expiry_dt: Date, floor=1e-10, fail=True):
-
-    t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-
-    if t_exp < 0 and fail is True:
-        raise FinError("Option expires before value date.")
-
-    return t_exp
-
+def option_years(value_dt: Date, expiry_dt: Date, floor=None, fail=True):
+    """Return scalar or vector expiry times with an optional explicit floor."""
     if isinstance(expiry_dt, Date):
         t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
         if t_exp < 0 and fail is True:
@@ -49,8 +42,11 @@ def option_years(value_dt: Date, expiry_dt: Date, floor=1e-10, fail=True):
 
             t_exps.append(t_exp)
         t_exp = np.array(t_exps)
+    else:
+        raise FinError("Expiry date must be a Date or a list of Dates.")
 
-    t_exp = np.maximum(t_exp, floor)
+    if floor is not None:
+        t_exp = np.maximum(t_exp, floor)
 
     return t_exp
 
@@ -63,7 +59,6 @@ def grid_index(t, grid_times: np.ndarray):
     for i in range(0, n):
         grid_time = grid_times[i]
         if abs(grid_time - t) < G_SMALL:
-            print(t, grid_times, i)
             return i
 
     raise FinError("Grid index not found")
@@ -496,13 +491,14 @@ def uniform_to_default_time(u, t, v):
             index = i
             break
 
-    if index == num_points + 1:
-        t1 = t[num_points - 1]
-        q1 = v[num_points - 1]
-        t2 = t[num_points]
-        q2 = v[num_points]
-        lam = np.log(q1 / q2) / (t2 - t1)
-        tau = t2 - np.log(u / q2) / lam
+    if index == 0:
+        # Extrapolate beyond the final curve node using its last forward hazard.
+        left = num_points - 2
+        right = num_points - 1
+        lam = np.log(v[left] / v[right]) / (t[right] - t[left])
+        if lam <= 0.0:
+            return 99999.0
+        tau = t[right] + np.log(v[right] / u) / lam
     else:
         t1 = t[index - 1]
         q1 = v[index - 1]

@@ -7,7 +7,7 @@ from scipy.optimize.linesearch import (
 )
 
 Inf = np.inf
-EPSILON = 1e-20
+EPSILON = 1.4901161193847656e-8
 
 _status_message = {
     "success": "Optimization terminated successfully.",
@@ -291,7 +291,19 @@ def fmin_cg(
     #     "return_all": retall,
     # }
 
-    res = _minimize_cg(f, x0, args=fargs, jac=fprime, callback=callback)
+    res = _minimize_cg(
+        f,
+        x0,
+        args=fargs,
+        jac=fprime,
+        callback=callback,
+        gtol=gtol,
+        norm=norm,
+        eps=epsilon,
+        maxiter=maxiter,
+        disp=bool(disp),
+        return_all=bool(retall),
+    )
 
     if full_output:
         retlist = res["x"], res["fun"], res["nfev"], res["njev"], res["status"]

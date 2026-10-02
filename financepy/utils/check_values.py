@@ -35,40 +35,6 @@ def check_num_paths(num_paths: int):
 ###########################################################################
 
 
-def check_t_exp(value_dt: Date, expiry_dt: Date):
-    """Calculate time to expiry in years."""
-
-    if not isinstance(value_dt, Date):
-        raise FinError("Valuation date must be a Date.")
-
-    if isinstance(expiry_dt, Date):
-
-        t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-
-        if t_exp < 0.0:
-            raise FinError("Expiry date falls before valuation date.")
-
-        return t_exp
-
-    elif isinstance(expiry_dt, list):
-
-        t_exps = []
-
-        for exp_dt in expiry_dt:
-            t_exp = check_t_exp(value_dt, exp_dt)
-
-            t_exps.append(t_exp)
-
-        return np.array(t_exps)
-
-    else:
-
-        raise FinError("Expiry date must be a Date or list of Dates.")
-
-
-########################################################################################
-
-
 def check_stock_price(stock_price: float):
 
     s0 = np.asarray(stock_price, dtype=float)

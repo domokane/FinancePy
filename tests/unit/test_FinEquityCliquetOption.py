@@ -1,6 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import numpy as np
+import pytest
+from financepy.utils.error import FinError
+from financepy.models.black_scholes_analytic import european_value
 
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
@@ -8,6 +11,26 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
 from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
+
+
+@pytest.mark.parametrize("value_dt", [Date(4, 1, 2026), Date(1, 7, 2025)])
+def test_cliquet_rejects_dates_before_first_reset(value_dt):
+    """A pre-inception stock level must not be treated as an observed reset."""
+    curve = FlatDiscountCurve(value_dt, .03)
+    option = EquityCliquetOption(Date(5, 1, 2026), Date(4, 1, 2027), OptionTypes.EUROPEAN_CALL, FrequencyTypes.ANNUAL)
+    with pytest.raises(FinError, match="before start date"):
+        option.value(value_dt, 100.0, curve, curve, BlackScholes(.2))
+
+
+def test_one_period_cliquet_at_inception_matches_vanilla():
+    """At the first reset the observed stock sets the one-period strike."""
+    start = Date(5, 1, 2026)
+    expiry = Date(4, 1, 2027)
+    option = EquityCliquetOption(start, expiry, OptionTypes.EUROPEAN_CALL, FrequencyTypes.ANNUAL)
+    curve = FlatDiscountCurve(start, .03)
+    dividend = FlatDiscountCurve(start, .01)
+    expected = european_value(100.0, (expiry - start) / 365.0, 100.0, .03, .01, .2, OptionTypes.EUROPEAN_CALL.value)
+    assert option.value(start, 100.0, curve, dividend, BlackScholes(.2)) == pytest.approx(expected)
 
 ########################################################################################
 

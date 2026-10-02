@@ -88,6 +88,13 @@ def test_zero_price_is_between_zero_and_one():
     assert 0.0 < value <= 1.0
 
 
+def test_zero_price_is_stable_for_tiny_positive_volatility():
+
+    value = zero_price(0.03, 0.1, 0.05, 1.0e-10, 10.0)
+
+    assert value == pytest.approx(0.6882687528140472, rel=1.0e-12, abs=1.0e-14)
+
+
 def test_zero_price_zero_volatility_matches_deterministic_integral():
 
     sigma = 0.0

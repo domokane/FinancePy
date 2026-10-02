@@ -202,21 +202,15 @@ def covar(a: np.ndarray, b: np.ndarray):
 
 @njit(float64(float64, float64), fastmath=True, cache=True)
 def pair_gcd(v1: float, v2: float):
-    """Determine the Greatest Common Divisor of two integers using Euclid's
-    algorithm. TODO - compare this with math.gcd(a,b) for speed. Also examine
-    to see if I should not be declaring inputs as integers for NUMBA."""
+    """Determine the GCD of integer-valued inputs using Euclid's algorithm."""
 
-    if v1 == 0 or v2 == 0:
-        return 0
+    a = int(abs(v1))
+    b = int(abs(v2))
 
-    while v2 != 0:
-        temp = v2
-        factor = v1 / v2
-        v2 = v1 - factor * v2
-        v1 = temp
+    while b != 0:
+        a, b = b, a % b
 
-    gcd = abs(v1)
-    return gcd
+    return float(a)
 
 
 ########################################################################################

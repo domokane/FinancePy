@@ -222,7 +222,7 @@ class IborSwap:
         float_leg_value = self.float_leg.value(value_dt, discount_curve, index_curve, first_fixing_rate)
 
         value = fixed_leg_value + float_leg_value
-        pv01 = np.abs(fixed_leg_value / self.fixed_leg.cpn / self.fixed_leg.notional)
+        pv01 = self.pv01(value_dt, discount_curve)
         pay_receive_float = -1 if self.float_leg.leg_type == SwapTypes.PAY else 1
         swap_rate = float_leg_value / self.float_leg.notional / pv01 / pay_receive_float
 
@@ -256,11 +256,7 @@ class IborSwap:
     def pv01(self, value_dt: Date, discount_curve: DiscountCurve):
         """Calculate the value of 1 basis point coupon on the fixed leg."""
 
-        pv = self.fixed_leg.value(value_dt, discount_curve)
-        pv01 = pv / self.fixed_leg.cpn / self.fixed_leg.notional
-        # Needs to be positive even if it is a payer leg
-        pv01 = np.abs(pv01)
-        return pv01
+        return self.fixed_leg.pv01(value_dt, discount_curve)
 
     ###########################################################################
 

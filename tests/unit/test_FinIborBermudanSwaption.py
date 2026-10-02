@@ -68,7 +68,7 @@ def test_bk_european_exercise():
     model = BKTree(sigma, a, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 6313.7455
+    assert round(value_pay, 4) == 6347.5203
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert value_rec == 0.0
@@ -79,10 +79,10 @@ def test_bk_european_exercise():
     model = BKTree(sigma, a, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 15706.6985
+    assert round(value_pay, 4) == 15727.4291
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(value_rec, 4) == 9392.9531
+    assert round(value_rec, 4) == 9379.9088
 
 
 ########################################################################################
@@ -124,7 +124,7 @@ def test_bk_bermudan_exercise():
     model = BKTree(sigma, a, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 6313.7455
+    assert round(value_pay, 4) == 6347.5203
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert value_rec == 0.0
@@ -135,10 +135,10 @@ def test_bk_bermudan_exercise():
     model = BKTree(sigma, a, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 19175.5406
+    assert round(value_pay, 4) == 19128.0651
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(value_rec, 4) == 12956.6057
+    assert round(value_rec, 4) == 13034.7811
 
 
 ########################################################################################
@@ -178,7 +178,7 @@ def test_bdt_european_exercise():
     model = BDTTree(sigma, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 6313.7454
+    assert round(value_pay, 4) == 6347.5203
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert value_rec == 0.0
@@ -187,10 +187,10 @@ def test_bdt_european_exercise():
     model = BDTTree(sigma, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 15968.216
+    assert round(value_pay, 4) == 15989.2369
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(value_rec, 4) == 9654.4705
+    assert round(value_rec, 4) == 9641.7166
 
 
 ########################################################################################
@@ -230,7 +230,7 @@ def test_bdt_bermudan_exercise():
     model = BDTTree(sigma, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 6313.7454
+    assert round(value_pay, 4) == 6347.5203
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert value_rec == 0.0
@@ -239,10 +239,10 @@ def test_bdt_bermudan_exercise():
     model = BDTTree(sigma, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 19444.6517
+    assert round(value_pay, 4) == 19399.3263
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(value_rec, 4) == 13258.7686
+    assert round(value_rec, 4) == 13324.8945
 
 
 ########################################################################################
@@ -283,7 +283,7 @@ def test_hw_european_exercise():
     model = HWTree(sigma, a, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 6353.3815
+    assert round(value_pay, 4) == 6387.1564
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert value_rec == 0.0
@@ -293,10 +293,10 @@ def test_hw_european_exercise():
     model = HWTree(sigma, a, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 13698.0155
+    assert round(value_pay, 4) == 13721.4998
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(value_rec, 4) == 7344.6339
+    assert round(value_rec, 4) == 7334.3434
 
 
 ########################################################################################
@@ -337,7 +337,7 @@ def test_hw_bermudan_exercise():
     model = HWTree(sigma, a, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 6353.3815
+    assert round(value_pay, 4) == 6387.1564
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
     assert value_rec == 0.0
@@ -347,7 +347,7 @@ def test_hw_bermudan_exercise():
     model = HWTree(sigma, a, num_time_steps)
 
     value_pay = bermudan_swaption_pay.value(value_dt, libor_curve, model)
-    assert round(value_pay, 4) == 16609.3646
+    assert round(value_pay, 4) == 16561.2656
 
     value_rec = bermudan_swaption_rec.value(value_dt, libor_curve, model)
-    assert round(value_rec, 4) == 10406.4558
+    assert round(value_rec, 4) == 10464.5341

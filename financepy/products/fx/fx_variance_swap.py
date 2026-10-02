@@ -136,6 +136,9 @@ class FinFXVarianceSwap:
 
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
+        if t_mat <= 0.0:
+            raise FinError("Valuation date must be before maturity date.")
+
         r = discount_curve.zero_rate_cc(self.maturity_dt)
         q = dividend_curve.zero_rate_cc(self.maturity_dt)
 

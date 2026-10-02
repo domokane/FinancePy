@@ -18,6 +18,7 @@
 ###############################################################################
 
 import numpy as np
+from scipy.special import gammaln
 
 from scipy.optimize import least_squares
 
@@ -309,11 +310,17 @@ class MertonJumpDiffusion:
             if n >= lambda_t and 1.0 - cumulative_prob < self.poisson_tolerance:
                 break
 
-            # Recursive Poisson probability:
-            #
-            # p_(n+1) = p_n lambda T / (n+1)
-            #
-            poisson_prob *= lambda_t / (n + 1.0)
+            # Re-evaluate from the log PMF. A recursive update cannot recover
+            # once exp(-lambda_t) underflows for large Poisson exposures.
+            if lambda_t > 0.0:
+                next_n = n + 1
+                poisson_prob = np.exp(
+                    -lambda_t
+                    + next_n * np.log(lambda_t)
+                    - gammaln(next_n + 1.0)
+                )
+            else:
+                poisson_prob = 0.0
 
         return float(option_value)
 

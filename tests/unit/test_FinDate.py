@@ -457,3 +457,20 @@ def test_leap_day_only_valid_in_leap_year():
 
     with pytest.raises(FinError):
         Date(29, 2, 2023)
+
+
+@pytest.mark.parametrize(
+    "hour,minute,second",
+    [
+        (-1, 0, 0),
+        (24, 0, 0),
+        (0, -1, 0),
+        (0, 60, 0),
+        (0, 0, -1),
+        (0, 0, 60),
+        (1.5, 0, 0),
+    ],
+)
+def test_invalid_time_components_raise_finerror(hour, minute, second):
+    with pytest.raises(FinError, match="Invalid hour, minute or second"):
+        Date(1, 1, 2020, hour, minute, second)

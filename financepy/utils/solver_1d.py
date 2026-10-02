@@ -318,22 +318,29 @@ def newton(
     if maxiter < 1:
         raise FinError("maxiter must be greater than 0")
 
+    if args is None:
+        args = ()
+
     # Convert to float (don't use float(x0); this works also for complex x0)
     p0 = 1.0 * x0
     fun_calls = 0
+
+    def _return_result(root, converged, iterations):
+        if full_output:
+            return root, results(root, fun_calls, iterations, converged)
+        return root
+
     if fprime is not None:
         # Newton-Raphson method
         for itr in range(maxiter):
             # first evaluate fval
-            fval = func(p0, args)
+            fval = func(p0, *args)
             fun_calls += 1
             # If fval is 0, a root has been found, then terminate
             if fval == 0:
-                return p0
-            fder = fprime(p0, args)
+                return _return_result(p0, True, itr)
+            fder = fprime(p0, *args)
             fun_calls += 1
-
-            #            print("==>", itr, p0, fval, fder)
 
             if fder == 0:
                 if disp is True:
@@ -343,11 +350,11 @@ def newton(
                         "iterations, value is ",
                         p0,
                     )
-                return None
+                return _return_result(None, False, itr + 1)
 
             newton_step = fval / fder
             if fprime2:
-                fder2 = fprime2(p0, args)
+                fder2 = fprime2(p0, *args)
                 fun_calls += 1
                 # Halley's method:
                 #   newton_step /= (1.0 - 0.5 * newton_step * fder2 / fder)
@@ -360,7 +367,7 @@ def newton(
                     newton_step /= 1.0 - adj
             p = p0 - newton_step
             if np.isclose(p, p0, rtol=rtol, atol=tol):
-                return p
+                return _return_result(p, True, itr + 1)
             p0 = p
     else:
         # Secant method
@@ -372,9 +379,9 @@ def newton(
             eps = 1e-4
             p1 = x0 * (1 + eps)
             p1 += eps if p1 >= 0 else -eps
-        q0 = func(p0, args)
+        q0 = func(p0, *args)
         fun_calls += 1
-        q1 = func(p1, args)
+        q1 = func(p1, *args)
         fun_calls += 1
         if abs(q1) < abs(q0):
             p0, p1, q0, q1 = p1, p0, q1, q0
@@ -388,16 +395,16 @@ def newton(
                             "iterations, value is ",
                             str(p1),
                         )
-                    return None
+                    return _return_result(None, False, itr + 1)
                 p = (p1 + p0) / 2.0
-                return p
+                return _return_result(p, True, itr + 1)
             else:
                 if abs(q1) > abs(q0):
                     p = (-q0 / q1 * p1 + p0) / (1 - q0 / q1)
                 else:
                     p = (-q1 / q0 * p0 + p1) / (1 - q1 / q0)
             if np.isclose(p, p1, rtol=rtol, atol=tol):
-                return p
+                return _return_result(p, True, itr + 1)
             p0, q0 = p1, q1
             p1 = p
             q1 = func(p1, *args)
@@ -411,7 +418,7 @@ def newton(
             str(p),
         )
 
-    return p
+    return _return_result(p, False, maxiter)
 
 
 ########################################################################################

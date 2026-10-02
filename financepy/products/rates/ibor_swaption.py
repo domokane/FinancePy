@@ -136,6 +136,9 @@ class IborSwaption:
 
         check_curve_dt(value_dt, discount_curve)
 
+        if value_dt > self.exercise_dt:
+            raise FinError("Valuation date after exercise date")
+
         # The pv01 is the value of the swap cash flows as of the curve date
         pv01 = swap.pv01(value_dt, discount_curve)
 
@@ -143,8 +146,8 @@ class IborSwaption:
         # date that makes the forward swap worth par including principal
         s = swap.swap_rate(value_dt, discount_curve)
 
-        t_exp = (self.exercise_dt - self.settle_dt) / G_DAYS_IN_YEAR
-        t_mat = (self.maturity_dt - self.settle_dt) / G_DAYS_IN_YEAR
+        t_exp = (self.exercise_dt - value_dt) / G_DAYS_IN_YEAR
+        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
         # Discounting is done via the PV01 annuity so no discounting in Black
         df = 1.0
@@ -303,6 +306,9 @@ class IborSwaption:
 
         check_curve_dt(value_dt, discount_curve)
 
+        if value_dt > self.exercise_dt:
+            raise FinError("Valuation date after exercise date")
+
         swap = IborSwap(
             self.exercise_dt,
             self.maturity_dt,
@@ -324,7 +330,7 @@ class IborSwaption:
 
         pv01 = swap.cash_settled_pv01(value_dt, swap_rate, self.fixed_freq_type)
 
-        t_exp = (self.exercise_dt - self.settle_dt) / G_DAYS_IN_YEAR
+        t_exp = (self.exercise_dt - value_dt) / G_DAYS_IN_YEAR
 
         # Discounting is done via the PV01 annuity so no discounting in Black
         df = 1.0

@@ -1,6 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-from math import sqrt, exp
+from math import sqrt, exp, expm1
 from numba import njit, float64, int64
 import numba as nb
 import numpy as np
@@ -79,6 +79,24 @@ def zero_price(
     t: float
 ) -> float:
     """Generate zero price analytically using Vasicek model"""
+    at = a * t
+    if abs(at) <= 0.5:
+        # The usual affine expression subtracts terms proportional to 1/a
+        # and 1/a**2. Evaluate the integrated Gaussian variance directly in
+        # this region, using its convergent series in z = a*t.
+        bb = -expm1(-at) / a if a != 0.0 else t
+        z = at
+        z_power = 1.0
+        coefficient = 1.0 / 3.0
+        variance_factor = coefficient
+        for n in range(20):
+            coefficient *= (2.0 ** (n + 3) - 2.0) / ((2.0 ** (n + 2) - 2.0) * (n + 4.0))
+            z_power *= -z
+            variance_factor += coefficient * z_power
+        variance = sigma * sigma * t * t * t * variance_factor
+        mean = b * t + (r0 - b) * bb
+        return exp(-mean + 0.5 * variance)
+
     bb = (1.0 - exp(-a * t)) / a
     aa = exp(
         (b - sigma * sigma / 2.0 / a / a) * (bb - t) - bb * bb * sigma * sigma / 4.0 / a

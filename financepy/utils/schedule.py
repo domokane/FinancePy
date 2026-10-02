@@ -193,20 +193,18 @@ class Schedule:
 
             # This needs checking
             next_dt = self.effective_dt
-            flow_num = 0
-
             unadjusted_schedule_dts.append(next_dt)
-            flow_num = 1
 
             while next_dt < self.termination_dt:
-                unadjusted_schedule_dts.append(next_dt)
-                tot_num_months = num_months * (flow_num)
+                tot_num_months = num_months * len(unadjusted_schedule_dts)
                 next_dt = self.effective_dt.add_months(tot_num_months)
-                flow_num = flow_num + 1
+                if next_dt < self.termination_dt:
+                    unadjusted_schedule_dts.append(next_dt)
 
             # The effective date is not adjusted as it is given
-            for i in range(1, flow_num):
-                dt = calendar.adjust(unadjusted_schedule_dts[i], self.bd_type)
+            self.adjusted_dts.append(self.effective_dt)
+            for dt in unadjusted_schedule_dts[1:]:
+                dt = calendar.adjust(dt, self.bd_type)
 
                 self.adjusted_dts.append(dt)
 

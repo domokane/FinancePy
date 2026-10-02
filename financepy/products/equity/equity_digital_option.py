@@ -16,7 +16,6 @@ from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.bs_digital_option import bs_digital_option_value
 from ...utils.check_values import check_curve_dt
-from ...utils.check_values import check_t_exp
 from ...utils.helpers import option_years
 from ...models.model import Model
 
@@ -71,8 +70,28 @@ class EquityDigitalOption(EquityOption):
         options."""
 
         t_exp = option_years(value_dt, self.expiry_dt)
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
+
+        if t_exp == 0.0:
+            scalar_input = np.isscalar(stock_price)
+            stock_price = np.asarray(stock_price, dtype=float)
+            if self.call_put_type == OptionTypes.EUROPEAN_CALL:
+                event = stock_price > self.barrier
+            else:
+                event = stock_price < self.barrier
+
+            if self.digital_type == DigitalOptionTypes.CASH_OR_NOTHING:
+                payoff = event.astype(float)
+            elif self.digital_type == DigitalOptionTypes.ASSET_OR_NOTHING:
+                payoff = stock_price * event
+            else:
+                raise FinError("Unknown digital option type.")
+
+            if scalar_input:
+                return float(payoff)
+            return payoff
 
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
@@ -99,11 +118,22 @@ class EquityDigitalOption(EquityOption):
         Carlo simulation. Product assumes a barrier only at expiry. Monte Carlo
         handles both a cash-or-nothing and an asset-or-nothing option."""
 
-        t_exp = check_t_exp(value_dt, self.expiry_dt)
-        t_exp = max(t_exp, 1e-10)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
+
+        if t_exp == 0.0:
+            if self.call_put_type == OptionTypes.EUROPEAN_CALL:
+                event = stock_price > self.barrier
+            else:
+                event = stock_price < self.barrier
+
+            if self.digital_type == DigitalOptionTypes.CASH_OR_NOTHING:
+                return float(event)
+            if self.digital_type == DigitalOptionTypes.ASSET_OR_NOTHING:
+                return float(stock_price if event else 0.0)
+            raise FinError("Unknown digital option type.")
 
         np.random.seed(seed)
 

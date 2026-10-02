@@ -14,7 +14,6 @@ from ...utils.global_types import TouchOptionTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...utils.check_values import check_curve_dt
-from ...utils.check_values import check_t_exp
 from ...utils.helpers import option_years
 from ...models.model import Model
 from ...models.gbm_process_simulator import get_paths_times
@@ -40,6 +39,7 @@ def _barrier_pay_one_at_hit_pv_down(s, h, r, dt):
 
     for ip in range(0, num_paths):
         hit_flag = 0
+        v = 0.0
 
         for it in range(0, num_time_steps):
             if s[ip][it] <= h:
@@ -66,6 +66,7 @@ def _barrier_pay_one_at_hit_pv_up(s, h, r, dt):
 
     for ip in range(0, num_paths):
         hit_flag = 0
+        v = 0.0
 
         for it in range(0, num_time_steps):
             if s[ip][it] >= h:
@@ -436,7 +437,7 @@ class FXOneTouchOption(FXOption):
 
         # "THIS NEEDS TO BE CHECKED"
 
-        t_exp = check_t_exp(value_dt, self.expiry_dt)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         check_curve_dt(value_dt, domestic_curve)
         check_curve_dt(value_dt, foreign_curve)
