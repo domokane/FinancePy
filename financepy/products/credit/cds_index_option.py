@@ -120,13 +120,16 @@ class CDSIndexOption:
         adj_strike = c + (k - c) * strike_rpv01 / index_rpv01 / q_expiry_index
 
         denom = sigma * sqrt(t_exp)
-        d1 = log(adj_fwd / adj_strike) + 0.5 * sigma * sigma * t_exp
-        d2 = log(adj_fwd / adj_strike) - 0.5 * sigma * sigma * t_exp
-        d1 /= denom
-        d2 /= denom
+        if denom == 0.0:
+            v_pay = max(adj_fwd - adj_strike, 0.0) * index_rpv01
+            v_rec = max(adj_strike - adj_fwd, 0.0) * index_rpv01
+        else:
+            log_moneyness = log(adj_fwd / adj_strike)
+            d1 = (log_moneyness + 0.5 * sigma * sigma * t_exp) / denom
+            d2 = (log_moneyness - 0.5 * sigma * sigma * t_exp) / denom
 
-        v_pay = (adj_fwd * normcdf(d1) - adj_strike * normcdf(d2)) * index_rpv01
-        v_rec = (adj_strike * normcdf(-d2) - adj_fwd * normcdf(-d1)) * index_rpv01
+            v_pay = (adj_fwd * normcdf(d1) - adj_strike * normcdf(d2)) * index_rpv01
+            v_rec = (adj_strike * normcdf(-d2) - adj_fwd * normcdf(-d1)) * index_rpv01
 
         v_pay *= self.notional
         v_rec *= self.notional
