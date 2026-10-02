@@ -134,9 +134,19 @@ def fast_double_no_touch_pricer(s0, L, U, K, t_exp, opt_type, r_d, r_f, sigma):
         else:  # DOT
             return K * df_d
 
+    b = r_d - r_f
+
+    # With no time or no volatility the FX path is deterministic. A barrier
+    # is touched exactly when the path endpoint lies outside the open interval.
+    if t_exp <= 0.0 or sigma == 0.0:
+        terminal_s = s0 * np.exp((b - 0.5 * sigma * sigma) * t_exp)
+        touched = terminal_s <= L or terminal_s >= U
+        if (opt_type == 2 and touched) or (opt_type != 2 and not touched):
+            return 0.0
+        return K * df_d
+
     # Precompute constants
     Z = np.log(U / L)
-    b = r_d - r_f
     sig2 = sigma * sigma
     term1 = 2.0 * b / sig2 - 1.0
     alpha = -0.5 * term1
@@ -148,7 +158,9 @@ def fast_double_no_touch_pricer(s0, L, U, K, t_exp, opt_type, r_d, r_f, sigma):
     # Heuristic n_max from damping bound
     # exp(-0.5*sig2*(n*pi/Z)^2 * t) <= eps  => n >= ...
     eps = 1e-14
-    base = (Z / (np.pi * sigma * np.sqrt(2.0 * t_exp))) * np.sqrt(np.log(1.0 / eps))
+    base = (Z / (np.pi * sigma)) * np.sqrt(
+        2.0 * np.log(1.0 / eps) / t_exp
+    )
     n_max = int(base) + 5
     if n_max < 50:
         n_max = 50
