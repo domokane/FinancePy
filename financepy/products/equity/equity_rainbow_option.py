@@ -57,6 +57,9 @@ def payoff_value(s, payoff_type_value, payoff_params):
     elif payoff_type_value == EquityRainbowOptionTypes.CALL_ON_NTH.value:
         n = payoff_params[0]
         k = payoff_params[1]
+        if isinstance(n, (bool, np.bool_)) or not float(n).is_integer():
+            raise FinError("Nth parameter must be an integer")
+        n = int(n)
         # sort on asset
         ssorted = np.sort(s, axis=0)
         assetn = ssorted[-n, :]
@@ -64,6 +67,9 @@ def payoff_value(s, payoff_type_value, payoff_params):
     elif payoff_type_value == EquityRainbowOptionTypes.PUT_ON_NTH.value:
         n = payoff_params[0]
         k = payoff_params[1]
+        if isinstance(n, (bool, np.bool_)) or not float(n).is_integer():
+            raise FinError("Nth parameter must be an integer")
+        n = int(n)
         # sort on asset
         ssorted = np.sort(s, axis=0)
         assetn = ssorted[-n, :]
@@ -370,6 +376,8 @@ class EquityRainbowOption(EquityOption):
 
         if payoff_type == EquityRainbowOptionTypes.CALL_ON_NTH or payoff_type == EquityRainbowOptionTypes.PUT_ON_NTH:
             n = payoff_params[0]
+            if isinstance(n, (bool, np.bool_)) or not float(n).is_integer():
+                raise FinError("Nth parameter must be an integer")
             if n < 1 or n > num_assets:
                 raise FinError("Nth parameter must be 1 to " + str(num_assets))
 
