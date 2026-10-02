@@ -124,18 +124,24 @@ class CDSOption:
         forward_rpv01 = cds.rpv01(value_dt, issuer_curve)[DIRTY]
 
         t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        log_moneyness = log(forward_spread / strike)
-
         half_vol_squared_t = 0.5 * volatility * volatility * t_exp
         vol_sqrt_t = volatility * sqrt(t_exp)
 
-        d1 = (log_moneyness + half_vol_squared_t) / vol_sqrt_t
-        d2 = (log_moneyness - half_vol_squared_t) / vol_sqrt_t
-
-        if self.long_protection:
-            option_value = forward_spread * normcdf(d1) - strike * normcdf(d2)
+        if vol_sqrt_t == 0.0:
+            # The Black formula's zero-variance limit is the intrinsic value.
+            if self.long_protection:
+                option_value = max(forward_spread - strike, 0.0)
+            else:
+                option_value = max(strike - forward_spread, 0.0)
         else:
-            option_value = strike * normcdf(-d2) - forward_spread * normcdf(-d1)
+            log_moneyness = log(forward_spread / strike)
+            d1 = (log_moneyness + half_vol_squared_t) / vol_sqrt_t
+            d2 = (log_moneyness - half_vol_squared_t) / vol_sqrt_t
+
+            if self.long_protection:
+                option_value = forward_spread * normcdf(d1) - strike * normcdf(d2)
+            else:
+                option_value = strike * normcdf(-d2) - forward_spread * normcdf(-d1)
 
         option_value = option_value * forward_rpv01
 
