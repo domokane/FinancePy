@@ -726,13 +726,16 @@ Args:
         array-like, strictly positive.
 
 Returns:
-    A tuple ``(full_pv, clean_pv, spread_dv01, ir_dv01, recovery01)``:
-        full_pv: Clean PV plus accrued interest.
-        clean_pv: PV excluding accrued interest.
-        credit01: PV change for a 1 bp increase in the CDS spread.
-        ir01: PV change for a 1 bp increase in the interest rate.
+    A tuple ``(dirty_pv, clean_pv, rpv01_dirty, rpv01_clean,
+    spread_dv01, ir_dv01, recovery01)``:
+        dirty_pv: PV including accrued premium.
+        clean_pv: PV excluding accrued premium.
+        rpv01_dirty: Dirty risky PV01 of the premium leg.
+        rpv01_clean: Clean risky PV01 of the premium leg.
+        spread_dv01: PV change for a 1 bp increase in the CDS spread.
+        ir_dv01: PV change for a 1 bp increase in the interest rate.
         recovery01: PV change for a 1 percentage-point increase in
-            the contractual recovery.
+            recovery.
 
     Elements are floats if every input was scalar, otherwise ndarrays
     with the broadcast shape of the inputs. The sensitivities are
