@@ -17,6 +17,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...models.bs_digital_option import bs_digital_option_value
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_t_exp
+from ...utils.helpers import option_years
 from ...models.model import Model
 
 ########################################################################################
@@ -69,7 +70,8 @@ class EquityDigitalOption(EquityOption):
         barrier at expiry. Handles both cash-or-nothing and asset-or-nothing
         options."""
 
-        t_exp = check_t_exp(value_dt, self.expiry_dt)
+        check_t_exp(value_dt, self.expiry_dt)
+        t_exp = option_years(value_dt, self.expiry_dt)
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
@@ -117,7 +119,8 @@ class EquityDigitalOption(EquityOption):
         Carlo simulation. Product assumes a barrier only at expiry. Monte Carlo
         handles both a cash-or-nothing and an asset-or-nothing option."""
 
-        t_exp = check_t_exp(value_dt, self.expiry_dt)
+        check_t_exp(value_dt, self.expiry_dt)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
