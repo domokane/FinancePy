@@ -1037,7 +1037,7 @@ def datediff(d1: Date, d2: Date) -> int:
 
 
 def from_datetime(dt: datetime.date | datetime.datetime) -> Date:
-    return Date(dt.day, dt.month, dt.year)
+    return Date.from_date(dt)
 
 
 ########################################################################################
