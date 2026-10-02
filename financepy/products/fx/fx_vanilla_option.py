@@ -214,8 +214,8 @@ class FXVanillaOption:
         self.expiry_dt = expiry_dt
         self.delivery_dt = delivery_dt
 
-        if np.any(strike_fx_rate < 0.0):
-            raise FinError("Negative strike.")
+        if np.any(strike_fx_rate <= 0.0):
+            raise FinError("Strike must be greater than zero.")
 
         self.strike_fx_rate = strike_fx_rate
 
