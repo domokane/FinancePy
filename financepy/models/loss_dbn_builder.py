@@ -97,11 +97,15 @@ def portfolio_gcd(actual_losses: Sequence[float]) -> float:
     num_credits = len(actual_losses)
     scaling = 1000000
 
-    temp = (int)(actual_losses[0] * scaling)
+    temp = 0
 
-    for i_credit in range(1, num_credits):
-        num2 = int(actual_losses[i_credit] * scaling)
-        temp = pair_gcd(temp, num2)
+    for i_credit in range(0, num_credits):
+        num2 = int(abs(actual_losses[i_credit]) * scaling)
+        if num2 != 0:
+            if temp == 0:
+                temp = num2
+            else:
+                temp = pair_gcd(temp, num2)
 
     portfolio_gcd = float(temp / scaling)
     return portfolio_gcd
