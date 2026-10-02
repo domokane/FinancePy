@@ -40,6 +40,7 @@ def _barrier_pay_one_at_hit_pv_down(s, h, r, dt):
 
     for ip in range(0, num_paths):
         hit_flag = 0
+        v = 0.0
 
         for it in range(0, num_time_steps):
             if s[ip][it] <= h:
@@ -66,6 +67,7 @@ def _barrier_pay_one_at_hit_pv_up(s, h, r, dt):
 
     for ip in range(0, num_paths):
         hit_flag = 0
+        v = 0.0
 
         for it in range(0, num_time_steps):
             if s[ip][it] >= h:
