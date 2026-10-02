@@ -83,6 +83,16 @@ class FXFixedLookbackOption:
             if s_min > s0:
                 raise FinError("The s_min value must be <= the stock price.")
 
+        if v == 0.0 or t_exp == 0.0:
+            terminal_spot = s0 * exp((r_d - r_f) * t_exp)
+            if self.opt_type == OptionTypes.EUROPEAN_CALL:
+                running_max = max(s_max, terminal_spot)
+                return df * max(running_max - k, 0.0)
+            if self.opt_type == OptionTypes.EUROPEAN_PUT:
+                running_min = min(s_min, terminal_spot)
+                return df * max(k - running_min, 0.0)
+            raise FinError("Unknown lookback option type:" + str(self.opt_type))
+
         # There is a risk of an overflow in the limit of q=r which
         # we remove by adjusting the value of the dividend
         if abs(r_d - r_f) < G_SMALL:

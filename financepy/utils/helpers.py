@@ -26,15 +26,8 @@ def _func_name():
 ########################################################################################
 
 
-def option_years(value_dt: Date, expiry_dt: Date, floor=1e-10, fail=True):
-
-    t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
-
-    if t_exp < 0 and fail is True:
-        raise FinError("Option expires before value date.")
-
-    return t_exp
-
+def option_years(value_dt: Date, expiry_dt: Date, floor=None, fail=True):
+    """Return scalar or vector expiry times with an optional explicit floor."""
     if isinstance(expiry_dt, Date):
         t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
         if t_exp < 0 and fail is True:
@@ -49,8 +42,11 @@ def option_years(value_dt: Date, expiry_dt: Date, floor=1e-10, fail=True):
 
             t_exps.append(t_exp)
         t_exp = np.array(t_exps)
+    else:
+        raise FinError("Expiry date must be a Date or a list of Dates.")
 
-    t_exp = np.maximum(t_exp, floor)
+    if floor is not None:
+        t_exp = np.maximum(t_exp, floor)
 
     return t_exp
 

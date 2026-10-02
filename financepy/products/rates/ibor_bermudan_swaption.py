@@ -145,7 +145,7 @@ class IborBermudanSwaption:
 
             if flow_dt > self.exercise_dt:
                 cpn_time = (flow_dt - value_dt) / G_DAYS_IN_YEAR
-                cpn_flow = swap.fixed_leg.payments[i_flow - 1] / self.notional
+                cpn_flow = swap.fixed_leg.payments[i_flow] / self.notional
                 cpn_times.append(cpn_time)
                 cpn_flows.append(cpn_flow)
 

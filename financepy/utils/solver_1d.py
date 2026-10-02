@@ -338,7 +338,7 @@ def newton(
             fun_calls += 1
             # If fval is 0, a root has been found, then terminate
             if fval == 0:
-                return p0
+                return _return_result(p0, True, itr)
             fder = fprime(p0, *args)
             fun_calls += 1
 

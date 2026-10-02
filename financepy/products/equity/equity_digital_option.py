@@ -74,6 +74,25 @@ class EquityDigitalOption(EquityOption):
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
+        if t_exp == 0.0:
+            scalar_input = np.isscalar(stock_price)
+            stock_price = np.asarray(stock_price, dtype=float)
+            if self.call_put_type == OptionTypes.EUROPEAN_CALL:
+                event = stock_price > self.barrier
+            else:
+                event = stock_price < self.barrier
+
+            if self.digital_type == DigitalOptionTypes.CASH_OR_NOTHING:
+                payoff = event.astype(float)
+            elif self.digital_type == DigitalOptionTypes.ASSET_OR_NOTHING:
+                payoff = stock_price * event
+            else:
+                raise FinError("Unknown digital option type.")
+
+            if scalar_input:
+                return float(payoff)
+            return payoff
+
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
@@ -103,6 +122,18 @@ class EquityDigitalOption(EquityOption):
 
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
+
+        if t_exp == 0.0:
+            if self.call_put_type == OptionTypes.EUROPEAN_CALL:
+                event = stock_price > self.barrier
+            else:
+                event = stock_price < self.barrier
+
+            if self.digital_type == DigitalOptionTypes.CASH_OR_NOTHING:
+                return float(event)
+            if self.digital_type == DigitalOptionTypes.ASSET_OR_NOTHING:
+                return float(stock_price if event else 0.0)
+            raise FinError("Unknown digital option type.")
 
         np.random.seed(seed)
 
