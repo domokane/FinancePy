@@ -78,9 +78,43 @@ class EquityBarrierOption(EquityOption):
         """
 
         t_exp = option_years(value_dt, self.expiry_dt)
+        if t_exp < 0.0:
+            raise FinError("Value date is after option expiry date.")
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
         check_stock_price(stock_price)
+
+        if t_exp == 0.0:
+            spots = np.asarray(stock_price, dtype=float)
+            is_down = self.barrier_type in (
+                BarrierTypes.DOWN_AND_OUT_CALL,
+                BarrierTypes.DOWN_AND_IN_CALL,
+                BarrierTypes.DOWN_AND_OUT_PUT,
+                BarrierTypes.DOWN_AND_IN_PUT,
+            )
+            is_in = self.barrier_type in (
+                BarrierTypes.DOWN_AND_IN_CALL,
+                BarrierTypes.UP_AND_IN_CALL,
+                BarrierTypes.UP_AND_IN_PUT,
+                BarrierTypes.DOWN_AND_IN_PUT,
+            )
+            is_call = self.barrier_type in (
+                BarrierTypes.DOWN_AND_OUT_CALL,
+                BarrierTypes.DOWN_AND_IN_CALL,
+                BarrierTypes.UP_AND_OUT_CALL,
+                BarrierTypes.UP_AND_IN_CALL,
+            )
+            touched = (
+                spots <= self.barrier_level if is_down else spots >= self.barrier_level
+            )
+            payoff = (
+                np.maximum(spots - self.strike_price, 0.0)
+                if is_call
+                else np.maximum(self.strike_price - spots, 0.0)
+            )
+            values = np.where(touched if is_in else ~touched, payoff, 0.0)
+            return values * self.notional
 
         values = []
 
