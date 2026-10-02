@@ -108,7 +108,7 @@ class EquityFixedLookbackOption(EquityOption):
             return max(k - min(s0, s_min), 0.0)
 
         if v == 0.0:
-            terminal_stock = s0 * exp((r - q) * t_exp)
+            terminal_stock = s0 * np.exp((r - q) * t_exp)
             if self.opt_type == OptionTypes.EUROPEAN_CALL:
                 maximum = max(s_max, s0, terminal_stock)
                 return df * max(maximum - k, 0.0)
