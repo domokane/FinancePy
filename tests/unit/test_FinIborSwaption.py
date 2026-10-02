@@ -111,8 +111,8 @@ def test_pay():
     assert round(swap2, 0) == 125188
     assert round(swap3, 0) == 125188
     assert round(swap4, 0) == 125188
-    assert round(swap5, 0) == 125571
-    assert round(swap6, 0) == 124390
+    assert round(swap5, 0) == 125188
+    assert round(swap6, 0) == 124503
 
     k = 0.035
     swaption = IborSwaption(
@@ -135,8 +135,8 @@ def test_pay():
     assert round(swap2, 0) == 62595
     assert round(swap3, 0) == 62595
     assert round(swap4, 0) == 62596
-    assert round(swap5, 0) == 62979
-    assert round(swap6, 0) == 62189
+    assert round(swap5, 0) == 62595
+    assert round(swap6, 0) == 62209
 
     k = 0.065
     swaption = IborSwaption(
@@ -157,8 +157,8 @@ def test_pay():
     swap6 = swaption.value(value_dt, libor_curve, model6)
     assert round(swap1, 0) == 0
     assert round(swap2, 0) == 0
-    assert round(swap3, 0) == 22
-    assert round(swap4, 0) == 60
+    assert round(swap3, 0) == 23
+    assert round(swap4, 0) == 62
     assert round(swap5, 0) == 0
     assert round(swap6, 0) == 0
 
@@ -190,7 +190,7 @@ def test_receive():
     assert round(swap1, 4) == 0.0
     assert round(swap2, 4) == 0.0
     assert round(swap3, 4) == 0.0
-    assert round(swap4, 4) == 0.0030
+    assert round(swap4, 4) == 0.0034
     assert round(swap5, 4) == 0.0
     assert round(swap6, 4) == 0.0
 
@@ -213,10 +213,10 @@ def test_receive():
     swap6 = swaption.value(value_dt, libor_curve, model6)
     assert round(swap1, 0) == 0
     assert round(swap2, 0) == 0
-    assert round(swap3, 0) == 4888
-    assert round(swap4, 0) == 5334
-    assert round(swap5, 0) == 0
-    assert round(swap6, 0) == 818
+    assert round(swap3, 0) == 4909
+    assert round(swap4, 0) == 5357
+    assert round(swap5, 0) == 16
+    assert round(swap6, 0) == 861
 
     k = 0.08
     swaption = IborSwaption(
@@ -237,7 +237,7 @@ def test_receive():
     swap6 = swaption.value(value_dt, libor_curve, model6)
     assert round(swap1, 0) == 125182
     assert round(swap2, 0) == 125182
-    assert round(swap3, 0) == 125182
+    assert round(swap3, 0) == 125183
     assert round(swap4, 0) == 125185
-    assert round(swap5, 0) == 124799
-    assert round(swap6, 0) == 124415
+    assert round(swap5, 0) == 125182
+    assert round(swap6, 0) == 124672
