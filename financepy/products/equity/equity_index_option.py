@@ -64,6 +64,10 @@ class EquityIndexOption:
         check_curve_dt(value_dt, discount_curve)
 
         t_exp = option_years(value_dt, self.expiry_dt)
+        if np.any(t_exp < 0.0):
+            raise FinError("Valuation date after expiry date.")
+
+        at_expiry = np.asarray(t_exp) == 0.0
         t_exp = np.maximum(t_exp, 1e-10)
 
         if np.any(forward_price <= 0.0):
@@ -77,6 +81,13 @@ class EquityIndexOption:
             value = model.value(forward_price, k, t_exp, df, self.opt_type)
         else:
             raise FinError("Unknown Model Type")
+
+        if np.any(at_expiry):
+            if self.opt_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.AMERICAN_CALL):
+                expiry_value = np.maximum(forward_price - k, 0.0)
+            else:
+                expiry_value = np.maximum(k - forward_price, 0.0)
+            value = np.where(at_expiry, expiry_value, value)
 
         value = value * self.num_options
         return value
