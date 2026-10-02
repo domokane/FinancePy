@@ -102,6 +102,19 @@ class EquityFixedLookbackOption(EquityOption):
             if s_min > s0:
                 raise FinError("The Smin value must be <= the stock price.")
 
+        if t_exp == 0.0:
+            if self.opt_type == OptionTypes.EUROPEAN_CALL:
+                return max(max(s0, s_max) - k, 0.0)
+            return max(k - min(s0, s_min), 0.0)
+
+        if v == 0.0:
+            terminal_stock = s0 * exp((r - q) * t_exp)
+            if self.opt_type == OptionTypes.EUROPEAN_CALL:
+                maximum = max(s_max, s0, terminal_stock)
+                return df * max(maximum - k, 0.0)
+            minimum = min(s_min, s0, terminal_stock)
+            return df * max(k - minimum, 0.0)
+
         # There is a risk of an overflow in the limit of q=r which
         # we remove by adjusting the value of the dividend
         if abs(r - q) < G_SMALL:
