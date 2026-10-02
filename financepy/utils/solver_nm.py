@@ -46,7 +46,8 @@ def nelder_mead(
     args : tuple
         Extra arguments to fun
     tol_f, tol_x : float
-        Tolerances for convergence
+        Maximum objective spread and coordinate spread for convergence.
+        Both tolerances must be satisfied by the final simplex.
     max_iter : int
         Maximum iterations
     roh, chi, v, sigma : float
@@ -65,12 +66,8 @@ def nelder_mead(
         f_val[i] = fun(vertices[i], *args)
 
     sort_ind = f_val.argsort()
-    lv_ratio = 1.0
     nit = 0
     x_bar = vertices[sort_ind[:n]].sum(axis=0) / n
-    sigma_n = sigma**n
-    rohv = roh * v
-    rohchi = roh * chi
 
     while True:
         shrink = False
@@ -78,10 +75,10 @@ def nelder_mead(
         worst_val_idx = sort_ind[n]
 
         term_f = f_val[worst_val_idx] - f_val[best_val_idx] < tol_f
-        term_x = lv_ratio < tol_x
+        term_x = np.max(np.abs(vertices - vertices[best_val_idx])) < tol_x
         fail = nit >= max_iter
 
-        if term_f or term_x or fail:
+        if (term_f and term_x) or fail:
             break
 
         # Step 2: Reflection
@@ -90,30 +87,24 @@ def nelder_mead(
 
         if f_val[best_val_idx] <= f_r < f_val[sort_ind[n - 1]]:
             vertices[worst_val_idx] = x_r
-            lv_ratio *= roh
 
         elif f_r < f_val[best_val_idx]:
             x_e = x_bar + chi * (x_r - x_bar)
             f_e = fun(x_e, *args)
             if f_e < f_r:
                 vertices[worst_val_idx] = x_e
-                lv_ratio *= rohchi
             else:
                 vertices[worst_val_idx] = x_r
-                lv_ratio *= roh
         else:
             # Contraction
             if f_r < f_val[worst_val_idx]:
                 x_c = x_bar + v * (x_r - x_bar)
-                lv_ratio_update = rohv
             else:
                 x_c = x_bar - v * (x_r - x_bar)
-                lv_ratio_update = v
 
             f_c = fun(x_c, *args)
             if f_c < min(f_r, f_val[worst_val_idx]):
                 vertices[worst_val_idx] = x_c
-                lv_ratio *= lv_ratio_update
             else:
                 # Shrink
                 shrink = True
@@ -127,7 +118,6 @@ def nelder_mead(
                     + sigma * (x_bar - best_vertex)
                     + (vertices[worst_val_idx] - vertices[sort_ind[n]]) / n
                 )
-                lv_ratio *= sigma_n
 
         if not shrink:
             f_val[worst_val_idx] = fun(vertices[worst_val_idx], *args)
