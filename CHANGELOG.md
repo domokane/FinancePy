@@ -1,5 +1,11 @@
 ## CHANGE LOG
+1 Oct 2026
+- EquityCliquetOption now allows price and return-based payoffs
+- EquityCliquetOption now allows payoffs at period end or at expiry
+- Added Monte Carlo pricer to EquityCliquetOption
+
 30 Sep 2026
+- EquityAsianOption inherits EquityOption enabling it to get all Greeks for free
 - Renamed functions in utils.stats.py to std_err and std_dev
 - Introduce MCResult to encapsulate monte carlo value and standard error
 - Applied MCResult to Asian options and Equity vanilla options

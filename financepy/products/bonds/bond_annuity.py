@@ -102,10 +102,6 @@ class BondAnnuity:
 
     def calculate_payments(self, settle_dt: Date, face: float):
         """Calculate bond payments"""
-        # No need to generate flows if settlement date has not changed
-        if settle_dt == self.settle_dt:
-            return
-
         if settle_dt == self.maturity_dt:
             raise FinError("Settlement date is maturity date.")
 

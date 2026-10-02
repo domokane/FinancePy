@@ -94,7 +94,6 @@ class DiscountCurve:
         self._dfs = np.array(self._dfs)
 
         if test_monotonicity(self._times) is False:
-            print(self._times)
             raise FinError("Times are not sorted in increasing order")
 
         self.freq_type = FrequencyTypes.CONTINUOUS

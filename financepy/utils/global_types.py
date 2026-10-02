@@ -16,6 +16,16 @@ class BlackTypes(Enum):
     CRR_TREE = 2
 
 
+class CliquetTypes(Enum):
+    PRICE = 1
+    RETURN = 2
+
+
+class PaymentTimingTypes(Enum):
+    PERIODIC = 1
+    MATURITY = 2
+
+
 class VolFuncTypes(Enum):
 
     CLARK = 0
@@ -177,15 +187,44 @@ class SolverTypes(Enum):
 class TouchOptionTypes(Enum):
     """Enumeration of touch option types."""
 
-    DOWN_AND_IN_CASH_AT_HIT = 1  # s0>H pays $1 at hit time from above
-    UP_AND_IN_CASH_AT_HIT = 2  # s0<H pays $1 at hit time from below
-    DOWN_AND_IN_CASH_AT_EXPIRY = 3  # s0>H pays $1 at T if hit from below
-    UP_AND_IN_CASH_AT_EXPIRY = 4  # s0<H pays $1 at T if hit from below
-    DOWN_AND_OUT_CASH_OR_NOTHING = 5  # s0>H pays $1 at T if S>H for all t<T
-    UP_AND_OUT_CASH_OR_NOTHING = 6  # s0<H pays $1 at T if S<H for all t<T
-    DOWN_AND_IN_ASSET_AT_HIT = 7  # s0>H pays H at hit time from above
-    UP_AND_IN_ASSET_AT_HIT = 8  # s0>H pays H at hit time from below
-    DOWN_AND_IN_ASSET_AT_EXPIRY = 9  # s0>H pays S(T) at T if S<H for t < T
-    UP_AND_IN_ASSET_AT_EXPIRY = 10  # s0<H pays S(T) at T if S>H for t < T
-    DOWN_AND_OUT_ASSET_OR_NOTHING = 11  # s0>H pays S(T) at T if S>H for t < T
-    UP_AND_OUT_ASSET_OR_NOTHING = 12  # s0<H pays S(T) at T if S<H for t < T
+    # Cash one-touch: pays $1 when the barrier is hit
+    DOWN_AND_IN_CASH_AT_HIT = 1
+    # s0 > H; pays $1 at the first time S(t) <= H
+
+    UP_AND_IN_CASH_AT_HIT = 2
+    # s0 < H; pays $1 at the first time S(t) >= H
+
+    # Cash one-touch: pays $1 at expiry if the barrier has been hit
+    DOWN_AND_IN_CASH_AT_EXPIRY = 3
+    # s0 > H; pays $1 at T if min S(t) <= H
+
+    UP_AND_IN_CASH_AT_EXPIRY = 4
+    # s0 < H; pays $1 at T if max S(t) >= H
+
+    # Cash no-touch: pays $1 at expiry if the barrier is never hit
+    DOWN_AND_OUT_CASH_OR_NOTHING = 5
+    # s0 > H; pays $1 at T if min S(t) > H
+
+    UP_AND_OUT_CASH_OR_NOTHING = 6
+    # s0 < H; pays $1 at T if max S(t) < H
+
+    # Asset one-touch: pays the asset/barrier value when the barrier is hit
+    DOWN_AND_IN_ASSET_AT_HIT = 7
+    # s0 > H; pays H at the first time S(t) <= H
+
+    UP_AND_IN_ASSET_AT_HIT = 8
+    # s0 < H; pays H at the first time S(t) >= H
+
+    # Asset-or-nothing knock-in: pays S(T) at expiry if barrier is hit
+    DOWN_AND_IN_ASSET_AT_EXPIRY = 9
+    # s0 > H; pays S(T) at T if min S(t) <= H
+
+    UP_AND_IN_ASSET_AT_EXPIRY = 10
+    # s0 < H; pays S(T) at T if max S(t) >= H
+
+    # Asset-or-nothing knock-out: pays S(T) if barrier is never hit
+    DOWN_AND_OUT_ASSET_OR_NOTHING = 11
+    # s0 > H; pays S(T) at T if min S(t) > H
+
+    UP_AND_OUT_ASSET_OR_NOTHING = 12
+    # s0 < H; pays S(T) at T if max S(t) < H
