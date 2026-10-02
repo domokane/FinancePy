@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import pytest
+
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.day_count import DayCountTypes
@@ -7,6 +9,7 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.date import Date
 from financepy.products.bonds.bond_annuity import BondAnnuity
+from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 ########################################################################################
 
@@ -209,6 +212,27 @@ def test_forward_gen_with_long_end_stub__bond_annuity():
     assert round(annuity.flow_amounts[-1]) == 25417.0
 
     assert annuity.accrued_interest(settle_dt, face) == 0.0
+
+
+def test_bond_annuity_rebuilds_flows_when_face_changes_at_same_settlement():
+    settle_dt = Date(20, 6, 2018)
+    annuity = BondAnnuity(
+        Date(20, 6, 2019),
+        0.05,
+        FrequencyTypes.SEMI_ANNUAL,
+        DayCountTypes.ACT_360,
+    )
+
+    annuity.calculate_payments(settle_dt, 1.0)
+    one_unit_coupon = annuity.flow_amounts[1]
+    annuity.calculate_payments(settle_dt, 100.0)
+
+    assert annuity.flow_amounts[1] == pytest.approx(100.0 * one_unit_coupon)
+
+    curve = FlatDiscountCurve(settle_dt, 0.0)
+    price = annuity.dirty_price_from_discount_curve(settle_dt, curve)
+    expected = 100.0 * 0.05 * (183.0 + 182.0) / 360.0
+    assert price == pytest.approx(expected)
 
 
 ########################################################################################
