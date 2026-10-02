@@ -22,6 +22,17 @@ from ...models.black_scholes import BlackScholes
 from ...models.model import Model
 from ...market.curves.discount_curve import DiscountCurve
 
+
+def _standardized_distance(numerator, denominator):
+    """Divide by volatility time, using the deterministic zero-variance limit."""
+    numerator, denominator = np.broadcast_arrays(numerator, denominator)
+    result = np.zeros(numerator.shape, dtype=float)
+    np.divide(numerator, denominator, out=result, where=denominator != 0.0)
+    result = np.where((denominator == 0.0) & (numerator > 0.0), np.inf, result)
+    result = np.where((denominator == 0.0) & (numerator < 0.0), -np.inf, result)
+    return result
+
+
 ########################################################################################
 
 
@@ -129,13 +140,20 @@ class FXDigitalOption:
         if not isinstance(model, BlackScholes):
             raise FinError("Model must be BlackScholes.")
 
-        f = spot_fx_rate * for_df / dom_df
+        # The time floor above is only for curve evaluation; at expiry the
+        # event is determined by spot, with no forward drift.
+        if t_exp == 0.0:
+            f = spot_fx_rate
+        else:
+            f = spot_fx_rate * for_df / dom_df
         k = self.strike_fx_rate
         v = model.volatility
         vol_sqrt_t = v * np.sqrt(t_exp)
 
-        d1 = (np.log(f / k) + 0.5 * (v**2) * t_exp) / vol_sqrt_t
-        d2 = d1 - vol_sqrt_t
+        d1_numerator = np.log(f / k) + 0.5 * (v**2) * t_exp
+        d2_numerator = d1_numerator - (v**2) * t_exp
+        d1 = _standardized_distance(d1_numerator, vol_sqrt_t)
+        d2 = _standardized_distance(d2_numerator, vol_sqrt_t)
 
         if self.opt_type == OptionTypes.DIGITAL_CALL and self.for_name == self.prem_currency:
             v = spot_fx_rate * for_df * normcdf_vect(d1)
