@@ -189,6 +189,9 @@ def tranche_surv_prob_recursion(
     else:
         gcd = portfolio_gcd(loss_amounts)
 
+    if gcd == 0.0:
+        return 1.0
+
     loss_units = np.zeros(num_credits)
     num_loss_units = 1  # this is the zero loss
 

@@ -225,3 +225,23 @@ def test_generate_is_idempotent_when_termination_date_is_adjusted():
     # Products build a schedule and call generate() on it, e.g. the swap legs
     schedule = Schedule(d1, d2, FrequencyTypes.QUARTERLY)
     assert schedule.generate() == list(schedule.adjusted_dts)
+
+
+def test_forward_schedule_preserves_weekend_effective_date():
+    effective_dt = Date(20, 6, 2020)  # Saturday
+    termination_dt = Date(20, 8, 2020)
+    schedule = Schedule(
+        effective_dt,
+        termination_dt,
+        FrequencyTypes.MONTHLY,
+        CalendarTypes.WEEKEND,
+        BusDayAdjustTypes.FOLLOWING,
+        DateGenRuleTypes.FORWARD,
+        False,
+    )
+
+    assert schedule.schedule_dts() == [
+        effective_dt,
+        Date(20, 7, 2020),
+        termination_dt,
+    ]

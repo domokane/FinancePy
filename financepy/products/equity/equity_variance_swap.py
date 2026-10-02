@@ -68,6 +68,9 @@ class EquityVarianceSwap:
         volatility to the valuation date, the forward looking implied
         volatility to the maturity date using the libor discount curve."""
 
+        if value_dt < self.start_dt or value_dt > self.maturity_dt:
+            raise FinError("Valuation date must be within the variance swap life")
+
         t1 = (value_dt - self.start_dt) / G_DAYS_IN_YEAR
         t2 = (self.maturity_dt - self.start_dt) / G_DAYS_IN_YEAR
 
@@ -89,6 +92,9 @@ class EquityVarianceSwap:
         """This is an approximation of the fair strike variance by Demeterfi
         et al. (1999) which assumes that sigma(K) = sigma(F) - b(K-F)/F where
         F is the forward stock price and sigma(F) is the ATM forward vol."""
+
+        if value_dt < self.start_dt or value_dt >= self.maturity_dt:
+            raise FinError("Valuation date must be before maturity and on or after start")
 
         f = fwd_stock_price
 
@@ -123,6 +129,9 @@ class EquityVarianceSwap:
         using a static replication methodology with a specially weighted
         portfolio of put and call options across a range of strikes using the
         approximate method set out by Demeterfi et al. 1999."""
+
+        if value_dt < self.start_dt or value_dt >= self.maturity_dt:
+            raise FinError("Valuation date must be before maturity and on or after start")
 
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)

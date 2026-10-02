@@ -45,7 +45,7 @@ class EquityCompoundOption(EquityOption):
 
         check_argument_types(self.__init__, locals())
 
-        if c_expiry_dt > u_expiry_dt:
+        if c_expiry_dt >= u_expiry_dt:
             raise FinError("Compound expiry date must precede underlying expiry date")
 
         if c_opt_type not in (
