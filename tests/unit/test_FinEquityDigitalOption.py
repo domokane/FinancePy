@@ -1,5 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+import pytest
+
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.global_types import DigitalOptionTypes
 from financepy.products.equity.equity_digital_option import EquityDigitalOption
@@ -22,6 +25,34 @@ dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 model = BlackScholes(volatility)
 
 num_paths = 40000
+
+
+@pytest.mark.parametrize("call_put", [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT])
+@pytest.mark.parametrize("digital_type", [DigitalOptionTypes.CASH_OR_NOTHING, DigitalOptionTypes.ASSET_OR_NOTHING])
+@pytest.mark.parametrize("spot", [90.0, 100.0, 110.0])
+def test_expiry_analytic_and_mc_match_strict_event_payoff(call_put, digital_type, spot):
+    """At expiry neither path simulates a future crossing of the barrier."""
+    curve = FlatDiscountCurve(expiry_dt, 0.05)
+    option = EquityDigitalOption(expiry_dt, 100.0, call_put, digital_type)
+    event = spot > 100.0 if call_put == OptionTypes.EUROPEAN_CALL else spot < 100.0
+    expected = float(event)
+    if digital_type == DigitalOptionTypes.ASSET_OR_NOTHING:
+        expected *= spot
+    assert option.value(expiry_dt, spot, curve, curve, model) == expected
+    assert option.value_mc(expiry_dt, spot, curve, curve, model) == expected
+
+
+@pytest.mark.parametrize("call_put", [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT])
+@pytest.mark.parametrize("digital_type", [DigitalOptionTypes.CASH_OR_NOTHING, DigitalOptionTypes.ASSET_OR_NOTHING])
+def test_expiry_analytic_preserves_vector_payoffs(call_put, digital_type):
+    """Analytic vector inputs retain one deterministic payoff per stock."""
+    curve = FlatDiscountCurve(expiry_dt, 0.05)
+    option = EquityDigitalOption(expiry_dt, 100.0, call_put, digital_type)
+    spots = np.array([90.0, 100.0, 110.0])
+    expected = np.array([0.0, 0.0, 1.0]) if call_put == OptionTypes.EUROPEAN_CALL else np.array([1.0, 0.0, 0.0])
+    if digital_type == DigitalOptionTypes.ASSET_OR_NOTHING:
+        expected *= spots
+    np.testing.assert_array_equal(option.value(expiry_dt, spots, curve, curve, model), expected)
 
 ########################################################################################
 
