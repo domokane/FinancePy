@@ -301,7 +301,7 @@ class CDSTranche:
         s += label_to_string("RUNNING COUPON", self.running_cpn * 10000, "bp\n")
         s += label_to_string("LONG PROTECTION", self.long_protect)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAYCOUNT", self.dc_type)
+        s += label_to_string("DAYCOUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
         s += label_to_string("DATE_GEN_RULE", self.dg_type)
