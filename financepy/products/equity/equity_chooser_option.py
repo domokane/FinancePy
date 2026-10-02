@@ -255,6 +255,21 @@ class EquityChooserOption(EquityOption):
     ):
         """Value the complex chooser option Monte Carlo."""
 
+        if isinstance(value_dt, Date) is False:
+            raise FinError("Valuation date is not a Date")
+
+        if value_dt > self.choose_dt:
+            raise FinError("Value date after choose date.")
+
+        if value_dt > self.call_expiry_dt:
+            raise FinError("Valuation date after call expiry date.")
+
+        if value_dt > self.put_expiry_dt:
+            raise FinError("Valuation date after put expiry date.")
+
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+
         if value_dt == self.choose_dt:
             v = self.value_dt_on_choose_dt(value_dt, stock_price, discount_curve, dividend_curve, model)
             return v
