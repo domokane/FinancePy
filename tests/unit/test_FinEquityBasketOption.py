@@ -1,12 +1,14 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import numpy as np
+import pytest
 
 from financepy.utils.date import Date
 from financepy.utils.helpers import beta_vector_to_corr_matrix
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.global_types import OptionTypes
 from financepy.products.equity.equity_basket_option import EquityBasketOption
+from financepy.utils.error import FinError
 
 
 value_dt = Date(1, 1, 2015)
@@ -19,6 +21,37 @@ beta = 0.999999
 betas = np.ones(num_assets) * beta
 corr_matrix = beta_vector_to_corr_matrix(betas)
 num_paths = 10000
+
+
+@pytest.mark.parametrize("opt_type,strike,expected", [
+    (OptionTypes.EUROPEAN_CALL, 95.0, 10.0),
+    (OptionTypes.EUROPEAN_CALL, 105.0, 0.0),
+    (OptionTypes.EUROPEAN_CALL, 115.0, 0.0),
+    (OptionTypes.EUROPEAN_PUT, 95.0, 0.0),
+    (OptionTypes.EUROPEAN_PUT, 105.0, 0.0),
+    (OptionTypes.EUROPEAN_PUT, 115.0, 10.0),
+])
+def test_expiry_payoff_on_inhomogeneous_equally_weighted_basket(opt_type, strike, expected):
+    """At expiry the payoff depends on the observed basket, not variance."""
+    curve = FlatDiscountCurve(expiry_dt, 0.05)
+    option = EquityBasketOption(expiry_dt, strike, opt_type, 2)
+    value = option.value(
+        expiry_dt, np.array([90.0, 120.0]), curve, [curve, curve],
+        np.array([0.2, 0.4]), np.eye(2),
+    )
+    assert value == expected
+
+
+def test_post_expiry_valuation_is_rejected():
+    """No remaining-time approximation is used after the contract expires."""
+    after = expiry_dt.add_days(1)
+    curve = FlatDiscountCurve(after, 0.05)
+    option = EquityBasketOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL, 2)
+    with pytest.raises(FinError):
+        option.value(
+            after, np.array([90.0, 120.0]), curve, [curve, curve],
+            np.array([0.2, 0.4]), np.eye(2),
+        )
 
 ########################################################################################
 
