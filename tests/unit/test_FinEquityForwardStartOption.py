@@ -4,6 +4,7 @@
 
 import numpy as np
 import pytest
+from financepy.utils.error import FinError
 
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
@@ -26,6 +27,22 @@ dividend_yield = 0.02
 model = BlackScholes(volatility)
 discount_curve = FlatDiscountCurve(value_dt, interest_rate)
 dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
+
+
+@pytest.mark.parametrize("spot", [0.0, -1.0, np.nan, np.inf, -np.inf, np.array([100.0, np.nan]), np.array([])])
+def test_forward_start_rejects_invalid_stock_prices(spot):
+    """Invalid stock levels fail with FinError before pricing cashflows."""
+    option = EquityForwardStartOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL, FrequencyTypes.ANNUAL)
+    with pytest.raises(FinError, match="Stock price"):
+        option.value(value_dt, spot, discount_curve, dividend_curve, model)
+
+
+def test_forward_start_preserves_valid_vector_price_scaling():
+    """The validator preserves vector prices and homogeneous payoff scaling."""
+    option = EquityForwardStartOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL, FrequencyTypes.ANNUAL)
+    scalar = option.value(value_dt, 100.0, discount_curve, dividend_curve, model)
+    vector = option.value(value_dt, np.array([100.0, 200.0]), discount_curve, dividend_curve, model)
+    np.testing.assert_allclose(vector, [scalar, 2 * scalar])
 
 
 ########################################################################################

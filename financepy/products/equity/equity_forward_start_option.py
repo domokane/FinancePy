@@ -17,6 +17,7 @@ from ...utils.calendar import CalendarTypes, DateGenRuleTypes
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.flat_discount_curve import DiscountCurve
 from ...utils.check_values import check_curve_dt
+from ...utils.check_values import check_stock_price
 from ...utils.helpers import option_years
 
 from ...models.black_scholes_analytic import european_value
@@ -118,6 +119,8 @@ class EquityForwardStartOption(EquityOption):
 
         if not isinstance(model, BlackScholes):
             raise FinError("Unknown Model Type")
+
+        check_stock_price(stock_price)
 
         s0 = stock_price
         fwd_vol = max(model.volatility, 1e-6)
