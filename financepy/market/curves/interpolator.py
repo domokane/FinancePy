@@ -123,17 +123,22 @@ def _uinterpolate(t: float, times: np.ndarray, dfs: np.ndarray, method: int) -> 
     i = _find_interval(t, times)
 
     if method == InterpTypes.LINEAR_ZERO_RATES.value:
-        if i == 1:
+        if i == 1 and times[0] == 0.0:
             r1 = -np.log(dfs[1]) / times[1]
             r2 = r1
             dt = times[1] - times[0]
             r = ((times[1] - t) * r1 + (t - times[0]) * r2) / dt
             return np.exp(-r * t)
         if i < n:
-            r1 = -np.log(dfs[i - 1]) / times[i - 1]
-            r2 = -np.log(dfs[i]) / times[i]
-            dt = times[i] - times[i - 1]
-            r = ((times[i] - t) * r1 + (t - times[i - 1]) * r2) / dt
+            left = i - 1
+            right = i
+            if left < 0:
+                left = 0
+                right = 1
+            r1 = -np.log(dfs[left]) / times[left]
+            r2 = -np.log(dfs[right]) / times[right]
+            dt = times[right] - times[left]
+            r = ((times[right] - t) * r1 + (t - times[left]) * r2) / dt
             return np.exp(-r * t)
         r1 = -np.log(dfs[n - 1]) / times[n - 1]
         r2 = r1
