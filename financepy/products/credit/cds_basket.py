@@ -192,8 +192,9 @@ class CDSBasket:
         num_payments = len(payment_dts)
         day_count = DayCount(self.accrual_dc_type)
 
-        # First accrual start date (stub handling)
-        accrual_start_dt = getattr(self.cds_contract, "accrual_start_dt", payment_dts[0])
+        # CDS stores one accrual start per payment period. Use its first date
+        # so the initial stub is included in both scheduled and default accrual.
+        accrual_start_dt = self.cds_contract.accrual_start_dts[0]
 
         # Times in years from value_dt
         pay_times = np.array(
