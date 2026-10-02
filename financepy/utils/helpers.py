@@ -63,7 +63,6 @@ def grid_index(t, grid_times: np.ndarray):
     for i in range(0, n):
         grid_time = grid_times[i]
         if abs(grid_time - t) < G_SMALL:
-            print(t, grid_times, i)
             return i
 
     raise FinError("Grid index not found")
