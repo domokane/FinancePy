@@ -342,9 +342,14 @@ def interpolate(
     times = np.asarray(times, dtype=np.float64)
     dfs = np.asarray(dfs, dtype=np.float64)
     if isinstance(t, (float, np.float64)):
+        if not np.isfinite(t):
+            raise FinError("Interpolation times must be finite.")
         return _uinterpolate(float(t), times, dfs, int(method))
     if isinstance(t, np.ndarray):
-        return _vinterpolate(np.asarray(t, dtype=np.float64), times, dfs, int(method))
+        t = np.asarray(t, dtype=np.float64)
+        if not np.all(np.isfinite(t)):
+            raise FinError("Interpolation times must be finite.")
+        return _vinterpolate(t, times, dfs, int(method))
     raise FinError(f"Unknown input type {type(t)}")
 
 
@@ -381,6 +386,10 @@ class Interpolator:
             raise FinError("times and dfs must be one-dimensional arrays.")
         if times.size != dfs.size:
             raise FinError("times and dfs must have the same length.")
+        if not np.all(np.isfinite(times)):
+            raise FinError("Curve times must be finite.")
+        if not np.all(np.isfinite(dfs)):
+            raise FinError("Discount factors must be finite.")
         if np.any(times < 0.0):
             raise FinError("Curve times must be non-negative.")
         if np.any(dfs <= 0.0):
@@ -452,6 +461,8 @@ class Interpolator:
         else:
             raise FinError(f"t is not a recognized type: {type(t)}")
 
+        if not np.all(np.isfinite(tvec)):
+            raise FinError("Interpolation times must be finite.")
         if np.any(tvec < 0.0):
             raise FinError("Interpolation times must be non-negative.")
 
