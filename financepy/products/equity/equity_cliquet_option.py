@@ -105,6 +105,9 @@ class EquityCliquetOption(EquityOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
+        if value_dt < self.start_dt:
+            raise FinError("Value date before start date.")
+
         if value_dt > self.final_expiry_dt:
             raise FinError("Value date after final expiry date.")
 
