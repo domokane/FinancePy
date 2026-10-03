@@ -99,10 +99,8 @@ def nelder_mead(
             # Contraction
             if f_r < f_val[worst_val_idx]:
                 x_c = _clip_to_bounds(x_bar + v * (x_r - x_bar), bounds)
-                lv_ratio_update = rohv
             else:
                 x_c = _clip_to_bounds(x_bar - v * (x_r - x_bar), bounds)
-                lv_ratio_update = v
 
             f_c = fun(x_c, *args)
             if f_c < min(f_r, f_val[worst_val_idx]):
