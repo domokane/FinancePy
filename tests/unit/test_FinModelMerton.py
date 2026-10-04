@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import numpy as np
+import pytest
 from financepy.models.merton_firm_mkt import MertonFirmMkt
 from financepy.models.merton_firm import MertonFirm
 
@@ -124,3 +125,26 @@ def test_merton():
     assert model.asset_to_debt_ratio() == 1.4
     assert round(model.physical_default_probability(), 4) == 0.0334
     assert round(model.distance_to_default(), 4) == 1.8324
+
+
+def test_market_calibration_is_invariant_to_monetary_units():
+    equity = 45.63363370957471
+    equity_volatility = 0.7306450094667433
+    calibrated = []
+
+    for unit in (1.0, 1.0e6):
+        model = MertonFirmMkt(
+            equity * unit,
+            100.0 * unit,
+            1.0,
+            0.05,
+            0.05,
+            equity_volatility,
+        )
+        calibrated.append(
+            (float(model.asset_volatility()), float(model.equity_volatility()))
+        )
+
+    assert calibrated[1][0] == pytest.approx(calibrated[0][0], rel=1.0e-10)
+    assert calibrated[1][1] == pytest.approx(equity_volatility, rel=1.0e-9)
+    assert calibrated[0][1] == pytest.approx(equity_volatility, rel=1.0e-9)
