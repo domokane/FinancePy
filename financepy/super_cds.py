@@ -36,7 +36,7 @@ from .market.curves.cds_curve import CDSCurve
 # dates functions
 from .utils.date import Date
 from .utils.day_count import DayCountTypes
-from .utils.frequency import FrequencyTypes
+from .utils.frequency import FrequencyTypes, annual_frequency
 from .utils.date import from_datetime
 from .utils.calendar import CalendarTypes
 
@@ -364,14 +364,24 @@ def cds_single_name():
     notional = aba_cashflow_CDS.range((6, coluna)).value
     # long protection?
     long_protection = True  # True = compra CDS, False = vende CDS
+    # coupons' frequency - take the integer part of the value in the cell and convert to FrequencyTypes
+    freq_type = FrequencyTypes(int(aba_cashflow_CDS.range((7, coluna)).value))
     # contrato de CDS
     cds_contract = CDS(
-        effective_date, maturity_date, running_coupon, notional, long_protection
-    )  # effective_date
+        step_in_dt=effective_date,
+        maturity_dt_or_tenor=maturity_date,
+        running_cpn=running_coupon,
+        notional=notional,
+        long_protect=long_protection,
+        freq_type=freq_type,
+    )
+
     # mostra os dados do contrato de CDS criado acima
     linha_debug = ut.print_debug("debug", linha_debug, repr(cds_contract), verbal_debug)
     # mostra todos os dados da curva de CDS caso o debug seja verbal
-    for dados in cds_contract.print_payments_by_HH(effective_date, issuer_curve):
+    for dados in cds_contract.print_payments_by_HH(
+        effective_date, issuer_curve, full_flow=True
+    ):
         linha_debug = ut.print_debug("debug", linha_debug, dados, verbal_debug)
 
     """Calcula o premio do CDS e outros dados"""
@@ -396,12 +406,22 @@ def cds_single_name():
     aba_cashflow_CDS.range((30, coluna)).value = cds_contract.premium_leg_pv(
         trade_date, issuer_curve, recovery_rate
     )
-
     # protection leg + Accrued Interest
     # aba_cashflow_CDS.range((31, coluna)).value = cds_contract.prot_leg_pv_by_HH(
     #    trade_date, issuer_curve, recovery_rate
     # )
     aba_cashflow_CDS.range((31, coluna)).value = cds_contract.prot_leg_pv(
+        trade_date, issuer_curve, recovery_rate
+    )
+
+    # Extras by HH
+    aba_cashflow_CDS.range((32, coluna)).value = cds_contract.cash_settlement_amount(
+        trade_date, settlement_date, issuer_curve, recovery_rate
+    )
+    aba_cashflow_CDS.range((33, coluna)).value = cds_contract.upfront(
+        trade_date, settlement_date, issuer_curve, recovery_rate
+    )
+    aba_cashflow_CDS.range((35, coluna)).value = cds_contract.premium_leg_pv_by_HH(
         trade_date, issuer_curve, recovery_rate
     )
 
@@ -413,12 +433,30 @@ def cds_single_name():
     )
     linha_debug += 1
 
-    # extras para teste
-    up_front = cds_contract.upfront(
-        trade_date, settlement_date, issuer_curve, recovery_rate
+    # By HH: extras para teste
+    temp1 = cds_contract.premium_leg_pv_by_HH(trade_date, issuer_curve, recovery_rate)
+    linha_debug = ut.print_debug(
+        "debug", linha_debug, f"prm leg by HH: {temp1}", verbal_debug
+    )
+    temp2 = cds_contract.rpv01(trade_date, issuer_curve, pv01_method=0)
+    linha_debug = ut.print_debug(
+        "debug",
+        linha_debug,
+        f"RPV01 dirty: {temp2[0]}, clean: {temp2[1]}",
+        verbal_debug,
     )
     linha_debug = ut.print_debug(
-        "debug", linha_debug, f"up front: {up_front}", verbal_debug
+        "debug",
+        linha_debug,
+        f"Frequencia: {cds_contract.freq_type} ( {annual_frequency(cds_contract.freq_type)})",
+        verbal_debug,
+    )
+    temp3 = cds_contract.premium_leg_pv(trade_date, issuer_curve, recovery_rate)
+    linha_debug = ut.print_debug(
+        "debug",
+        linha_debug,
+        f"prm leg: {temp3[0]}, frequency: {temp3[1]}",
+        verbal_debug,
     )
 
 

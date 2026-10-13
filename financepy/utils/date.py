@@ -1038,6 +1038,23 @@ def datediff(d1: Date, d2: Date) -> int:
     return int(dd)
 
 
+# by HH ################################################################################
+
+
+def count_months(d1: Date, d2: Date) -> int:
+    """Returns the number of months between two dates."""
+    # If d1 is later than d2, swap them to ensure d1 is earlier.
+    if d1 > d2:
+        d1, d2 = d2, d1
+    # calculate the difference in months and years
+    months = (d2.y - d1.y) * 12 + (d2.m - d1.m)
+    # check if the day of d2 is less than the day of d1, if so, subtract one month
+    if d2.d < d1.d:
+        months -= 1
+    # return the total number of months
+    return months
+
+
 ########################################################################################
 
 

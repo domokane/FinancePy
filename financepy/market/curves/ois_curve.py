@@ -184,31 +184,31 @@ class OISCurve(DiscountCurve):
 
         # Validation of the inputs.
         if num_depos > 0:
-
+            # set start date to the first deposit start date
             depo_start_dt = ois_deposits[0].start_dt
-
+            # check each deposit is of the correct type and that it starts after the anchor date
             for depo in ois_deposits:
-
                 if isinstance(depo, IborDeposit) is False:
                     raise FinError("Deposit is not of type IborDeposit")
-
+                # start date of each deposit
                 start_dt = depo.start_dt
-
+                # check that the start date is after the anchor date
                 if start_dt < self.anchor_dt:
                     raise FinError("First deposit starts before value date.")
-
-                if start_dt < depo_start_dt:
-                    depo_start_dt = start_dt
-
+                #
+                # Old code that was replaced by the min function below
+                # if start_dt < depo_start_dt:
+                #    depo_start_dt = start_dt
+                depo_start_dt = min(depo_start_dt, start_dt)
+            # check that the start of each deposit is before its maturity date
             for depo in ois_deposits:
                 start_dt = depo.start_dt
                 end_dt = depo.maturity_dt
                 if start_dt >= end_dt:
                     raise FinError("First deposit ends on or before it begins")
 
-        # Ensure order of depos
+        # Ensure order of deposits
         if num_depos > 1:
-
             prev_dt = ois_deposits[0].maturity_dt
             for depo in ois_deposits[1:]:
                 next_dt = depo.maturity_dt

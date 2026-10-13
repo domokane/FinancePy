@@ -8,6 +8,7 @@ from copy import deepcopy
 import numpy as np
 
 from ...utils.date import Date
+from ...utils.date import count_months
 from ...utils.error import FinError
 from ...utils.calendar import Calendar, CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
@@ -102,12 +103,36 @@ class CDS:
         self.payment_dts = []
         self.accrual_start_dts = []
         self.accrual_end_dts = []
-        num_months = int(12.0 / frequency)
+        # if frequency is zero, we calculate the number of months between start and maturity
+        if frequency == 0:
+            num_months = count_months(start_dt, self.maturity_dt)
+        # if frequency is positive, the number of months between each coupon date is
+        # 12 divided by the frequency
+        elif frequency > 0:
+            num_months = int(12.0 / frequency)
+        # anythign else is invalid. Raise an error
+        else:
+            raise FinError("Invalid frequency")
 
         # We generate unadjusted dates - not adjusted for weekends or holidays
         unadjusted_schedule_dts = []
 
-        if self.dg_type == DateGenRuleTypes.BACKWARD:
+        # if the frequency is zero or negative, we set the last date to be the start date
+        if frequency == 0:
+            # last date
+            unadjusted_schedule_dts.append(self.maturity_dt)
+            # first date
+            unadjusted_schedule_dts.append(start_dt)
+
+            # now we adjust for holiday using business day adjustment
+            # convention specified
+            adjusted_dts = []
+            for date in reversed(unadjusted_schedule_dts):
+                adjusted = calendar.adjust(date, self.bd_type)
+                adjusted_dts.append(adjusted)
+
+        # standard CDS rule
+        elif self.dg_type == DateGenRuleTypes.BACKWARD:
 
             # We start at end date and step backwards
             next_dt = self.maturity_dt
@@ -118,6 +143,9 @@ class CDS:
             while next_dt > start_dt:
                 next_dt = next_dt.add_months(-num_months)
                 unadjusted_schedule_dts.append(next_dt)
+
+            # if the first date is after the strat date, them we make equal to the start date
+            unadjusted_schedule_dts[0] = min(unadjusted_schedule_dts[0], start_dt)
 
             # now we adjust for holiday using business day adjustment
             # convention specified
@@ -700,18 +728,16 @@ class CDS:
         payment_times = []
         for date in self.payment_dts:
             t = (date - value_dt) / G_DAYS_IN_YEAR
-
+            # if future date, then we add to the list of payment times. If not, we ignore it
             if t > 0.0:
                 payment_times.append(t)
 
         # this is the part of the cpn accrued from the previous cpn date to now
-
         pcd, start_index = self.get_pcd(value_dt)
 
         day_count = DayCount(self.accrual_dc_type)
 
         eff_dt = self.step_in_dt
-
         # A contract whose protection started in the past starts today
         eff_dt = max(eff_dt, value_dt)
 
@@ -743,9 +769,22 @@ class CDS:
     def premium_leg_pv(self, value_dt: Date, issuer_curve: CDSCurve, pv01_method=0):
         """Value of the premium leg of a CDS."""
 
-        dirty_rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)[DIRTY]
-        v = dirty_rpv01 * self.notional * self.running_cpn
-        return v
+        frequency = int(annual_frequency(self.freq_type))
+
+        # check if the frequency is zero, if so, we return the accrued interest as the premium leg pv
+        if frequency == 0:
+            valor = self.accrued_interest(value_dt)
+
+        # if frequency is positive, we calculate the premium leg pv using the rpv01 method
+        elif frequency > 0:
+            dirty_rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)[DIRTY]
+            valor = dirty_rpv01 * self.notional * self.running_cpn
+        # anythign else is invalid. Raise an error
+        else:
+            raise FinError("Invalid frequency")
+
+        # end
+        return valor, frequency
 
     # by HH ###################################################################
 
@@ -1044,7 +1083,9 @@ class CDS:
 
     # by HH ####################################################################
 
-    def print_payments_by_HH(self, value_dt: Date, issuer_curve: CDSCurve):
+    def print_payments_by_HH(
+        self, value_dt: Date, issuer_curve: CDSCurve, full_flow: bool = False
+    ):
         """We only print payments after the current valuation date"""
         num_flows = len(self.payment_dts)
         # cria a lista que vai receber os dados
@@ -1057,8 +1098,8 @@ class CDS:
         for it in range(num_flows):
             # dado do cupom
             dt = self.payment_dts[it]
-            # se a data do cupom for maior que o value date, entao adiciona os dados
-            if dt > value_dt:
+            # se a data do cupom for maior que o value date ou se full_flow for True, entao adiciona os dados
+            if full_flow or dt > value_dt:
                 # fracao de ano
                 acc_factor = self.accrual_factors[it]
                 # fluxo financeiro?

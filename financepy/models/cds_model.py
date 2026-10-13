@@ -94,7 +94,9 @@ def risky_pv01_numba(
 
     # future accrued from now to cpn payment date assuming default roughly
     # midway
-    dirty_rpv01 += 0.5 * z1 * dq * (year_fracs[1] - accrual_factor_pcd_to_now) * cpn_accd_indicator
+    dirty_rpv01 += (
+        0.5 * z1 * dq * (year_fracs[1] - accrual_factor_pcd_to_now) * cpn_accd_indicator
+    )
 
     for it in range(1, len(payment_times)):
 
@@ -118,7 +120,9 @@ def risky_pv01_numba(
                 h12 = -np.log(q2 / q1) / tau
                 r12 = -np.log(z2 / z1) / tau
                 alpha = h12 + r12
-                exp_term = 1.0 - np.exp(-alpha * tau) - alpha * tau * np.exp(-alpha * tau)
+                exp_term = (
+                    1.0 - np.exp(-alpha * tau) - alpha * tau * np.exp(-alpha * tau)
+                )
                 d_dirty_rpv01 = q1 * z1 * h12 * exp_term / abs(alpha * alpha + 1e-20)
             else:
                 d_dirty_rpv01 = 0.50 * (q1 - q2) * z2 * accrual_factor
@@ -188,7 +192,7 @@ def prot_leg_pv_numba(
         log_z1 = np.log(z1)
         log_q1 = np.log(q1)
 
-        for _ in range(0, num_steps):
+        for _ in range(num_steps):
             t = t + dt
             z2 = _uinterpolate(t, np_ibor_times, np_ibor_values, method)
             q2 = _uinterpolate(t, np_surv_times, np_surv_values, method)
@@ -212,7 +216,7 @@ def prot_leg_pv_numba(
 
     else:
 
-        for _ in range(0, num_steps):
+        for _ in range(num_steps):
             t += dt
             z2 = _uinterpolate(t, np_ibor_times, np_ibor_values, method)
             q2 = _uinterpolate(t, np_surv_times, np_surv_values, method)
