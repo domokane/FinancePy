@@ -175,7 +175,7 @@ class EquityAsianOption(EquityOption):
         model: Model,
         num_paths: int,
         seed: int,
-        accrued_average: float,
+        accrued_average: float = None,
     ) -> MCResult:
         """Monte Carlo valuation of the Asian Average option using standard
         Monte Carlo code enhanced by Numba. I have discontinued the use of this
@@ -228,8 +228,8 @@ class EquityAsianOption(EquityOption):
         dividend_curve: DiscountCurve,
         model: Model,  # Model
         num_paths: int,  # Numpaths integer
-        seed,
-        accrued_average,
+        seed: int,
+        accrued_average: float = None,
     ) -> MCResult:
         """Monte Carlo valuation of the Asian Average option. This method uses
         a lot of Numpy vectorisation. It is also helped by Numba."""
@@ -279,10 +279,10 @@ class EquityAsianOption(EquityOption):
         stock_price: float,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
-        model: Model,  # Model
-        num_paths: int,  # Numpaths integer
-        seed,
-        accrued_average,
+        model: Model,
+        num_paths: int,
+        seed: int,
+        accrued_average: float = None,
     ) -> MCResult:
         """Monte Carlo valuation of the Asian Average option using a control
         variate method that improves accuracy and reduces the variance of the

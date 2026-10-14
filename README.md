@@ -123,14 +123,7 @@ Contributions from developers and finance practitioners are welcome. You can hel
 
 Before beginning a substantial change, [open an issue](https://github.com/domokane/FinancePy/issues) or comment on an existing one to coordinate work.
 
-Contributions should prioritize:
-
-- Readable, PEP 8–style Python.
-- Clear documentation for classes and functions.
-- Tests for new functionality, including representative valuation cases.
-- Straightforward implementations and sensible performance.
-
-See the [open issues](https://github.com/domokane/FinancePy/issues) and [pull requests](https://github.com/domokane/FinancePy/pulls).
+For more information see [contributing](https://github.com/domokane/FinancePy/CONTRIBUTING.md)
 
 ## Project status and support
 

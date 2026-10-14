@@ -295,12 +295,11 @@ financepy.products.fx.fx_forward
 <div class="signature">
 
 <code>FXForward(
-    expiry_dt: Date,
-    strike_fx_rate: float,
-    currency_pair: str,
+    settlement_dt: Date,
+    strike_fx_rate: FXRate,
     notional: float,
-    notional_currency: str,
-    spot_days: int = 0,
+    notional_ccy: str,
+    buy_ccy: str,
 ) -&gt; None</code>
 
 </div>
@@ -308,7 +307,16 @@ financepy.products.fx.fx_forward
 
 
 
-<div class="docstring">Contract to buy or sell currency at a forward rate decided today.</div>
+<div class="docstring">Deliverable FX forward transaction.
+
+The transaction exchanges two currencies at an agreed
+exchange rate on a specified future settlement date.
+
+The buy_currency determines which currency is received
+and which is paid.
+
+FX rates are expressed in units of the second currency
+per unit of the first currency.</div>
 
 <h3>Methods</h3>
 <div class="member">
@@ -322,47 +330,47 @@ financepy.products.fx.fx_forward
 value(
     self,
     value_dt: Date,
-    spot_fx_rate: float,
+    spot_fx_rate: FXRate,
     domestic_curve: DiscountCurve,
     foreign_curve: DiscountCurve,
-)
+) -&gt; dict[str, float]
 </code>
 
 </div>
 
 
-<div class="docstring">Calculate the value of an FX forward contract where the current
-FX rate is the spot_fx_rate.</div>
-
-</div>
-
-<div class="member">
-
-<h4>forward</h4>
-
-
-<div class="signature">
-
-<code>
-forward(
-    self,
-    value_dt: Date,
-    spot_fx_rate: float,
-    domestic_curve: DiscountCurve,
-    foreign_curve: DiscountCurve,
-)
-</code>
-
-</div>
-
-
-<div class="docstring">Calculate the FX Forward rate that makes the value of the FX
-contract equal to zero.</div>
+<div class="docstring">Calculate the present value of the FX forward in both currencies.</div>
 
 </div>
 
 
 </section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>fx_forward_rate</h3>
+
+<div class="signature">
+
+<code>
+fx_forward_rate(
+    value_dt: Date,
+    settlement_dt: Date,
+    spot_fx_rate: FXRate,
+    domestic_curve: DiscountCurve,
+    foreign_curve: DiscountCurve,
+) -&gt; FXRate
+</code>
+
+</div>
+
+<div class="docstring">Calculate the fair forward exchange rate.
+
+The spot FX rate is assumed to settle on the
+conventional spot settlement date determined
+from the valuation date and currency pair.</div>
+
+</div>
 
 <div class="generated">
 

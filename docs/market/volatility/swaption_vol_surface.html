@@ -358,15 +358,16 @@ check_calibration(
     self,
     verbose: bool,
     tol: float = 1e-06,
-) -&gt; None
+) -&gt; float
 </code>
 
 </div>
 
 
-<div class="docstring">Compare calibrated vol surface with market and output a report
-which sets out the quality of fit to the ATM and 10 and 25 delta market
-strangles and risk reversals.</div>
+<div class="docstring">Compare the calibrated vol surface with the market vol grid and
+return the largest absolute difference between fitted and market
+vols. If verbose, print a report with one line per expiry and strike,
+flagging with an asterisk any point whose error exceeds tol.</div>
 
 </div>
 

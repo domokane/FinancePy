@@ -299,6 +299,9 @@ financepy.products.equity.equity_cliquet_option
     final_expiry_dt: Date,
     opt_type: OptionTypes,
     freq_type: FrequencyTypes,
+    payoff_type: CliquetTypes = &lt;CliquetTypes.PRICE: 1&gt;,
+    payoff_timing_type: PaymentTimingTypes = &lt;PaymentTimingTypes.PERIODIC: 1&gt;,
+    notional: float = 1.0,
     cal_type: CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;,
     bd_type: BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;,
     dg_type: DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;,
@@ -337,6 +340,51 @@ value(
 
 <div class="docstring">Value the cliquet option as a sequence of options using the Black-
 Scholes model.</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_mc</h4>
+
+
+<div class="signature">
+
+<code>
+value_mc(
+    self,
+    value_dt: Date,
+    stock_price: float,
+    discount_curve: DiscountCurve,
+    dividend_curve: DiscountCurve,
+    model: Model,
+    num_paths: int = 200000,
+    seed: int = 4242,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">Value the cliquet option using Monte Carlo simulation.
+
+The stock is simulated exactly under Black-Scholes from reset date
+to reset date, so there is no Euler time-discretisation error.
+
+Returns
+-------
+value : float
+    Monte Carlo value.
+
+stderr : float
+    Monte Carlo standard error estimated from antithetic pair
+    averages.
+
+Notes
+-----
+This implementation requires value_dt == start_dt. Valuation after
+inception requires historical reset fixings and, for MATURITY
+payment timing, already-realised period payoffs.</div>
 
 </div>
 

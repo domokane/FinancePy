@@ -298,10 +298,6 @@ financepy.products.equity.equity_forward_start_option
     start_dt: Date,
     final_expiry_dt: Date,
     opt_type: OptionTypes,
-    freq_type: FrequencyTypes,
-    cal_type: CalendarTypes = &lt;CalendarTypes.WEEKEND: 2&gt;,
-    bd_type: BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;,
-    dg_type: DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;,
 )</code>
 
 </div>
@@ -309,15 +305,13 @@ financepy.products.equity.equity_forward_start_option
 
 <div class="inheritance">Inherits from: EquityOption</div>
 
-<div class="docstring">An EquityForwardStartOption is an option whose strike is set equal to the
-stock price on the start date and which expires at a later date. When a
-frequency is given, the period between the start date and the final expiry
-date is divided into a sequence of consecutive forward-start options, each
-one starting when the previous one expires with its strike set to the stock
-price at that time. With a single period this is the classic forward-start
-option of Rubinstein (1991); with several periods it is a cliquet of
-at-the-money forward-start options whose first strike is set on the start
-date rather than on the valuation date.</div>
+<div class="docstring">European forward-start equity option.
+
+The strike is set equal to the stock price on start_dt.
+The option expires on final_expiry_dt.
+
+The option is valued under Black-Scholes using forward interest
+and dividend rates between the strike-setting and expiry dates.</div>
 
 <h3>Methods</h3>
 <div class="member">
@@ -335,31 +329,6 @@ value(
     discount_curve: DiscountCurve,
     dividend_curve: DiscountCurve,
     model: Model,
-)
-</code>
-
-</div>
-
-
-<div class="docstring">Value the forward-start option as a sequence of at-the-money
-forward-start options using the Black-Scholes model. The option that
-starts on date t1 and expires on date t2 is worth
-S * Q(0, t1) * BS(1, t2 - t1, 1, r(t1, t2), q(t1, t2), vol) where
-Q(0, t1) is the dividend deflator to the strike setting date and r and
-q are the forward rates over the life of the option.</div>
-
-</div>
-
-<div class="member">
-
-<h4>print_payments</h4>
-
-
-<div class="signature">
-
-<code>
-print_payments(
-    self,
 )
 </code>
 

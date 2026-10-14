@@ -296,12 +296,6 @@ financepy.models.black_scholes
 
 <code>BlackScholes(
     volatility: float | numpy.ndarray,
-    bs_type: BlackScholesTypes = &lt;BlackScholesTypes.DEFAULT: 0&gt;,
-    num_steps_per_year: int = 52,
-    num_paths: int = 10000,
-    seed: int = 42,
-    use_sobol: bool = False,
-    params: dict | None = None,
 )</code>
 
 </div>
@@ -328,6 +322,7 @@ value(
     risk_free_rate: float,
     dividend_rate: float,
     opt_type: OptionTypes,
+    bs_type: BlackScholesAlgorithmTypes,
 ) -&gt; float
 </code>
 

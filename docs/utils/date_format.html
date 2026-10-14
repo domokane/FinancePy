@@ -316,7 +316,7 @@ financepy.utils.date_format
 <div class="signature">
 
 <code>
-get_date_format() -&gt; str
+get_date_format() -&gt; DateFormatTypes
 </code>
 
 </div>
@@ -349,13 +349,13 @@ print_date_format()
 
 <code>
 set_date_format(
-    fmt: str,
+    fmt: str | financepy.utils.date_format.DateFormatTypes,
 ) -&gt; None
 </code>
 
 </div>
 
-<div class="docstring">Set the global date format.</div>
+<div class="docstring">Set the global date format using an enum or its name.</div>
 
 </div>
 

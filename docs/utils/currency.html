@@ -286,29 +286,24 @@ pre {
 <p class="source-name">
 financepy.utils.currency
 </p>
-<h1>Types</h1>
-<section>
+<h1>Functions</h1>
+<div class="member">
 
-<h2>CurrencyTypes</h2>
+<h3>get_currency_calendar_type</h3>
 
-<div class="docstring">Enumeration of currency types.</div>
+<div class="signature">
 
-<h3>Members</h3>
-<div class="enum-members">
-<div><code>USD</code> = <code>1</code></div>
-<div><code>EUR</code> = <code>2</code></div>
-<div><code>GBP</code> = <code>3</code></div>
-<div><code>CHF</code> = <code>4</code></div>
-<div><code>CAD</code> = <code>5</code></div>
-<div><code>AUD</code> = <code>6</code></div>
-<div><code>NZD</code> = <code>7</code></div>
-<div><code>DKK</code> = <code>8</code></div>
-<div><code>SEK</code> = <code>9</code></div>
-<div><code>HKD</code> = <code>10</code></div>
-<div><code>NONE</code> = <code>11</code></div>
+<code>
+get_currency_calendar_type(
+    currency: str,
+) -&gt; CalendarTypes
+</code>
+
 </div>
 
-</section>
+<div class="docstring">Return the holiday calendar associated with a currency.</div>
+
+</div>
 
 <div class="generated">
 

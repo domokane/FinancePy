@@ -289,27 +289,26 @@ financepy.models.equity_crr_tree
 <h1>Functions</h1>
 <div class="member">
 
-<h3>crr_tree_val_avg</h3>
+<h3>crr_richardson</h3>
 
 <div class="signature">
 
 <code>
-crr_tree_val_avg(
-    stock_price: float,
-    interest_rate: float,
-    dividend_rate: float,
-    volatility: float,
-    num_steps_per_year: int,
-    time_to_expiry: float,
-    opt_type: int,
-    strike_price: float,
-) -&gt; Dict[str, Any]
+crr_richardson(
+    stock_price,
+    interest_rate,
+    dividend_rate,
+    volatility,
+    num_steps_per_year,
+    time_to_expiry,
+    opt_type,
+    strike_price,
+)
 </code>
 
 </div>
 
-<div class="docstring">Calculate the average values off the tree using an even and an odd
-number of time steps.</div>
+<p><em>No description available.</em></p>
 
 </div>
 

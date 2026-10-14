@@ -71,7 +71,7 @@ class FXRate:
         if self.ccy_pair != other.ccy_pair:
             raise FinError("Cannot subtract FX rates with different currency pairs.")
 
-        return self.rate - other.rate
+        return FXRate(self.ccy_pair, self.rate - other.rate)
 
     def __repr__(self) -> str:
         return (
