@@ -94,7 +94,7 @@ class Black:
                 raise FinError("Implementation not available for this product")
 
             results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k, True
+                f, r, r, v, self.num_steps, t, opt_type.value, k, True
             )
             return results["value"]
 
@@ -128,7 +128,7 @@ class Black:
                 raise FinError("Implementation not available for this product")
 
             results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k, True
+                f, r, r, v, self.num_steps, t, opt_type.value, k, True
             )
             return results["delta"]
 
@@ -162,7 +162,7 @@ class Black:
                 raise FinError("Implementation not available for this product")
 
             results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k, True
+                f, r, r, v, self.num_steps, t, opt_type.value, k, True
             )
             return results["gamma"]
 
@@ -196,7 +196,7 @@ class Black:
                 raise FinError("Implementation not available for this product")
 
             results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k, True
+                f, r, r, v, self.num_steps, t, opt_type.value, k, True
             )
             return results["theta"]
 
@@ -232,11 +232,11 @@ class Black:
             bump_size = 0.01
 
             results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k, True
+                f, r, r, v, self.num_steps, t, opt_type.value, k, True
             )
 
             results_volshift = crr_tree_val_avg(
-                f, 0.0, 0.0, v + bump_size, self.num_steps, t, opt_type.value, k, True
+                f, r, r, v + bump_size, self.num_steps, t, opt_type.value, k, True
             )
 
             return (results_volshift["value"] - results["value"]) / bump_size
@@ -454,10 +454,10 @@ def implied_volatility(
         return black_vega(fwd, t, k, r, sigma, opt_type)
 
     def _f_american(sigma, *args):
-        fwd, t, k, _, opt_type, price = args
+        fwd, t, k, r, opt_type, price = args
         num_steps = 200
         results = crr_tree_val_avg(
-            fwd, 0.0, 0.0, sigma, num_steps, t, opt_type.value, k, True
+            fwd, r, r, sigma, num_steps, t, opt_type.value, k, True
         )
         return results["value"] - price
 
@@ -467,13 +467,12 @@ def implied_volatility(
         num_steps = 200
 
         results = crr_tree_val_avg(
-            fwd, 0.0, 0.0, sigma, num_steps, t, opt_type.value, k, True
+            fwd, r, r, sigma, num_steps, t, opt_type.value, k, True
         )
 
         results_volshift = crr_tree_val_avg(
-            fwd, 0.0, 0.0, sigma + bump_size, num_steps, t, opt_type.value, k, True
+            fwd, r, r, sigma + bump_size, num_steps, t, opt_type.value, k, True
         )
-
         return (results_volshift["value"] - results["value"]) / bump_size
 
     def _estimate_vol_from_price(fwd, t, k, european_opt_type, european_price):

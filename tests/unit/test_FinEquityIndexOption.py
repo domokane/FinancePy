@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
+
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
 from financepy.products.equity.equity_index_option import EquityIndexOption
@@ -61,6 +63,8 @@ def test_equity_american_index_option_price():
     strike = 100.0
     future_prices = [80.0, 90.0, 100.0, 110.0, 120.0]
     num_steps = 200
+    # the futures price has no carry while the option is discounted at the curve rate
+    r = -np.log(discount_curve.df(expiry_dt)) / time_to_expiry
     # costruct each opton
     american_call_option = EquityIndexOption(
         expiry_dt, strike, OptionTypes.AMERICAN_CALL
@@ -78,8 +82,8 @@ def test_equity_american_index_option_price():
         )
         result = crr_tree_val_avg(
             future_prices[i],
-            0.0,
-            0.0,
+            r,
+            r,
             volatility,
             num_steps,
             time_to_expiry,
@@ -94,8 +98,8 @@ def test_equity_american_index_option_price():
         )
         result = crr_tree_val_avg(
             future_prices[i],
-            0.0,
-            0.0,
+            r,
+            r,
             volatility,
             num_steps,
             time_to_expiry,

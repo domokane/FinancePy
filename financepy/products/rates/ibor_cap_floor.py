@@ -172,12 +172,18 @@ class IborCapFloor:
             caplet_floorlet_value = df * alpha * max(strike_rate - fwd_rate, 0.0)
 
         caplet_floorlet_value *= self.notional
+        intrinsic_value = caplet_floorlet_value
+
+        # A first caplet or floorlet whose rate is not fixed yet still has time value
+        if self.last_fixing is None and start_dt > value_dt:
+            caplet_floorlet_value = self.value_caplet_floor_let(value_dt, start_dt, end_dt, libor_curve, model)
+
         cap_floor_value += caplet_floorlet_value
 
         self.caplet_floorlet_fwd_rates.append(fwd_rate)
         self.caplet_floorlet_values.append(caplet_floorlet_value)
         self.caplet_floorlet_alphas.append(alpha)
-        self.caplet_floorlet_intrinsic.append(caplet_floorlet_value)
+        self.caplet_floorlet_intrinsic.append(intrinsic_value)
         self.caplet_floorlet_dfs.append(df)
         self.cap_floor_pv.append(cap_floor_value)
 
@@ -218,8 +224,8 @@ class IborCapFloor:
         check_curve_dt(value_dt, libor_curve)
 
         curve_dc_type = libor_curve.curve_dc_type
-        t_exp = times_from_dates(self.start_dt, caplet_start_dt, curve_dc_type)
-        #        t_exp = (caplet_start_dt - self.start_dt) / G_DAYS_IN_YEAR
+        # The option expires when the rate fixes, measured from the valuation date
+        t_exp = times_from_dates(value_dt, caplet_start_dt, curve_dc_type)
 
         dc_counter = DayCount(self.accrual_dc_type)
         alpha = dc_counter.year_frac(caplet_start_dt, caplet_end_dt)[0]

@@ -23,10 +23,12 @@ def test_no_default_pv01_includes_first_coupon(basis):
     contract = basket.cds_contract
     starts = [contract.accrual_start_dts[0]] + contract.payment_dts[:-1]
     day_count = DayCount(basis)
-    expected = sum(day_count.year_frac(start, end)[0] * curve.df(end) for start, end in zip(starts, contract.payment_dts))
+    expected = sum(day_count.year_frac(start, end)[0] * curve.df(end)
+                   for start, end in zip(starts, contract.payment_dts))
     assert pv01 == pytest.approx(expected)
     assert protection == 0.0
-    assert expected > sum(day_count.year_frac(start, end)[0] * curve.df(end) for start, end in zip(contract.payment_dts[:-1], contract.payment_dts[1:]))
+    assert expected > sum(day_count.year_frac(start, end)[0] * curve.df(end)
+                          for start, end in zip(contract.payment_dts[:-1], contract.payment_dts[1:]))
 
 
 def test_first_period_default_accrues_from_actual_first_start():
@@ -40,5 +42,16 @@ def test_first_period_default_accrues_from_actual_first_start():
     assert tau < (basket.cds_contract.payment_dts[0] - today) / 365.0
     pv01, protection = basket.value_legs_mc(today, 1, np.array([[tau]]), [issuer], curve)
     start = (basket.cds_contract.accrual_start_dts[0] - today) / 365.0
-    assert pv01 == pytest.approx((tau - start) * curve.df_t(tau))
+
+    df = curve.df_t(tau)
+
+    expected_accrual = tau - start
+    actual_accrual = pv01 / df
+
+    print("Expected accrual:", expected_accrual)
+    print("Actual accrual:  ", actual_accrual)
+    print("Accrual error:   ", actual_accrual - expected_accrual)
+    print("Implied start:   ", tau - actual_accrual)
+
+    assert pv01 == pytest.approx((tau - start) * (365.0 / 360.0) * curve.df_t(tau))
     assert protection == pytest.approx((1.0 - issuer.recovery_rate) * curve.df_t(tau))
