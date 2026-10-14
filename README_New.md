@@ -4,8 +4,6 @@
 
 <div align="center">
 
-# FinancePy
-
 ### Financial derivatives pricing and risk analytics in Python
 
 **Readable financial models. Practical valuation tools. Python performance with Numba.**
