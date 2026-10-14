@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/financepy-logo.png" alt="FinancePy logo" width="400">
+  <img src="assets/financepy-logo.png" alt="FinancePy logo" width="300">
 </div>
 
 <div align="center">
