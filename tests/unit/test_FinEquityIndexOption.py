@@ -85,6 +85,7 @@ def test_equity_american_index_option_price():
             time_to_expiry,
             OptionTypes.AMERICAN_CALL.value,
             strike,
+            True
         )
         price_expected = result["value"]
         assert round(price, 4) == round(price_expected, 4)
@@ -100,6 +101,7 @@ def test_equity_american_index_option_price():
             time_to_expiry,
             OptionTypes.AMERICAN_PUT.value,
             strike,
+            True
         )
         price_expected = result["value"]
         assert round(price, 4) == round(price_expected, 4)

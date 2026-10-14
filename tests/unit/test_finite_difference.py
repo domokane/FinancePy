@@ -298,6 +298,7 @@ def test_european_call():
         time_to_expiry,
         opt_type_value,
         strike_price,
+        True
     )
     assert v == approx(value["value"], abs=1e-2)
 
@@ -347,6 +348,7 @@ def test_european_put():
         time_to_expiry,
         opt_type_value,
         strike_price,
+        True
     )
     assert v == approx(value["value"], abs=1e-2)
 
@@ -397,6 +399,7 @@ def test_american_call():
         time_to_expiry,
         opt_type_value,
         strike_price,
+        True
     )
     assert v == approx(value["value"], abs=1e-2)
 
@@ -446,6 +449,7 @@ def test_american_put():
         time_to_expiry,
         opt_type_value,
         strike_price,
+        True
     )
     assert v == approx(value["value"], abs=1e-2)
 

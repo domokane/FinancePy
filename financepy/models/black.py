@@ -14,7 +14,6 @@ from ..utils.solver_1d import bisection, newton
 from ..models.equity_crr_tree import crr_tree_val_avg
 
 
-
 class Black:
     """Black model for European and American options on forwards/futures."""
 
@@ -95,7 +94,7 @@ class Black:
                 raise FinError("Implementation not available for this product")
 
             results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k
+                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k, True
             )
             return results["value"]
 
@@ -129,7 +128,7 @@ class Black:
                 raise FinError("Implementation not available for this product")
 
             results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k
+                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k, True
             )
             return results["delta"]
 
@@ -163,7 +162,7 @@ class Black:
                 raise FinError("Implementation not available for this product")
 
             results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k
+                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k, True
             )
             return results["gamma"]
 
@@ -197,7 +196,7 @@ class Black:
                 raise FinError("Implementation not available for this product")
 
             results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k
+                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k, True
             )
             return results["theta"]
 
@@ -233,11 +232,11 @@ class Black:
             bump_size = 0.01
 
             results = crr_tree_val_avg(
-                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k
+                f, 0.0, 0.0, v, self.num_steps, t, opt_type.value, k, True
             )
 
             results_volshift = crr_tree_val_avg(
-                f, 0.0, 0.0, v + bump_size, self.num_steps, t, opt_type.value, k
+                f, 0.0, 0.0, v + bump_size, self.num_steps, t, opt_type.value, k, True
             )
 
             return (results_volshift["value"] - results["value"]) / bump_size
@@ -458,7 +457,7 @@ def implied_volatility(
         fwd, t, k, _, opt_type, price = args
         num_steps = 200
         results = crr_tree_val_avg(
-            fwd, 0.0, 0.0, sigma, num_steps, t, opt_type.value, k
+            fwd, 0.0, 0.0, sigma, num_steps, t, opt_type.value, k, True
         )
         return results["value"] - price
 
@@ -468,11 +467,11 @@ def implied_volatility(
         num_steps = 200
 
         results = crr_tree_val_avg(
-            fwd, 0.0, 0.0, sigma, num_steps, t, opt_type.value, k
+            fwd, 0.0, 0.0, sigma, num_steps, t, opt_type.value, k, True
         )
 
         results_volshift = crr_tree_val_avg(
-            fwd, 0.0, 0.0, sigma + bump_size, num_steps, t, opt_type.value, k
+            fwd, 0.0, 0.0, sigma + bump_size, num_steps, t, opt_type.value, k, True
         )
 
         return (results_volshift["value"] - results["value"]) / bump_size

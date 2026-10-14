@@ -60,6 +60,7 @@ def test_american_call():
         time_to_expiry,
         opt_type.value,
         strike_price,
+        True
     )
 
     # FIGURE OUT WHY THIS FAILS
@@ -113,6 +114,7 @@ def test_american_put():
         time_to_expiry,
         opt_type.value,
         strike_price,
+        True
     )
     assert v_ls == approx(value["value"], abs=2e-1)
 
