@@ -1,4 +1,8 @@
 <div align="center">
+  <img src="assets/financepy-logo.png" alt="FinancePy logo" width="400">
+</div>
+
+<div align="center">
 
 # FinancePy
 
