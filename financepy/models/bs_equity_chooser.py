@@ -4,7 +4,7 @@ from scipy import optimize
 from ..utils.math import M
 from ..utils.global_vars import G_SMALL
 from ..utils.global_types import OptionTypes
-from .black_scholes_analytic import european_value
+from .bs_european_analytic import european_value
 
 DEBUG_MODE = False
 

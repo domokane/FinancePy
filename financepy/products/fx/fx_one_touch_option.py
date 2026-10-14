@@ -178,11 +178,6 @@ class FXOneTouchOption(FXOption):
         assuming a continuous (American) barrier from value date to expiry.
         Handles both cash-or-nothing and asset-or-nothing options."""
 
-        debug_mode = False
-
-        if isinstance(value_dt, Date) is False:
-            raise FinError("Valuation date is not a Date")
-
         t_exp = option_years(value_dt, self.expiry_dt)
 
         check_curve_dt(value_dt, domestic_curve)
@@ -206,6 +201,7 @@ class FXOneTouchOption(FXOption):
         mu = (b - v * v / 2.0) / v / v
         lam = np.sqrt(mu * mu + 2.0 * r_d / v / v)
 
+        debug_mode = False
         if debug_mode:
             print("t:", t_exp)
             print("vol", v)
@@ -434,8 +430,6 @@ class FXOneTouchOption(FXOption):
         Carlo simulation. Accuracy is not great when compared to the analytical
         result as we only observe the barrier a finite number of times. The
         convergence is slow."""
-
-        # "THIS NEEDS TO BE CHECKED"
 
         t_exp = option_years(value_dt, self.expiry_dt)
 

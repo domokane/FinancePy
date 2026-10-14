@@ -10,11 +10,12 @@ from ..utils.global_vars import G_SMALL
 from ..utils.error import FinError
 from ..utils.global_types import OptionTypes
 
-from .black_scholes_analytic import european_value
+from .bs_european_analytic import european_value
 
 ########################################################################################
 
 
+@njit(fastmath=True, cache=True)
 def _f(
     stock_price,
     opt_type_u,
@@ -56,12 +57,14 @@ def _f(
 
     return opt_value - strike_c
 
+####################################################################################
+
 
 def implied_stock_price(
-    tc,
-    tu,
-    kc,
-    ku,
+    t_c,
+    t_u,
+    k_c,
+    k_u,
     opt_type_u,
     r,
     q,
@@ -71,41 +74,41 @@ def implied_stock_price(
 
     The critical stock price S* satisfies
 
-        V_underlying(S*, tu - tc) = kc.
+        V_underlying(S*, t_u - t_c) = k_c.
 
     It depends on the compound strike, underlying strike, remaining
-    maturity, rates, dividend yield, volatility and underlying option
+    mat_urity, rates, dividend yield, volatility and underlying option
     type. It does not depend on today's stock price.
 
     A bracketed Brent solver is used because the critical stock price
     must remain positive.
     """
 
-    if tu <= tc:
+    if t_u <= t_c:
         raise FinError(
             "Underlying option expiry must be after "
             "compound option expiry."
         )
 
-    if kc <= 0.0:
+    if k_c <= 0.0:
         raise FinError(
             "Compound option strike must be positive."
         )
 
-    if ku <= 0.0:
+    if k_u <= 0.0:
         raise FinError(
             "Underlying option strike must be positive."
         )
 
     args = (
         opt_type_u,
-        tc,
-        tu,
-        ku,
+        t_c,
+        t_u,
+        k_u,
         r,
         q,
         vol,
-        kc,
+        k_c,
     )
 
     # The stock price must be strictly positive.
@@ -114,8 +117,8 @@ def implied_stock_price(
     # Start with an economically sensible upper bound and expand it
     # until the root is bracketed.
     upper = max(
-        2.0 * ku,
-        2.0 * kc,
+        2.0 * k_u,
+        2.0 * k_c,
         1.0,
     )
 
@@ -158,26 +161,6 @@ def implied_stock_price(
 
     return sstar
 
-# def _f(s0, *args) -> float:
-#     opt2_int = args[0]
-#     t2: float = args[1]
-#     k2: float = args[2]
-#     t1: float = args[3]
-#     r: float = args[4]
-#     q: float = args[5]
-#     vol: float = args[6]
-#     k1: float = args[7]  # Target
-
-#     if s0 <= 0.0:
-#         raise FinError("Unable to solve for stock price that fits k_1")
-
-#     tau: float = t2 - t1
-#     opt_value: float = european_value(s0, tau, k2, r, q, vol, opt2_int)
-#     obj_fn: float = opt_value - k1
-
-#     return obj_fn
-
-
 ########################################################################################
 
 
@@ -207,7 +190,7 @@ def value_cmpd_once(
 
     # Map the compound-option expiry to the nearest tree time.
     # Using int() would systematically place the compound expiry
-    # before its actual date and introduce a pricing bias.
+    # before its act_ual date and introduce a pricing bias.
     num_steps1 = int(round(t1 / dt))
     num_steps1 = max(1, min(num_steps1, num_steps - 1))
     num_steps2 = num_steps - num_steps1
@@ -223,6 +206,13 @@ def value_cmpd_once(
     d1 = 1.0 / u1
     u2 = np.exp(volatility * np.sqrt(dt))
     d2 = 1.0 / u2
+
+    p = (np.exp((r - q) * dt) - d1) / (u1 - d1)
+
+    if not np.isfinite(p) or p < 0.0 or p > 1.0:
+        raise FinError(
+            "Invalid CRR probability; increase num_steps"
+        )
 
     probs = np.zeros(num_steps)
     period_dfs = np.zeros(num_steps)
@@ -261,7 +251,7 @@ def value_cmpd_once(
     # work backwards by first setting values at expiry date t2
     index = num_steps * (num_steps + 1) // 2
 
-    for i_node in range(0, i_time + 1):
+    for i_node in range(0, num_steps + 1):
         s = stock_vals[index + i_node]
         if (
             opt_type2 == OptionTypes.EUROPEAN_CALL.value
@@ -310,7 +300,7 @@ def value_cmpd_once(
         #     v_dn = option_vals[next_node_dn]
         #     future_exp_val = probs[i_time] * v_up
         #     future_exp_val += (1.0 - probs[i_time]) * v_dn
-        #     hold_value = period_dfs[i_time] * future_exp_val
+        #     hold_value = period_dfs[i_time] * fut_ure_exp_val
 
         underlying_value = option_vals[index + i_node]
 
@@ -375,7 +365,7 @@ def value_cmpd_once(
     delta_up = (option_vals[5] - option_vals[4]) / (stock_vals[5] - stock_vals[4])
     delta_dn = (option_vals[4] - option_vals[3]) / (stock_vals[4] - stock_vals[3])
 
-    gamma = (delta_up - delta_dn) / (stock_vals[2] - stock_vals[1])
+    gamma = 2.0 * (delta_up - delta_dn) / (stock_vals[5] - stock_vals[3])
     theta = (option_vals[4] - option_vals[0]) / (2.0 * dt1)
     results = np.array([price, delta, gamma, theta])
     return results
@@ -383,100 +373,95 @@ def value_cmpd_once(
 
 ########################################################################################
 
-
-# def implied_stock_price(
-#     tc: float,
-#     tu: float,
-#     kc: float,
-#     ku: float,
-#     opt_type_u: int,
-#     r: float,
-#     q: float,
-#     vol: float,
-# ) -> float:
-
-#     argtuple = (
-#         opt_type_u,
-#         tu,
-#         ku,
-#         tc,
-#         r,
-#         q,
-#         vol,
-#         kc,
-#     )
-
-#     sigma = optimize.newton(
-#         _f,
-#         x0=s0,
-#         args=argtuple,
-#         tol=1e-8,
-#         maxiter=50,
-#         fprime2=None,
-#     )
-
-#     return sigma
-
-
-########################################################################################
-
-
 def equity_compound_option_bs(
     c_opt_type: int,
     u_opt_type: int,
-    tc: float,
-    tu: float,
-    kc: float,
-    ku: float,
+    t_c: float,
+    t_u: float,
+    k_c: float,
+    k_u: float,
     s0: float,
-    ru: float,
-    qu: float,
-    volatility: float,
-    num_steps: int = 200,
+    r_c: float,
+    r_u: float,
+    q_c: float,
+    q_u: float,
+    volatility: float
 ) -> float:
     """Value the compound option using an analytical approach if it is
     entirely European style. Otherwise use a Tree approach to handle the
     early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
     Rubinstein (1991). See also Haug page 132."""
 
-    # If the option has any American feature then use the tree
-    if (
-        c_opt_type == OptionTypes.AMERICAN_CALL.value
-        or u_opt_type == OptionTypes.AMERICAN_CALL.value
-        or c_opt_type == OptionTypes.AMERICAN_PUT.value
-        or u_opt_type == OptionTypes.AMERICAN_PUT.value
-    ):
+    call_type = OptionTypes.EUROPEAN_CALL.value
+    put_type = OptionTypes.EUROPEAN_PUT.value
 
-        v = equity_compound_option_value_tree(
-            c_opt_type, u_opt_type, tc, tu, kc, ku, s0, ru, qu, volatility, num_steps
+    if not np.isfinite(t_c) or not np.isfinite(t_u):
+        raise FinError("Maturities must be finite")
+
+    if t_c <= 0.0 or t_u <= t_c:
+        raise FinError(
+            "Require 0 < compound expiry < underlying expiry"
         )
 
-        return v[0]
+    if not np.isfinite(k_c) or k_c < 0.0:
+        raise FinError("Invalid compound strike")
 
-    tc = np.maximum(tc, G_SMALL)
-    tu = np.maximum(tc, tu)
-    v = np.maximum(volatility, G_SMALL)
+    if not np.isfinite(k_u) or k_u <= 0.0:
+        raise FinError("Invalid underlying strike")
 
-    sstar = implied_stock_price(
-        tc,
-        tu,
-        kc,
-        ku,
-        u_opt_type,
-        ru,
-        qu,
-        volatility,
+    if not np.isfinite(s0) or s0 <= 0.0:
+        raise FinError("Invalid stock price")
+
+    if not np.isfinite(r_u) or not np.isfinite(q_u):
+        raise FinError("Invalid underlying option interest rate or dividend yield")
+
+    if not np.isfinite(r_c) or not np.isfinite(q_c):
+        raise FinError("Invalid compoubnd option interest rate or dividend yield")
+
+    if not np.isfinite(volatility) or volatility < 0.0:
+        raise FinError("Invalid volatility")
+
+    v = max(volatility, G_SMALL)
+
+    tau = t_u - t_c
+
+    r_cu = (r_u * t_u - r_c * t_c) / tau
+    q_cu = (q_u * t_u - q_c * t_c) / tau
+
+    underlying_value = european_value(
+        s0, t_u, k_u, r_u, q_u, v, u_opt_type
     )
 
-    a1 = (log(s0 / sstar) + (ru - qu + (v**2) / 2.0) * tc) / v / sqrt(tc)
-    a2 = a1 - v * sqrt(tc)
-    b1 = (log(s0 / ku) + (ru - qu + (v**2) / 2.0) * tu) / v / sqrt(tu)
-    b2 = b1 - v * sqrt(tu)
+    if k_c == 0.0:
+        if c_opt_type == call_type:
+            return underlying_value
+        if c_opt_type == put_type:
+            return 0.0
 
-    dqu = exp(-qu * tu)
-    dfc = exp(-ru * tc)
-    dfu = exp(-ru * tu)
-    c = sqrt(tc / tu)
+    if u_opt_type == put_type:
+        max_put_value = k_u * exp(-r_cu * (t_u - t_c))
+
+        if k_c >= max_put_value:
+            if c_opt_type == call_type:
+                return 0.0
+            if c_opt_type == put_type:
+                return k_c * exp(-r_c * t_c) - underlying_value
+
+    sstar = implied_stock_price(
+        t_c, t_u, k_c, k_u,
+        u_opt_type, r_cu, q_cu, v
+    )
+
+    a1 = (log(s0 / sstar) + (r_c - q_c + 0.50 * (v**2)) * t_c) / v / sqrt(t_c)
+    a2 = a1 - v * sqrt(t_c)
+    b1 = (log(s0 / k_u) + (r_u - q_u + 0.50 * (v**2)) * t_u) / v / sqrt(t_u)
+    b2 = b1 - v * sqrt(t_u)
+
+    dfc = exp(-r_c * t_c)
+    dfu = exp(-r_u * t_u)
+
+    dqu = exp(-q_u * t_u)
+    c = sqrt(t_c / t_u)
 
     # Taken from Hull Page 532 (6th edition)
 
@@ -486,26 +471,26 @@ def equity_compound_option_bs(
     if c_opt_type == call_type and u_opt_type == call_type:
         v = (
             s0 * dqu * phi2(a1, b1, c)
-            - ku * dfu * phi2(a2, b2, c)
-            - dfc * kc * normcdf(a2)
+            - k_u * dfu * phi2(a2, b2, c)
+            - dfc * k_c * normcdf(a2)
         )
     elif c_opt_type == put_type and u_opt_type == call_type:
         v = (
-            ku * dfu * phi2(-a2, b2, -c)
+            k_u * dfu * phi2(-a2, b2, -c)
             - s0 * dqu * phi2(-a1, b1, -c)
-            + dfc * kc * normcdf(-a2)
+            + dfc * k_c * normcdf(-a2)
         )
     elif c_opt_type == call_type and u_opt_type == put_type:
         v = (
-            ku * dfu * phi2(-a2, -b2, c)
+            k_u * dfu * phi2(-a2, -b2, c)
             - s0 * dqu * phi2(-a1, -b1, c)
-            - dfc * kc * normcdf(-a2)
+            - dfc * k_c * normcdf(-a2)
         )
     elif c_opt_type == put_type and u_opt_type == put_type:
         v = (
             s0 * dqu * phi2(a1, -b1, -c)
-            - ku * dfu * phi2(a2, -b2, -c)
-            + dfc * kc * normcdf(a2)
+            - k_u * dfu * phi2(a2, -b2, -c)
+            + dfc * k_c * normcdf(a2)
         )
     else:
         raise FinError("Unknown option type")
@@ -515,33 +500,33 @@ def equity_compound_option_bs(
 
 ########################################################################################
 
-
+@njit(fastmath=True, cache=True)
 def equity_compound_option_value_tree(
     c_opt_type: int,
     u_opt_type: int,
-    tc: float,
-    tu: float,
-    kc: float,
-    ku: float,
+    t_c: float,
+    t_u: float,
+    k_c: float,
+    k_u: float,
     s0: float,
     ru: float,
     qu: float,
     volatility: float,
     num_steps: int = 200,
 ) -> np.ndarray:
-    """This function is called if the option has American features."""
+    """This function is called if the option has American feat_ures."""
 
     v1 = value_cmpd_once(
         s0,
         ru,
         qu,
         volatility,
-        tc,
-        tu,
+        t_c,
+        t_u,
         c_opt_type,
         u_opt_type,
-        kc,
-        ku,
+        k_c,
+        k_u,
         num_steps,
     )
 
@@ -550,12 +535,12 @@ def equity_compound_option_value_tree(
         ru,
         qu,
         volatility,
-        tc,
-        tu,
+        t_c,
+        t_u,
         c_opt_type,
         u_opt_type,
-        kc,
-        ku,
+        k_c,
+        k_u,
         num_steps+1,
     )
 

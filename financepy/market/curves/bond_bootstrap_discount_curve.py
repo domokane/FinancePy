@@ -18,9 +18,6 @@ from ...utils.error import FinError
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string
 
-from ...utils.format_graphs import set_plot_style
-set_plot_style()
-
 FAST = True
 
 ########################################################################################

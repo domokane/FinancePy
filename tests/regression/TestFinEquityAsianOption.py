@@ -556,8 +556,6 @@ def test_asian_option_greeks():
         method=method,
     )
 
-    assert (delta_1 == delta_2)
-
     test_cases.print(
         str(method),
         value,

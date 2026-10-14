@@ -23,7 +23,7 @@ from ...utils.mc_result import MCResult
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.flat_discount_curve import DiscountCurve
 
-from ...models.black_scholes_analytic import european_value
+from ...models.bs_european_analytic import european_value
 from ...models.black_scholes import BlackScholes
 from ...models.model import Model
 

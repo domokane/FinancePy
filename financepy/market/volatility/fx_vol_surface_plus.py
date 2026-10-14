@@ -24,7 +24,7 @@ from ...utils.solver_nm import nelder_mead
 from ...utils.solver_1d import newton_secant
 from ...utils.distribution import FinDistribution
 from ...products.fx.fx_vanilla_option import fast_delta
-from ...models.black_scholes_analytic import european_value
+from ...models.bs_european_analytic import european_value
 from ...utils.math import norminvcdf
 from ...models.sabr import vol_function_sabr_beta_half
 from ...models.sabr import vol_function_sabr_beta_one
@@ -53,9 +53,6 @@ from scipy.optimize import minimize
 from numba import njit, float64, int64
 
 from ...utils.error import FinError
-
-from ...utils.format_graphs import set_plot_style
-set_plot_style()
 
 
 ########################################################################################

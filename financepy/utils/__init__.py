@@ -19,5 +19,5 @@ from .error import *
 
 __all__ = [name for name in globals() if not name.startswith("_")]
 
-from .format_graphs import *
+from .plot_style import *
 set_plot_style()

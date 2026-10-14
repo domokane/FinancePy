@@ -22,9 +22,9 @@ from scipy.special import gammaln
 
 from scipy.optimize import least_squares
 
-from financepy.models.black_scholes_analytic import value
-from financepy.models.black_scholes_analytic import vega
-from financepy.models.black_scholes_analytic import implied_volatility
+from financepy.models.bs_european_analytic import european_value
+from financepy.models.bs_european_analytic import vega
+from financepy.models.bs_european_analytic import implied_volatility
 from financepy.utils.global_types import OptionTypes
 
 ###############################################################################
@@ -292,7 +292,7 @@ class MertonJumpDiffusion:
 
             q_n = q + lam * kappa_j - n * (mu_j + 0.5 * delta_j * delta_j) / t
 
-            value_n = value(
+            value_n = european_value(
                 s,
                 t,
                 k,
@@ -638,7 +638,7 @@ class MertonJumpDiffusion:
                 k = strikes[j]
                 vol = market_vols[i, j]
 
-                market_prices[i, j] = value(
+                market_prices[i, j] = european_value(
                     s,
                     t,
                     k,

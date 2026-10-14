@@ -23,7 +23,6 @@ from ...models.model import Model
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo
 # TODO: Sobol for Monte Carlo
-# TODO: TIGHTEN UP LIMIT FOR W FROM 100
 # TODO: Vectorise the analytical pricing formula
 ##########################################################################
 
@@ -150,10 +149,10 @@ class EquityFloatLookbackOption(EquityOption):
 
             if smax == s0:
                 term = -normcdf(b1 - 2.0 * b * np.sqrt(t_exp) / v) + expbt * normcdf(b1)
-            elif s0 < smax and w > 100:
-                term = expbt * normcdf(b1)
             else:
-                term = (-((s0 / smax) ** (-w))) * normcdf(b1 - 2.0 * b * np.sqrt(t_exp) / v) + expbt * normcdf(b1)
+                # the power and the probability are combined in log space as either can over- or underflow
+                log_term = -w * np.log(s0 / smax) + log_ndtr(b1 - 2.0 * b * np.sqrt(t_exp) / v)
+                term = -np.exp(log_term) + expbt * normcdf(b1)
 
             v = smax * df * normcdf(-b2) - s0 * dq * normcdf(-b1) + s0 * df * u * term
 

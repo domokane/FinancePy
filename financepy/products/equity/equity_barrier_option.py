@@ -14,8 +14,8 @@ from ...models.process_simulator import GBMNumericalSchemeTypes
 from ...models.process_simulator import ProcessTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
-from ...models.barrier_option_model import barrier_option_value
-from ...models.barrier_option_mc import value_barrier_option_mc
+from ...models.bs_barrier_option import barrier_option_value
+from ...models.bs_barrier_option_mc import value_barrier_option_mc
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
 from ...utils.check_values import check_strike_price
@@ -124,11 +124,12 @@ class EquityBarrierOption(EquityOption):
         if isinstance(value_dt, Date) is False:
             raise FinError("Valuation date is not a Date")
 
+        t_exp = option_years(value_dt, self.expiry_dt)
+
         check_stock_price(stock_price)
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
-        t_exp = option_years(value_dt, self.expiry_dt)
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
 

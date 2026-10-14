@@ -2,7 +2,6 @@
 
 import add_fp_to_path
 
-from financepy.utils.currency import CurrencyTypes
 from financepy.utils.amount import Amount
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -15,11 +14,11 @@ test_cases = FinTestCases(__file__, global_test_case_mode)
 def test_amount():
 
     test_cases.header("LABEL", "AMOUNT")
-    x = Amount(101000.232, CurrencyTypes.USD)
+    x = Amount(101000.232, "USD")
 
     test_cases.print("Amount", x)
 
-    x = Amount(101000.232, CurrencyTypes.CAD)
+    x = Amount(101000.232, "CAD")
 
     test_cases.print("Amount", x)
 

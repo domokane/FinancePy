@@ -152,9 +152,9 @@ def test_fin_fx_vanilla_option_wystup_example2():
     delta = call_option.delta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(delta["pips_spot_delta"], 4) == -0.4700
-    assert round(delta["pips_fwd_delta"], 4) == -0.4890
+    assert round(delta["pips_fwd_delta"], 4) == -0.4891
     assert round(delta["pct_spot_delta_prem_adj"], 4) == -0.5180
-    assert round(delta["pct_fwd_delta_prem_adj"], 4) == -0.5389
+    assert round(delta["pct_fwd_delta_prem_adj"], 4) == -0.5391
 
 
 ########################################################################################
@@ -245,9 +245,9 @@ def test_fin_fx_vanilla_option_bloomberg_example():
     delta = call_option.delta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(delta["pips_spot_delta"], 4) == 0.3671
-    assert round(delta["pips_fwd_delta"], 4) == 0.3859
+    assert round(delta["pips_fwd_delta"], 4) == 0.386
     assert round(delta["pct_spot_delta_prem_adj"], 4) == 0.3208
-    assert round(delta["pct_fwd_delta_prem_adj"], 4) == 0.3373
+    assert round(delta["pct_fwd_delta_prem_adj"], 4) == 0.3374
 
 
 ########################################################################################

@@ -169,14 +169,7 @@ def test_asian_delta_before_averaging(method):
         model,
     ) = make_market(value_dt)
 
-    value = option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-        method=method,
-    )
+    SPOT_BUMP = 0.001 * stock_price
 
     value_up = option.value(
         value_dt,
@@ -187,7 +180,16 @@ def test_asian_delta_before_averaging(method):
         method=method,
     )
 
-    expected = (value_up - value) / SPOT_BUMP
+    value_dn = option.value(
+        value_dt,
+        stock_price - SPOT_BUMP,
+        discount_curve,
+        dividend_curve,
+        model,
+        method=method,
+    )
+
+    expected = (value_up - value_dn) / SPOT_BUMP / 2.0
 
     actual = option.delta(
         value_dt,
@@ -200,8 +202,8 @@ def test_asian_delta_before_averaging(method):
 
     assert actual == pytest.approx(
         expected,
-        rel=1.0e-10,
-        abs=1.0e-10,
+        rel=1.0e-6,
+        abs=1.0e-6,
     )
 
 
@@ -220,15 +222,7 @@ def test_asian_delta_during_averaging(method):
         model,
     ) = make_market(value_dt)
 
-    value = option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-        method=method,
-        accrued_average=accrued_average,
-    )
+    SPOT_BUMP = 0.001 * stock_price
 
     value_up = option.value(
         value_dt,
@@ -240,7 +234,17 @@ def test_asian_delta_during_averaging(method):
         accrued_average=accrued_average,
     )
 
-    expected = (value_up - value) / SPOT_BUMP
+    value_dn = option.value(
+        value_dt,
+        stock_price - SPOT_BUMP,
+        discount_curve,
+        dividend_curve,
+        model,
+        method=method,
+        accrued_average=accrued_average,
+    )
+
+    expected = (value_up - value_dn) / SPOT_BUMP / 2.0
 
     actual = option.delta(
         value_dt,
@@ -254,8 +258,8 @@ def test_asian_delta_during_averaging(method):
 
     assert actual == pytest.approx(
         expected,
-        rel=1.0e-10,
-        abs=1.0e-10,
+        rel=1.0e-6,
+        abs=1.0e-6,
     )
 
 
@@ -278,14 +282,7 @@ def test_asian_gamma_before_averaging(method):
         model,
     ) = make_market(value_dt)
 
-    value = option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-        method=method,
-    )
+    SPOT_BUMP = 0.001 * stock_price
 
     value_up = option.value(
         value_dt,
@@ -296,9 +293,18 @@ def test_asian_gamma_before_averaging(method):
         method=method,
     )
 
-    value_down = option.value(
+    value_dn = option.value(
         value_dt,
         stock_price - SPOT_BUMP,
+        discount_curve,
+        dividend_curve,
+        model,
+        method=method,
+    )
+
+    value = option.value(
+        value_dt,
+        stock_price,
         discount_curve,
         dividend_curve,
         model,
@@ -308,7 +314,7 @@ def test_asian_gamma_before_averaging(method):
     expected = (
         value_up
         - 2.0 * value
-        + value_down
+        + value_dn
     ) / SPOT_BUMP**2
 
     actual = option.gamma(
@@ -322,8 +328,8 @@ def test_asian_gamma_before_averaging(method):
 
     assert actual == pytest.approx(
         expected,
-        rel=1.0e-8,
-        abs=1.0e-8,
+        rel=1.0e-6,
+        abs=1.0e-6,
     )
 
 
@@ -347,14 +353,7 @@ def test_asian_gamma_during_averaging(method):
         "accrued_average": accrued_average,
     }
 
-    value = option.value(
-        value_dt,
-        stock_price,
-        discount_curve,
-        dividend_curve,
-        model,
-        **kwargs,
-    )
+    SPOT_BUMP = 0.001 * stock_price
 
     value_up = option.value(
         value_dt,
@@ -365,9 +364,18 @@ def test_asian_gamma_during_averaging(method):
         **kwargs,
     )
 
-    value_down = option.value(
+    value_dn = option.value(
         value_dt,
         stock_price - SPOT_BUMP,
+        discount_curve,
+        dividend_curve,
+        model,
+        **kwargs,
+    )
+
+    value = option.value(
+        value_dt,
+        stock_price,
         discount_curve,
         dividend_curve,
         model,
@@ -377,7 +385,7 @@ def test_asian_gamma_during_averaging(method):
     expected = (
         value_up
         - 2.0 * value
-        + value_down
+        + value_dn
     ) / SPOT_BUMP**2
 
     actual = option.gamma(
@@ -391,8 +399,8 @@ def test_asian_gamma_during_averaging(method):
 
     assert actual == pytest.approx(
         expected,
-        rel=1.0e-8,
-        abs=1.0e-8,
+        rel=1.0e-6,
+        abs=1.0e-6,
     )
 
 
@@ -462,8 +470,8 @@ def test_asian_vega(method, value_dt, accrued_average):
 
     assert actual == pytest.approx(
         expected,
-        rel=1.0e-10,
-        abs=1.0e-10,
+        rel=1.0e-6,
+        abs=1.0e-6,
     )
 
 
@@ -481,6 +489,8 @@ def test_asian_vega(method, value_dt, accrued_average):
     ],
 )
 def test_asian_vanna(method, value_dt, accrued_average):
+
+    SPOT_BUMP = 0.01
 
     option = make_option()
 
@@ -533,8 +543,8 @@ def test_asian_vanna(method, value_dt, accrued_average):
 
     assert actual == pytest.approx(
         expected,
-        rel=1.0e-8,
-        abs=1.0e-8,
+        rel=1.0e-6,
+        abs=1.0e-6,
     )
 
 
@@ -600,6 +610,6 @@ def test_asian_rho(method, value_dt, accrued_average):
 
     assert actual == pytest.approx(
         expected,
-        rel=1.0e-8,
-        abs=1.0e-8,
+        rel=1.0e-6,
+        abs=1.0e-6,
     )

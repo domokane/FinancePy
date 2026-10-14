@@ -16,11 +16,11 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 
 from ...models.model import Model
-from ...models.black_scholes_analytic import european_value
+from ...models.bs_european_analytic import european_value
 from ...utils.helpers import option_years
 from ...utils.check_values import check_curve_dt
 
-from ...models.equity_chooser_bs import equity_chooser_value
+from ...models.bs_equity_chooser import equity_chooser_value
 
 DEBUG_MODE = False
 
@@ -128,16 +128,16 @@ class EquityChooserOption(EquityOption):
 
         scalar_input = np.isscalar(stock_price)
 
+        t_choose = option_years(value_dt, self.choose_dt)
+        t_call = option_years(value_dt, self.call_expiry_dt)
+        t_put = option_years(value_dt, self.put_expiry_dt)
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
         if value_dt == self.choose_dt:
             v = self.value_dt_on_choose_dt(value_dt, stock_price, discount_curve, dividend_curve, model)
             return v
-
-        t_choose = option_years(value_dt, self.choose_dt)
-        t_call = option_years(value_dt, self.call_expiry_dt)
-        t_put = option_years(value_dt, self.put_expiry_dt)
 
         df_t = discount_curve.df(self.choose_dt)
         df_c = discount_curve.df(self.call_expiry_dt)

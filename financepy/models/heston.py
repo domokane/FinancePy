@@ -13,7 +13,7 @@ from ..utils.global_types import OptionTypes
 from ..models.process_simulator import HestonNumericalSchemeTypes
 from ..utils.math import norminvcdf
 from ..utils.error import FinError
-from ..models.black_scholes_analytic import implied_volatility
+from ..models.bs_european_analytic import implied_volatility
 
 
 from enum import Enum

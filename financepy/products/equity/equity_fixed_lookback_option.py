@@ -3,6 +3,7 @@
 ##############################################################################
 
 import numpy as np
+from scipy.special import log_ndtr
 
 
 from ...utils.math import normcdf
@@ -22,7 +23,6 @@ from ...models.model import Model
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo
 # TODO: Sobol for Monte Carlo
-# TODO: TIGHTEN UP LIMIT FOR W FROM 100
 # TODO: Vectorise the analytical pricing formula
 ##########################################################################
 
@@ -136,10 +136,10 @@ class EquityFixedLookbackOption(EquityOption):
 
                 if s0 == k:
                     term = -normcdf(d1 - 2.0 * b * sqrt_t_exp / v) + expbt_exp * normcdf(d1)
-                elif s0 < k and w > 100.0:
-                    term = expbt_exp * normcdf(d1)
                 else:
-                    term = -np.power(s0 / k, -w) * normcdf(d1 - 2 * b * sqrt_t_exp / v) + expbt_exp * normcdf(d1)
+                    # the power and the probability are combined in log space as either can over- or underflow
+                    log_term = -w * np.log(s0 / k) + log_ndtr(d1 - 2.0 * b * sqrt_t_exp / v)
+                    term = -np.exp(log_term) + expbt_exp * normcdf(d1)
 
                 v = s0 * dq * normcdf(d1) - k * df * normcdf(d2) + s0 * df * u * term
 
@@ -150,10 +150,10 @@ class EquityFixedLookbackOption(EquityOption):
 
                 if s0 == s_max:
                     term = -normcdf(e1 - 2.0 * b * sqrt_t_exp / v) + expbt_exp * normcdf(e1)
-                elif s0 < s_max and w > 100.0:
-                    term = expbt_exp * normcdf(e1)
                 else:
-                    term = (-((s0 / s_max) ** (-w))) * normcdf(e1 - 2.0 * b * sqrt_t_exp / v) + expbt_exp * normcdf(e1)
+                    # the power and the probability are combined in log space as either can over- or underflow
+                    log_term = -w * np.log(s0 / s_max) + log_ndtr(e1 - 2.0 * b * sqrt_t_exp / v)
+                    term = -np.exp(log_term) + expbt_exp * normcdf(e1)
 
                 v = df * (s_max - k) + s0 * dq * normcdf(e1) - s_max * df * normcdf(e2) + s0 * df * u * term
 
@@ -166,10 +166,10 @@ class EquityFixedLookbackOption(EquityOption):
 
                 if s0 == s_min:
                     term = normcdf(-f1 + 2.0 * b * sqrt_t_exp / v) - expbt_exp * normcdf(-f1)
-                elif s0 > s_min and w < -100.0:
-                    term = -expbt_exp * normcdf(-f1)
                 else:
-                    term = ((s0 / s_min) ** (-w)) * normcdf(-f1 + 2.0 * b * sqrt_t_exp / v) - expbt_exp * normcdf(-f1)
+                    # the power and the probability are combined in log space as either can over- or underflow
+                    log_term = -w * np.log(s0 / s_min) + log_ndtr(-f1 + 2.0 * b * sqrt_t_exp / v)
+                    term = np.exp(log_term) - expbt_exp * normcdf(-f1)
 
                 v = df * (k - s_min) - s0 * dq * normcdf(-f1) + s_min * df * normcdf(-f2) + s0 * df * u * term
 
@@ -180,10 +180,10 @@ class EquityFixedLookbackOption(EquityOption):
 
                 if s0 == k:
                     term = normcdf(-d1 + 2.0 * b * sqrt_t_exp / v) - expbt_exp * normcdf(-d1)
-                elif s0 > k and w < -100.0:
-                    term = -expbt_exp * normcdf(-d1)
                 else:
-                    term = ((s0 / k) ** (-w)) * normcdf(-d1 + 2.0 * b * sqrt_t_exp / v) - expbt_exp * normcdf(-d1)
+                    # the power and the probability are combined in log space as either can over- or underflow
+                    log_term = -w * np.log(s0 / k) + log_ndtr(-d1 + 2.0 * b * sqrt_t_exp / v)
+                    term = np.exp(log_term) - expbt_exp * normcdf(-d1)
 
                 v = k * df * normcdf(-d2) - s0 * dq * normcdf(-d1) + s0 * df * u * term
 

@@ -7,7 +7,7 @@ import numpy as np
 from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
 
-from .black_scholes_analytic import european_value
+from .bs_european_analytic import european_value
 from typing import Sequence
 
 ###############################################################################

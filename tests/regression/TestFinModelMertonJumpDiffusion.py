@@ -3,7 +3,7 @@ import add_fp_to_path
 
 from financepy.utils.global_types import OptionTypes
 from financepy.models.merton_jump_diffusion import MertonJumpDiffusion
-from financepy.models.black_scholes_analytic import value
+from financepy.models.bs_european_analytic import european_value
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -48,7 +48,7 @@ def test_merton_reduces_to_black_scholes_zero_intensity():
             option_type,
         )
 
-        v_bs = value(
+        v_bs = european_value(
             s,
             t,
             k,
@@ -94,7 +94,7 @@ def test_merton_reduces_to_black_scholes_zero_jump_size():
             option_type,
         )
 
-        v_bs = value(
+        v_bs = european_value(
             s,
             t,
             k,

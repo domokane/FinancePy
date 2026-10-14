@@ -8,14 +8,12 @@ from financepy.utils.error import FinError
 
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date
-from financepy.utils.frequency import FrequencyTypes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
-from financepy.models.black_scholes_analytic import european_value
+from financepy.models.bs_european_analytic import european_value
 from financepy.products.equity.equity_forward_start_option import (
     EquityForwardStartOption,
 )
-from financepy.products.equity.equity_cliquet_option import EquityCliquetOption
 
 value_dt = Date(1, 1, 2026)
 start_dt = Date(1, 7, 2026)
@@ -32,14 +30,14 @@ dividend_curve = FlatDiscountCurve(value_dt, dividend_yield)
 @pytest.mark.parametrize("spot", [0.0, -1.0, np.nan, np.inf, -np.inf, np.array([100.0, np.nan]), np.array([])])
 def test_forward_start_rejects_invalid_stock_prices(spot):
     """Invalid stock levels fail with FinError before pricing cashflows."""
-    option = EquityForwardStartOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL, FrequencyTypes.ANNUAL)
+    option = EquityForwardStartOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL)
     with pytest.raises(FinError, match="Stock price"):
         option.value(value_dt, spot, discount_curve, dividend_curve, model)
 
 
 def test_forward_start_preserves_valid_vector_price_scaling():
     """The validator preserves vector prices and homogeneous payoff scaling."""
-    option = EquityForwardStartOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL, FrequencyTypes.ANNUAL)
+    option = EquityForwardStartOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL)
     scalar = option.value(value_dt, 100.0, discount_curve, dividend_curve, model)
     vector = option.value(value_dt, np.array([100.0, 200.0]), discount_curve, dividend_curve, model)
     np.testing.assert_allclose(vector, [scalar, 2 * scalar])
@@ -60,44 +58,112 @@ def test_forward_start_matches_rubinstein():
     t_start = (start_dt - value_dt) / 365.0
     t_expiry = (expiry_dt - value_dt) / 365.0
     for opt_type in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
-        option = EquityForwardStartOption(start_dt, expiry_dt, opt_type, FrequencyTypes.ANNUAL)
+        option = EquityForwardStartOption(start_dt, expiry_dt, opt_type)
         v = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
         assert v == pytest.approx(_rubinstein(opt_type, t_start, t_expiry), rel=1e-10)
-        assert len(option.v_options) == 1
-        assert option.actual_dts == [expiry_dt]
 
 
-def test_forward_start_is_a_cliquet_from_the_start_date():
-    """With several periods the value is the sum of the forward-start options, and
-    equals the cliquet option valued on the start date deflated by the dividend
-    yield to that date."""
-    option = EquityForwardStartOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL, FrequencyTypes.QUARTERLY)
-    v = option.value(value_dt, stock_price, discount_curve, dividend_curve, model)
-    assert len(option.v_options) == 4
-    assert v == pytest.approx(sum(option.v_options))
+def test_forward_start_put_call_parity():
 
-    cliquet = EquityCliquetOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL, FrequencyTypes.QUARTERLY)
-    v_cliquet = cliquet.value(
-        start_dt,
-        stock_price,
-        FlatDiscountCurve(start_dt, interest_rate),
-        FlatDiscountCurve(start_dt, dividend_yield),
-        model,
+    call = EquityForwardStartOption(
+        start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL
     )
-    t_start = (start_dt - value_dt) / 365.0
-    assert v == pytest.approx(v_cliquet * np.exp(-dividend_yield * t_start), rel=1e-10)
+    put = EquityForwardStartOption(
+        start_dt, expiry_dt, OptionTypes.EUROPEAN_PUT
+    )
+
+    call_value = call.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
+    put_value = put.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model
+    )
+
+    dq_start = dividend_curve.df(start_dt)
+    dq_end = dividend_curve.df(expiry_dt)
+
+    df_start = discount_curve.df(start_dt)
+    df_end = discount_curve.df(expiry_dt)
+
+    expected = stock_price * (
+        dq_end - dq_start * df_end / df_start
+    )
+
+    assert call_value - put_value == pytest.approx(
+        expected, rel=1e-10, abs=1e-10
+    )
 
 
 def test_forward_start_rejects_valuation_after_start():
-    option = EquityForwardStartOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL, FrequencyTypes.ANNUAL)
-    with pytest.raises(Exception, match="strike has been set"):
-        option.value(start_dt.add_days(1), stock_price, FlatDiscountCurve(start_dt.add_days(1), interest_rate), FlatDiscountCurve(start_dt.add_days(1), dividend_yield), model)
-    with pytest.raises(Exception, match="after start date"):
-        EquityForwardStartOption(expiry_dt, start_dt, OptionTypes.EUROPEAN_CALL, FrequencyTypes.ANNUAL)
+
+    option = EquityForwardStartOption(
+        start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL
+    )
+
+    later_dt = start_dt.add_days(1)
+
+    with pytest.raises(FinError, match="after strike-setting date"):
+        option.value(
+            later_dt,
+            stock_price,
+            FlatDiscountCurve(later_dt, interest_rate),
+            FlatDiscountCurve(later_dt, dividend_yield),
+            model,
+        )
+
+    with pytest.raises(FinError, match="Expiry date must be after start date"):
+        EquityForwardStartOption(
+            expiry_dt,
+            start_dt,
+            OptionTypes.EUROPEAN_CALL,
+        )
 
 
 def test_forward_start_repr():
-    option = EquityForwardStartOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_PUT, FrequencyTypes.ANNUAL)
+
+    option = EquityForwardStartOption(
+        start_dt,
+        expiry_dt,
+        OptionTypes.EUROPEAN_PUT,
+    )
+
     text = repr(option)
+
     assert "EquityForwardStartOption" in text
-    assert "CALENDAR TYPE" in text
+    assert "START_DATE" in text
+    assert "FINAL EXPIRY DATE" in text
+    assert "OPTION_TYPE" in text
+
+
+def test_forward_start_on_start_date():
+
+    option = EquityForwardStartOption(
+        start_dt,
+        expiry_dt,
+        OptionTypes.EUROPEAN_CALL,
+    )
+
+    dc = FlatDiscountCurve(start_dt, interest_rate)
+    qc = FlatDiscountCurve(start_dt, dividend_yield)
+
+    value = option.value(
+        start_dt,
+        stock_price,
+        dc,
+        qc,
+        model,
+    )
+
+    tau = (expiry_dt - start_dt) / 365.0
+
+    expected = european_value(
+        stock_price,
+        tau,
+        stock_price,
+        interest_rate,
+        dividend_yield,
+        volatility,
+        OptionTypes.EUROPEAN_CALL.value,
+    )
+
+    assert value == pytest.approx(expected, rel=1e-10)

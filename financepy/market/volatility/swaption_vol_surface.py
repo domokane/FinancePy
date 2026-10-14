@@ -29,9 +29,6 @@ from ...models.sabr import vol_function_sabr
 from ...models.sabr import vol_function_sabr_beta_half
 from ...models.sabr import vol_function_sabr_beta_one
 
-from ...utils.format_graphs import set_plot_style
-set_plot_style()
-
 
 ########################################################################################
 # ISSUES

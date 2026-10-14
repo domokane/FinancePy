@@ -9,7 +9,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.frequency import FrequencyTypes
-from ...utils.global_vars import G_DAYS_IN_YEAR, ONE_MILLION
+from ...utils.global_vars import ONE_MILLION
 from ...utils.math import normcdf
 from ...products.credit.cds import CDS
 from ...utils.helpers import check_argument_types
@@ -17,6 +17,7 @@ from ...utils.date import Date
 from ...utils.error import FinError
 from ...utils.check_values import check_curve_dt
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import option_years
 
 DIRTY = 0
 CLEAN = 1
@@ -122,8 +123,8 @@ class CDSOption:
         strike = self.strike_cpn
         forward_spread = cds.par_spread(value_dt, issuer_curve)
         forward_rpv01 = cds.rpv01(value_dt, issuer_curve)[DIRTY]
+        t_exp = option_years(value_dt, self.expiry_dt)
 
-        t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
         half_vol_squared_t = 0.5 * volatility * volatility * t_exp
         vol_sqrt_t = volatility * sqrt(t_exp)
 

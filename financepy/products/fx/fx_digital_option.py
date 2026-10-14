@@ -11,6 +11,7 @@ from ...utils.math import normcdf_vect  # normcdf_prime_vect
 
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
+from ...utils.helpers import option_years
 
 from ...utils.date import Date
 
@@ -119,8 +120,8 @@ class FXDigitalOption:
 
         if isinstance(value_dt, Date):
             spot_dt = value_dt.add_weekdays(self.spot_days)
-            t_del = (self.delivery_dt - spot_dt) / G_DAYS_IN_YEAR
-            t_exp = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+            t_del = option_years(value_dt, self.delivery_dt)
+            t_exp = option_years(value_dt, self.expiry_dt)
         else:
             t_del = value_dt
             t_exp = t_del
@@ -213,19 +214,8 @@ class FXDigitalOption:
 
         spot_dt = value_dt.add_weekdays(self.spot_days)
 
-        t_del = (
-            self.delivery_dt - spot_dt
-        ) / G_DAYS_IN_YEAR
-
-        t_exp = (
-            self.expiry_dt - value_dt
-        ) / G_DAYS_IN_YEAR
-
-        if t_exp < 0.0:
-            raise FinError("Option time to expiry is less than zero.")
-
-        if t_del < 0.0:
-            raise FinError("Option time to delivery is less than zero.")
+        t_del = option_years(spot_dt, self.delivery_dt)
+        t_exp = option_years(spot_dt, self.expiry_dt)
 
         # ------------------------------------------------------------------
         # Market parameters
@@ -234,10 +224,9 @@ class FXDigitalOption:
         t = max(t_exp, 1.0e-10)
 
         dom_df = domestic_curve.df_t(t)
-        for_df = foreign_curve.df_t(t)
 
-        r_d = -np.log(dom_df) / t
-        r_f = -np.log(for_df) / t
+        r_d = domestic_curve.zero_rate_cc(self.expiry_dt)
+        r_f = foreign_curve.zero_rate_cc(self.expiry_dt)
 
         mu = r_d - r_f
 

@@ -6,7 +6,7 @@
 from numbers import Real
 
 from financepy.utils.error import FinError
-from financepy.utils.currency import CurrencyTypes
+from financepy.utils.check_values import check_currency
 
 
 class Amount:
@@ -15,20 +15,18 @@ class Amount:
     def __init__(
         self,
         amount: float,
-        currency_type: CurrencyTypes,
+        ccy_name: str,
     ) -> None:
         if not isinstance(amount, Real):
             raise FinError("Amount must be numeric.")
 
-        if not isinstance(currency_type, CurrencyTypes):
-            raise FinError("Invalid currency type.")
-
+        check_currency(ccy_name)
         self.amount = float(amount)
-        self.currency_type = currency_type
+        self.ccy_name = ccy_name
 
     def __repr__(self):
         return (
-            f"{self.currency_type.name} "
+            f"{self.ccy_name} "
             f"{self.amount:,.2f}"
         )
 
@@ -38,13 +36,13 @@ class Amount:
     def __neg__(self):
         return Amount(
             -self.amount,
-            self.currency_type,
+            self.ccy_name,
         )
 
     def __abs__(self):
         return Amount(
             abs(self.amount),
-            self.currency_type,
+            self.ccy_name,
         )
 
     def __add__(self, other):
@@ -55,7 +53,7 @@ class Amount:
 
         return Amount(
             self.amount + other.amount,
-            self.currency_type,
+            self.ccy_name,
         )
 
     def __sub__(self, other):
@@ -75,7 +73,7 @@ class Amount:
 
         return Amount(
             self.amount * scalar,
-            self.currency_type,
+            self.ccy_name,
         )
 
     def __rmul__(self, scalar):
@@ -85,7 +83,7 @@ class Amount:
         if isinstance(other, Real):
             return Amount(
                 self.amount / other,
-                self.currency_type,
+                self.ccy_name,
             )
 
         if isinstance(other, Amount):
@@ -104,7 +102,7 @@ class Amount:
         )
 
     def _check_currency(self, other):
-        if self.currency_type != other.currency_type:
+        if self.ccy_name != other.ccy_name:
             raise FinError(
                 "Cannot combine amounts with different currencies."
             )

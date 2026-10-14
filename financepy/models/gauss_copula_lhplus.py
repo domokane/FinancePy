@@ -11,6 +11,7 @@ from ..utils.error import FinError
 
 from typing import Any
 
+
 class LHPlusModel:
     """Large Homogenous Portfolio model with extra asset. Used for
     approximating full Gaussian copula."""
@@ -82,6 +83,10 @@ class LHPlusModel:
 
         k0 = 0.0
         num_steps = int(k / dk)
+
+        if num_steps == 0:
+            raise FinError("dk too small so num_steps is zero.")
+
         dk = k / num_steps
         cdf0 = 1.0
         cdf1 = 0.0

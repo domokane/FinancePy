@@ -1,209 +1,157 @@
-# FinancePy
-A one-stop library for pricing and risk-managing options, futures and other financial instruments. See below for a comprehensive overview.
+<div align="center">
+  <img src="assets/financepy-logo.png" alt="FinancePy logo" width="250">
+</div>
+<div align="center">
 
-## First Installation
-FinancePy can be installed from pip using the following command:
+### Financial derivatives pricing and risk analytics in Python
 
-`pip install financepy`
+**Readable financial models. Practical valuation tools. Python performance with Numba.**
 
-To upgrade an existing installation type:
+[![PyPI](https://img.shields.io/pypi/v/financepy?label=PyPI&color=0077b6)](https://pypi.org/project/financepy/)
+[![Python](https://img.shields.io/pypi/pyversions/financepy?color=3776ab)](https://pypi.org/project/financepy/)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/license-GPL--3.0--or--later-555)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/domokane/FinancePy?style=flat&color=e0a526)](https://github.com/domokane/FinancePy/stargazers)
 
-`pip install --upgrade financepy`
+[**Documentation**](https://domokane.github.io/FinancePy/) · [**Quick start**](#quick-start) · [**Examples**](https://github.com/domokane/FinancePy/tree/master/examples) · [**Report an issue**](https://github.com/domokane/FinancePy/issues)
 
-Then start a Python terminal and type
+</div>
 
-`from financepy.utils import *`
+---
 
-Here is a quick check to make sure it all loaded. Type
+## What is FinancePy?
 
-```>>> Date(19,2,2026).add_days(2)```
+**FinancePy** is an open-source Python library for the **valuation and risk analysis of financial securities and derivatives**. It covers instruments across fixed income, equities, foreign exchange and credit, with an emphasis on code that can be inspected, understood and extended.
 
-You should see
+FinancePy is designed for quantitative analysts, risk managers, traders, educators and students who want to explore how financial instruments are priced and risk-managed. It is an excellent starting point for researchers wishing to test and extend existing models or to develop new models. It is a work-in-progress and contributions are welcome.
 
-```21-FEB-2026```
+### Why FinancePy?
 
-## Examples
+- **Broad product coverage** — work with bonds, options, swaps and other financial derivatives.
+- **Transparent implementations** — inspect pricing logic written in Python.
+- **Performance-oriented** — Numba accelerates computationally intensive models where used.
+- **Product-first organization** — start from the instrument you want to value, then choose a model and market inputs.
+- **Learn by example** — explore scripts, notebooks and API documentation.
 
-### Example Code
+>**A Simple Core idea:** 
+<p align="center"><strong>Valuation = Product + Model + Market Data</strong></p>
+ 
 
-FinancePy includes many ready-to-run Python examples:
+## Quick start
 
-https://github.com/domokane/FinancePy/tree/master/examples/scripts
+### 1. Install
 
-The examples show how to construct and use FinancePy products and models.  
-Copy, download, and modify them to get started quickly.
+FinancePy is available on PyPI:
 
-### Jupyter Notebooks
-
-Interactive Jupyter notebooks are available here:
-
-https://github.com/domokane/FinancePy/tree/master/examples/notebooks
-
-Use these to explore FinancePy interactively and as a starting point for your own analysis.
-
-## API Documentation
-
-The automatically generated FinancePy API documentation is available here:
-
-https://domokane.github.io/FinancePy/
-
-The API reference contains the available classes, functions, method signatures,
-arguments, and docstrings, organised by package.
-
-## Structure of Financepy
-
-The structure of financepy is as follows
-```
-├── market/
-├── models/
-├── products/
-├── utils/
+```bash
+python -m pip install financepy
 ```
 
-The market folder contains objects linked to structured market data such as interest rate term structures, i.e `curves' and volatility term structures and surfaces.
+To upgrade:
 
+```bash
+python -m pip install --upgrade financepy
 ```
-├── market/
-│   ├── curves
-│       ├── composite_discount_curve.py
-│       ├── discount_curve_flat.py
-│       ├── ...
-│       ├── discount_curve.py
-│   ├── prices
-│   ├── volatility
-│       ├── equity_vol_curve.py
-│       ├── ...
-│       ├── fx_vol_surface.py
-│       ├── swaption_vol_surface.py
-```
-The models folder contains mathematical pricing models.
-```
-├── models/
-│   ├── bachelier.py
-│   ├── bdt_tree.py
-│   ├── black_scholes.py
-│   ├── ...
-│   ├── vasicek_mc.py
-```
-These model pricing functions are not usually called directly but are called from the products objects in the products folder. There is a module for each of the covered product types which are grouped into bonds, credit, equiy, fx and rates as follows:
-```
-├── products/
-│   ├── Bonds
-│       ├── bond_convertible.py
-│       ├── bond_future.py
-│       ├── ...
-│       ├── bond.py
-│   ├── Credit
-│       ├── cds_basket.py
-│       ├── ...
-│       ├── cds.py
-│   ├── Equity
-│       ├── equity_american_option.py
-│       ├── ...
-│       ├── equity_variance_swap.py
-│   ├── FX
-│       ├── fx_barrier_option.py
-│       ├── ...
-│       ├── fx_variance_swap.py
-│   ├── Rates
-│       ├── callable_swap.py
-│       ├── ...
-│       ├── ibor_swaption.py
-```
-Finally, we have the utils folder that contains useful classes such as dates, day counts and schedule generation
-```
-├── utils/
-│   ├── calendar.py
-│   ├── day_count.py
-│   ├── date
-│   ├── schedule
-```
-and many more.
 
-## Notebooks
-The notebooks folder contains over 90 example notebooks on how to use the library.
+### 2. Verify your installation
 
-## Disclaimer
-This software is distributed FREE AND WITHOUT ANY WARRANTY. Report any bugs or concerns here as an issue.
+```python
+from financepy.utils import Date
+
+settlement_date = Date(19, 2, 2026)
+print(settlement_date.add_days(2))
+# 21-FEB-2026
+```
+
+**Note:** The first use of some models can take longer while Numba compiles and caches optimized code. Subsequent runs can be faster.
+
+### 3. Explore a pricing example
+
+Start with the ready-to-run [example scripts](https://github.com/domokane/FinancePy/tree/master/examples/scripts) or [Jupyter notebooks](https://github.com/domokane/FinancePy/tree/master/examples/notebooks). These illustrate how to construct products, provide market data, select models and calculate valuations.
+
+## What can you model?
+
+| Area | Examples of functionality |
+| --- | --- |
+| **Fixed income** | Bonds, interest-rate curves, swaps and swaptions |
+| **Equity derivatives** | Equity options and associated pricing models |
+| **Foreign exchange** | FX derivatives and volatility surfaces |
+| **Credit** | Credit instruments and credit curves |
+| **Market data** | Discount curves, price inputs and volatility structures |
+| **Financial utilities** | Dates, calendars, day counts and schedules |
+
+Coverage varies by product and model. Consult the [API documentation](https://domokane.github.io/FinancePy/) and examples for the supported interfaces.
+
+## How FinancePy is organized
+
+The library separates the *instrument*, the *pricing model* and the *market inputs* so that each can be examined independently.
+
+```text
+financepy/
+├── products/    # Financial instruments and their valuation interfaces
+├── models/      # Low-level analytical and Monte Carlo pricing and valuation models
+├── market/      # Curves, volatility and other market data
+└── utils/       # Dates, calendars, schedules and general mathematics
+```
+
+This product-oriented design helps users find the instrument they need without first navigating every available mathematical model.
+
+## Documentation and learning resources
+
+| Resource | Description |
+| --- | --- |
+| [API reference](https://domokane.github.io/FinancePy/) | Classes, functions and method documentation |
+| [Quick-start guides](https://github.com/domokane/FinancePy/tree/master/docs) | Introductions to major product areas |
+| [Example scripts](https://github.com/domokane/FinancePy/tree/master/examples/scripts) | Runnable examples for products and models |
+| [Jupyter notebooks](https://github.com/domokane/FinancePy/tree/master/examples/notebooks) | Interactive experiments and tutorials |
+| [Changelog](CHANGELOG.md) | Changes across releases |
+
+## Design philosophy
+
+FinancePy aims to balance **clarity**, **coverage** and **speed**:
+
+1. Keep financial calculations understandable to readers with working Python knowledge.
+2. Make model implementations inspectable rather than hiding them behind compiled extensions.
+3. Use Numba to improve performance where appropriate.
+4. Organize functionality around financial products and practical valuation tasks.
+5. Provide examples and tests that help users verify results and learn the models.
+
+Numerical results can differ from those of other financial systems because of conventions, curve construction, interpolation choices or model assumptions. Validate inputs and outputs for your own use case.
 
 ## Contributing
-If you have a knowledge of Quantitative Finance and Python, then please consider contributing to this project. There are small tasks and big tasks to be done. Just look in the list of Issues and you may find something you can do. Before you begin, please comment in the issue thread in case someone else may be working on that issue. Or you can contact me directly at dominic.okane at edhec.edu. There are a number of requirements:
 
-* The code should be Pep8 compliant.
-* Comments are required for every class and function, and they should give a clear description.
-* At least one broad test case and a set of unit tests must be provided for every function.
-* Avoid very pythonic constructions. For example a loop is as good as a list comprehension. And with numba it can be faster. Readability and speed are the priorities.
+Contributions from developers and finance practitioners are welcome. You can help by fixing bugs, improving documentation, adding tests, extending examples or proposing new products and models.
 
-## Users
-If you are a user and require some additional functionality, then please add it as an issue.
+Before beginning a substantial change, [open an issue](https://github.com/domokane/FinancePy/issues) or comment on an existing one to coordinate work.
 
-## Overview
+Contributions should prioritize:
 
-FinancePy is a python-based library that is currently in beta version. It covers the following functionality:
+- Readable, PEP 8–style Python.
+- Clear documentation for classes and functions.
+- Tests for new functionality, including representative valuation cases.
+- Straightforward implementations and sensible performance.
 
-* Valuation and risk models for a wide range of equity, FX, interest rate and credit derivatives.
+See the [open issues](https://github.com/domokane/FinancePy/issues) and [pull requests](https://github.com/domokane/FinancePy/pulls).
 
-Although it is written entirely in Python, it can achieve speeds comparable to C++ by using Numba. As a result the user has both the ability to examine the underlying code and the ability to perform pricing and risk at speeds which compare to a library written in C++.
+## Project status and support
 
-The target audience for this library includes:
+FinancePy is an open-source project. If you find a defect, need a feature or want to suggest a valuation example, please [create an issue](https://github.com/domokane/FinancePy/issues) with enough detail to reproduce or evaluate the request.
 
-* Students of finance and students of python
-* Academics teaching finance or conducting research into finance
-* Traders wishing to price or risk-manage a derivative.
-* Quantitative analysts seeking to price or reverse engineer a price.
-* Risk managers wishing to replicate and understand price sensitivity.
-* Portfolio managers wishing to check prices or calculate risk measures.
-* Fund managers wanting to value a portfolio or examine a trading strategy.
-
-Users should have a good, but not advanced, understanding of Python. In terms of Python, the style of the library has been determined subject to the following criteria:
-
-1. To make the code as simple as possible so that those with a basic Python fluency can understand and check the code.
-2. To keep all the code in Python so users can look through the code to the lowest level.
-3. To offset the performance impact of (2) by leveraging Numba to make the code as fast as possible without resorting to Cython.
-4. To make the design product-based rather than model-based so someone wanting to price a specific product can easily find that without having to worry too much about the model – just use the default – unless they want to. For most products, a Monte-Carlo implementation has been provided both as a reference for testing and as a way to better understand how the product functions in terms of payments, their timings and conditions.
-5. To make the library as complete as possible so a user can find all their required finance-related functionality in one place. This is better for the user as they only have to learn one interface.
-6. To avoid complex designs. Limited inheritance unless it allows for significant code reuse. Some code duplication is OK, at least temporarily.
-7. To have good documentation and easy-to-follow examples.
-8. To make it easy for interested parties to contribute.
-
-In many cases the valuations should be close to if not identical to those produced by financial systems such as Bloomberg. However for some products, larger value differences may arise due to differences in date generation and interpolation schemes. Over time it is hoped to reduce the size of such differences.
-
-Important Note:
-
-* IF YOU HAVE ANY PRICING OR RISK EXAMPLES YOU WOULD LIKE REPLICATED, SEND SCREENSHOTS OF ALL THE UNDERLYING DATA, MODEL DETAILS AND VALUATION.
-* IF THERE IS A PRODUCT YOU WOULD LIKE TO HAVE ADDED, SEND ME THE REQUEST.
-* IF THERE IS FUNCTIONALITY YOU WOULD LIKE ADDED, SEND ME A REQUEST.
-
-The underlying Python library is split into a number of major modules:
-
-* Utils - These are utility functions used to assist you with modelling a security. These include dates (Date), calendars, schedule generation, some finance-related mathematics functions and some helper functions.
-* Market - These are modules that capture the market information used to value a security. These include interest rate and credit curves, volatility surfaces and prices.
-* Models - These are the low-level models used to value derivative securities ranging from Black-Scholes to complex stochastic volatility models.
-* Products - These are the actual securities and range from Government bonds to Bermudan swaptions.
-
-Any product valuation is the result of the following data design:
-
-**VALUATION** = **PRODUCT** + **MODEL** + **MARKET**
-
-The interface to each product has a value() function that will take a model and market to produce a price.
+**Disclaimer:** FinancePy is provided without warranty. Financial calculations should be independently checked before being used for trading, investment or risk-management decisions.
 
 ## Author
 
-I was a Professor of Finance at the EDHEC Business School in Nice, France. I have 12 years of industry experience and over 18 years of academic experience.
-
-Contact me at okane.dominic at gmail.com.
-
-## Dependencies
-
-FinancePy depends on Numpy, Numba, Scipy and basic python libraries such as os, sys and datetime.
-
-## Changelog
-
-See the changelog for a detailed history of changes.
+FinancePy was created by **Dominic O'Kane**, drawing on experience in quantitative finance, industry and academia.
 
 ## License
 
- GPL-3.0 License - See the license file in this folder for details.
+FinancePy is licensed under **GPL-3.0-or-later**. See the [LICENSE](LICENSE) file for details.
 
+---
 
+<div align="center">
 
+**Explore the models · Learn from the examples · Contribute to open quantitative finance**
+
+[Documentation](https://domokane.github.io/FinancePy/) · [Examples](https://github.com/domokane/FinancePy/tree/master/examples) · [GitHub](https://github.com/domokane/FinancePy)
+
+</div>

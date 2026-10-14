@@ -189,6 +189,7 @@ def test_implied_volatility():
         time_to_expiry,
         opt_type.value,
         strike,
+        True
     )
     price = results["value"]
     sigma = implied_volatility(forward, time_to_expiry, r, strike, price, opt_type)
@@ -205,6 +206,7 @@ def test_implied_volatility():
         time_to_expiry,
         opt_type.value,
         strike,
+        True
     )
     price = results["value"]
     sigma = implied_volatility(forward, time_to_expiry, r, strike, price, opt_type)

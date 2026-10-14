@@ -10,7 +10,6 @@ pep8_converter/
 private/
 # PYTHON AND JUPYTER FILES
 build/
-*.png
 *.jpeg
 env/
 venv/

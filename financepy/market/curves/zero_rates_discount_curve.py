@@ -15,9 +15,6 @@ from typing import Union
 
 import numpy as np
 
-from ...utils.format_graphs import set_plot_style
-set_plot_style()
-
 
 # TODO: Fix up __repr__ function
 
