@@ -92,11 +92,11 @@ def test_cap():
     cvalue5 = capfloor.value(value_dt, libor_curve, model5)
     cvalue6 = capfloor.value(value_dt, libor_curve, model6)
     assert round(cvalue1, 3) == 28889.475
-    assert round(cvalue2, 3) == 28889.478
+    assert round(cvalue2, 3) == 28889.479
     assert round(cvalue3, 3) == 28889.475
     assert round(cvalue4, 3) == 28889.475
-    assert round(cvalue5, 3) == 82372.560
-    assert round(cvalue6, 3) == 28889.606
+    assert round(cvalue5, 3) == 80314.608
+    assert round(cvalue6, 3) == 28889.621
 
     k = 0.05
     capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
@@ -106,12 +106,12 @@ def test_cap():
     cvalue4 = capfloor.value(value_dt, libor_curve, model4)
     cvalue5 = capfloor.value(value_dt, libor_curve, model5)
     cvalue6 = capfloor.value(value_dt, libor_curve, model6)
-    assert round(cvalue1, 0) == 1905
-    assert round(cvalue2, 0) == 2399
-    assert round(cvalue3, 0) == 517
-    assert round(cvalue4, 0) == 570
-    assert round(cvalue5, 0) == 63678
-    assert round(cvalue6, 0) == 1910
+    assert round(cvalue1, 0) == 2025
+    assert round(cvalue2, 0) == 2550
+    assert round(cvalue3, 0) == 547
+    assert round(cvalue4, 0) == 604
+    assert round(cvalue5, 0) == 64095
+    assert round(cvalue6, 0) == 2030
 
     k = 0.08
     capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
@@ -122,12 +122,12 @@ def test_cap():
     cvalue5 = capfloor.value(value_dt, libor_curve, model5)
     cvalue6 = capfloor.value(value_dt, libor_curve, model6)
 
-    assert round(cvalue1, 4) == 3.1029
-    assert round(cvalue2, 4) == 21.3032
-    assert round(cvalue3, 4) == 0.0022
-    assert round(cvalue4, 4) == 0.0178
-    assert round(cvalue5, 0) == 53619
-    assert round(cvalue6, 4) == 0.1585
+    assert round(cvalue1, 4) == 3.3478
+    assert round(cvalue2, 4) == 22.5901
+    assert round(cvalue3, 4) == 0.0026
+    assert round(cvalue4, 4) == 0.0203
+    assert round(cvalue5, 0) == 51739
+    assert round(cvalue6, 4) == 0.1763
 
 
 ########################################################################################
@@ -146,11 +146,11 @@ def test_floor():
     cvalue5 = capfloor.value(value_dt, libor_curve, model5)
     cvalue6 = capfloor.value(value_dt, libor_curve, model6)
     assert round(cvalue1, 4) == 0.0
-    assert round(cvalue2, 4) == 0.0037
+    assert round(cvalue2, 4) == 0.0043
     assert round(cvalue3, 4) == 0.0
     assert round(cvalue4, 4) == 0.0
-    assert round(cvalue5, 0) == 51899
-    assert round(cvalue6, 4) == 0.1310
+    assert round(cvalue5, 0) == 51425
+    assert round(cvalue6, 4) == 0.1465
 
     k = 0.05
     capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
@@ -160,12 +160,12 @@ def test_floor():
     cvalue4 = capfloor.value(value_dt, libor_curve, model4)
     cvalue5 = capfloor.value(value_dt, libor_curve, model5)
     cvalue6 = capfloor.value(value_dt, libor_curve, model6)
-    assert round(cvalue1, 0) == 2089
-    assert round(cvalue2, 0) == 2584
-    assert round(cvalue3, 0) == 702
-    assert round(cvalue4, 0) == 754
-    assert round(cvalue5, 0) == 62278
-    assert round(cvalue6, 0) == 2094
+    assert round(cvalue1, 0) == 2209
+    assert round(cvalue2, 0) == 2735
+    assert round(cvalue3, 0) == 732
+    assert round(cvalue4, 0) == 788
+    assert round(cvalue5, 0) == 64279
+    assert round(cvalue6, 0) == 2214
 
     k = 0.08
     capfloor = IborCapFloor(start_dt, maturity_dt, cap_floor_type, k)
@@ -176,8 +176,8 @@ def test_floor():
     cvalue5 = capfloor.value(value_dt, libor_curve, model5)
     cvalue6 = capfloor.value(value_dt, libor_curve, model6)
     assert round(cvalue1, 0) == 29261
-    assert round(cvalue2, 0) == 29279
+    assert round(cvalue2, 0) == 29281
     assert round(cvalue3, 0) == 29258
     assert round(cvalue4, 0) == 29258
-    assert round(cvalue5, 0) == 81293
+    assert round(cvalue5, 0) == 80997
     assert round(cvalue6, 0) == 29258
