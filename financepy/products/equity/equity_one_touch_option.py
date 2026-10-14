@@ -20,12 +20,12 @@ from ...utils.helpers import option_years
 from ...models.model import Model
 
 from ...utils.math import normcdf_vect
-from ...models.equity_one_touch_bs import barrier_pay_one_at_hit_pv_down
-from ...models.equity_one_touch_bs import barrier_pay_one_at_hit_pv_up
-from ...models.equity_one_touch_bs import barrier_pay_asset_at_expiry_down_out
-from ...models.equity_one_touch_bs import barrier_pay_asset_at_expiry_up_out
-from ...models.equity_one_touch_bs import barrier_pay_asset_at_expiry_down
-from ...models.equity_one_touch_bs import barrier_pay_asset_at_expiry_up
+from ...models.bs_equity_one_touch import barrier_pay_one_at_hit_pv_down
+from ...models.bs_equity_one_touch import barrier_pay_one_at_hit_pv_up
+from ...models.bs_equity_one_touch import barrier_pay_asset_at_expiry_down_out
+from ...models.bs_equity_one_touch import barrier_pay_asset_at_expiry_up_out
+from ...models.bs_equity_one_touch import barrier_pay_asset_at_expiry_down
+from ...models.bs_equity_one_touch import barrier_pay_asset_at_expiry_up
 
 ########################################################################################
 # TODO: Implement Sobol random numbers

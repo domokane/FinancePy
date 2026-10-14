@@ -10,7 +10,7 @@ from ..utils.error import FinError
 from ..utils.global_types import OptionTypes
 from ..utils.math import normcdf
 
-from .asian_option_mc import error_str
+from .bs_asian_option_mc import error_str
 
 
 @njit(cache=True, parallel=False, fastmath=True)

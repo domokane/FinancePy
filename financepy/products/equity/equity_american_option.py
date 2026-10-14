@@ -16,8 +16,9 @@ from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
 from ...utils.helpers import option_years
 
-# from ...models.black_scholes_analytic import baw_value
+# from ...models.bs_european_analytic import baw_value
 from ...models.model import Model
+from ...models.bs_american_analytic import american_value
 
 ########################################################################################
 # TODO: Implement some analytical approximations
@@ -65,9 +66,12 @@ class EquityAmericanOption(EquityOption):
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model: Model,
+        **kwargs
     ):
         """Valuation of an American option using a CRR tree to take into
         account the value of early exercise."""
+
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
@@ -76,18 +80,18 @@ class EquityAmericanOption(EquityOption):
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
 
-        t_exp = option_years(value_dt, self.expiry_dt)
-        t_exp = np.maximum(t_exp, 1e-10)
-
         s = np.asarray(stock_price, dtype=float)
         k = self.strike_price
+        vol = model.volatility
+        opt_type = self.opt_type
 
         if s.ndim == 0:
-            v = model.value(float(s), t_exp, k, r, q, self.opt_type)
+            v = american_value(float(s), t_exp, k, r, q, vol, opt_type, **kwargs)
         else:
-            v = np.asarray(
-                [model.value(float(spot), t_exp, k, r, q, self.opt_type) for spot in s]
-            )
+            n = len(s)
+            v = np.empty_like(s)
+            for i in range(n):
+                v[i] = american_value(s[i], t_exp, k, r, q, vol, opt_type, **kwargs)
 
         return v * self.num_options
 

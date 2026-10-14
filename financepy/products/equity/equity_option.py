@@ -2,19 +2,17 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-
+from copy import deepcopy
 from typing import Union
 
 from financepy.models.model import Model
 
 from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...models.black_scholes import BlackScholes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.date import Date
 
 ########################################################################################
 
-BUMP = 1e-4
 
 ########################################################################################
 
@@ -46,25 +44,27 @@ class EquityOption:
     ):
         """Calculate option delta by perturbation of stock price."""
 
-        v = self.value(
+        bump = stock_price * 1e-3
+
+        v_dn = self.value(
             value_dt,
-            stock_price,
+            stock_price - bump,
             discount_curve,
             dividend_curve,
             model,
             **kwargs,
         )
 
-        v_bumped = self.value(
+        v_up = self.value(
             value_dt,
-            stock_price + BUMP,
+            stock_price + bump,
             discount_curve,
             dividend_curve,
             model,
             **kwargs,
         )
 
-        return (v_bumped - v) / BUMP
+        return (v_up - v_dn) / (2.0 * bump)
 
     ###########################################################################
 
@@ -79,6 +79,8 @@ class EquityOption:
     ):
         """Calculate option gamma by perturbation of stock price."""
 
+        bump = 1e-3 * stock_price
+
         v = self.value(
             value_dt,
             stock_price,
@@ -90,7 +92,7 @@ class EquityOption:
 
         v_bumped_dn = self.value(
             value_dt,
-            stock_price - BUMP,
+            stock_price - bump,
             discount_curve,
             dividend_curve,
             model,
@@ -99,14 +101,14 @@ class EquityOption:
 
         v_bumped_up = self.value(
             value_dt,
-            stock_price + BUMP,
+            stock_price + bump,
             discount_curve,
             dividend_curve,
             model,
             **kwargs,
         )
 
-        return (v_bumped_up - 2.0 * v + v_bumped_dn) / BUMP**2
+        return (v_bumped_up - 2.0 * v + v_bumped_dn) / bump**2
 
     ###########################################################################
 
@@ -132,7 +134,8 @@ class EquityOption:
             **kwargs,
         )
 
-        bumped_model = BlackScholes(model.volatility + bump)
+        bumped_model = deepcopy(model)
+        bumped_model.volatility += bump
 
         v_bumped = self.value(
             value_dt,
@@ -157,6 +160,7 @@ class EquityOption:
         **kwargs,
     ):
         """Calculate option vanna by perturbing delta with respect to vol."""
+        bump = 0.01
 
         delta = self.delta(
             value_dt,
@@ -167,7 +171,8 @@ class EquityOption:
             **kwargs,
         )
 
-        bumped_model = BlackScholes(model.volatility + BUMP)
+        bumped_model = deepcopy(model)
+        bumped_model.volatility += bump
 
         delta_bumped = self.delta(
             value_dt,
@@ -178,7 +183,7 @@ class EquityOption:
             **kwargs,
         )
 
-        return (delta_bumped - delta) / BUMP
+        return (delta_bumped - delta) / bump
 
     ###########################################################################
 
@@ -204,6 +209,9 @@ class EquityOption:
 
         next_dt = value_dt.add_days(1)
 
+        old_discount_anchor_dt = discount_curve.anchor_dt
+        old_dividend_anchor_dt = dividend_curve.anchor_dt
+
         discount_curve.anchor_dt = next_dt
         dividend_curve.anchor_dt = next_dt
 
@@ -220,8 +228,8 @@ class EquityOption:
             )
         finally:
             # Always restore curves, even if valuation raises.
-            discount_curve.anchor_dt = value_dt
-            dividend_curve.anchor_dt = value_dt
+            discount_curve.anchor_dt = old_discount_anchor_dt
+            dividend_curve.anchor_dt = old_dividend_anchor_dt
 
         return (v_bumped - v) / time_bump
 
@@ -238,6 +246,8 @@ class EquityOption:
     ):
         """Calculate option rho by perturbing the interest-rate curve."""
 
+        bump = 0.0001
+
         v = self.value(
             value_dt,
             stock_price,
@@ -250,12 +260,12 @@ class EquityOption:
         v_bumped = self.value(
             value_dt,
             stock_price,
-            discount_curve.bump_parallel(BUMP),
+            discount_curve.bump_parallel(bump),
             dividend_curve,
             model,
             **kwargs,
         )
 
-        return (v_bumped - v) / BUMP
+        return (v_bumped - v) / bump
 
     ###########################################################################

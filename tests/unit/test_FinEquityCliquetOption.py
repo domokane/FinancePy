@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 from financepy.utils.error import FinError
-from financepy.models.black_scholes_analytic import european_value
+from financepy.models.bs_european_analytic import european_value
 
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.date import Date

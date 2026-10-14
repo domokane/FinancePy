@@ -51,7 +51,7 @@ from ...models.sabr import vol_function_sabr_beta_half
 
 from ...utils.math import norminvcdf
 
-from ...models.black_scholes_analytic import european_value
+from ...models.bs_european_analytic import european_value
 from ...products.fx.fx_vanilla_option import fast_delta
 from ...utils.distribution import FinDistribution
 

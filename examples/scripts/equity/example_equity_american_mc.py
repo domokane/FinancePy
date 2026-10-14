@@ -40,7 +40,7 @@ from financepy.utils.global_types import OptionTypes
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
-from financepy.models.black_scholes_analytic import value as bs_value
+from financepy.models.bs_european_analytic import value as bs_value
 from financepy.models.equity_crr_tree import crr_tree_val
 from financepy.models.equity_lsmc import equity_lsmc, BoundaryFitTypes
 from financepy.products.equity.equity_american_option import (

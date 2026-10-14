@@ -143,6 +143,10 @@ class Schedule:
 
         calendar = Calendar(self.cal_type)
         frequency = annual_frequency(self.freq_type)
+
+        if frequency == 0 or frequency == 99 or frequency == -1:
+            raise FinError("Frequency must be annual, semi-annual, quarterly or monthly.")
+
         num_months = int(12 / frequency)
 
         # Always step from the unadjusted termination date. A previous call may

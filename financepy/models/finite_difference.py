@@ -1,9 +1,6 @@
-from copy import deepcopy
-from functools import partial
-
 import numpy as np
-from numba import njit
 
+from numba import njit
 
 from ..utils.math import band_matrix_multiplication
 from ..utils.math import solve_tridiagonal_matrix
@@ -13,6 +10,7 @@ from ..utils.global_types import OptionTypes
 ########################################################################################
 
 
+@njit(cache=True, fastmath=True)
 def validate_black_scholes_fd_inputs(
     spot_price,
     volatility,
@@ -60,9 +58,6 @@ def validate_black_scholes_fd_inputs(
     if num_steps_per_year is not None and num_steps_per_year <= 0:
         raise ValueError("num_steps_per_year must be positive or None")
 
-    if isinstance(opt_type, OptionTypes):
-        opt_type = opt_type.value
-
     valid_types = {
         OptionTypes.EUROPEAN_CALL.value,
         OptionTypes.EUROPEAN_PUT.value,
@@ -74,61 +69,80 @@ def validate_black_scholes_fd_inputs(
         raise ValueError(f"Unsupported option type: {opt_type}")
 
 
+@njit(cache=True, fastmath=True)
 def fn_dx(x, wind=0):
 
     # Intermediate rows
-    # Note: As first and last rows are handled separately
-    # (at the end of this method)
-    # we can use numpy roll without worrying about the end values
+    # Note: first and last rows are handled separately
+    # at the end of this method.
     dxl = x - np.roll(x, 1)
     dxu = np.roll(x, -1) - x
+
+    n = len(x)
+    out = np.empty((n, 3), dtype=x.dtype)
+
     if wind < 0:
         # (-1/dxl, 1/dxl, 0)
-        out = np.array((-1 / dxl, 1 / dxl, np.zeros_like(dxl))).T
+        out[:, 0] = -1.0 / dxl
+        out[:, 1] = 1.0 / dxl
+        out[:, 2] = 0.0
+
     elif wind == 0:
-        intermediate_rows = np.array((-dxu / dxl, dxu / dxl - dxl / dxu, dxl / dxu)) / (
-            dxl + dxu
-        )
-        out = intermediate_rows.T
+        denom = dxl + dxu
+
+        out[:, 0] = (-dxu / dxl) / denom
+        out[:, 1] = (dxu / dxl - dxl / dxu) / denom
+        out[:, 2] = (dxl / dxu) / denom
+
     else:
         # (0, -1/dxu, 1/dxu)
-        out = np.array((np.zeros_like(dxu), -1 / dxu, 1 / dxu)).T
+        out[:, 0] = 0.0
+        out[:, 1] = -1.0 / dxu
+        out[:, 2] = 1.0 / dxu
 
     # First row
     if wind >= 0:
-        out[0] = (0, -1, 1)
-        out[0] /= x[1] - x[0]
+        h = x[1] - x[0]
+        out[0, 0] = 0.0
+        out[0, 1] = -1.0 / h
+        out[0, 2] = 1.0 / h
     else:
-        out[0] = (0, 0, 0)
+        out[0, :] = 0.0
 
     # Last row
     if wind <= 0:
-        out[-1] = (-1, 1, 0)
-        out[-1] /= x[-1] - x[-2]
+        h = x[-1] - x[-2]
+        out[-1, 0] = -1.0 / h
+        out[-1, 1] = 1.0 / h
+        out[-1, 2] = 0.0
     else:
-        out[-1] = (0, 0, 0)
+        out[-1, :] = 0.0
 
     return out
-
 
 ########################################################################################
 
 
+@njit(cache=True, fastmath=True)
 def fn_dxx(x):
 
     # Intermediate rows
-    # Note: As first and last rows are handled separately
-    # (they overwritten at end of this method),
-    # we can use numpy roll without worrying about the end values
+    # Note: first and last rows are handled separately.
     dxl = x - np.roll(x, 1)
     dxu = np.roll(x, -1) - x
-    intermediate_rows = np.array([2 / dxl, -(2 / dxl + 2 / dxu), 2 / dxu]) / (dxu + dxl)
-    out = intermediate_rows.T
 
-    # First row
-    out[0] = (0, 0, 0)
-    # Last row
-    out[-1] = (0, 0, 0)
+    n = len(x)
+    out = np.empty((n, 3), dtype=x.dtype)
+
+    denom = dxu + dxl
+
+    out[:, 0] = (2.0 / dxl) / denom
+    out[:, 1] = -(2.0 / dxl + 2.0 / dxu) / denom
+    out[:, 2] = (2.0 / dxu) / denom
+
+    # Boundary rows
+    out[0, :] = 0.0
+    out[-1, :] = 0.0
 
     return out
 
@@ -136,9 +150,10 @@ def fn_dxx(x):
 ########################################################################################
 
 
+@njit(cache=True, fastmath=True)
 def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
     """
-    1d finite difference solution for pdes of the form
+    1d finite difference solution for PDEs of the form
 
     0 = dV/dt + a V
 
@@ -148,37 +163,62 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
 
     [1-theta dt a] V(t) = [1 + (1-theta) dt a] V(t+dt)
     """
-    if dt == 0:
+
+    if dt == 0.0:
         raise ValueError("Timestep length dt must be non-zero")
-    if theta == 0:
+
+    if theta == 0.0:
         raise ValueError("Theta must be non-zero")
 
-    # Calculate the finite differences for the first and second derivatives
     dxx = fn_dxx(x)
 
     if wind == 0:
         dx = fn_dx(x, 0)
+
     elif wind < 0:
-        dxd = fn_dx(x, -1)
-        dx = dxd
+        dx = fn_dx(x, -1)
+
     elif wind == 1:
-        dxu = fn_dx(x, 1)
-        dx = dxu
-    elif wind > 1:
-        # use dxd when mu < 0 and dxu otherwise
+        dx = fn_dx(x, 1)
+
+    else:
+        # Adaptive upwinding:
+        # use downward difference when local drift is negative,
+        # upward difference otherwise.
+
         dxd = fn_dx(x, -1)
         dxu = fn_dx(x, 1)
-        dx = np.zeros((len(x), 1)) + dxu
-        dx[mu[0] < 0] = dxd
 
-    # Ensure mu and var have correct dimensions
-    mu = np.atleast_2d(mu)
-    var = np.atleast_2d(var)
+        dx = dxu.copy()
 
-    # Calculate matrix
-    mm = dx.shape[1] // 2  # integer division
-    a = dt * theta * (mu.T * dx + 0.5 * var.T * dxx)
-    a[:, mm] += 1 - dt * theta * r
+        for i in range(len(x)):
+            if mu[i] < 0.0:
+                dx[i, 0] = dxd[i, 0]
+                dx[i, 1] = dxd[i, 1]
+                dx[i, 2] = dxd[i, 2]
+
+    mm = dx.shape[1] // 2
+
+    # Avoid np.atleast_2d here; explicitly construct the matrix.
+    a = np.empty_like(dx)
+
+    for i in range(len(x)):
+        a[i, 0] = dt * theta * (
+            mu[i] * dx[i, 0]
+            + 0.5 * var[i] * dxx[i, 0]
+        )
+
+        a[i, 1] = dt * theta * (
+            mu[i] * dx[i, 1]
+            + 0.5 * var[i] * dxx[i, 1]
+        )
+
+        a[i, 2] = dt * theta * (
+            mu[i] * dx[i, 2]
+            + 0.5 * var[i] * dxx[i, 2]
+        )
+
+        a[i, mm] += 1.0 - dt * theta * r[i]
 
     return a
 
@@ -186,30 +226,37 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
 ########################################################################################
 
 
-def fd_roll_backwards(res, theta, ai=None, ae=None):
+@njit(cache=True, fastmath=True)
+def fd_roll_backwards(res, theta, ai, ae):
 
-    # TODO Test for more than one vector
-    ai = np.array([]) if ai is None else ai
-    ae = np.array([]) if ae is None else ae
-    num_vectors = len(res)
+    num_vectors = res.shape[0]
+    num_points = res.shape[1]
     mm = 1
 
-    # Explicit case
-    if theta != 1:
+    if theta != 1.0:
         for k in range(num_vectors):
-            res[k] = band_matrix_multiplication(ae, mm, mm, res[k])
+            tmp = band_matrix_multiplication(
+                ae, mm, mm, res[k]
+            )
 
-    # Implicit case
-    if theta != 0:
+            for j in range(num_points):
+                res[k, j] = tmp[j]
+
+    if theta != 0.0:
         for k in range(num_vectors):
-            res[k] = solve_tridiagonal_matrix(ai, res[k])
+            tmp = solve_tridiagonal_matrix(
+                ai, res[k]
+            )
+
+            for j in range(num_points):
+                res[k, j] = tmp[j]
 
     return res
-
 
 ########################################################################################
 
 
+@njit(cache=True, fastmath=True)
 def fd_roll_forwards(res, theta, ai=None, ae=None):
 
     ai = np.array([]) if ai is None else ai
@@ -235,6 +282,7 @@ def fd_roll_forwards(res, theta, ai=None, ae=None):
 ########################################################################################
 
 
+@njit(cache=True, fastmath=True)
 def smooth_digital(xl, xu, strike):
 
     if xu <= strike:
@@ -248,6 +296,7 @@ def smooth_digital(xl, xu, strike):
 ########################################################################################
 
 
+@njit(cache=True, fastmath=True)
 def digital(x, strike):
 
     return 0.5 * (np.sign(x - strike) + 1)
@@ -256,6 +305,7 @@ def digital(x, strike):
 ########################################################################################
 
 
+@njit(cache=True, fastmath=True)
 def smooth_call(xl, xu, strike):
 
     if xu <= strike:
@@ -268,8 +318,8 @@ def smooth_call(xl, xu, strike):
 
 ########################################################################################
 
-
-def option_payoff(s, strike, smooth, dig, opt_type_int):
+@njit(cache=True, fastmath=True)
+def option_payoff(s, strike, smooth, dig: bool, opt_type_int):
 
     is_put = opt_type_int in {
         OptionTypes.AMERICAN_PUT.value,
@@ -280,7 +330,7 @@ def option_payoff(s, strike, smooth, dig, opt_type_int):
     # overwritten later)
     if not smooth:
         if dig:
-            res = (s >= strike).astype(float)
+            res = (s >= strike).astype(np.float64)
         else:
             res = np.maximum(s - strike, 0.0)
     else:
@@ -314,7 +364,7 @@ def option_payoff(s, strike, smooth, dig, opt_type_int):
 
 ########################################################################################
 
-
+# @njit(cache=True, fastmath=True)
 def black_scholes_fd(
     spot_price,
     volatility,
@@ -322,7 +372,7 @@ def black_scholes_fd(
     strike_price,
     risk_free_rate,
     dividend_yield,
-    opt_type,
+    opt_type_value,
     num_steps_per_year=None,
     num_samples=2000,
     num_std=5,
@@ -341,7 +391,7 @@ def black_scholes_fd(
         strike_price,
         risk_free_rate,
         dividend_yield,
-        opt_type,
+        opt_type_value,
         num_steps_per_year,
         num_samples,
         num_std,
@@ -349,16 +399,13 @@ def black_scholes_fd(
         wind,
     )
 
-    if isinstance(opt_type, OptionTypes):
-        opt_type = opt_type.value
-
     if time_to_expiry == 0.0:
         return option_payoff(
             np.array([spot_price]),
             strike_price,
             False,
             digital,
-            opt_type,
+            opt_type_value,
         )[0, 0]
 
     # Define grid
@@ -375,7 +422,7 @@ def black_scholes_fd(
     s = spot_price * np.exp(xl + d_x * np.arange(0, num_samples))
 
     # Generate the option payoff to be fitted
-    payoff = option_payoff(s, strike_price, smooth, digital, opt_type)
+    payoff = option_payoff(s, strike_price, smooth, digital, opt_type_value)
 
     # time steps
     if num_steps_per_year is not None:
@@ -392,8 +439,8 @@ def black_scholes_fd(
     var_ = (s * volatility) ** 2
 
     # Initialise implicit and explicit matricies
-    ai = np.array([])
-    ae = np.array([])
+    ai = np.empty((num_samples, 3), dtype=np.float64)
+    ae = np.empty((num_samples, 3), dtype=np.float64)
 
     # Store original res as res0
     res = payoff.copy()
@@ -408,7 +455,7 @@ def black_scholes_fd(
         res = fd_roll_backwards(res, theta, ai=ai, ae=ae)
 
         # Early exercise (American)
-        if opt_type in {
+        if opt_type_value in {
             OptionTypes.AMERICAN_CALL.value,
             OptionTypes.AMERICAN_PUT.value,
         }:
@@ -417,7 +464,9 @@ def black_scholes_fd(
 
     # By default, keep old behaviour (scalar @ center node)
     center_val = res[0][num_samples // 2]
-    if return_grid:
-        # Return the full grid for plotting and analysis
-        return s, res[0], center_val
+
+    # if return_grid:
+    #     # Return the full grid for plotting and analysis
+    #     return s, res[0], center_val
+
     return center_val

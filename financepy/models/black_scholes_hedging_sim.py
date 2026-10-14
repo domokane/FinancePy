@@ -10,8 +10,8 @@ import pandas as pd
 
 from numba import njit
 
-from financepy.models.black_scholes_analytic import european_value
-from financepy.models.black_scholes_analytic import delta
+from financepy.models.bs_european_analytic import european_value
+from financepy.models.bs_european_analytic import delta
 
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.error import FinError

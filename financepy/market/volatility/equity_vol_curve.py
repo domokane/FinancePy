@@ -14,9 +14,9 @@ from ...utils.error import FinError
 from ...utils.math import test_monotonicity
 from ...models.option_implied_dbn import option_implied_dbn
 
-from ...models.black_scholes_analytic import fwd as bsa_fwd
-from ...models.black_scholes_analytic import delta as bsa_delta
-from ...models.black_scholes_analytic import vega as bsa_vega
+from ...models.bs_european_analytic import fwd as bsa_fwd
+from ...models.bs_european_analytic import delta as bsa_delta
+from ...models.bs_european_analytic import vega as bsa_vega
 
 ########################################################################################
 

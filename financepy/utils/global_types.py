@@ -38,18 +38,6 @@ class VolFuncTypes(Enum):
     SSVI = 7
 
 
-class BlackScholesTypes(Enum):
-
-    DEFAULT = 0
-    ANALYTICAL = 1
-    CRR_TREE = 2
-    BARONE_ADESI = 3
-    LSMC = 4
-    BJERKSUND_STENSLAND = 5
-    FINITE_DIFFERENCE = 6
-    PSOR = 7
-
-
 class OISCompoundingTypes(Enum):
     COMPOUNDED = 1
     OVERNIGHT_COMPOUNDED_ANNUAL_RATE = 2

@@ -7,7 +7,6 @@ import numpy as np
 
 from ...utils.global_types import DoubleBarrierTypes
 
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
@@ -15,9 +14,9 @@ from ...models.gbm_process_simulator import get_paths_times
 from .fx_option import FXOption
 from ...utils.check_values import check_curve_dt
 from ...utils.helpers import option_years
-from ...models.double_touch_option import fast_double_no_touch_pricer
-from ...models.double_touch_option import barrier_pay_at_expiry_double_hit
-from ...models.double_touch_option import p_double_touch_bb_parallel
+from ...models.bs_double_touch_option import fast_double_no_touch_pricer
+from ...models.bs_double_touch_option import barrier_pay_at_expiry_double_hit
+from ...models.bs_double_touch_option import p_double_touch_bb_parallel
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.model import Model
 
@@ -164,8 +163,8 @@ class FXDoubleOneTouchOption(FXOption):
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         model: Model,
-        num_steps_per_year: int=52,
-        num_paths: int=100000,
+        num_steps_per_year: int = 52,
+        num_paths: int = 100000,
         seed=42,
     ):
 
@@ -255,9 +254,8 @@ class FXDoubleOneTouchOption(FXOption):
         - KNOCK_IN  (double one-touch): pays K if a barrier is touched before expiry.
         - KNOCK_OUT (double no-touch):   pays K if neither barrier is touched before expiry.
         """
-        T = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-        if T <= 0.0:
-            return 0.0
+
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         check_curve_dt(value_dt, domestic_curve)
         check_curve_dt(value_dt, foreign_curve)
@@ -272,10 +270,11 @@ class FXDoubleOneTouchOption(FXOption):
         L = self.lower_barrier_fx_rate
         U = self.upper_barrier_fx_rate
 
-        steps = int(max(1, num_steps_per_year * T))
+        steps = int(max(1, num_steps_per_year * t_exp))
 
         # Estimate touch probability with Brownian bridge (parallel)
-        p_touch = p_double_touch_bb_parallel(S0, L, U, mu, sigma, T, steps, num_paths, seed)
+        p_touch = p_double_touch_bb_parallel(S0, L, U, mu, sigma,
+                                             t_exp, steps, num_paths, seed)
 
         if self.option_type == DoubleBarrierTypes.KNOCK_OUT:
             # Double no-touch

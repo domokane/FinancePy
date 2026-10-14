@@ -18,6 +18,7 @@ from ...utils.check_values import check_curve_dt
 
 from ...models.model import Model
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.helpers import option_years
 
 ########################################################################################
 
@@ -78,7 +79,7 @@ def value_mc_fast(
     num_assets: int,
     payoff_type,
     payoff_params,
-    num_paths: int=10000,
+    num_paths: int = 10000,
     seed=4242,
 ):
 
@@ -215,7 +216,7 @@ class FXRainbowOption(FXOption):
         self.validate(stock_prices, foreign_rates, volatilities, betas)
 
         # Use result by Stulz (1982) given by Haug Page 211
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         r = domestic_curve.zero_rate_cc(self.expiry_dt)
 
@@ -234,27 +235,27 @@ class FXRainbowOption(FXOption):
         k = self.payoff_params[0]
 
         v = np.sqrt(v1 * v1 + v2 * v2 - 2 * rho * v1 * v2)
-        d = (np.log(s1 / s2) + (b1 - b2 + v * v / 2) * t) / v / np.sqrt(t)
-        y1 = (np.log(s1 / k) + (b1 + v1 * v1 / 2) * t) / v1 / np.sqrt(t)
-        y2 = (np.log(s2 / k) + (b2 + v2 * v2 / 2) * t) / v2 / np.sqrt(t)
+        d = (np.log(s1 / s2) + (b1 - b2 + v * v / 2) * t_exp) / v / np.sqrt(t_exp)
+        y1 = (np.log(s1 / k) + (b1 + v1 * v1 / 2) * t_exp) / v1 / np.sqrt(t_exp)
+        y2 = (np.log(s2 / k) + (b2 + v2 * v2 / 2) * t_exp) / v2 / np.sqrt(t_exp)
         rho1 = (v1 - rho * v2) / v
         rho2 = (v2 - rho * v1) / v
-        dq1 = np.exp(-q1 * t)
-        dq2 = np.exp(-q2 * t)
-        df = np.exp(-r * t)
-        sqrtt = np.sqrt(t)
+        dq1 = np.exp(-q1 * t_exp)
+        dq2 = np.exp(-q2 * t_exp)
+        df = np.exp(-r * t_exp)
+        sqrtt = np.sqrt(t_exp)
 
         if self.payoff_type == FXRainbowOptionTypes.CALL_ON_MAXIMUM:
             v = (
                 s1 * dq1 * M(y1, d, rho1)
                 + s2 * dq2 * M(y2, -d + v * sqrtt, rho2)
-                - k * df * (1.0 - M(-y1 + v1 * np.sqrt(t), -y2 + v2 * sqrtt, rho))
+                - k * df * (1.0 - M(-y1 + v1 * np.sqrt(t_exp), -y2 + v2 * sqrtt, rho))
             )
         elif self.payoff_type == FXRainbowOptionTypes.CALL_ON_MINIMUM:
             v = (
                 s1 * dq1 * M(y1, -d, -rho1)
-                + s2 * dq2 * M(y2, d - v * np.sqrt(t), -rho2)
-                - k * df * M(y1 - v1 * np.sqrt(t), y2 - v2 * np.sqrt(t), rho)
+                + s2 * dq2 * M(y2, d - v * np.sqrt(t_exp), -rho2)
+                - k * df * M(y1 - v1 * np.sqrt(t_exp), y2 - v2 * np.sqrt(t_exp), rho)
             )
         elif self.payoff_type == FXRainbowOptionTypes.PUT_ON_MAXIMUM:
             cmax1 = s2 * dq2 + s1 * dq1 * normcdf(d) - s2 * dq2 * normcdf(d - v * sqrtt)
@@ -288,23 +289,20 @@ class FXRainbowOption(FXOption):
         foreign_rates: float,
         volatilities: np.ndarray,
         betas,
-        num_paths: int=10000,
+        num_paths: int = 10000,
         seed=4242,
     ):
+
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         check_curve_dt(value_dt, discount_curve)
 
         self.validate(stock_prices, foreign_rates, volatilities, betas)
 
-        if value_dt > expiry_dt:
-            raise FinError("Value date after expiry date.")
-
-        t = (self.expiry_dt - value_dt) / G_DAYS_IN_YEAR
-
         r = discount_curve.zero_rate_cc(expiry_dt)
 
         v = value_mc_fast(
-            t,
+            t_exp,
             stock_prices,
             r,
             foreign_rates,

@@ -1,6 +1,6 @@
 import pytest
 
-from financepy.models.black_scholes_analytic import value as black_scholes_value
+from financepy.models.bs_european_analytic import european_value
 from financepy.models.merton_jump_diffusion import MertonJumpDiffusion
 from financepy.utils.global_types import OptionTypes
 
@@ -15,7 +15,7 @@ def test_zero_jump_size_preserves_price_at_large_poisson_exposure():
     )
 
     price = model.value(120.0, 1.0, 100.0, 0.03, 0.01, OptionTypes.EUROPEAN_CALL)
-    expected = black_scholes_value(
+    expected = european_value(
         120.0,
         1.0,
         100.0,

@@ -9,6 +9,7 @@ from financepy.utils.math import normcdf_integrate
 from financepy.utils.math import normcdf
 from financepy.utils.math import normcdf_slow
 from financepy.utils.math import norminvcdf
+from financepy.utils.math import phi2
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
@@ -83,7 +84,64 @@ def test_fin_math():
         test_cases.print(x, y1, y2, x_out1, x_out2, diff1, diff2)
 
 
+def test_phi2():
+
+    tol = 1.0e-7
+
+    # Independence
+    assert abs(
+        phi2(0.3, -0.7, 0.0)
+        - normcdf(0.3) * normcdf(-0.7)
+    ) < tol
+
+    # Origin identities
+    assert abs(
+        phi2(0.0, 0.0, 0.0)
+        - 0.25
+    ) < tol
+
+    assert abs(
+        phi2(0.0, 0.0, 0.5)
+        - 1.0 / 3.0
+    ) < tol
+
+    assert abs(
+        phi2(0.0, 0.0, -0.5)
+        - 1.0 / 6.0
+    ) < tol
+
+    # Symmetry
+    for rho in (-0.9, -0.5, 0.0, 0.5, 0.9):
+
+        a = phi2(-0.7, 1.3, rho)
+        b = phi2(1.3, -0.7, rho)
+
+        assert abs(a - b) < tol
+
+    # Perfect positive correlation
+    assert abs(
+        phi2(0.3, -0.7, 1.0)
+        - normcdf(-0.7)
+    ) < tol
+
+    # Perfect negative correlation
+    expected = max(
+        normcdf(0.3)
+        + normcdf(-0.7)
+        - 1.0,
+        0.0,
+    )
+
+    assert abs(
+        phi2(0.3, -0.7, -1.0)
+        - expected
+    ) < tol
+
+
 ########################################################################################
 
+
 test_fin_math()
+test_phi2()
+
 test_cases.compare_test_cases()

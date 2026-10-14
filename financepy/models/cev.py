@@ -17,7 +17,7 @@ from scipy.stats import ncx2
 
 from ..utils.error import FinError
 from ..utils.global_types import OptionTypes
-from ..models.black_scholes_analytic import (
+from ..models.bs_european_analytic import (
     european_value,
     implied_volatility,
 )

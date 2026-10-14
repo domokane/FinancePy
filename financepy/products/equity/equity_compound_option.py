@@ -12,9 +12,10 @@ from ...utils.global_vars import G_SMALL
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.flat_discount_curve import DiscountCurve
 from ...utils.helpers import label_to_string, check_argument_types
-from ...models.equity_compound_option_bs import equity_compound_option_value_tree
-from ...models.equity_compound_option_bs import equity_compound_option_bs
+from ...models.bs_equity_compound_option import equity_compound_option_value_tree
+from ...models.bs_equity_compound_option import equity_compound_option_bs
 from ...utils.check_values import check_curve_dt
+from ...utils.check_values import check_volatility
 from ...utils.helpers import option_years
 from ...models.model import Model
 
@@ -50,19 +51,21 @@ class EquityCompoundOption(EquityOption):
 
         if c_opt_type not in (
             OptionTypes.EUROPEAN_CALL,
-            OptionTypes.AMERICAN_CALL,
             OptionTypes.EUROPEAN_PUT,
-            OptionTypes.AMERICAN_PUT,
         ):
-            raise FinError("Compound option must be European or American call or put.")
+            raise FinError("Compound option must be European call or put.")
 
         if u_opt_type not in (
             OptionTypes.EUROPEAN_CALL,
-            OptionTypes.AMERICAN_CALL,
             OptionTypes.EUROPEAN_PUT,
-            OptionTypes.AMERICAN_PUT,
         ):
-            raise FinError("Underlying option must be European or American call or put.")
+            raise FinError("Underlying option must be European call or put.")
+
+        if not np.isfinite(c_strike_price) or c_strike_price < 0.0:
+            raise FinError("Invalid compound strike price")
+
+        if not np.isfinite(u_strike_price) or u_strike_price <= 0.0:
+            raise FinError("Invalid underlying strike price")
 
         self.c_expiry_dt = c_expiry_dt
         self.c_strike_price = float(c_strike_price)
@@ -88,8 +91,20 @@ class EquityCompoundOption(EquityOption):
         early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
         Rubinstein (1991). See also Haug page 132."""
 
+        if value_dt >= self.c_expiry_dt:
+            raise FinError(
+                "Valuation date must precede compound option expiry"
+            )
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
+        check_volatility(model.volatility)
+
+        if not np.isfinite(stock_price) or stock_price <= 0.0:
+            raise FinError("Stock price must be positive")
+
+        rc = discount_curve.zero_rate_cc(self.c_expiry_dt)
+        qc = dividend_curve.zero_rate_cc(self.c_expiry_dt)
 
         ru = discount_curve.zero_rate_cc(self.u_expiry_dt)
         qu = dividend_curve.zero_rate_cc(self.u_expiry_dt)
@@ -110,10 +125,11 @@ class EquityCompoundOption(EquityOption):
             kc,
             ku,
             stock_price,
+            rc,
             ru,
+            qc,
             qu,
-            vol,
-            num_steps,
+            vol
         )
 
         return v
@@ -133,8 +149,22 @@ class EquityCompoundOption(EquityOption):
         early exercise. Solution by Geske (1977), Hodges and Selby (1987) and
         Rubinstein (1991). See also Haug page 132."""
 
+        if value_dt >= self.c_expiry_dt:
+            raise FinError(
+                "Valuation date must precede compound option expiry"
+            )
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
+        check_volatility(model.volatility)
+
+        if not np.isfinite(stock_price) or stock_price <= 0.0:
+            raise FinError("Stock price must be positive")
+
+        if isinstance(num_steps, (bool, np.bool_)) or not isinstance(
+            num_steps, (int, np.integer)
+        ) or num_steps < 2:
+            raise FinError("num_steps must be an integer >= 2")
 
         ru = discount_curve.zero_rate_cc(self.u_expiry_dt)
         qu = dividend_curve.zero_rate_cc(self.u_expiry_dt)

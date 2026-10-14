@@ -441,6 +441,10 @@ def phi3(b1: float, b2: float, b3: float, r12: float, r13: float, r23: float):
 
     dx = 0.001
     lower_limit = -7
+
+    if b1 <= lower_limit:
+        raise FinError("b1 must be greater than -7")
+
     upper_limit = b1
     num_points = int((b1 - lower_limit) / dx)
     dx = (upper_limit - lower_limit) / num_points
@@ -543,11 +547,8 @@ def norminvcdf(p):
 
 
 @njit(float64(float64, float64, float64), fastmath=True, cache=True)
-def phi2(h1, hk, r):
+def phi2_OLD(h1, hk, r):
     """Drezner and Wesolowsky implementation of bi-variate normal"""
-
-    #    if abs(r) > 0.9999999:
-    #        raise FinError("Phi2: |Correlation| > 1")
 
     x = [0.0, 0.0, 0.0, 0.0, 0.0]
     w = [0.0, 0.0, 0.0, 0.0, 0.0]
@@ -613,6 +614,211 @@ def phi2(h1, hk, r):
     return bv
 
 
+@njit(float64(float64, float64, float64), fastmath=True, cache=True)
+def phi2(h1, h2, rho):
+    """Standard bivariate normal CDF.
+
+    Returns
+        P(X <= h1, Y <= h2)
+
+    where X and Y are standard normal random variables with
+    correlation rho.
+
+    Drezner-Wesolowsky approximation.
+    """
+
+    # ------------------------------------------------------------
+    # Limiting cases rho = +/- 1
+    # ------------------------------------------------------------
+
+    if rho >= 1.0 - 1.0e-12:
+        return normcdf(min(h1, h2))
+
+    if rho <= -1.0 + 1.0e-12:
+        return max(
+            normcdf(h1) + normcdf(h2) - 1.0,
+            0.0,
+        )
+
+    # ------------------------------------------------------------
+    # Gauss-Legendre nodes and weights
+    # ------------------------------------------------------------
+
+    x = (
+        0.04691008,
+        0.23076534,
+        0.50000000,
+        0.76923466,
+        0.95308992,
+    )
+
+    w = (
+        0.018854042,
+        0.038088059,
+        0.0452707394,
+        0.038088059,
+        0.018854042,
+    )
+
+    hk = h1 * h2
+    hs = 0.5 * (h1 * h1 + h2 * h2)
+
+    bv = 0.0
+
+    # ------------------------------------------------------------
+    # Moderate correlation
+    # ------------------------------------------------------------
+
+    if (
+        abs(rho) < 0.7
+        or abs(h1) > 35.0
+        or abs(h2) > 35.0
+    ):
+
+        for i in range(5):
+
+            r1 = rho * x[i]
+
+            one_minus_r1_sq = 1.0 - r1 * r1
+
+            bv += (
+                w[i]
+                * np.exp(
+                    (r1 * hk - hs)
+                    / one_minus_r1_sq
+                )
+                / np.sqrt(one_minus_r1_sq)
+            )
+
+        return (
+            normcdf(h1) * normcdf(h2)
+            + rho * bv
+        )
+
+    # ------------------------------------------------------------
+    # High absolute correlation
+    # ------------------------------------------------------------
+
+    one_minus_rho_sq = 1.0 - rho * rho
+    sqrt_one_minus_rho_sq = np.sqrt(one_minus_rho_sq)
+
+    h2_work = h2
+
+    if rho < 0.0:
+        h2_work = -h2_work
+
+    hk_work = h1 * h2_work
+
+    exp_minus_half_hk = np.exp(-0.5 * hk_work)
+
+    bv = 0.0
+
+    if one_minus_rho_sq > 0.0:
+
+        h_diff = abs(h1 - h2_work)
+
+        half_diff_sq = 0.5 * h_diff * h_diff
+
+        scaled_diff = (
+            h_diff / sqrt_one_minus_rho_sq
+        )
+
+        aa = 0.5 - 0.125 * hk_work
+
+        ab = (
+            3.0
+            - 2.0 * aa * half_diff_sq
+        )
+
+        bv = (
+            0.13298076
+            * scaled_diff
+            * ab
+            * normcdf(-scaled_diff)
+            -
+            np.exp(
+                -half_diff_sq
+                / one_minus_rho_sq
+            )
+            * (
+                ab
+                + aa * one_minus_rho_sq
+            )
+            * 0.053051647
+        )
+
+        for i in range(5):
+
+            r1 = (
+                sqrt_one_minus_rho_sq
+                * x[i]
+            )
+
+            rr = r1 * r1
+
+            sqrt_one_minus_rr = np.sqrt(
+                1.0 - rr
+            )
+
+            bv -= (
+                w[i]
+                * np.exp(
+                    -half_diff_sq / rr
+                )
+                * (
+                    np.exp(
+                        -hk_work
+                        / (
+                            1.0
+                            + sqrt_one_minus_rr
+                        )
+                    )
+                    / (
+                        sqrt_one_minus_rr
+                        * exp_minus_half_hk
+                    )
+                    - 1.0
+                    - aa * rr
+                )
+            )
+
+    # ------------------------------------------------------------
+    # Recover the required correlation sign
+    # ------------------------------------------------------------
+
+    if rho > 0.0:
+
+        bv = (
+            bv
+            * sqrt_one_minus_rho_sq
+            * exp_minus_half_hk
+            + normcdf(min(h1, h2_work))
+        )
+
+    else:
+
+        bv = (
+            -bv
+            * sqrt_one_minus_rho_sq
+            * exp_minus_half_hk
+        )
+
+        if h1 >= h2_work:
+            bv += (
+                normcdf(h1)
+                + normcdf(h2)
+                - 1.0
+            )
+
+    # Protect against tiny quadrature round-off outside [0, 1].
+    if bv < 0.0:
+        return 0.0
+
+    if bv > 1.0:
+        return 1.0
+
+    return bv
+
 ########################################################################################
 # This is named for consistency with Haug and its conciseness. Consider renaming
 # phi2 to M
@@ -677,17 +883,21 @@ def npv(irr: float, times_cfs: list):
 
 @njit(fastmath=True, cache=True)
 def band_matrix_multiplication(a, m1, m2, b):
+
     n = a.shape[0]
     x = np.zeros(n)
 
-    jl = np.arange(n) - m1
-    jl[jl < 0] = 0
-
-    ju = np.arange(n) + m2
-    ju[ju > n - 1] = n - 1
-
     for i in range(n):
-        for j in range(jl[i], ju[i] + 1):
+
+        jl = i - m1
+        if jl < 0:
+            jl = 0
+
+        ju = i + m2
+        if ju > n - 1:
+            ju = n - 1
+
+        for j in range(jl, ju + 1):
             k = j - i + m1
             x[i] += a[i, k] * b[j]
 

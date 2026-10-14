@@ -11,7 +11,7 @@ from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
-from financepy.models.black_scholes_analytic import european_value
+from financepy.models.bs_european_analytic import european_value
 from financepy.products.equity.equity_forward_start_option import (
     EquityForwardStartOption,
 )
@@ -91,7 +91,8 @@ def test_forward_start_is_a_cliquet_from_the_start_date():
 def test_forward_start_rejects_valuation_after_start():
     option = EquityForwardStartOption(start_dt, expiry_dt, OptionTypes.EUROPEAN_CALL, FrequencyTypes.ANNUAL)
     with pytest.raises(Exception, match="strike has been set"):
-        option.value(start_dt.add_days(1), stock_price, FlatDiscountCurve(start_dt.add_days(1), interest_rate), FlatDiscountCurve(start_dt.add_days(1), dividend_yield), model)
+        option.value(start_dt.add_days(1), stock_price, FlatDiscountCurve(start_dt.add_days(
+            1), interest_rate), FlatDiscountCurve(start_dt.add_days(1), dividend_yield), model)
     with pytest.raises(Exception, match="after start date"):
         EquityForwardStartOption(expiry_dt, start_dt, OptionTypes.EUROPEAN_CALL, FrequencyTypes.ANNUAL)
 

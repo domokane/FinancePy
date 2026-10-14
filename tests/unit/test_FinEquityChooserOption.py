@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from financepy.utils.error import FinError
 from financepy.utils.global_types import OptionTypes
-from financepy.models.black_scholes_analytic import european_value
+from financepy.models.bs_european_analytic import european_value
 
 from financepy.utils.date import Date
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
@@ -42,7 +42,8 @@ def test_mc_on_choose_date_matches_independent_best_vanilla_option():
     option = EquityChooserOption(choose_dt, call_expiry, put_expiry, 100.0, 100.0)
     discount = FlatDiscountCurve(choose_dt, 0.03)
     dividend = FlatDiscountCurve(choose_dt, 0.01)
-    call = european_value(100.0, (call_expiry - choose_dt) / 365.0, 100.0, .03, .01, .2, OptionTypes.EUROPEAN_CALL.value)
+    call = european_value(100.0, (call_expiry - choose_dt) / 365.0,
+                          100.0, .03, .01, .2, OptionTypes.EUROPEAN_CALL.value)
     put = european_value(100.0, (put_expiry - choose_dt) / 365.0, 100.0, .03, .01, .2, OptionTypes.EUROPEAN_PUT.value)
     assert option.value_mc(choose_dt, 100.0, discount, dividend, BlackScholes(.2)) == pytest.approx(max(call, put))
 

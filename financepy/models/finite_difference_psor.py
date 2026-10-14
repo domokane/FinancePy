@@ -1,4 +1,3 @@
-from copy import deepcopy
 
 import numpy as np
 from numba import njit
@@ -10,6 +9,7 @@ from .finite_difference import option_payoff, calculate_fd_matrix
 ########################################################################################
 
 
+@njit(cache=True, fastmath=True)
 def black_scholes_fd_psor(
     spot_price,
     volatility,
@@ -17,7 +17,7 @@ def black_scholes_fd_psor(
     strike_price,
     risk_free_rate,
     dividend_yield,
-    opt_type,
+    opt_type_value,
     num_time_steps=None,
     num_samples=2000,
     num_std=5,
@@ -25,7 +25,7 @@ def black_scholes_fd_psor(
     wind=0,
     digital=False,
     smooth=False,
-    acc=1e-13,
+    acc=1e-9,
     d_omega=5e-5,
     max_iter=0,
 ):
@@ -38,8 +38,6 @@ def black_scholes_fd_psor(
         max_iter: Maximum number of iterations in psor step. Set to 0 to
         allow any number of iterations.
     """
-    if isinstance(opt_type, OptionTypes):
-        opt_type = opt_type.value
 
     # Define grid
     std = volatility * (time_to_expiry**0.5)
@@ -55,7 +53,7 @@ def black_scholes_fd_psor(
     s = spot_price * np.exp(xl + d_x * np.arange(0, num_samples))
 
     # Generate the option payoff to be fitted
-    payoff = option_payoff(s, strike_price, smooth, digital, opt_type)
+    payoff = option_payoff(s, strike_price, smooth, digital, opt_type_value)
 
     # time steps
     num_steps = num_time_steps or num_samples // 4
@@ -67,7 +65,8 @@ def black_scholes_fd_psor(
     var_ = (s * volatility) ** 2
 
     # Result starts as the payoff and we iterate backwards
-    res = deepcopy(payoff)[0]
+    # res = deepcopy(payoff)[0]
+    res = payoff[0].copy()
 
     # Explicit
     ae = calculate_fd_matrix(s, r_, mu_, var_, dt, 1.0 - theta, wind)
@@ -80,11 +79,17 @@ def black_scholes_fd_psor(
     omega = 1.8
     previous_nloops = 0
 
+    total_nloops = 0
+    max_nloops = 0
+
     for _ in range(num_steps - 1, -1, -1):
 
         res, nloops = psor_roll_backwards(
             res_k=res, acc=acc, ai=ai, ae=ae, omega=omega, max_iter=max_iter
         )
+
+        total_nloops += nloops
+        max_nloops = max(max_nloops, nloops)
 
         # Increase omega if nloops is larger this iteration.
         # Decrease if nloops is less. Otherwise stay the same.
@@ -95,7 +100,7 @@ def black_scholes_fd_psor(
         previous_nloops = nloops
 
         # Early exit for American options
-        if opt_type in {
+        if opt_type_value in {
             OptionTypes.AMERICAN_CALL.value,
             OptionTypes.AMERICAN_PUT.value,
         }:
@@ -109,7 +114,7 @@ def black_scholes_fd_psor(
 
 
 @njit(fastmath=True, cache=True)
-def psor_roll_backwards(ae, ai, res_k, omega, acc=1e-13, max_iter=0):
+def psor_roll_backwards(ae, ai, res_k, omega, acc=1e-12, max_iter=0):
 
     # Explicit step
     z_ip1 = band_matrix_multiplication(ae, 1, 1, res_k)
@@ -123,49 +128,42 @@ def psor_roll_backwards(ae, ai, res_k, omega, acc=1e-13, max_iter=0):
 
 
 @njit(fastmath=True, cache=True)
-def psor(ai, omega, initial_value, z_ip1, max_iter=0, acc=1e-13):
-    """
-    Projected Successive Over Relaxation -
+def psor(ai, omega, res_k, z_ip1, max_iter=0, acc=1e-13):
 
-    Parameters:
-        ai (np.array): Implicit finite difference matrix
-        omega (float): Number between 1 and 2 weighted average of previous and
-        current iteration
-        initial_value (np.array): Vector produced by previous iteration
-        z_ip1 (matrix): Matrix for updating to next timestep
-        max_iter (int): Maximum number of iterations before raising an error
-        # (max_iter=0 means no maximum)
-        acc (float): Accuracy. The maximum acceptable square difference
-        # between two iterations
-
-    Returns:
-        res_k (np.array): Vector for next time step
-        nloops: Number of iterations required to achieve required accuracy
-    """
     nloops = 0
-    res_k = initial_value
-    res_kp1 = initial_value.copy()
-    delta = 1
-    a, b, c = ai.T
+    n = len(res_k)
 
-    # Iterate for until solution is stable
-    while delta >= acc:
-        for j in range(1, len(res_k) - 1):
+    a = ai[:, 0]
+    b = ai[:, 1]
+    c = ai[:, 2]
 
-            res_kp1[j] = z_ip1[j] - a[j] * res_kp1[j - 1] - c[j] * res_k[j + 1]
-            res_kp1[j] /= b[j]
+    while True:
 
-            # Over relaxation
-            res_kp1[j] = omega * res_kp1[j] + (1 - omega) * res_k[j]
+        delta = 0.0
 
-        # Calculate change compared to previous iteration
-        delta = np.sum((res_kp1 - res_k) ** 2)
-        if max_iter != 0 and nloops > max_iter:
-            raise RuntimeError("Calculation is not converging")
+        for j in range(1, n - 1):
 
-        # roll back i.e. k+1 -> k
-        res_k = res_kp1.copy()
+            old = res_k[j]
+
+            new = (
+                z_ip1[j]
+                - a[j] * res_k[j - 1]
+                - c[j] * res_k[j + 1]
+            ) / b[j]
+
+            new = omega * new + (1.0 - omega) * old
+
+            diff = new - old
+            delta += diff * diff
+
+            res_k[j] = new
 
         nloops += 1
+
+        if delta < acc:
+            break
+
+        if max_iter != 0 and nloops >= max_iter:
+            raise RuntimeError("Calculation is not converging")
 
     return res_k, nloops

@@ -187,8 +187,7 @@ class EquityBasketOption:
         assets. The num_paths and seed are pre-set to default values but can be
         overwritten."""
 
-        check_argument_types(getattr(self, _func_name(), None), locals())
-
+        t_exp = option_years(value_dt, self.expiry_dt)
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, *dividend_curves)
 
@@ -206,8 +205,6 @@ class EquityBasketOption:
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         mus = r - qs
         k = self.strike_price
-
-        t_exp = option_years(value_dt, self.expiry_dt)
 
         np.random.seed(seed)
 

@@ -4,7 +4,7 @@ import numpy as np
 
 from scipy.interpolate import RectBivariateSpline
 
-from ..models.black_scholes_analytic import european_value
+from ..models.bs_european_analytic import european_value
 from ..utils.error import FinError
 from ..utils.global_types import OptionTypes
 

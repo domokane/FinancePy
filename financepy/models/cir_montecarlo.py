@@ -181,6 +181,16 @@ def rate_path_mc(
     rate_path = np.empty(num_steps + 1)
     rate_path[0] = r0
 
+    if sigma == 0.0:
+        decay = np.exp(-a * dt_eff)
+        r = r0
+
+        for i_step in range(1, num_steps + 1):
+            r = b + (r - b) * decay
+            rate_path[i_step] = r
+
+        return rate_path
+
     if num_steps == 0:
         return rate_path
 
@@ -191,7 +201,9 @@ def rate_path_mc(
 
         for i_step in range(1, num_steps + 1):
             z = np.random.normal()
-            r = r + a * (b - r) * dt_eff + z * sigmasqrt_dt * np.sqrt(max(r, 0.0))
+            r_pos = max(r, 0.0)
+            r = r + a * (b - r_pos) * dt_eff + sigma * np.sqrt(r_pos * dt_eff) * z
+            r = max(r, 0.0)
             rate_path[i_step] = r
 
     elif scheme == CIRNumericalSchemeTypes.LOGNORMAL.value:
@@ -205,7 +217,7 @@ def rate_path_mc(
             var = sigma * sigma * y * (x * r + 0.5 * b * y) / a
 
             if sigma == 0.0 or var <= 0.0:
-                r = mean
+                r = max(mean, 0.0)
             else:
                 sig = np.sqrt(np.log(1.0 + var / (mean * mean)))
                 z = np.random.normal()
@@ -258,6 +270,8 @@ def rate_path_mc(
         raise ValueError("Unknown CIR numerical scheme.")
 
     return rate_path
+
+#####################################################################################
 
 
 @njit(

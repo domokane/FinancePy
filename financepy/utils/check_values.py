@@ -2,11 +2,45 @@ import numpy as np
 
 
 from .date import Date
-from .global_vars import G_DAYS_IN_YEAR
 from .error import FinError
+from .currency import g_ccy_names
 
 ###########################################################################
 # Validation for specific input types that handles arrays and scalars
+###########################################################################
+
+
+def check_currency(ccy_name: str) -> None:
+    """Check that a currency code is supported."""
+
+    ccy_name = ccy_name.upper()
+
+    if len(ccy_name) != 3:
+        raise FinError("Currency code must be a three letter code")
+
+    if ccy_name not in g_ccy_names:
+        raise FinError(f"Unsupported currency: {ccy_name}")
+
+###########################################################################
+
+
+def check_currency_pair(ccy_pair: str) -> None:
+    """Check that an FX currency pair contains two valid currencies."""
+
+    ccy_pair = ccy_pair.upper()
+
+    if len(ccy_pair) != 6:
+        raise FinError("Currency pair must contain six letters.")
+
+    ccy_1 = ccy_pair[:3]
+    ccy_2 = ccy_pair[3:]
+
+    check_currency(ccy_1)
+    check_currency(ccy_2)
+
+    if ccy_1 == ccy_2:
+        raise FinError("Currencies in pair must be different.")
+
 ###########################################################################
 
 

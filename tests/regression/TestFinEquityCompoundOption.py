@@ -57,12 +57,12 @@ def test_equity_compound_option():
                 )
 
                 values_tree = cmpd_option.value_tree(value_dt,
-                    stock_price,
-                    discount_curve,
-                    dividend_curve,
-                    model,
-                    num_steps,
-                )
+                                                     stock_price,
+                                                     discount_curve,
+                                                     dividend_curve,
+                                                     model,
+                                                     num_steps,
+                                                     )
 
                 test_cases.print(
                     opt_type1,
@@ -77,47 +77,47 @@ def test_equity_compound_option():
 
     stock_price = 85.0
 
-    test_cases.header(
-        "TYPE1", "TYPE2", "k_1", "k_2", "S", "TreeSteps", "Exact", "TreeValue"
-    )
+    # test_cases.header(
+    #     "TYPE1", "TYPE2", "k_1", "k_2", "S", "TreeSteps", "Exact", "TreeValue"
+    # )
 
-    for opt_type1 in [OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT]:
-        for opt_type2 in [OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT]:
+    # for opt_type1 in [OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT]:
+    #     for opt_type2 in [OptionTypes.AMERICAN_CALL, OptionTypes.AMERICAN_PUT]:
 
-            cmpd_option = EquityCompoundOption(
-                expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
-            )
+    #         cmpd_option = EquityCompoundOption(
+    #             expiry_dt1, opt_type1, k1, expiry_dt2, opt_type2, k2
+    #         )
 
-            for num_steps in num_steps_list:
+    #         for num_steps in num_steps_list:
 
-                value = cmpd_option.value(
-                    value_dt,
-                    stock_price,
-                    discount_curve,
-                    dividend_curve,
-                    model,
-                    num_steps,
-                )
+    #             value = cmpd_option.value(
+    #                 value_dt,
+    #                 stock_price,
+    #                 discount_curve,
+    #                 dividend_curve,
+    #                 model,
+    #                 num_steps,
+    #             )
 
-                values_tree = cmpd_option.value_tree(
-                    value_dt,
-                    stock_price,
-                    discount_curve,
-                    dividend_curve,
-                    model,
-                    num_steps,
-                )
+    #             values_tree = cmpd_option.value_tree(
+    #                 value_dt,
+    #                 stock_price,
+    #                 discount_curve,
+    #                 dividend_curve,
+    #                 model,
+    #                 num_steps,
+    #             )
 
-                test_cases.print(
-                    opt_type1,
-                    opt_type2,
-                    k1,
-                    k2,
-                    stock_price,
-                    num_steps,
-                    value,
-                    values_tree[0],
-                )
+    #             test_cases.print(
+    #                 opt_type1,
+    #                 opt_type2,
+    #                 k1,
+    #                 k2,
+    #                 stock_price,
+    #                 num_steps,
+    #                 value,
+    #                 values_tree[0],
+    #             )
 
     test_cases.header(
         "TYPE1",

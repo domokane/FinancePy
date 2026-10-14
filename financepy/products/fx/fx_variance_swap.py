@@ -11,7 +11,7 @@ from ...utils.date import Date
 from ...utils.global_vars import ONE_MILLION
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_types import OptionTypes
-from ...models.black_scholes_analytic import european_value
+from ...models.bs_european_analytic import european_value
 from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.helpers import check_argument_types

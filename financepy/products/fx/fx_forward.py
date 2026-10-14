@@ -4,184 +4,196 @@
 
 import numpy as np
 
-
 from ...utils.date import Date
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.check_values import check_curve_dt
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.check_values import check_currency
+from .fx_rate import FXRate
 
 ########################################################################################
-# ALL CCY RATES MUST BE IN NUM UNITS OF DOMESTIC PER UNIT OF FOREIGN CURRENCY
-# SO EUR USD = 1.30 MEANS 1.30 DOLLARS PER EURO SO DOLLAR IS THE DOMESTIC AND
-# EUR IS THE FOREIGN CURRENCY
+
+
+def fx_forward_rate(
+    value_dt: Date,
+    settlement_dt: Date,
+    spot_fx_rate: FXRate,
+    domestic_curve: DiscountCurve,
+    foreign_curve: DiscountCurve,
+) -> FXRate:
+    """Calculate the fair forward exchange rate.
+
+    The spot FX rate is assumed to settle on the
+    conventional spot settlement date determined
+    from the valuation date and currency pair.
+    """
+
+    check_curve_dt(value_dt, domestic_curve)
+    check_curve_dt(value_dt, foreign_curve)
+
+    spot_settle_dt = spot_fx_rate.spot_date(value_dt)
+
+    if settlement_dt < spot_settle_dt:
+        raise FinError("Forward settlement date before spot settlement date.")
+
+    # Discount factors to the contractual settlement date.
+    dom_df = domestic_curve.df(settlement_dt)
+    for_df = foreign_curve.df(settlement_dt)
+
+    # Discount factors to the conventional spot settlement date.
+    dom_df_spot = domestic_curve.df(spot_settle_dt)
+    for_df_spot = foreign_curve.df(spot_settle_dt)
+
+    fwd_rate = (
+        spot_fx_rate.rate
+        * for_df
+        / for_df_spot
+        * dom_df_spot
+        / dom_df
+    )
+
+    ccy_pair = spot_fx_rate.ccy_pair
+    return FXRate(ccy_pair, fwd_rate)
+
 ########################################################################################
 
 
 class FXForward:
-    """Contract to buy or sell currency at a forward rate decided today."""
+    """Deliverable FX forward transaction.
+
+    The transaction exchanges two currencies at an agreed
+    exchange rate on a specified future settlement date.
+
+    The buy_currency determines which currency is received
+    and which is paid.
+
+    FX rates are expressed in units of the second currency
+    per unit of the first currency.
+    """
 
     def __init__(
         self,
-        expiry_dt: Date,
-        strike_fx_rate: float,  # PRICE OF 1 UNIT OF FOR IN DOM CCY
-        currency_pair: str,  # FOR DOM
+        settlement_dt: Date,
+        strike_fx_rate: FXRate,
         notional: float,
-        notional_currency: str,  # must be FOR or DOM
-        spot_days: int = 0,
+        notional_ccy: str,
+        buy_ccy: str,
     ) -> None:
-        """Creates a FinFXForward which allows the owner to buy the FOR
-        against the DOM currency at the strike_fx_rate and to pay it in the
-        notional currency."""
 
         check_argument_types(self.__init__, locals())
 
-        delivery_dt = expiry_dt.add_weekdays(spot_days)
+        notional_ccy = notional_ccy.upper()
+        buy_ccy = buy_ccy.upper()
 
-        """ The FX rate is the price in domestic currency ccy2 of a single unit
-        of the foreign currency which is ccy1. For example EURUSD of 1.3 is the
-        price in USD (CCY2) of 1 unit of EUR (CCY1) """
+        check_currency(notional_ccy)
+        check_currency(buy_ccy)
 
-        if delivery_dt < expiry_dt:
-            raise FinError("Delivery date must be on or after expiry date.")
+        ccy_pair = strike_fx_rate.ccy_pair
 
-        if len(currency_pair) != 6:
-            raise FinError("Currency pair must be 6 characters.")
+        if not np.isfinite(notional) or notional <= 0.0:
+            raise FinError("Notional must be positive and finite.")
 
-        self.expiry_dt = expiry_dt
-        self.delivery_dt = delivery_dt
-        self.strike_fx_rate = strike_fx_rate
+        self.for_ccy = ccy_pair[:3]
+        self.dom_ccy = ccy_pair[3:]
 
-        self.currency_pair = currency_pair
-        self.for_name = self.currency_pair[0:3]
-        self.dom_name = self.currency_pair[3:6]
+        if self.for_ccy == self.dom_ccy:
+            raise FinError("Currencies in pair must be different.")
 
-        if notional_currency != self.dom_name and notional_currency != self.for_name:
+        if notional_ccy not in (self.for_ccy, self.dom_ccy):
             raise FinError("Notional currency not in currency pair.")
 
-        self.notional = notional
-        self.notional_currency = notional_currency
-        self.spot_days = spot_days
-        self.notional_dom = None
-        self.notional_for = None
-        self.npv_dom = None
-        self.npv_for = None
+        if buy_ccy not in (self.for_ccy, self.dom_ccy):
+            raise FinError("Buy currency not in currency pair.")
 
-    ###########################################################################
+        self.settlement_dt = settlement_dt
+        self.strike_fx_rate = strike_fx_rate
+        self.ccy_pair = ccy_pair
+
+        self.notional = notional
+        self.notional_ccy = notional_ccy
+        self.buy_ccy = buy_ccy
+
+        if notional_ccy == self.for_ccy:
+            self.notional_for = notional
+            self.notional_dom = notional * strike_fx_rate.rate
+        else:
+            self.notional_dom = notional
+            self.notional_for = notional / strike_fx_rate.rate
+
+        # +1: buy first currency, sell second currency.
+        # -1: sell first currency, buy second currency.
+        self.direction = 1 if buy_ccy == self.for_ccy else -1
+
+        self.cashflow_for = self.direction * self.notional_for
+        self.cashflow_dom = -self.direction * self.notional_dom
+
+        self.spot_dt = None
+
+    ##########################################################################
 
     def value(
         self,
         value_dt: Date,
-        spot_fx_rate: float,  # 1 unit of foreign in domestic
+        spot_fx_rate: FXRate,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
-    ):
-        """Calculate the value of an FX forward contract where the current
-        FX rate is the spot_fx_rate."""
+    ) -> dict[str, float]:
+        """Calculate the present value of the FX forward in both currencies."""
 
-        if isinstance(value_dt, Date) is False:
-            raise FinError("Valuation date is not a Date")
+        if value_dt > self.settlement_dt:
+            raise FinError("Valuation date after settlement date.")
 
-        if value_dt > self.expiry_dt:
-            raise FinError("Valuation date after expiry date.")
+        if spot_fx_rate.ccy_pair != self.ccy_pair:
+            raise FinError("Spot FX currency pair does not match contract.")
 
         check_curve_dt(value_dt, domestic_curve)
         check_curve_dt(value_dt, foreign_curve)
 
-        if isinstance(value_dt, Date):
-            t = (self.delivery_dt - value_dt) / G_DAYS_IN_YEAR
-        else:
-            t = value_dt
+        self.spot_dt = spot_fx_rate.spot_date(value_dt)
 
-        if np.any(spot_fx_rate <= 0.0):
-            raise FinError("spot_fx_rate must be greater than zero.")
+        if self.settlement_dt < self.spot_dt:
+            raise FinError("Settlement date before conventional spot date.")
 
-        if np.any(t < 0.0):
-            raise FinError("Time to expiry must be positive.")
+        fair_forward = fx_forward_rate(
+            value_dt,
+            self.settlement_dt,
+            spot_fx_rate,
+            domestic_curve,
+            foreign_curve,
+        )
 
-        t = np.maximum(t, 1e-10)
+        dom_df = domestic_curve.df(self.settlement_dt)
 
-        new_fwd_fx_rate = self.forward(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
+        npv_dom = dom_df * (
+            self.cashflow_for * fair_forward.rate
+            + self.cashflow_dom
+        )
 
-        if self.notional_currency == self.dom_name:
-            self.notional_dom = self.notional
-            self.notional_for = self.notional / self.strike_fx_rate
-        elif self.notional_currency == self.for_name:
-            self.notional_dom = self.notional * self.strike_fx_rate
-            self.notional_for = self.notional
-        else:
-            raise FinError("Invalid notional currency.")
+        # Convert domestic PV using the implied cash FX rate.
+        dom_df_spot = domestic_curve.df(self.spot_dt)
+        for_df_spot = foreign_curve.df(self.spot_dt)
 
-        dom_df = domestic_curve.df_t(t)
+        cash_fx_rate = (
+            spot_fx_rate.rate * dom_df_spot / for_df_spot
+        )
 
-        # ==============================================================
-        # Standard FX Forward valuation (in domestic currency)
-        # PV = DF_dom * (N_for * F - N_dom)
-        # ==============================================================
-        v = dom_df * (self.notional_for * new_fwd_fx_rate - self.notional_dom)
-
-        # Valuing in domestic and foreign
-        self.npv_dom = v
-        self.npv_for = v / new_fwd_fx_rate
+        npv_for = npv_dom / cash_fx_rate
 
         return {
-            "npv_dom": self.npv_dom,
-            "npv_for": self.npv_for,
-            "not_dom": self.notional_dom,
-            "not_for": self.notional_for,
-            "ccy_dom": self.dom_name,
-            "ccy_for": self.for_name,
+            self.dom_ccy: npv_dom,
+            self.for_ccy: npv_for,
         }
 
-    ###########################################################################
-
-    def forward(
-        self,
-        value_dt: Date,
-        spot_fx_rate: float,  # 1 unit of foreign in domestic
-        domestic_curve: DiscountCurve,
-        foreign_curve: DiscountCurve,
-    ):
-        """Calculate the FX Forward rate that makes the value of the FX
-        contract equal to zero."""
-
-        if isinstance(value_dt, Date):
-            t = (self.delivery_dt - value_dt) / G_DAYS_IN_YEAR
-        else:
-            t = value_dt
-
-        if np.any(spot_fx_rate <= 0.0):
-            raise FinError("spot_fx_rate must be greater than zero.")
-
-        if np.any(t < 0.0):
-            raise FinError("Time to expiry must be positive.")
-
-        t = np.maximum(t, 1e-10)
-
-        for_df = foreign_curve.df_t(t)
-        dom_df = domestic_curve.df_t(t)
-
-        fwd_fx_rate = spot_fx_rate * for_df / dom_df
-        return fwd_fx_rate
-
-    ###########################################################################
+    ##########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("SPOT DATE", self.spot_dt)
+        s += label_to_string("SETTLEMENT DATE", self.settlement_dt)
         s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
-        s += label_to_string("CURRENCY PAIR", self.currency_pair)
+        s += label_to_string("CURRENCY PAIR", self.ccy_pair)
         s += label_to_string("NOTIONAL", self.notional)
-        s += label_to_string("NOTIONAL CCY", self.notional_currency)
-        s += label_to_string("SPOT DAYS", self.spot_days, "")
+        s += label_to_string("NOTIONAL CCY", self.notional_ccy)
+        s += label_to_string("BUY CURRENCY", self.buy_ccy)
         return s
-
-    ###########################################################################
-
-    def _print(self):
-        """Simple print function for backward compatibility."""
-        print(self)
-
-
-########################################################################################

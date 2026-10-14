@@ -16,6 +16,18 @@ COLORS = [
     "#BBBBBB",
 ]
 
+LINESTYLES = [
+    "-",
+    "--",
+    "-.",
+    ":",
+    "-",
+    "--",
+    "-.",
+]
+
+PLOT_CYCLER = cycler(color=COLORS) + cycler(linestyle=LINESTYLES)
+
 
 def set_plot_style():
     """Apply the standard FinancePy plotting style."""
@@ -26,7 +38,7 @@ def set_plot_style():
             "mathtext.fontset": "dejavusans",
             "font.size": 16,
 
-            "figure.figsize": (12, 6),
+            "figure.figsize": (9, 6),
             "figure.dpi": 150,
             "figure.constrained_layout.use": True,
 
@@ -36,7 +48,8 @@ def set_plot_style():
             "axes.labelsize": 18,
             "axes.titlesize": 18,
             "axes.titlepad": 12,
-            "axes.prop_cycle": cycler(color=COLORS),
+            "axes.prop_cycle": PLOT_CYCLER,
+            "axes.grid": True,
 
             "xtick.labelsize": 16,
             "ytick.labelsize": 16,

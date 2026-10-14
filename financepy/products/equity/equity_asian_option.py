@@ -15,13 +15,13 @@ from ...utils.helpers import check_argument_types, label_to_string
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
 
-from ...models.asian_option_mc import asian_value_mc_fast_cv_numba
-from ...models.asian_option_mc import asian_value_mc_fast_numba
-from ...models.asian_option_mc import asian_value_mc_numba
+from ...models.bs_asian_option_mc import asian_value_mc_fast_cv_numba
+from ...models.bs_asian_option_mc import asian_value_mc_fast_numba
+from ...models.bs_asian_option_mc import asian_value_mc_numba
 
-from ...models.asian_option_bs import value_asian_curran
-from ...models.asian_option_bs import value_asian_turnbull_wakeman_discrete
-from ...models.asian_option_bs import value_asian_kemna_vorst_geometric
+from ...models.bs_asian_option import value_asian_curran
+from ...models.bs_asian_option import value_asian_turnbull_wakeman_discrete
+from ...models.bs_asian_option import value_asian_kemna_vorst_geometric
 from ...models.model import Model
 
 from ...utils.check_values import check_curve_dt
@@ -133,13 +133,13 @@ class EquityAsianOption(EquityOption):
         Note that the accrued average is only required if the value date is
         inside the averaging period for the option."""
 
+        t_exp = option_years(value_dt, self.expiry_dt)
+        t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
         check_stock_price(stock_price)
         check_volatility(model.volatility)
-
-        t_exp = option_years(value_dt, self.expiry_dt)
-        t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
 
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)
@@ -181,14 +181,14 @@ class EquityAsianOption(EquityOption):
         Monte Carlo code enhanced by Numba. I have discontinued the use of this
         as it is both slow and has limited variance reduction."""
 
+        t_exp = option_years(value_dt, self.expiry_dt)
+        t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
         check_stock_price(stock_price)
         check_volatility(model.volatility)
         check_num_paths(num_paths)
-
-        t_exp = option_years(value_dt, self.expiry_dt)
-        t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
 
         r = discount_curve.zero_rate_cc(self.expiry_dt)
         q = dividend_curve.zero_rate_cc(self.expiry_dt)

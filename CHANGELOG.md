@@ -1,4 +1,61 @@
 ## CHANGE LOG
+14 Oct 2016
+- Added example script for EquityGapOption
+- Renamed black_scholes_analytic to bs_european_analytic in models folder
+- Removed graph format setters from plot functionality
+Wish to have all Black-Scholes model file names start with bs_
+- Added bs_european_analytic
+- Added bs_equity_asian_option
+- Added bs_equity_asian_option_mc
+- Added bs_equity_chooser_option
+- Added bs_equity_compound_option
+- Added bs_equity_one_touch_option
+- Added bs_power_option
+- Removed equity_asian_option_mc
+- Removed equity_asian_option_bs
+- Removed equity_chooser_bs
+- Removed equity_compound_bs
+- Removed equity_one_touch_bs
+- Renamed barrier_option_mc to bs_barrier_option_mc
+- Renamed barrier_option_model to bs_barrier_option
+- Renamed BlackScholesTypes to BlackScholesAlgorithmTypes 
+- Added bs_american_analytic 
+- Minor edits to cir_monte_carlo
+- Added Numba to finite_difference plus bug fixes
+- Added Numba to finite_difference_psor plus bug fixes
+- Validation checks in gauss_copula_lhplus 
+- Added use of option_years in bond_option 
+- Added use of option_years in cds_option 
+- Changes to EquityAmericanOption
+- Changes to EquityAsianOption
+- Changes to EquityBarrierOption
+- Changes to EquityBasketOption
+- Changes to EquityChooserOption
+- Changes to EquityCliquetOption
+- Changes to EquityCompoundOption
+- Changes to EquityForwardStartOption
+- Changes to EquityGapOption
+- Changes to EquityOneTouchOption
+- Changes to EquityPowerOption
+- Changes to EquityVanillaOption
+- Revised bumping in EquityOption
+- Added option_years to fx_digital_option
+- Added option_years to fx_double_digital_option
+- Added option_years to fx_double_one_touch_option
+- Redesign fx_forwards
+- Added FXRate classes
+- Added FXSpot class
+- Updated FXMarketConventions
+- Added option_years to fx_rainbow_options
+- Added option_years to fx_one_touch_options
+- Added option_years to fx_vanilla_options
+- Changed Amount to use currency string
+- Added check_currency to check_values 
+- Extended currency.py to more countries
+- Deleted format_graphs replaced with plot_style
+- Updated test cases and regression tests 
+- Revised README 
+
 1 Oct 2026
 - EquityCliquetOption now allows price and return-based payoffs
 - EquityCliquetOption now allows payoffs at period end or at expiry

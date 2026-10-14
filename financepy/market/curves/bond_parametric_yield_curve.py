@@ -26,9 +26,6 @@ from .curve_fits import CurveFitNelsonSiegel
 from .curve_fits import CurveFitNelsonSiegelSvensson
 from .curve_fits import CurveFitBSpline
 
-from ...utils.format_graphs import set_plot_style
-set_plot_style()
-
 
 class BondParametricYieldCurve:
     """Fit and interpolate a bond yield curve."""

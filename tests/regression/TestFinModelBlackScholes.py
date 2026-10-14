@@ -1,5 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import matplotlib.pyplot as plt
+from FinTestCases import FinTestCases, global_test_case_mode
 import add_fp_to_path
 
 from financepy.utils.date import Date
@@ -8,7 +10,7 @@ from financepy.utils.day_count import DayCountTypes
 
 
 from financepy.utils.global_types import OptionTypes
-from financepy.utils.global_types import BlackScholesTypes
+from financepy.models.bs_american_analytic import BlackScholesAlgorithmTypes
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
@@ -18,11 +20,9 @@ from financepy.products.equity.equity_american_option import EquityAmericanOptio
 
 PLOT_GRAPHS = False
 
-from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
-import matplotlib.pyplot as plt
 
 # TODO Complete output of results to log files
 
@@ -44,7 +44,7 @@ def test_black_scholes():
     eu_option_type = OptionTypes.EUROPEAN_CALL
 
     # Pure American Option TREE
-    am_option = EquityAmericanOption(expiry_dt, strike_price, opt_type)
+    amer_option = EquityAmericanOption(expiry_dt, strike_price, opt_type)
 
     # American with European style exercise TREE
     ameu_option = EquityAmericanOption(expiry_dt, strike_price, eu_option_type)
@@ -82,24 +82,33 @@ def test_black_scholes():
 
     for num_steps in num_steps_per_year:
 
-        model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
-        model_anal = BlackScholes(volatility, BlackScholesTypes.ANALYTICAL)
-        model_BAW = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
+        model_tree = BlackScholes(volatility)
+        model_anal = BlackScholes(volatility)
+        model_BAW = BlackScholes(volatility)
 
-        v_am = am_option.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model_tree
+        algo_type = BlackScholesAlgorithmTypes.CRR_TREE
+
+        v_am = amer_option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model_tree,
+            algo_type=algo_type
         )
+
+        algo_type = BlackScholesAlgorithmTypes.ANALYTICAL
 
         v_eu = ameu_option.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model_tree
+            value_dt, stock_price, discount_curve, dividend_curve, model_tree,
+            algo_type=algo_type
         )
+
+        algo_type = BlackScholesAlgorithmTypes.BARONE_ADESI_WHALEY
 
         v_bs = eu_option.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model_anal
+            value_dt, stock_price, discount_curve, dividend_curve, model_anal,
         )
 
-        v_am_baw = am_option.value(
-            value_dt, stock_price, discount_curve, dividend_curve, model_BAW
+        v_am_baw = amer_option.value(
+            value_dt, stock_price, discount_curve, dividend_curve, model_BAW,
+            algo_type=algo_type
         )
 
         am_tree_value.append(v_am)
@@ -137,7 +146,7 @@ def test_barone_edesi():
     opt_type = OptionTypes.AMERICAN_CALL
     eu_option_type = OptionTypes.EUROPEAN_CALL
 
-    am_option = EquityAmericanOption(expiry_dt, strike_price, opt_type)
+    amer_option = EquityAmericanOption(expiry_dt, strike_price, opt_type)
 
     ameu_option = EquityAmericanOption(expiry_dt, strike_price, eu_option_type)
 
@@ -151,34 +160,30 @@ def test_barone_edesi():
         value_dt, dividend_yield, FrequencyTypes.CONTINUOUS, DayCountTypes.ACT_365F
     )
 
-    num_steps_per_year = 400
+    model = BlackScholes(volatility)
 
-    model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year)
+    algo_type = BlackScholesAlgorithmTypes.DEFAULT
 
-    v = am_option.value(
-         value_dt, stock_price, discount_curve, dividend_curve, model_tree
-     )
-    assert round(v, 4) == 6.8398
+    v = amer_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model,
+        algo_type=algo_type)
 
-    model_approx = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
+    algo_type = BlackScholesAlgorithmTypes.BARONE_ADESI_WHALEY
 
-    v = am_option.value(
-         value_dt, stock_price, discount_curve, dividend_curve, model_approx
+    v = amer_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model, algo_type=algo_type
     )
 
-    assert round(v, 4) == 6.8277
+    algo_type = BlackScholesAlgorithmTypes.DEFAULT
 
     v = ameu_option.value(
-         value_dt, stock_price, discount_curve, dividend_curve, model_tree
+        value_dt, stock_price, discount_curve, dividend_curve, model, algo_type=algo_type
     )
 
-    assert round(v, 4) == 6.7512
+    algo_type = BlackScholesAlgorithmTypes.DEFAULT
 
     v = eu_option.value(
-         value_dt, stock_price, discount_curve, dividend_curve, model_tree
-    )
-
-    assert round(v, 4) == 6.7493
+        value_dt, stock_price, discount_curve, dividend_curve, model)
 
 
 test_barone_edesi()

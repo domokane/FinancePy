@@ -21,21 +21,23 @@ from ...utils.helpers import option_years
 
 from ...models.model import Model
 from ...models.black_scholes import BlackScholes
-from ...models.black_scholes_analytic import european_value
-from ...models.black_scholes_analytic import delta
-from ...models.black_scholes_analytic import vega
-from ...models.black_scholes_analytic import gamma
-from ...models.black_scholes_analytic import rho
-from ...models.black_scholes_analytic import vanna
-from ...models.black_scholes_analytic import theta
-from ...models.black_scholes_analytic import implied_volatility
-from ...models.black_scholes_analytic import intrinsic
+from ...models.bs_european_analytic import european_value
+from ...models.bs_european_analytic import delta
+from ...models.bs_european_analytic import vega
+from ...models.bs_european_analytic import gamma
+from ...models.bs_european_analytic import rho
+from ...models.bs_european_analytic import vanna
+from ...models.bs_european_analytic import theta
+from ...models.bs_european_analytic import implied_volatility
+from ...models.bs_european_analytic import intrinsic
 
 from ...models.black_scholes_mc import value_mc_nonumba_nonumpy
 from ...models.black_scholes_mc import value_mc_numpy_numba
 from ...models.black_scholes_mc import value_mc_numba_only
 from ...models.black_scholes_mc import value_mc_numpy_only
 from ...models.black_scholes_mc import value_mc_numba_parallel
+
+from ...utils.check_values import check_strike_price
 
 ########################################################################################
 
@@ -55,11 +57,12 @@ class EquityVanillaOption:
         date, the option strike, the option type and the number of options."""
 
         check_argument_types(self.__init__, locals())
+        check_strike_price(strike_price)
 
         self.opt_type = opt_type
         self.opt_type_value = opt_type.value
         self.expiry_dt = expiry_dt
-        self.strike_price = strike_price
+        self.strike_price = float(strike_price)
         self.num_options = num_options
 
     ###########################################################################
