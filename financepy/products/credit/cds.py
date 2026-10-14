@@ -281,8 +281,10 @@ class CDS:
     ):
         """Valuation of a CDS contract on a specific valuation date given
         an issuer curve and a contract recovery rate."""
+        # checa se a data de valoracao eh menor que a data da curva
+        check_curve_dt(value_dt, issuer_curve)
         # calcula a perna de protecao do CDS
-        prot_pv = self.prot_leg_pv_by_HH(
+        prot_pv = self.prot_leg_pv_plus_accrual(
             value_dt,
             issuer_curve,
             contract_recovery_rate,
@@ -305,8 +307,8 @@ class CDS:
         clean_pv = omega * (prot_pv - prm_pv)
         dirty_pv = clean_pv + self.accrued_interest(value_dt)
         # retorna os valores
-        return {"dirty_pv": dirty_pv, "clean_pv": clean_pv}
-        # return (dirty_pv, clean_pv)
+        # old by HH: return {"dirty_pv": dirty_pv, "clean_pv": clean_pv}
+        return (dirty_pv, clean_pv)
 
     ###########################################################################
 
@@ -638,7 +640,6 @@ class CDS:
         check_curve_dt(value_dt, issuer_curve)
 
         t_eff = (self.step_in_dt - value_dt) / G_DAYS_IN_YEAR
-
         # An existing contract may have protection which as of now started in the past
         # We need to ensure that looking forward the protection starts immediately
         t_eff = max(t_eff, 0.0)
@@ -663,7 +664,7 @@ class CDS:
 
     # by HH ###################################################################
 
-    def prot_leg_pv_by_HH(
+    def prot_leg_pv_plus_accrual(
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
@@ -673,25 +674,16 @@ class CDS:
     ):
         """Calculates the protection leg PV of the CDS by calling into the
         fast NUMBA code that has been defined above."""
-
-        teff = (self.step_in_dt - value_dt) / G_DAYS_IN_YEAR
-        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
-
-        libor_curve = issuer_curve.libor_curve
-
-        v = prot_leg_pv_numba(
-            teff,
-            t_mat,
-            libor_curve._times,
-            libor_curve._dfs,
-            issuer_curve._times,
-            issuer_curve._qs,
+        valor = self.prot_leg_pv(
+            value_dt,
+            issuer_curve,
             contract_recovery_rate,
             num_steps_per_year,
             prot_method,
         )
+
         # adicionar o accrual do cupom atual e retorna
-        return v * self.notional + self.accrued_interest(value_dt)
+        return valor + self.accrued_interest(value_dt)
 
     ###########################################################################
 
@@ -773,12 +765,13 @@ class CDS:
 
         # check if the frequency is zero, if so, we return the accrued interest as the premium leg pv
         if frequency == 0:
-            valor = self.accrued_interest(value_dt)
+            valor = self.premium_leg_pv_by_HH(value_dt, issuer_curve, pv01_method)
 
         # if frequency is positive, we calculate the premium leg pv using the rpv01 method
         elif frequency > 0:
             dirty_rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)[DIRTY]
             valor = dirty_rpv01 * self.notional * self.running_cpn
+
         # anythign else is invalid. Raise an error
         else:
             raise FinError("Invalid frequency")

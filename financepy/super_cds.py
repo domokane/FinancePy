@@ -5,10 +5,10 @@
 # updated on set/2026
 # @author: Hernan Lobert
 #
-# Nota: reinstlar o package a cada vez que altera usando:
-# instala o FinancePy instalado no C:\ com permissao para editar:
-# cd C:\Python\FinancePy
-# uv pip install --system-certs --system --upgrade --editable .
+# Nota: reinstlar o package a cada vez que altera o codigo fonte conforme abaixo.
+#    instala o FinancePy instalado no C:\ com permissao para editar:
+#       CD C:\Python\FinancePy
+#       uv pip install --system-certs --system --upgrade --editable .
 
 """import the packages that we'll use"""
 
@@ -38,7 +38,7 @@ from .utils.date import Date
 from .utils.day_count import DayCountTypes
 from .utils.frequency import FrequencyTypes, annual_frequency
 from .utils.date import from_datetime
-from .utils.calendar import CalendarTypes
+from .utils.calendar import CalendarTypes, Calendar
 
 # swap functions
 from .products.rates.ibor_swap import SwapTypes
@@ -334,24 +334,38 @@ def cds_single_name():
     # t+1 do trade date = step-in date
     effective_date = trade_date.add_days(1)
     # data de liquidação do CDS
-    settlement_date = trade_date.add_days(3)
+    # settlement_date = trade_date.add_days(3)
+
+    settlement_date = Calendar(CalendarTypes.UNITED_STATES).add_business_days(
+        trade_date, 3
+    )
+
     # recovery rate
     recovery_rate = aba_cashflow_CDS.range((22, coluna)).value
     # CDS Flat Spread negociado com o mercado - spread do CDS em percentual
     cds_flat_spread = aba_cashflow_CDS.range((17, coluna)).value / 10000
     # cria os vertices de CDS
-    cds6m = CDS(effective_date, "6M", cds_flat_spread)  # effective_date
-    cds1y = CDS(effective_date, "1Y", cds_flat_spread)
-    cds2y = CDS(effective_date, "2Y", cds_flat_spread)
+    # cds6m = CDS(effective_date, "6M", cds_flat_spread)  # effective_date
+    # cds1y = CDS(effective_date, "1Y", cds_flat_spread)
+    # cds2y = CDS(effective_date, "2Y", cds_flat_spread)
     cds3y = CDS(effective_date, "3Y", cds_flat_spread)
-    cds4y = CDS(effective_date, "4Y", cds_flat_spread)
+    # cds4y = CDS(effective_date, "4Y", cds_flat_spread)
     cds5y = CDS(effective_date, "5Y", cds_flat_spread)
     cds7y = CDS(effective_date, "7Y", cds_flat_spread)
     cds10y = CDS(effective_date, "10Y", cds_flat_spread)
     # Lista dos vertices de CDS
-    cds_list = [cds6m, cds1y, cds2y, cds3y, cds4y, cds5y, cds7y, cds10y]
+    # cds_list = [cds6m, cds1y, cds2y, cds3y, cds4y, cds5y, cds7y, cds10y]
+    cds_list = [cds3y, cds5y, cds7y, cds10y]
     # Curva do CDS
-    issuer_curve = CDSCurve(trade_date, cds_list, curva_OIS, recovery_rate)
+    issuer_curve = CDSCurve(
+        trade_date,
+        cds_list,
+        curva_OIS,
+        recovery_rate,
+        DayCountTypes.ACT_360,
+        # DayCountTypes.ACT_365F,
+        InterpTypes.FLAT_FWD_RATES,
+    )
     linha_debug = ut.print_debug("debug", linha_debug, repr(issuer_curve), verbal_debug)
 
     """Cria o contrato de CDS"""
@@ -436,26 +450,32 @@ def cds_single_name():
     # By HH: extras para teste
     temp1 = cds_contract.premium_leg_pv_by_HH(trade_date, issuer_curve, recovery_rate)
     linha_debug = ut.print_debug(
-        "debug", linha_debug, f"prm leg by HH: {temp1}", verbal_debug
+        "debug", linha_debug, f"prm leg by HH: {temp1:.2f}", verbal_debug
     )
-    temp2 = cds_contract.rpv01(trade_date, issuer_curve, pv01_method=0)
+    temp1 = cds_contract.prot_leg_pv_plus_accrual(
+        trade_date, issuer_curve, recovery_rate
+    )
+    linha_debug = ut.print_debug(
+        "debug", linha_debug, f"prot+accrual leg by HH: {temp1:.2f}", verbal_debug
+    )
+    temp1 = cds_contract.rpv01(trade_date, issuer_curve, pv01_method=0)
     linha_debug = ut.print_debug(
         "debug",
         linha_debug,
-        f"RPV01 dirty: {temp2[0]}, clean: {temp2[1]}",
+        f"RPV01 dirty: {temp1[0]:.2f}, clean: {temp1[1]:.2f}",
         verbal_debug,
     )
     linha_debug = ut.print_debug(
         "debug",
         linha_debug,
-        f"Frequencia: {cds_contract.freq_type} ( {annual_frequency(cds_contract.freq_type)})",
+        f"Frequencia: {cds_contract.freq_type} ( {annual_frequency(cds_contract.freq_type):.2f} )",
         verbal_debug,
     )
-    temp3 = cds_contract.premium_leg_pv(trade_date, issuer_curve, recovery_rate)
+    temp1 = cds_contract.value_by_HH(trade_date, issuer_curve, recovery_rate)
     linha_debug = ut.print_debug(
         "debug",
         linha_debug,
-        f"prm leg: {temp3[0]}, frequency: {temp3[1]}",
+        f"Value by HH dirty: {temp1[0]:.2f}, clean: {temp1[1]:.2f}",
         verbal_debug,
     )
 
@@ -513,7 +533,7 @@ def f_premio_cds(
     cds_value = cds_contract.value_by_HH(trade_date, issuer_curve, recovery_rate)
 
     """retorna o premio o CDS - clean value = cash amount (BBG)"""
-    return cds_value["clean_pv"]
+    return cds_value[1]  # "clean_pv"]
 
 
 def f_auxiliar_cds_embutido(
