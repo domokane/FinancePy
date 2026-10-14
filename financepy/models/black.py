@@ -457,7 +457,7 @@ def implied_volatility(
         fwd, t, k, r, opt_type, price = args
         num_steps = 200
         results = crr_tree_val_avg(
-            fwd, r, r, sigma, num_steps, t, opt_type.value, k
+            fwd, r, r, sigma, num_steps, t, opt_type.value, k, True
         )
         return results["value"] - price
 
