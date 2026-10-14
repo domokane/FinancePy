@@ -1,7 +1,6 @@
 <div align="center">
-  <img src="assets/financepy-logo.png" alt="FinancePy logo" width="300">
+  <img src="assets/financepy-logo.png" alt="FinancePy logo" width="250">
 </div>
-
 <div align="center">
 
 ### Financial derivatives pricing and risk analytics in Python
