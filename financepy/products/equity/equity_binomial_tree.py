@@ -230,6 +230,12 @@ class EquityBinomialTree:
 
         # do some validation
         t_exp = (expiry_dt - value_dt) / G_DAYS_IN_YEAR
+        if t_exp <= 0.0:
+            raise FinError("Time to expiry must be positive.")
+
+        if volatility <= 0.0:
+            raise FinError("Volatility must be positive.")
+
         r = discount_curve.zero_rate_cc(expiry_dt)
 
         dq = dividend_curve.df(expiry_dt)

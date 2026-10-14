@@ -3,6 +3,7 @@
 ##############################################################################
 
 from enum import Enum
+from .error import FinError
 
 ########################################################################################
 
@@ -30,16 +31,23 @@ G_DATE_TYPE_FORMAT: DateFormatTypes = DateFormatTypes.UK_LONG
 ########################################################################################
 
 
-def set_date_format(fmt: str) -> None:
-    """Set the global date format."""
+def set_date_format(fmt: str | DateFormatTypes) -> None:
+    """Set the global date format using an enum or its name."""
     global G_DATE_TYPE_FORMAT
+    if isinstance(fmt, str):
+        try:
+            fmt = DateFormatTypes[fmt.strip().upper()]
+        except KeyError as exc:
+            raise FinError(f"Unknown date format: {fmt}") from exc
+    if not isinstance(fmt, DateFormatTypes):
+        raise FinError("Date format must be a DateFormatTypes value or name.")
     G_DATE_TYPE_FORMAT = fmt
 
 
 ########################################################################################
 
 
-def get_date_format() -> str:
+def get_date_format() -> DateFormatTypes:
     """Return the current global date format."""
     return G_DATE_TYPE_FORMAT
 

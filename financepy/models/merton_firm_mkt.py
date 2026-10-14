@@ -15,9 +15,8 @@ from .merton_firm import MertonFirm
 
 def _merton_equations(
     x: np.ndarray,
-    equity_value: float,
+    equity_to_debt: float,
     equity_volatility: float,
-    bond_face: float,
     years_to_maturity: float,
     risk_free_rate: float,
 ) -> np.ndarray:
@@ -26,29 +25,26 @@ def _merton_equations(
     observed equity value and equity volatility.
     """
 
-    asset_value, asset_volatility = x
+    asset_to_debt, asset_volatility = x
 
     sigma = asset_volatility
-    a = asset_value
-    e = equity_value
     r = risk_free_rate
     t = years_to_maturity
-    f = bond_face
 
-    if a <= 0.0 or sigma <= 0.0:
+    if asset_to_debt <= 0.0 or sigma <= 0.0:
         return np.array([1.0e10, 1.0e10])
 
     sigma_root_t = sigma * np.sqrt(t)
 
-    d1 = (np.log(a / f) + (r + 0.5 * sigma**2) * t) / sigma_root_t
+    d1 = (np.log(asset_to_debt) + (r + 0.5 * sigma**2) * t) / sigma_root_t
     d2 = d1 - sigma_root_t
 
-    model_equity_value = a * normcdf(d1) - f * np.exp(-r * t) * normcdf(d2)
-    model_equity_volatility = a / e * normcdf(d1) * sigma
+    model_equity_to_debt = asset_to_debt * normcdf(d1) - np.exp(-r * t) * normcdf(d2)
+    model_equity_volatility = asset_to_debt / equity_to_debt * normcdf(d1) * sigma
 
     return np.array(
         [
-            model_equity_value - equity_value,
+            model_equity_to_debt - equity_to_debt,
             model_equity_volatility - equity_volatility,
         ]
     )
@@ -174,14 +170,14 @@ class MertonFirmMkt(MertonFirm):
 
             # Natural initial approximation:
             # assets ~= equity + present value of debt.
-            asset_value_0 = e + l * np.exp(-r * t)
+            asset_to_debt_0 = e / l + np.exp(-r * t)
 
             # Approximate asset volatility using the equity-to-asset ratio.
-            asset_volatility_0 = ve * e / asset_value_0
+            asset_volatility_0 = ve * (e / l) / asset_to_debt_0
 
             x0 = np.array(
                 [
-                    asset_value_0,
+                    asset_to_debt_0,
                     asset_volatility_0,
                 ]
             )
@@ -189,13 +185,13 @@ class MertonFirmMkt(MertonFirm):
             result = optimize.root(
                 _merton_equations,
                 x0,
-                args=(e, ve, l, t, r),
+                args=(e / l, ve, t, r),
             )
 
             if not result.success:
                 raise FinError("Unable to solve for Merton asset value and volatility: " f"{result.message}")
 
-            asset_value = result.x[0]
+            asset_value = result.x[0] * l
             asset_volatility = result.x[1]
 
             if asset_value <= 0.0:

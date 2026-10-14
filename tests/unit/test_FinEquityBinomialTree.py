@@ -1,6 +1,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import numpy as np
+import pytest
+from financepy.utils.error import FinError
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
@@ -32,6 +34,23 @@ num_steps = 100
 strike_price = 50.0
 
 tree = EquityBinomialTree()
+
+
+@pytest.mark.parametrize("invalid_expiry,invalid_vol,message", [
+    (value_dt, volatility, "Time to expiry"),
+    (value_dt.add_days(-1), volatility, "Time to expiry"),
+    (expiry_dt, 0.0, "Volatility"),
+    (expiry_dt, -0.1, "Volatility"),
+])
+def test_tree_rejects_nonpositive_time_or_volatility(invalid_expiry, invalid_vol, message):
+    """Reject singular tree inputs before transition or Greek divisions."""
+    payoff = EquityTreePayoffTypes.VANILLA_OPTION
+    with pytest.raises(FinError, match=message):
+        tree.value(
+            stock_price, discount_curve, dividend_curve, invalid_vol,
+            num_steps, value_dt, payoff, invalid_expiry, payoff,
+            EquityTreeExerciseTypes.EUROPEAN, np.array([1.0, strike_price]),
+        )
 
 ########################################################################################
 
