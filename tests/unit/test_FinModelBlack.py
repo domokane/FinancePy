@@ -182,8 +182,8 @@ def test_implied_volatility():
     opt_type = OptionTypes.AMERICAN_CALL
     results = crr_tree_val_avg(
         forward,
-        0.0,
-        0.0,
+        r,
+        r,
         volatility,
         200,
         time_to_expiry,
@@ -198,8 +198,8 @@ def test_implied_volatility():
     opt_type = OptionTypes.AMERICAN_PUT
     results = crr_tree_val_avg(
         forward,
-        0.0,
-        0.0,
+        r,
+        r,
         volatility,
         200,
         time_to_expiry,
@@ -209,3 +209,28 @@ def test_implied_volatility():
     price = results["value"]
     sigma = implied_volatility(forward, time_to_expiry, r, strike, price, opt_type)
     assert round(sigma, 5) == volatility
+
+
+########################################################################################
+
+
+def test_american_value_discounts_at_the_rate():
+
+    # An American option on a forward earns no carry but is discounted at r, so its value lies
+    # between the Black European value and the undiscounted one. References are from QuantLib's
+    # FdBlackScholesVanillaEngine on a spot of 100 with a dividend yield equal to r.
+    forward = 100.0
+    time_to_expiry = 1.0
+    r = 0.10
+    df_r = np.exp(-r * time_to_expiry)
+    model_tree = Black(0.15, implementation_type=BlackTypes.CRR_TREE, num_steps=2000)
+
+    for opt_type, european_type, strike, expected in [
+        (OptionTypes.AMERICAN_PUT, OptionTypes.EUROPEAN_PUT, 100.0, 5.55305),
+        (OptionTypes.AMERICAN_CALL, OptionTypes.EUROPEAN_CALL, 90.0, 11.37203),
+    ]:
+        value = model_tree.value(forward, strike, time_to_expiry, df_r, opt_type)
+        european = black_value(forward, time_to_expiry, strike, r, 0.15, european_type)
+
+        assert abs(value - expected) < 1.0e-3
+        assert european < value < european / df_r
