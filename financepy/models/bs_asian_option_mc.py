@@ -480,3 +480,118 @@ def asian_value_mc_fast_cv_numba(
     error = discount * std_err(payoff_cv)
 
     return value, error
+
+########################################################################################
+
+
+def asian_value_mc_sobol(
+    t_avg: float,
+    t_exp: float,
+    k: float,
+    num_obs_per_year: int,
+    opt_type_value: int,
+    stock_price: float,
+    interest_rate: float,
+    dividend_yield: float,
+    volatility: float,
+    num_paths: int,
+    seed: int,
+    accrued_average: float = None,
+    num_scrambles: int = 8,
+) -> tuple[float, float]:
+    """Price an arithmetic Asian option using scrambled Sobol paths.
+
+    num_paths counts *all* simulated paths, including the antithetic paths
+    and all independent scrambles. The number of Sobol path pairs within
+    each scramble must be a power of two. The reported error is the
+    standard error across independent randomized-QMC replicate prices,
+    not an IID standard error calculated from individual Sobol paths.
+    """
+    from scipy.special import ndtri
+    from scipy.stats import qmc
+
+    if opt_type_value not in (
+        OptionTypes.EUROPEAN_CALL.value,
+        OptionTypes.EUROPEAN_PUT.value,
+    ):
+        raise FinError("Invalid Option Type: Must be EUROPEAN call or put")
+
+    if t_exp < 0.0 or t_avg >= t_exp:
+        raise FinError("Averaging start must be before a positive expiry.")
+    if k < 0.0 or stock_price <= 0.0 or volatility < 0.0:
+        raise FinError("Invalid strike, spot or volatility.")
+    if num_obs_per_year <= 0:
+        raise FinError("Number of observations per year must be positive.")
+    if not isinstance(num_scrambles, (int, np.integer)) or num_scrambles < 2:
+        raise FinError("At least two independent Sobol scrambles are required.")
+    if not isinstance(num_paths, (int, np.integer)):
+        raise FinError("Number of paths must be an integer.")
+
+    divisor = 2 * num_scrambles
+    if num_paths % divisor != 0:
+        raise FinError("num_paths must be 2 * num_scrambles * a power of two.")
+    pairs_per_scramble = num_paths // divisor
+    if pairs_per_scramble < 2 or pairs_per_scramble & (pairs_per_scramble - 1):
+        raise FinError("Sobol path pairs per scramble must be a power of two.")
+
+    tau = t_exp - t_avg
+    multiplier = 1.0
+    if t_avg < 0.0:
+        if accrued_average is None or accrued_average <= 0.0:
+            raise FinError(error_str)
+        k = (k * tau + accrued_average * t_avg) / t_exp
+        multiplier = t_exp / tau
+        t_avg = 0.0
+
+    averaging_time = t_exp - t_avg
+    n = max(1, int(averaging_time * num_obs_per_year + 0.5))
+    dt = averaging_time / n
+    drift = interest_rate - dividend_yield - 0.5 * volatility**2
+    step_drift = drift * dt
+    step_vol = volatility * np.sqrt(dt)
+    start_drift = drift * t_avg
+    start_vol = volatility * np.sqrt(t_avg)
+    first_step = 1 if t_avg > 0.0 else 0
+    dimension = n + first_step
+
+    # Each independent scramble produces one replicated QMC price.
+    replicate_prices = np.empty(num_scrambles)
+    seeds = np.random.SeedSequence(seed).spawn(num_scrambles)
+    m = pairs_per_scramble.bit_length() - 1
+
+    for rep in range(num_scrambles):
+        points = qmc.Sobol(d=dimension, scramble=True, seed=np.random.default_rng(seeds[rep])).random_base2(m)
+        # Avoid +/-inf in the Gaussian inverse transform at exact endpoints.
+        points = np.clip(points, np.finfo(float).tiny, 1.0 - np.finfo(float).eps)
+        normal = ndtri(points)
+
+        if first_step:
+            spot = stock_price * np.exp(start_drift)
+            stock_plus = spot * np.exp(start_vol * normal[:, 0])
+            stock_minus = spot * np.exp(-start_vol * normal[:, 0])
+        else:
+            stock_plus = np.full(pairs_per_scramble, stock_price, dtype=float)
+            stock_minus = stock_plus.copy()
+
+        average_plus = np.zeros(pairs_per_scramble)
+        average_minus = np.zeros(pairs_per_scramble)
+        for obs in range(n):
+            z = normal[:, obs + first_step]
+            stock_plus *= np.exp(step_drift + step_vol * z)
+            stock_minus *= np.exp(step_drift - step_vol * z)
+            average_plus += stock_plus / n
+            average_minus += stock_minus / n
+
+        if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
+            payoff_plus = np.maximum(average_plus - k, 0.0)
+            payoff_minus = np.maximum(average_minus - k, 0.0)
+        else:
+            payoff_plus = np.maximum(k - average_plus, 0.0)
+            payoff_minus = np.maximum(k - average_minus, 0.0)
+
+        replicate_prices[rep] = 0.5 * np.mean(payoff_plus + payoff_minus)
+
+    discount = multiplier * np.exp(-interest_rate * t_exp)
+    value = discount * np.mean(replicate_prices)
+    error = discount * np.std(replicate_prices, ddof=1) / np.sqrt(num_scrambles)
+    return value, error
