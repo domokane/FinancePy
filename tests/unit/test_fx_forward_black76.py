@@ -89,3 +89,23 @@ def test_fx_black76_rejects_american_option():
     )
     with pytest.raises(FinError, match="European"):
         option.value(value_dt, 1.0, curve, curve, Black(0.2))
+
+
+@pytest.mark.parametrize(
+    "option_type", (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT)
+)
+def test_fx_black76_matches_spot_model_under_interest_parity(option_type):
+    value_dt, expiry_dt = Date(2, 1, 2026), Date(2, 1, 2027)
+    domestic_curve = FlatDiscountCurve(value_dt, 0.045)
+    foreign_curve = FlatDiscountCurve(value_dt, 0.025)
+    option = FXVanillaOption(
+        expiry_dt, 1.10, "EURUSD", option_type, 100_000, "USD"
+    )
+
+    forward_model_price = option.value(
+        value_dt, 1.12, domestic_curve, foreign_curve, Black(0.18)
+    )["v"]
+    spot_model_price = option.value(
+        value_dt, 1.12, domestic_curve, foreign_curve, BlackScholes(0.18)
+    )["v"]
+    assert forward_model_price == pytest.approx(spot_model_price, rel=1e-12)
