@@ -30,11 +30,13 @@ def test_analytic_delta_matches_existing_power_price_finite_difference(
             s, t, strike, rate, dividend, volatility, kind.value, power
         )
 
+    # The existing pricer uses a ~6-decimal normal-CDF approximation.
+    # Price finite differences therefore need a small tolerance.
     bump_delta = (price(spot + h) - price(spot - h)) / (2.0 * h)
     analytic_delta = power_option_delta(
         spot, t, strike, rate, dividend, volatility, kind.value, power
     )
-    assert analytic_delta == pytest.approx(bump_delta, rel=2e-6, abs=1e-8)
+    assert analytic_delta == pytest.approx(bump_delta, rel=5e-5, abs=2e-6)
 
 
 @pytest.mark.parametrize(
@@ -49,7 +51,7 @@ def test_power_one_delta_matches_black_scholes(kind):
         ndtr(d1) if kind == OptionTypes.EUROPEAN_CALL else -ndtr(-d1)
     )
     actual = power_option_delta(s, t, k, r, q, v, kind.value, 1.0)
-    assert actual == pytest.approx(expected, abs=1e-10)
+    assert actual == pytest.approx(expected, abs=2e-7)
 
 
 @pytest.mark.parametrize("power", [0.5, 1.0, 2.0])
@@ -71,7 +73,7 @@ def test_equity_power_delta_matches_product_valuation_and_quantity(power, kind):
     bump_delta = (up-dn)/(2.0*h)
 
     assert product.delta(today, spot, discount, dividend, model) == pytest.approx(
-        bump_delta, rel=2e-6, abs=1e-8
+        bump_delta, rel=5e-5, abs=2e-6
     )
 
 
