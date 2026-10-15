@@ -22,6 +22,7 @@ from ...utils.helpers import option_years
 from ...models.model import Model
 from ...models.black_scholes import BlackScholes
 from ...models.bs_power_option import power_option_value
+from ...models.bs_power_option import power_option_delta
 
 from .equity_option import EquityOption
 
@@ -43,6 +44,9 @@ class EquityPowerOption(EquityOption):
         date, the option strike, the option type and the number of options."""
 
         check_argument_types(self.__init__, locals())
+
+        if not np.isfinite(power) or power <= 0.0:
+            raise FinError("Power must be strictly positive.")
 
         self.opt_type = opt_type
         self.opt_type_value = opt_type.value
@@ -126,6 +130,34 @@ class EquityPowerOption(EquityOption):
 
         value = value * self.num_options
         return value
+
+    ###########################################################################
+
+    def delta(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+    ):
+        """Analytical spot delta for a European power call or put."""
+        t_exp = option_years(value_dt, self.expiry_dt)
+        check_stock_price(stock_price)
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+        check_shapes(stock_price, self.strike_price, t_exp)
+
+        if not isinstance(model, BlackScholes):
+            raise FinError("Unknown Model Type")
+
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
+
+        return self.num_options * power_option_delta(
+            stock_price, t_exp, self.strike_price,
+            r, q, model.volatility, self.opt_type_value, self.power,
+        )
 
     ###########################################################################
 
