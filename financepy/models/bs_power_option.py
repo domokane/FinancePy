@@ -1,82 +1,100 @@
-# Copyright (C) 2020 Dominic O'Kane, G Poorna Prudhvi
+"""Closed-form European power options under geometric Brownian motion.
 
+Payoff: max(S_T**power - strike, 0) or max(strike - S_T**power, 0).
+The carry rate is dividend yield for equity or the foreign risk-free rate
+for FX. The discount rate is the domestic risk-free rate for FX.
+"""
 import numpy as np
-from numba import njit
+from scipy.special import ndtr
 
+from ..utils.error import FinError
 from ..utils.global_types import OptionTypes
-from ..utils.global_vars import G_SMALL
-from ..utils.math import normcdf
-
-########################################################################################
 
 
-@njit(fastmath=True, cache=True)
-def power_option_value(
-    s: float,
-    t: float,
-    k: float,
-    r: float,
-    q: float,
-    v: float,
-    opt_type_value: int,
-    n: float,
-) -> float:
-    """
-    Price a European power option with payoff:
+def _validate(spot, strike, power, maturity, rate, carry, volatility, opt_type):
+    if not np.isfinite([spot, strike, power, maturity, rate, carry, volatility]).all():
+        raise FinError("Power option inputs must be finite.")
+    if spot <= 0.0 or strike < 0.0 or maturity < 0.0 or volatility < 0.0:
+        raise FinError("Require spot>0, strike>=0, T>=0 and volatility>=0.")
+    if opt_type not in (OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT):
+        raise FinError("Only European power calls/puts are supported.")
 
-        Call: max(S_T**n - K, 0)
-        Put:  max(K - S_T**n, 0)
 
-    under Black-Scholes.
-    """
+def power_option_value(spot, strike, power, maturity, rate, carry, volatility,
+                       opt_type):
+    """Exact discounted expectation of a European power payoff under GBM."""
+    _validate(spot, strike, power, maturity, rate, carry, volatility, opt_type)
+    discount = np.exp(-rate * maturity)
+    if maturity == 0.0:
+        terminal = spot**power
+        payoff = (max(terminal - strike, 0.0) if opt_type == OptionTypes.EUROPEAN_CALL
+                  else max(strike - terminal, 0.0))
+        return discount * payoff
 
-    if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
-        phi = 1.0
-    elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
-        phi = -1.0
-    else:
-        return np.nan
+    mean_power = spot**power * np.exp(
+        power * (rate - carry) * maturity
+        + 0.5 * power * (power - 1.0) * volatility**2 * maturity
+    )
+    sigma_power = abs(power) * volatility * np.sqrt(maturity)
+    if sigma_power == 0.0:
+        payoff = (max(mean_power - strike, 0.0) if opt_type == OptionTypes.EUROPEAN_CALL
+                  else max(strike - mean_power, 0.0))
+        return discount * payoff
+    if strike == 0.0:
+        return discount * mean_power if opt_type == OptionTypes.EUROPEAN_CALL else 0.0
 
-    if n <= 0.0:
-        return np.nan
+    d2 = (np.log(spot**power / strike)
+          + power * (rate - carry - 0.5 * volatility**2) * maturity) / sigma_power
+    d1 = d2 + sigma_power
+    if opt_type == OptionTypes.EUROPEAN_CALL:
+        return discount * (mean_power * ndtr(d1) - strike * ndtr(d2))
+    return discount * (strike * ndtr(-d2) - mean_power * ndtr(-d1))
 
-    s = max(s, G_SMALL)
-    k = max(k, G_SMALL)
-    t = max(t, G_SMALL)
-    v = max(v, G_SMALL)
 
-    sqrt_t = np.sqrt(t)
+def power_option_delta(spot, strike, power, maturity, rate, carry, volatility,
+                       opt_type):
+    """Analytical spot derivative; at a deterministic kink returns 0 by convention."""
+    _validate(spot, strike, power, maturity, rate, carry, volatility, opt_type)
+    if power == 0.0:
+        return 0.0
 
-    # Critical stock level:
-    # S_T**n > K  <=>  S_T > K**(1/n)
-    k_root = k ** (1.0 / n)
+    discount = np.exp(-rate * maturity)
+    mean_power = spot**power * np.exp(
+        power * (rate - carry) * maturity
+        + 0.5 * power * (power - 1.0) * volatility**2 * maturity
+    )
+    derivative = discount * power * mean_power / spot
+    sigma_power = abs(power) * volatility * np.sqrt(maturity)
+    if sigma_power == 0.0:
+        if opt_type == OptionTypes.EUROPEAN_CALL:
+            return derivative if mean_power > strike else 0.0
+        return -derivative if mean_power < strike else 0.0
+    if strike == 0:
+        return derivative if opt_type == OptionTypes.EUROPEAN_CALL else 0.0
 
-    # Distribution threshold
-    d2 = (
-        np.log(s / k_root)
-        + (r - q - 0.5 * v * v) * t
-    ) / (v * sqrt_t)
+    d1 = ((np.log(spot**power / strike)
+          + power * (rate - carry - 0.5 * volatility**2) * maturity)
+          / sigma_power + sigma_power)
+    return derivative * (ndtr(d1) if opt_type == OptionTypes.EUROPEAN_CALL
+                         else -ndtr(-d1))
 
-    # Shift caused by the S_T**n moment
-    d1 = d2 + n * v * sqrt_t
 
-    # Discounted n-th moment of S_T
-    stock_term = (
-        s ** n
-        * np.exp(
-            (
-                (n - 1.0) * r
-                - n * q
-                + 0.5 * n * (n - 1.0) * v * v
-            ) * t
+class PowerOption:
+    """Reusable European power option for equity and FX under GBM."""
+
+    def __init__(self, strike, power, opt_type):
+        _validate(1.0, strike, power, 1.0, 0.0, 0.0, 0.0, opt_type)
+        self.strike, self.power, self.opt_type = strike, power, opt_type
+
+    def value(self, spot, maturity, rate, carry, volatility):
+        return power_option_value(
+            spot, self.strike, self.power, maturity, rate, carry,
+            volatility, self.opt_type
         )
-    )
 
-    strike_term = k * np.exp(-r * t)
+    def delta(self, spot, maturity, rate, carry, volatility):
+        return power_option_delta(
+            spot, self.strike, self.power, maturity, rate, carry,
+            volatility, self.opt_type
+        )
 
-    return (
-        phi * stock_term * normcdf(phi * d1)
-        - phi * strike_term * normcdf(phi * d2)
-    )
-
-#########################################################################################
