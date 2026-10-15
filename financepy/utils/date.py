@@ -824,33 +824,19 @@ class Date:
         for tenor_item in tenor:
             tenor_obj = Tenor.as_tenor(str_or_tenor=tenor_item)
 
-            # start with current date
-            d, m, y = self.d, self.m, self.y
-            # Do not int this to keep HMS
-            excel_dt = self.excel_dt
-
+            # Use date arithmetic methods to keep the Excel serial and
+            # hour/minute/second fields consistent for intraday dates.
             if tenor_obj.units == TenorUnit.DAYS:
-                new_excel_dt = excel_dt + int(tenor_obj.num_periods)
-                d, m, y = ymd_from_excel(new_excel_dt)
-                new_dt = Date._make_fast(d, m, y, new_excel_dt)
+                new_dt = self.add_days(int(tenor_obj.num_periods))
 
             elif tenor_obj.units == TenorUnit.WEEKS:
-                new_excel_dt = excel_dt + int(tenor_obj.num_periods) * 7
-                d, m, y = ymd_from_excel(new_excel_dt)
-                new_dt = Date._make_fast(d, m, y, new_excel_dt)
+                new_dt = self.add_days(int(tenor_obj.num_periods) * 7)
 
             elif tenor_obj.units == TenorUnit.MONTHS:
-                # reuse add_months (already _make_fast optimized)
+                # add_months already handles end-of-month truncation.
                 new_dt = self.add_months(int(tenor_obj.num_periods))
 
-                # handle case when Feb truncates to 28/29 (preserve original d if possible)
-                y, m = new_dt.y, new_dt.m
-                d = min(self.d, new_dt.eom().d)
-                excel_dt = excel_from_ymd(d, m, y)
-                new_dt = Date._make_fast(d, m, y, excel_dt)
-
             elif tenor_obj.units == TenorUnit.YEARS:
-                # just months × 12
                 new_dt = self.add_months(int(tenor_obj.num_periods) * 12)
 
             else:
