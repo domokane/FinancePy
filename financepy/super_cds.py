@@ -362,8 +362,8 @@ def cds_single_name():
         cds_list,
         curva_OIS,
         recovery_rate,
-        DayCountTypes.ACT_360,
-        # DayCountTypes.ACT_365F,
+        # DayCountTypes.ACT_360,
+        DayCountTypes.ACT_365F,
         InterpTypes.FLAT_FWD_RATES,
     )
     linha_debug = ut.print_debug("debug", linha_debug, repr(issuer_curve), verbal_debug)
@@ -476,6 +476,13 @@ def cds_single_name():
         "debug",
         linha_debug,
         f"Value by HH dirty: {temp1[0]:.2f}, clean: {temp1[1]:.2f}",
+        verbal_debug,
+    )
+    temp1 = cds_contract.value(trade_date, issuer_curve, recovery_rate)
+    linha_debug = ut.print_debug(
+        "debug",
+        linha_debug,
+        f"Value dirty: {temp1[0]:.2f}, clean: {temp1[1]:.2f}",
         verbal_debug,
     )
 

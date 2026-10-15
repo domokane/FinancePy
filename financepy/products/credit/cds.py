@@ -238,33 +238,50 @@ class CDS:
         an issuer curve and a contract recovery rate."""
         check_curve_dt(value_dt, issuer_curve)
 
-        rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)
-
-        dirty_rpv01 = rpv01[DIRTY]
-        clean_rpv01 = rpv01[CLEAN]
-
-        prot_pv = self.prot_leg_pv(
-            value_dt,
-            issuer_curve,
-            contract_recovery_rate,
-            num_steps_per_year,
-            prot_method,
-        )
-
-        fwd_df = 1.0
-
-        if self.long_protect:
-            omega = +1
+        if self.freq_type == FrequencyTypes.ZERO:
+            # Calculate the PV of the premium for bullet CDS
+            dirty_pv, clean_pv = self.value_by_HH(
+                value_dt,
+                issuer_curve,
+                contract_recovery_rate,
+                pv01_method,
+                prot_method,
+                num_steps_per_year,
+            )
         else:
-            omega = -1
+            # Calculate the PV of the premium using the RPV01 method
+            # Calculate the risky PV01 of the CDS contract using the specified method
+            rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)
+            dirty_rpv01 = rpv01[DIRTY]
+            clean_rpv01 = rpv01[CLEAN]
 
-        dirty_pv = (
-            fwd_df * omega * (prot_pv - self.running_cpn * dirty_rpv01 * self.notional)
-        )
+            # Calculate the PV of the protection leg of the CDS
+            prot_pv = self.prot_leg_pv(
+                value_dt,
+                issuer_curve,
+                contract_recovery_rate,
+                num_steps_per_year,
+                prot_method,
+            )
 
-        clean_pv = (
-            fwd_df * omega * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
-        )
+            fwd_df = 1.0
+
+            if self.long_protect:
+                omega = +1
+            else:
+                omega = -1
+
+            dirty_pv = (
+                fwd_df
+                * omega
+                * (prot_pv - self.running_cpn * dirty_rpv01 * self.notional)
+            )
+
+            clean_pv = (
+                fwd_df
+                * omega
+                * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
+            )
 
         return (dirty_pv, clean_pv)
 
