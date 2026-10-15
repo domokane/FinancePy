@@ -560,7 +560,7 @@ def asian_value_mc_sobol(
     m = pairs_per_scramble.bit_length() - 1
 
     for rep in range(num_scrambles):
-        points = qmc.Sobol(d=dimension, scramble=True, seed=seeds[rep]).random_base2(m)
+        points = qmc.Sobol(d=dimension, scramble=True, seed=np.random.default_rng(seeds[rep])).random_base2(m)
         # Avoid +/-inf in the Gaussian inverse transform at exact endpoints.
         points = np.clip(points, np.finfo(float).tiny, 1.0 - np.finfo(float).eps)
         normal = ndtri(points)
