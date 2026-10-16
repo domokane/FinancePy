@@ -12,6 +12,7 @@ from scipy.interpolate import CubicSpline, PchipInterpolator
 from ...utils.error import FinError
 from ...utils.global_vars import G_SMALL
 from ...utils.tension_spline import TensionSpline
+from .hagan_west_monotone_convex import HaganWestMonotoneConvex
 
 from enum import Enum
 
@@ -27,6 +28,7 @@ class InterpTypes(Enum):
     PCHIP_ZERO_RATES = 8
     PCHIP_LOG_DISCOUNT = 9
     TENSION_ZERO_RATES = 10
+    MONOTONE_CONVEX = 11
 
 
 # Groups used to make dispatch readable and cheap.
@@ -404,6 +406,18 @@ class Interpolator:
         self._onf_rates = None
         self._onf_integrals = None
 
+        if self._interp_type == InterpTypes.MONOTONE_CONVEX:
+            if times[0] > 0.0:
+                # Interpolator also supports datasets without an explicit
+                # valuation-date knot; DF(0)=1 anchors the forward curve.
+                hw_times = np.concatenate(([0.0], times))
+                hw_dfs = np.concatenate(([1.0], dfs))
+            else:
+                hw_times, hw_dfs = times, dfs
+            if hw_times.size > 1:
+                self._interp_fn = HaganWestMonotoneConvex(hw_times, hw_dfs)
+            return
+
         if times.size <= 1 or self._interp_type in _FAST_NUMBA_TYPES:
             return
 
@@ -466,7 +480,10 @@ class Interpolator:
         if np.any(tvec < 0.0):
             raise FinError("Interpolation times must be non-negative.")
 
-        if self._times.size <= 1:
+        if self._interp_type == InterpTypes.MONOTONE_CONVEX:
+            out = (np.ones_like(tvec) if self._interp_fn is None
+                   else self._interp_fn.discount_factor(tvec))
+        elif self._times.size <= 1:
             out = _vinterpolate(tvec, self._times, self._dfs, self._method)
         elif self._interp_type in _FAST_NUMBA_TYPES:
             out = _vinterpolate(tvec, self._times, self._dfs, self._method)
