@@ -188,9 +188,6 @@ class SwapFloatLeg:
         if not self.notional_array:
             self.notional_array = [self.notional] * num_payments
 
-        # FIXED A BUG HERE WHERE IT WAS USING INDEX CURVE DC TYPE
-        index_day_counter = DayCount(self.accrual_dc_type)
-
         for i_pmnt in range(0, num_payments):
 
             payment_dt = self.payment_dts[i_pmnt]
@@ -201,8 +198,6 @@ class SwapFloatLeg:
                 end_accrued_dt = self.end_accrued_dts[i_pmnt]
                 pay_alpha = self.year_fracs[i_pmnt]
 
-                index_alpha, _, _ = index_day_counter.year_frac(start_accrued_dt, end_accrued_dt)
-
                 if first_payment is False and first_fixing_rate is not None:
 
                     fwd_rate = first_fixing_rate
@@ -210,9 +205,15 @@ class SwapFloatLeg:
 
                 else:
 
-                    df_start = index_curve.df(start_accrued_dt)
-                    df_end = index_curve.df(end_accrued_dt)
-                    fwd_rate = (df_start / df_end - 1.0) / index_alpha
+                    # The index curve interpolates discount factors using
+                    # its own curve_dc_type. The coupon accrual convention
+                    # applies only to the simple forward-rate denominator.
+                    # Use the curve API to keep these conventions distinct.
+                    fwd_rate = index_curve.fwd_rate(
+                        start_accrued_dt,
+                        end_accrued_dt,
+                        accrual_dc_type=self.accrual_dc_type,
+                    )
 
                 payment_amount = (fwd_rate + self.spread) * pay_alpha * self.notional_array[i_pmnt]
 
