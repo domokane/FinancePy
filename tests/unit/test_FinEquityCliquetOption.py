@@ -304,3 +304,69 @@ def test_cliquet_repr_includes_caps_floors():
     assert "LOCAL_CAP" in rep
     assert "GLOBAL_FLOOR" in rep
     assert "GLOBAL_CAP" in rep
+
+
+def test_one_period_cliquet_with_cap_matches_bull_spread():
+    """Verify 1-period capped call cliquet analytically matches an exact textbook bull call spread."""
+    start = Date(5, 1, 2026)
+    expiry = Date(4, 1, 2027)
+    s0 = 100.0
+    r = 0.03
+    q = 0.01
+    vol = 0.20
+    t = (expiry - start) / 365.0
+
+    curve = FlatDiscountCurve(start, r)
+    dividend = FlatDiscountCurve(start, q)
+    model = BlackScholes(vol)
+
+    cliquet = EquityCliquetOption(
+        start,
+        expiry,
+        OptionTypes.EUROPEAN_CALL,
+        FrequencyTypes.ANNUAL,
+        payoff_type=CliquetTypes.RETURN,
+        payoff_timing_type=PaymentTimingTypes.MATURITY,
+        local_cap=0.10,
+    )
+    v_cliquet = cliquet.value(start, s0, curve, dividend, model)
+
+    c_atm = european_value(s0, t, s0, r, q, vol, OptionTypes.EUROPEAN_CALL.value)
+    c_otm = european_value(s0, t, 1.10 * s0, r, q, vol, OptionTypes.EUROPEAN_CALL.value)
+    expected_spread = (c_atm - c_otm) / s0
+
+    assert v_cliquet == pytest.approx(expected_spread, rel=1e-10)
+
+
+def test_cliquet_high_cap_converges_to_uncapped():
+    """Verify that as local_cap -> inf, capped cliquet value converges to uncapped cliquet value."""
+    start = Date(1, 1, 2026)
+    expiry = Date(1, 1, 2027)
+    curve = FlatDiscountCurve(start, 0.05)
+    dividend = FlatDiscountCurve(start, 0.02)
+    model = BlackScholes(0.20)
+    s0 = 100.0
+
+    c_uncapped = EquityCliquetOption(
+        start,
+        expiry,
+        OptionTypes.EUROPEAN_CALL,
+        FrequencyTypes.QUARTERLY,
+        payoff_type=CliquetTypes.RETURN,
+        payoff_timing_type=PaymentTimingTypes.MATURITY,
+    )
+    v_uncapped = c_uncapped.value(start, s0, curve, dividend, model)
+
+    c_high_cap = EquityCliquetOption(
+        start,
+        expiry,
+        OptionTypes.EUROPEAN_CALL,
+        FrequencyTypes.QUARTERLY,
+        payoff_type=CliquetTypes.RETURN,
+        payoff_timing_type=PaymentTimingTypes.MATURITY,
+        local_cap=10.0,
+    )
+    v_high_cap = c_high_cap.value(start, s0, curve, dividend, model)
+
+    assert v_high_cap == pytest.approx(v_uncapped, rel=1e-8)
+
