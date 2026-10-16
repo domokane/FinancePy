@@ -82,8 +82,6 @@ class CDSCurve:
         else:
             pass  # In some cases we allow None to be passed
 
-        return
-
     ###########################################################################
 
     def set_times(self, times: np.array):
@@ -152,7 +150,9 @@ class CDSCurve:
             n = len(t)
             qs = np.zeros(n)
             for i in range(0, n):
-                qs[i] = _uinterpolate(t[i], self._times, self._qs, self.interp_method.value)
+                qs[i] = _uinterpolate(
+                    t[i], self._times, self._qs, self.interp_method.value
+                )
             return qs
         elif np.isscalar(t):
             q = _uinterpolate(t, self._times, self._qs, self.interp_method.value)
@@ -198,6 +198,9 @@ class CDSCurve:
                 self.anchor_dt,
                 self.cds_contracts[i],
                 self.recovery_rate,
+                # TODO: by HH
+                # adicionar frequancia dos coupons
+                # adicionar o inicio do accrual
             )
 
             t_mat = (maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR

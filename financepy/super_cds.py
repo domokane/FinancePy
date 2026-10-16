@@ -9,6 +9,8 @@
 #    instala o FinancePy instalado no C:\ com permissao para editar:
 #       CD C:\Python\FinancePy
 #       uv pip install --system-certs --system --upgrade --editable .
+# ou
+#       uv pip install --system-certs --system --upgrade --editable C:\Python\FinancePy
 
 """import the packages that we'll use"""
 
@@ -332,27 +334,31 @@ def cds_single_name():
         aba_cashflow_CDS.range((11, coluna)).options(dates=dt.date).value
     )
     # t+1 do trade date = step-in date
-    effective_date = trade_date.add_days(1)
-    # data de liquidação do CDS
-    # settlement_date = trade_date.add_days(3)
-
-    settlement_date = Calendar(CalendarTypes.UNITED_STATES).add_business_days(
-        trade_date, 3
+    # old by HH: setp_in_date = trade_date.add_days(1)
+    setp_in_date = from_datetime(
+        aba_cashflow_CDS.range((22, coluna)).options(dates=dt.date).value
     )
-
+    # data de liquidação do CDS, t+3 do trade date
+    # settlement_date = trade_date.add_days(3)
+    # old by HH: settlement_date = Calendar(CalendarTypes.UNITED_STATES).add_business_days(
+    #    trade_date, 3
+    # )
+    settlement_date = from_datetime(
+        aba_cashflow_CDS.range((23, coluna)).options(dates=dt.date).value
+    )
     # recovery rate
-    recovery_rate = aba_cashflow_CDS.range((22, coluna)).value
+    recovery_rate = aba_cashflow_CDS.range((24, coluna)).value
     # CDS Flat Spread negociado com o mercado - spread do CDS em percentual
     cds_flat_spread = aba_cashflow_CDS.range((17, coluna)).value / 10000
     # cria os vertices de CDS
-    # cds6m = CDS(effective_date, "6M", cds_flat_spread)  # effective_date
-    # cds1y = CDS(effective_date, "1Y", cds_flat_spread)
-    # cds2y = CDS(effective_date, "2Y", cds_flat_spread)
-    cds3y = CDS(effective_date, "3Y", cds_flat_spread)
-    # cds4y = CDS(effective_date, "4Y", cds_flat_spread)
-    cds5y = CDS(effective_date, "5Y", cds_flat_spread)
-    cds7y = CDS(effective_date, "7Y", cds_flat_spread)
-    cds10y = CDS(effective_date, "10Y", cds_flat_spread)
+    # cds6m = CDS(setp_in_date, "6M", cds_flat_spread)  # setp_in_date
+    # cds1y = CDS(setp_in_date, "1Y", cds_flat_spread)
+    # cds2y = CDS(setp_in_date, "2Y", cds_flat_spread)
+    cds3y = CDS(setp_in_date, "3Y", cds_flat_spread)
+    # cds4y = CDS(setp_in_date, "4Y", cds_flat_spread)
+    cds5y = CDS(setp_in_date, "5Y", cds_flat_spread)
+    cds7y = CDS(setp_in_date, "7Y", cds_flat_spread)
+    cds10y = CDS(setp_in_date, "10Y", cds_flat_spread)
     # Lista dos vertices de CDS
     # cds_list = [cds6m, cds1y, cds2y, cds3y, cds4y, cds5y, cds7y, cds10y]
     cds_list = [cds3y, cds5y, cds7y, cds10y]
@@ -362,39 +368,45 @@ def cds_single_name():
         cds_list,
         curva_OIS,
         recovery_rate,
-        # DayCountTypes.ACT_360,
-        DayCountTypes.ACT_365F,
+        DayCountTypes.ACT_360,
         InterpTypes.FLAT_FWD_RATES,
     )
     linha_debug = ut.print_debug("debug", linha_debug, repr(issuer_curve), verbal_debug)
 
     """Cria o contrato de CDS"""
+    # maturity date do CDS. Sempre 20 de junho ou dezembro de cada ano
     maturity_date = from_datetime(
-        aba_cashflow_CDS.range((19, coluna)).options(dates=dt.date).value
+        aba_cashflow_CDS.range((20, coluna)).options(dates=dt.date).value
+    )
+    # data do inicio do accrual do cupom atual
+    accrual_start_date = from_datetime(
+        aba_cashflow_CDS.range((21, coluna)).options(dates=dt.date).value
     )
     # spread do CDS em percentual
-    running_coupon = aba_cashflow_CDS.range((21, coluna)).value / 10000
+    running_coupon = aba_cashflow_CDS.range((24, coluna)).value / 10000
     # notional
     notional = aba_cashflow_CDS.range((6, coluna)).value
-    # long protection?
+    # long protection? sempre true e troca o sinal na planilha
     long_protection = True  # True = compra CDS, False = vende CDS
     # coupons' frequency - take the integer part of the value in the cell and convert to FrequencyTypes
     freq_type = FrequencyTypes(int(aba_cashflow_CDS.range((7, coluna)).value))
     # contrato de CDS
     cds_contract = CDS(
-        step_in_dt=effective_date,
+        step_in_dt=setp_in_date,
         maturity_dt_or_tenor=maturity_date,
         running_cpn=running_coupon,
         notional=notional,
         long_protect=long_protection,
         freq_type=freq_type,
+        accrual_dc_type=DayCountTypes.ACT_360,
+        prev_coupon_dt=accrual_start_date,
     )
 
     # mostra os dados do contrato de CDS criado acima
     linha_debug = ut.print_debug("debug", linha_debug, repr(cds_contract), verbal_debug)
     # mostra todos os dados da curva de CDS caso o debug seja verbal
     for dados in cds_contract.print_payments_by_HH(
-        effective_date, issuer_curve, full_flow=True
+        setp_in_date, issuer_curve, full_flow=True
     ):
         linha_debug = ut.print_debug("debug", linha_debug, dados, verbal_debug)
 
@@ -403,39 +415,39 @@ def cds_single_name():
     cds_value = cds_contract.value(trade_date, issuer_curve, recovery_rate)
 
     # dirty value
-    aba_cashflow_CDS.range((27, coluna)).value = cds_value[0]  # "dirty_pv"]
+    aba_cashflow_CDS.range((34, coluna)).value = cds_value[0]  # "dirty_pv"]
     # clean value
-    aba_cashflow_CDS.range((29, coluna)).value = cds_value[1]  # "clean_pv"]
+    aba_cashflow_CDS.range((32, coluna)).value = cds_value[1]  # "clean_pv"]
     # accrual: dias e juros
-    aba_cashflow_CDS.range((28, coluna + 1)).value = cds_contract.accrued_days(
+    aba_cashflow_CDS.range((33, coluna + 1)).value = cds_contract.accrued_days(
         trade_date
     )
-    aba_cashflow_CDS.range((28, coluna)).value = cds_contract.accrued_interest(
+    aba_cashflow_CDS.range((33, coluna)).value = cds_contract.accrued_interest(
         trade_date
     )
     # premium leg
-    # aba_cashflow_CDS.range((30, coluna)).value = cds_contract.premium_leg_pv_by_HH(
+    # aba_cashflow_CDS.range((35, coluna)).value = cds_contract.premium_leg_pv_by_HH(
     #    trade_date, issuer_curve, recovery_rate
     # )
-    aba_cashflow_CDS.range((30, coluna)).value = cds_contract.premium_leg_pv(
+    aba_cashflow_CDS.range((35, coluna)).value = cds_contract.premium_leg_pv(
         trade_date, issuer_curve, recovery_rate
     )
     # protection leg + Accrued Interest
-    # aba_cashflow_CDS.range((31, coluna)).value = cds_contract.prot_leg_pv_by_HH(
+    # aba_cashflow_CDS.range((36, coluna)).value = cds_contract.prot_leg_pv_by_HH(
     #    trade_date, issuer_curve, recovery_rate
     # )
-    aba_cashflow_CDS.range((31, coluna)).value = cds_contract.prot_leg_pv(
+    aba_cashflow_CDS.range((36, coluna)).value = cds_contract.prot_leg_pv(
         trade_date, issuer_curve, recovery_rate
     )
 
     # Extras by HH
-    aba_cashflow_CDS.range((32, coluna)).value = cds_contract.cash_settlement_amount(
+    aba_cashflow_CDS.range((37, coluna)).value = cds_contract.cash_settlement_amount(
         trade_date, settlement_date, issuer_curve, recovery_rate
     )
-    aba_cashflow_CDS.range((33, coluna)).value = cds_contract.upfront(
+    aba_cashflow_CDS.range((38, coluna)).value = cds_contract.upfront(
         trade_date, settlement_date, issuer_curve, recovery_rate
     )
-    aba_cashflow_CDS.range((35, coluna)).value = cds_contract.premium_leg_pv_by_HH(
+    aba_cashflow_CDS.range((40, coluna)).value = cds_contract.premium_leg_pv_by_HH(
         trade_date, issuer_curve, recovery_rate
     )
 
@@ -485,12 +497,26 @@ def cds_single_name():
         f"Value dirty: {temp1[0]:.2f}, clean: {temp1[1]:.2f}",
         verbal_debug,
     )
+    temp1 = cds_contract.get_pcd(trade_date)
+    linha_debug = ut.print_debug(
+        "debug",
+        linha_debug,
+        f"pcd: {temp1[0]}, start_index: {temp1[1]}",
+        verbal_debug,
+    )
+    temp1 = cds_contract.accrual_factors
+    linha_debug = ut.print_debug(
+        "debug",
+        linha_debug,
+        f"Accrual factors: {temp1}",
+        verbal_debug,
+    )
 
 
 def f_premio_cds(
     cds_flat_spread: float,
     trade_date: Date,
-    effective_date: Date,
+    setp_in_date: Date,
     maturity_date: Date,
     running_coupon: float,
     recovery_rate: float,
@@ -503,7 +529,7 @@ def f_premio_cds(
     Args:
         cds_flat_spread (float): spread o CDS
         trade_date (Date): data da negociacao
-        effective_date (Date): data de inicio do CDS
+        setp_in_date (Date): data de inicio do CDS
         maturity_date (Date): data de vencimento do CDS
         running_coupon (float): coupon do CDS
         recovery_rate (float): taxa de recuperacao
@@ -519,21 +545,21 @@ def f_premio_cds(
     if isinstance(cds_flat_spread, np.ndarray):
         cds_flat_spread = cds_flat_spread[0].astype(float)
     # cria os vertices de CDS
-    cds6m = CDS(effective_date, "6M", cds_flat_spread)
-    cds1y = CDS(effective_date, "1Y", cds_flat_spread)
-    cds2y = CDS(effective_date, "2Y", cds_flat_spread)
-    cds3y = CDS(effective_date, "3Y", cds_flat_spread)
-    cds4y = CDS(effective_date, "4Y", cds_flat_spread)
-    cds5y = CDS(effective_date, "5Y", cds_flat_spread)
-    cds7y = CDS(effective_date, "7Y", cds_flat_spread)
-    cds10y = CDS(effective_date, "10Y", cds_flat_spread)
+    cds6m = CDS(setp_in_date, "6M", cds_flat_spread)
+    cds1y = CDS(setp_in_date, "1Y", cds_flat_spread)
+    cds2y = CDS(setp_in_date, "2Y", cds_flat_spread)
+    cds3y = CDS(setp_in_date, "3Y", cds_flat_spread)
+    cds4y = CDS(setp_in_date, "4Y", cds_flat_spread)
+    cds5y = CDS(setp_in_date, "5Y", cds_flat_spread)
+    cds7y = CDS(setp_in_date, "7Y", cds_flat_spread)
+    cds10y = CDS(setp_in_date, "10Y", cds_flat_spread)
     # Lista dos vertices de CDS
     cds_list = [cds6m, cds1y, cds2y, cds3y, cds4y, cds5y, cds7y, cds10y]
     # Curva do CDS
     issuer_curve = CDSCurve(trade_date, cds_list, curva_OIS, recovery_rate)
     # contrato de CDS
     cds_contract = CDS(
-        effective_date, maturity_date, running_coupon, notional, long_protection
+        setp_in_date, maturity_date, running_coupon, notional, long_protection
     )
 
     """Calcula o premio do CDS e outros dados"""
@@ -546,7 +572,7 @@ def f_premio_cds(
 def f_auxiliar_cds_embutido(
     cds_flat_spread: float,
     trade_date: Date,
-    effective_date: Date,
+    setp_in_date: Date,
     maturity_date: Date,
     running_coupon: float,
     recovery_rate: float,
@@ -566,7 +592,7 @@ def f_auxiliar_cds_embutido(
     cds_estimado = f_premio_cds(
         cds_flat_spread,
         trade_date,
-        effective_date,
+        setp_in_date,
         maturity_date,
         running_coupon,
         recovery_rate,
@@ -668,7 +694,7 @@ def procura_preco_cds():
         aba_cashflow_CDS.range((11, coluna)).options(dates=dt.date).value
     )
     # t+1 do trade date
-    effective_date = trade_date.add_days(1)
+    setp_in_date = trade_date.add_days(1)
     # CDS Flat Spread negociado com o mercado - spread do CDS em percentual
     # cds_flat_spread = (aba_cashflow_CDS.range((17, coluna)).value / 10000)
     # data de vencimento
@@ -701,7 +727,7 @@ def procura_preco_cds():
     # temp = f_auxiliar_cds_embutido(
     #     0.0123,
     #     trade_date,
-    #     effective_date,
+    #     setp_in_date,
     #     maturity_date,
     #     running_coupon,
     #     recovery_rate,
@@ -723,7 +749,7 @@ def procura_preco_cds():
             x0=0.0123,
             args=(
                 trade_date,
-                effective_date,
+                setp_in_date,
                 maturity_date,
                 running_coupon,
                 recovery_rate,
@@ -749,7 +775,7 @@ def procura_preco_cds():
             aba_cashflow_CDS.range((54, coluna + 2)).value = -f_premio_cds(
                 resultado_root.x[0],
                 trade_date,
-                effective_date,
+                setp_in_date,
                 maturity_date,
                 running_coupon,
                 recovery_rate,
@@ -815,21 +841,21 @@ def retorna_survival_probability():
     trade_date = from_datetime(
         aba_cashflow_CDS["trade_date_CDS"].options(dates=dt.date).value
     )
-    effective_date = from_datetime(
-        aba_cashflow_CDS["CDS_effective_date"].options(dates=dt.date).value
+    setp_in_date = from_datetime(
+        aba_cashflow_CDS["CDS_setp_in_date"].options(dates=dt.date).value
     )
     cds_flat_spread = (
         aba_cashflow_CDS["CDS_spread"].value / 10000
     )  # spread do CDS em percentual
     # cria os vertices de CDS
-    cds6m = CDS(effective_date, "6M", cds_flat_spread)
-    cds1y = CDS(effective_date, "1Y", cds_flat_spread)
-    cds2y = CDS(effective_date, "2Y", cds_flat_spread)
-    cds3y = CDS(effective_date, "3Y", cds_flat_spread)
-    cds4y = CDS(effective_date, "4Y", cds_flat_spread)
-    cds5y = CDS(effective_date, "5Y", cds_flat_spread)
-    cds7y = CDS(effective_date, "7Y", cds_flat_spread)
-    cds10y = CDS(effective_date, "10Y", cds_flat_spread)
+    cds6m = CDS(setp_in_date, "6M", cds_flat_spread)
+    cds1y = CDS(setp_in_date, "1Y", cds_flat_spread)
+    cds2y = CDS(setp_in_date, "2Y", cds_flat_spread)
+    cds3y = CDS(setp_in_date, "3Y", cds_flat_spread)
+    cds4y = CDS(setp_in_date, "4Y", cds_flat_spread)
+    cds5y = CDS(setp_in_date, "5Y", cds_flat_spread)
+    cds7y = CDS(setp_in_date, "7Y", cds_flat_spread)
+    cds10y = CDS(setp_in_date, "10Y", cds_flat_spread)
     # lista dos vertices de CDS
     cds_list = [cds6m, cds1y, cds2y, cds3y, cds4y, cds5y, cds7y, cds10y]
     # recovery rate
@@ -849,10 +875,10 @@ def retorna_survival_probability():
     long_protection = False  # True = compra CDS, False = vende CDS
     # contrato de CDS
     cds_contract = CDS(
-        effective_date, maturity_date, running_coupon, notional, long_protection
+        setp_in_date, maturity_date, running_coupon, notional, long_protection
     )
     linha_debug = ut.print_debug("debug", linha_debug, repr(cds_contract), verbal_debug)
-    for dados in cds_contract.print_payments_by_HH(effective_date, issuer_curve):
+    for dados in cds_contract.print_payments_by_HH(setp_in_date, issuer_curve):
         linha_debug = ut.print_debug("debug", linha_debug, dados, verbal_debug)
 
     # end

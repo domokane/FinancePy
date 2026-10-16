@@ -60,6 +60,8 @@ class CDS:
         cal_type: CalendarTypes | list | tuple = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
+        # Previous coupon date for first accrual period
+        prev_coupon_dt: Date | None = None,
     ) -> None:
         """Create a CDS from the step-in date, maturity date and cpn"""
 
@@ -87,6 +89,13 @@ class CDS:
         self.cal_type: CalendarTypes | list | tuple = cal_type
         self.freq_type: FrequencyTypes = freq_type
         self.bd_type: BusDayAdjustTypes = bd_type
+        # by HH
+        if prev_coupon_dt is None:
+            self.prev_coupon_dt: Date | None = None
+        elif prev_coupon_dt > step_in_dt:
+            raise FinError("Previous coupon date after step in date")
+        else:
+            self.prev_coupon_dt: Date | None = prev_coupon_dt
 
         self._generate_adjusted_cds_payment_dts()
         self._calc_flows()
@@ -122,7 +131,10 @@ class CDS:
             # last date
             unadjusted_schedule_dts.append(self.maturity_dt)
             # first date
-            unadjusted_schedule_dts.append(start_dt)
+            if self.prev_coupon_dt is None:
+                unadjusted_schedule_dts.append(self.step_in_dt)
+            else:
+                unadjusted_schedule_dts.append(self.prev_coupon_dt)
 
             # now we adjust for holiday using business day adjustment
             # convention specified
@@ -144,7 +156,11 @@ class CDS:
                 next_dt = next_dt.add_months(-num_months)
                 unadjusted_schedule_dts.append(next_dt)
 
-            # if the first date is after the strat date, them we make equal to the start date
+            # force the first date to be the one given by the user if not None
+            if self.prev_coupon_dt is not None:
+                unadjusted_schedule_dts[0] = self.prev_coupon_dt
+
+            # if the first date is after the start date, then we make equal to the start date
             unadjusted_schedule_dts[0] = min(unadjusted_schedule_dts[0], start_dt)
 
             # now we adjust for holiday using business day adjustment
@@ -163,8 +179,13 @@ class CDS:
         elif self.dg_type == DateGenRuleTypes.FORWARD:
 
             # We start at start date and step forwards
-
-            next_dt = start_dt
+            # force the first date to be the one given by the user if not None
+            if self.prev_coupon_dt is not None:
+                next_dt = self.prev_coupon_dt
+            else:  #  it is the start date
+                next_dt = start_dt
+            # check if the first date is before the start date, then we make equal to the start date
+            next_dt = min(next_dt, start_dt)
 
             # the unadjusted dates start at start date and end at last date
             # before maturity date
@@ -238,6 +259,7 @@ class CDS:
         an issuer curve and a contract recovery rate."""
         check_curve_dt(value_dt, issuer_curve)
 
+        # se for bullet CDS
         if self.freq_type == FrequencyTypes.ZERO:
             # Calculate the PV of the premium for bullet CDS
             dirty_pv, clean_pv = self.value_by_HH(
@@ -248,6 +270,7 @@ class CDS:
                 prot_method,
                 num_steps_per_year,
             )
+        # se nao for bullet CDS, entao calcula o PV do premium usando o metodo RPV01
         else:
             # Calculate the PV of the premium using the RPV01 method
             # Calculate the risky PV01 of the CDS contract using the specified method
@@ -730,10 +753,12 @@ class CDS:
         """The risky_pv01 is the present value of a risky one dollar paid on
         the premium leg of a CDS contract."""
 
+        # check if the value date is before the anchor date of the curve. If it is, we raise an error
         check_curve_dt(value_dt, issuer_curve)
-
         libor_curve = issuer_curve.libor_curve
 
+        # We calculate the payment times from the value date to each of the payment dates.
+        # We ignore any payment dates which have already passed.
         payment_times = []
         for date in self.payment_dts:
             t = (date - value_dt) / G_DAYS_IN_YEAR
@@ -741,21 +766,28 @@ class CDS:
             if t > 0.0:
                 payment_times.append(t)
 
-        # this is the part of the cpn accrued from the previous cpn date to now
-        pcd, start_index = self.get_pcd(value_dt)
-
-        day_count = DayCount(self.accrual_dc_type)
-
+        # effective date is the step in date of the CDS contract. This is the date when the protection
+        # starts. If the step in date is before the value date, then we set the effective date to be the
+        # value date. This is because we cannot have protection starting in the past. We can only have
+        # protection starting today or in the future.
         eff_dt = self.step_in_dt
         # A contract whose protection started in the past starts today
         eff_dt = max(eff_dt, value_dt)
-
-        accrual_factor_pcd_to_now = day_count.year_frac(pcd, eff_dt)[0]
-
-        year_fracs = self.accrual_factors[start_index:]
-
+        # day count fraction from the effective date to the value date
         t_eff = (eff_dt - value_dt) / G_DAYS_IN_YEAR
 
+        # accrual factor from the previous coupon date to now.
+        # This is used to calculate the accrued interest
+        day_count = DayCount(self.accrual_dc_type)
+        # this is the part of the cpn accrued from the previous cpn date to now
+        pcd, start_index = self.get_pcd(value_dt)
+        accrual_factor_pcd_to_now = day_count.year_frac(pcd, eff_dt)[0]
+        year_fracs = self.accrual_factors[start_index:]
+
+        # We call the NUMBA implementation of the risky PV01 calculation.
+        # This is a fast implementation that calculates the present value of a risky one dollar
+        # paid on the premium leg of a CDS contract. It takes into account the payment times,
+        # year fractions, discount factors, and survival probabilities from the issuer curve.
         value_rpv01 = risky_pv01_numba(
             t_eff,
             accrual_factor_pcd_to_now,

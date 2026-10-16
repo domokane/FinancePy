@@ -74,66 +74,90 @@ def risky_pv01_numba(
     # accrued is treated as though on average default occurs roughly midway
     # through a cpn period.
 
-    t_ncd = payment_times[0]
+    # if there is only one cash flow then we don't need to interpolate the survival probability and discount
+    # factor for the first cash flow
+    if payment_times.size == 1:
+        q1 = np_surv_values[0]
+        z1 = np_ibor_values[0]
+        dirty_rpv01 = q1 * z1 * year_fracs[0]
+        clean_rpv01 = dirty_rpv01 - accrual_factor_pcd_to_now
 
-    # The first cpn is a special case which needs to be handled carefully
-    # taking into account what cpn has already accrued and what has not
-    qeff = _uinterpolate(t_eff, np_surv_times, np_surv_values, method)
-    q1 = _uinterpolate(t_ncd, np_surv_times, np_surv_values, method)
-    z1 = _uinterpolate(t_ncd, np_ibor_times, np_ibor_values, method)
+    # else we have more than one cash flow and we need to interpolate the survival probability and discount
+    # factor for the first cash flow
+    else:
+        t_ncd = payment_times[0]
 
-    # this is the part of the cpn accrued from previous cpn date to now
-    # accrual_factor_pcd_to_now = day_count.year_frac(pcd,teff)
-    # reference credit survives to the premium payment date
-    dirty_rpv01 = q1 * z1 * year_fracs[1]
+        # The first cpn is a special case which needs to be handled carefully
+        # taking into account what cpn has already accrued and what has not
+        q1 = _uinterpolate(t_ncd, np_surv_times, np_surv_values, method)
+        z1 = _uinterpolate(t_ncd, np_ibor_times, np_ibor_values, method)
 
-    # cpn accrued from previous cpn to today paid in full at default
-    # before cpn payment
-    dq = qeff - q1
-    dirty_rpv01 += z1 * dq * accrual_factor_pcd_to_now * cpn_accd_indicator
+        # this is the part of the cpn accrued from previous cpn date to now
+        # accrual_factor_pcd_to_now = day_count.year_frac(pcd,teff)
+        # reference credit survives to the premium payment date
+        dirty_rpv01 = q1 * z1 * year_fracs[1]
 
-    # future accrued from now to cpn payment date assuming default roughly
-    # midway
-    dirty_rpv01 += (
-        0.5 * z1 * dq * (year_fracs[1] - accrual_factor_pcd_to_now) * cpn_accd_indicator
-    )
+        # cpn accrued from previous cpn to today paid in full at default
+        # before cpn payment
+        qeff = _uinterpolate(t_eff, np_surv_times, np_surv_values, method)
+        dq = qeff - q1
+        dirty_rpv01 += z1 * dq * accrual_factor_pcd_to_now * cpn_accd_indicator
 
-    for it in range(1, len(payment_times)):
+        # future accrued from now to cpn payment date assuming default roughly
+        # midway
+        dirty_rpv01 += (
+            0.5
+            * z1
+            * dq
+            * (year_fracs[1] - accrual_factor_pcd_to_now)
+            * cpn_accd_indicator
+        )
 
-        t2 = payment_times[it]
-        q2 = _uinterpolate(t2, np_surv_times, np_surv_values, method)
-        z2 = _uinterpolate(t2, np_ibor_times, np_ibor_values, method)
-        accrual_factor = year_fracs[it]
+        for it in range(1, len(payment_times)):
+            t2 = payment_times[it]
+            q2 = _uinterpolate(t2, np_surv_times, np_surv_values, method)
+            z2 = _uinterpolate(t2, np_ibor_times, np_ibor_values, method)
+            accrual_factor = year_fracs[it]
+            # full cpn is paid at the end of the current period if survives
+            dirty_rpv01 += q2 * z2 * accrual_factor
+            #        print(it, t2, z2, q2, accrual_factor, full_rpv01)
 
-        # full cpn is paid at the end of the current period if survives
-        dirty_rpv01 += q2 * z2 * accrual_factor
+            #######################################################################
+            # The following code calculates the contribution to the dirty_rpv01 from the accrued interest in the
+            # current period. This is only relevant if the cpn_accd_indicator is set to 1, which indicates that
+            # we are considering the accrued interest in the calculation of the risky PV01.
+            #######################################################################
+            if cpn_accd_indicator == 1:
+                if USE_FLAT_HAZARD_RATE_INTEGRAL:
+                    # This needs to be updated to handle small h+r
+                    tau = accrual_factor
+                    h12 = -np.log(q2 / q1) / tau
+                    r12 = -np.log(z2 / z1) / tau
+                    alpha = h12 + r12
+                    exp_term = (
+                        1.0 - np.exp(-alpha * tau) - alpha * tau * np.exp(-alpha * tau)
+                    )
+                    d_dirty_rpv01 = (
+                        q1 * z1 * h12 * exp_term / abs(alpha * alpha + 1e-20)
+                    )
+                else:
+                    d_dirty_rpv01 = 0.50 * (q1 - q2) * z2 * accrual_factor
+                # update the dirty_rpv01 with the contribution from the accrued interest
+                dirty_rpv01 = dirty_rpv01 + d_dirty_rpv01
+            # update discount rate, z and survival probability, q, for next iteration
+            q1 = q2
+            z1 = z2
 
-        #        print(it, t2, z2, q2, accrual_factor, full_rpv01)
+        # The clean_rpv01 is the dirty_rpv01 minus the accrual factor from the previous coupon date to now.
+        # This is because the clean_rpv01 does not include the accrued interest, while the dirty_rpv01 does.
+        # The clean_rpv01 is used to calculate the risky PV01 of a CDS contract, which is the present value of
+        # a risky one dollar paid on the premium leg of a CDS contract.
+        clean_rpv01 = dirty_rpv01 - accrual_factor_pcd_to_now
 
-        #######################################################################
-
-        if cpn_accd_indicator == 1:
-
-            if USE_FLAT_HAZARD_RATE_INTEGRAL:
-                # This needs to be updated to handle small h+r
-                tau = accrual_factor
-                h12 = -np.log(q2 / q1) / tau
-                r12 = -np.log(z2 / z1) / tau
-                alpha = h12 + r12
-                exp_term = (
-                    1.0 - np.exp(-alpha * tau) - alpha * tau * np.exp(-alpha * tau)
-                )
-                d_dirty_rpv01 = q1 * z1 * h12 * exp_term / abs(alpha * alpha + 1e-20)
-            else:
-                d_dirty_rpv01 = 0.50 * (q1 - q2) * z2 * accrual_factor
-
-            dirty_rpv01 = dirty_rpv01 + d_dirty_rpv01
-
-        q1 = q2
-        z1 = z2
-
-    clean_rpv01 = dirty_rpv01 - accrual_factor_pcd_to_now
-
+    # We return a numpy array with the dirty_rpv01 and clean_rpv01. The dirty_rpv01 is the present value of a
+    # risky one dollar paid on the premium leg of a CDS contract, including the accrued interest. The
+    # clean_rpv01 is the present value of a risky one dollar paid on the premium leg of a CDS contract,
+    # excluding the accrued interest.
     v = np.array([0.0, 0.0])
     v[DIRTY] = dirty_rpv01
     v[CLEAN] = clean_rpv01
