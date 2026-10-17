@@ -5,7 +5,7 @@
 
 ### Financial derivatives pricing and risk analytics in Python
 
-**Transparent financial models. Practical pricing and risk analytics. Python clarity with Numba-accelerated performance.**
+**Transparent financial models. Practical pricing and risk analytics. An intuitive interface. Python clarity with Numba-accelerated performance.**
 
 An open-source quantitative finance library for valuing and analysing bonds, equities, FX, interest-rate and credit derivatives. Built for quants, researchers, students and practitioners who want to understand the models they use.
 
