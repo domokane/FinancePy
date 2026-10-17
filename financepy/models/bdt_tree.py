@@ -1,7 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import numpy as np
-from numba import njit, float64, int64
+from numba import njit
 
 from ..utils.error import FinError
 from ..utils.math import accrued_interpolator
@@ -33,11 +33,7 @@ def option_exercise_types_to_int(option_exercise_type: ExerciseTypes) -> int:
 ########################################################################################
 
 
-@njit(
-    float64(float64, int64, float64[:, :], float64[:, :], float64, float64, float64),
-    fastmath=True,
-    cache=True,
-)
+@njit(fastmath=True, cache=True)
 def f(
     x0: float,
     m: int,
@@ -46,17 +42,22 @@ def f(
     df_end: float,
     dt: float,
     sigma: float,
+    shift: float = 0.0,
 ) -> float:
 
-    # x is the middle value on the short-rate on the tree
+    # x0 is the middle value of the shifted short-rate (r + shift) on the tree
     midm = int(m / 2)
-    rt[m, midm] = x0
+    x_node = x0
+    rt[m, midm] = x_node - shift
 
     for i in range(midm, 0, -1):
-        rt[m, i - 1] = rt[m, i] * np.exp(-2.0 * sigma * np.sqrt(dt))
+        x_node = x_node * np.exp(-2.0 * sigma * np.sqrt(dt))
+        rt[m, i - 1] = x_node - shift
 
+    x_node = x0
     for i in range(midm + 1, m + 1, 1):
-        rt[m, i] = rt[m, i - 1] * np.exp(2.0 * sigma * np.sqrt(dt))
+        x_node = x_node * np.exp(2.0 * sigma * np.sqrt(dt))
+        rt[m, i] = x_node - shift
 
     sum_inner = 0.0
     for i in range(0, m + 1):
@@ -72,11 +73,7 @@ def f(
 ########################################################################################
 
 
-@njit(
-    float64(float64, int64, float64[:, :], float64[:, :], float64, float64, float64),
-    fastmath=True,
-    cache=True,
-)
+@njit(fastmath=True, cache=True)
 def search_root(
     x0: float,
     m: int,
@@ -85,6 +82,7 @@ def search_root(
     df_end: float,
     dt: float,
     sigma: float,
+    shift: float = 0.0,
 ) -> float:
     """Search for the root of the function using a numerical method."""
     max_iter = 50
@@ -95,8 +93,8 @@ def search_root(
     else:
         x1 = x0 * 1.0001
 
-    f0 = f(x0, m, q_matrix, rt, df_end, dt, sigma)
-    f1 = f(x1, m, q_matrix, rt, df_end, dt, sigma)
+    f0 = f(x0, m, q_matrix, rt, df_end, dt, sigma, shift)
+    f1 = f(x1, m, q_matrix, rt, df_end, dt, sigma, shift)
 
     for _ in range(0, max_iter):
 
@@ -110,7 +108,7 @@ def search_root(
 
         x0, f0 = x1, f1
         x1 = x
-        f1 = f(x1, m, q_matrix, rt, df_end, dt, sigma)
+        f1 = f(x1, m, q_matrix, rt, df_end, dt, sigma, shift)
 
         if abs(f1) <= max_error:
             return x1
@@ -602,6 +600,7 @@ def build_tree_fast(
     tree_times: np.ndarray,
     num_time_steps: int,
     discount_factors: np.ndarray,
+    shift: float = 0.0,
 ) -> tuple[np.ndarray, np.ndarray, float]:
     """Unlike the BK and HW Trinomial trees, this Tree is packed into the lower
     diagonal of a square matrix because of its binomial nature. This means
@@ -614,7 +613,7 @@ def build_tree_fast(
     # as it follows HW code, but I am not sure if this is needed. EXAMINE
     # NOTE HW code uses this to have short rate at expiry, so it can use
     # analytical solutions for the zero coupon bond price
-    # This is the BDT model so x = log(r)
+    # This is the shifted BDT model so x = log(r + shift)
 
     # Some implementations use continuous compounding. Does not affect results.
     # Useful if you want to make direct comparisons of the tree.
@@ -623,10 +622,17 @@ def build_tree_fast(
     qq = np.zeros(shape=(num_time_steps + 2, num_time_steps + 2))
     rt = np.zeros(shape=(num_time_steps + 2, num_time_steps + 2))
 
+    if discount_factors[1] <= 0.0:
+        raise FinError("Discount factors must be positive.")
+
     if cont_compounded:
         r0 = -np.log(discount_factors[1]) / dt
     else:
         r0 = (1.0 / discount_factors[1] - 1.0) / dt
+
+    x0 = r0 + shift
+    if x0 <= 0.0:
+        raise FinError("Short rate plus shift must be positive.")
 
     rt[0, 0] = r0
     qq[0, 0] = 1.0
@@ -643,7 +649,18 @@ def build_tree_fast(
     for m in range(1, num_time_steps + 1):
 
         df_end = discount_factors[m + 1]
-        r0 = search_root(r0, m, qq, rt, df_end, dt, sigma)
+        if df_end <= 0.0:
+            raise FinError("Discount factors must be positive.")
+
+        max_df_end = 0.0
+        for i in range(0, m + 1):
+            max_df_end += qq[m, i]
+        max_df_end *= np.exp(shift * dt)
+
+        if df_end >= max_df_end:
+            raise FinError("Short rate plus shift must be positive.")
+
+        x0 = search_root(x0, m, qq, rt, df_end, dt, sigma, shift)
 
         if cont_compounded:
             qq[m + 1, 0] = 0.50 * qq[m, 0] * np.exp(-rt[m, 0] * dt)
@@ -676,10 +693,15 @@ class BDTTree:
 
     ####################################################################################
 
-    def __init__(self, sigma: float, num_time_steps: int = 100) -> None:
+    def __init__(
+        self,
+        sigma: float,
+        num_time_steps: int = 100,
+        shift: float = 0.0,
+    ) -> None:
         """Constructs the Black-Derman-Toy rate model in the case when the
         volatility is assumed to be constant. The short rate process simplifies
-        and is given by d(log(r)) = theta(t) * dt + sigma * dW."""
+        and is given by d(log(r + shift)) = theta(t) * dt + sigma * dW."""
 
         if sigma < 0.0:
             raise FinError("Negative volatility not allowed.")
@@ -690,6 +712,7 @@ class BDTTree:
             raise FinError("Drift fitting requires at least 3 time steps.")
 
         self.num_time_steps = num_time_steps
+        self.shift = shift
 
         self.qq = None
         self.rt = None
@@ -733,7 +756,7 @@ class BDTTree:
         self._df_values = df_values
 
         self.qq, self.rt, self._dt = build_tree_fast(
-            self.sigma, tree_times, self.num_time_steps, df_tree
+            self.sigma, tree_times, self.num_time_steps, df_tree, self.shift
         )
 
         return
@@ -872,5 +895,6 @@ class BDTTree:
 
         s = "Black-Derman-Toy Model\n"
         s += label_to_string("Sigma", self.sigma)
+        s += label_to_string("Shift", self.shift)
         s += label_to_string("num_time_steps", self.num_time_steps)
         return s
