@@ -1857,6 +1857,10 @@ class Calendar:
         if m == 1 and d == 3 and weekday == Date.MON:
             return True
 
+        # Jan 1 Sunday -> Jan 3 Tuesday (Jan 2 is the Monday holiday)
+        if m == 1 and d == 3 and weekday == Date.TUE:
+            return True
+
         if m == 1 and d == 4 and weekday in (Date.MON, Date.TUE):
             return True
 
