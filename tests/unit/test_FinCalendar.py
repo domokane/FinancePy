@@ -182,6 +182,38 @@ def test_us_observed_independence_day_2010():
     assert cal.adjust(Date(4, 7, 2010), BusDayAdjustTypes.FOLLOWING) == Date(6, 7, 2010)
 
 
+@pytest.mark.parametrize(
+    "cal_type", [CalendarTypes.UNITED_KINGDOM, CalendarTypes.LONDON]
+)
+def test_uk_moved_bank_holidays(cal_type):
+    cal = Calendar(cal_type)
+
+    # The usual Monday was a working day when the bank holiday was moved
+    for dt in [
+        Date(1, 5, 1995),
+        Date(27, 5, 2002),
+        Date(28, 5, 2012),
+        Date(4, 5, 2020),
+        Date(30, 5, 2022),
+    ]:
+        assert not cal.is_holiday(dt), dt
+        assert cal.is_business_day(dt), dt
+
+    # The dates the bank holidays were moved to
+    for dt in [
+        Date(8, 5, 1995),
+        Date(4, 6, 2002),
+        Date(4, 6, 2012),
+        Date(8, 5, 2020),
+        Date(2, 6, 2022),
+    ]:
+        assert cal.is_holiday(dt), dt
+
+    # The jubilee bank holidays next to them
+    for dt in [Date(3, 6, 2002), Date(5, 6, 2012), Date(3, 6, 2022)]:
+        assert cal.is_holiday(dt), dt
+
+
 def test_modified_following_does_not_cross_month():
     cal = Calendar(CalendarTypes.WEEKEND)
 
