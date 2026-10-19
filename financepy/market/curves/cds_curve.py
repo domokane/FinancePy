@@ -192,7 +192,8 @@ class CDSCurve:
         for i in range(0, num_times):
 
             maturity_dt = self.cds_contracts[i].maturity_dt
-
+            # arguments that hte function f will pass to the function cds.value to calibrate the
+            # survival probability for this CDS
             argtuple = (
                 self,
                 self.anchor_dt,
