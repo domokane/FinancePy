@@ -214,6 +214,17 @@ def test_uk_moved_bank_holidays(cal_type):
         assert cal.is_holiday(dt), dt
 
 
+def test_nz_new_year_on_sunday_observed_on_tuesday():
+    cal = Calendar(CalendarTypes.NEW_ZEALAND)
+
+    # 1 January falls on a Sunday, so 2 January (Monday) is the day after
+    # New Year's Day and New Year's Day itself is observed on 3 January
+    for y in [2006, 2012, 2017, 2023]:
+        assert cal.is_holiday(Date(2, 1, y)), y
+        assert cal.is_holiday(Date(3, 1, y)), y
+        assert cal.is_business_day(Date(4, 1, y)), y
+
+
 def test_modified_following_does_not_cross_month():
     cal = Calendar(CalendarTypes.WEEKEND)
 
