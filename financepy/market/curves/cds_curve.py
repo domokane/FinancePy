@@ -11,7 +11,7 @@ from ...utils.error import FinError
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import _uinterpolate, InterpTypes
-from ...utils.helpers import input_time, table_to_string
+from ...utils.helpers import input_time, table_to_string, times_from_dates
 from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import label_to_string
@@ -139,11 +139,18 @@ class CDSCurve:
         supports vectorisation."""
 
         if isinstance(dt, Date):
-            t = (dt - self.anchor_dt) / G_DAYS_IN_YEAR
+            t = times_from_dates(self.anchor_dt, dt, self.dc_type)
         elif isinstance(dt, list):
-            t = np.array(dt)
-        else:
+            if len(dt) > 0 and isinstance(dt[0], Date):
+                t = times_from_dates(self.anchor_dt, dt, self.dc_type)
+            else:
+                t = np.array(dt, dtype=float)
+        elif isinstance(dt, (float, int)):
+            t = float(dt)
+        elif isinstance(dt, np.ndarray):
             t = dt
+        else:
+            raise FinError("Unknown time type")
 
         if np.any(t < 0.0):
             raise FinError("Survival Date before curve anchor date")
@@ -155,7 +162,7 @@ class CDSCurve:
                 qs[i] = _uinterpolate(t[i], self._times, self._qs, self.interp_method.value)
             return qs
         elif np.isscalar(t):
-            q = _uinterpolate(t, self._times, self._qs, self.interp_method.value)
+            q = _uinterpolate(float(t), self._times, self._qs, self.interp_method.value)
             return q
 
         raise FinError("Unknown time type")
@@ -167,15 +174,16 @@ class CDSCurve:
         function supports vectorisation."""
 
         if isinstance(dt, Date):
-            t = (dt - self.anchor_dt) / G_DAYS_IN_YEAR
+            return self.libor_curve.df(dt)
         elif isinstance(dt, list):
-            t = np.array(dt)
+            if len(dt) > 0 and isinstance(dt[0], Date):
+                return self.libor_curve.df(dt)
+            else:
+                return self.libor_curve.df_t(np.array(dt, dtype=float))
+        elif isinstance(dt, (float, int, np.ndarray)):
+            return self.libor_curve.df_t(dt)
         else:
-            t = dt
-
-        df = self.libor_curve.df_t(t)
-
-        return df
+            raise FinError(f"Unknown date or time type: {type(dt)}")
 
     ###########################################################################
 
@@ -200,7 +208,7 @@ class CDSCurve:
                 self.recovery_rate,
             )
 
-            t_mat = (maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
+            t_mat = times_from_dates(self.anchor_dt, maturity_dt, self.dc_type)
             q = self._qs[i]
 
             self._times = np.append(self._times, t_mat)
