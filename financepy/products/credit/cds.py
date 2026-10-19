@@ -126,7 +126,7 @@ class CDS:
         # We generate unadjusted dates - not adjusted for weekends or holidays
         unadjusted_schedule_dts = []
 
-        # if the frequency is zero or negative, we set the last date to be the start date
+        ## if the frequency is zero or negative, we set the last date to be the start date
         if frequency == 0:
             # last date
             unadjusted_schedule_dts.append(self.maturity_dt)
@@ -134,7 +134,7 @@ class CDS:
             if self.prev_coupon_dt is None:
                 unadjusted_schedule_dts.append(self.step_in_dt)
             else:
-                unadjusted_schedule_dts.append(self.prev_coupon_dt)
+                unadjusted_schedule_dts.append(min(self.prev_coupon_dt, start_dt))
 
             # now we adjust for holiday using business day adjustment
             # convention specified
@@ -143,12 +143,11 @@ class CDS:
                 adjusted = calendar.adjust(date, self.bd_type)
                 adjusted_dts.append(adjusted)
 
-        # standard CDS rule
+        ## standard CDS rule - backward generation of dates from maturity to start date
         elif self.dg_type == DateGenRuleTypes.BACKWARD:
 
             # We start at end date and step backwards
             next_dt = self.maturity_dt
-
             unadjusted_schedule_dts.append(next_dt)
 
             # the unadjusted dates start at end date and end at previous cpn date
@@ -158,13 +157,13 @@ class CDS:
 
             # force the first date to be the one given by the user if not None
             if self.prev_coupon_dt is not None:
-                unadjusted_schedule_dts[0] = self.prev_coupon_dt
-
-            # if the first date is after the start date, then we make equal to the start date
-            unadjusted_schedule_dts[0] = min(unadjusted_schedule_dts[0], start_dt)
-
-            # now we adjust for holiday using business day adjustment
-            # convention specified
+                # if the first date is after the start date, then we make equal to the start date
+                unadjusted_schedule_dts[-1] = min(self.prev_coupon_dt, start_dt)
+            else:  # if none was given then use the last next_dt
+                # if the first date is after the start date, then we make equal to the start date
+                unadjusted_schedule_dts[-1] = min(unadjusted_schedule_dts[-1], start_dt)
+            self.temp = unadjusted_schedule_dts
+            # now we adjust for holiday using business day adjustment convention specified
             adjusted_dts = []
 
             for date in reversed(unadjusted_schedule_dts):
@@ -176,13 +175,14 @@ class CDS:
         # Acc Start = [22-DEC-2008, 20-MAR-2009, 22-JUN-2009, 21-SEP-2009, 21-DEC-2009]
         # Acc End   = [19-MAR-2009, 21-JUN-2009, 20-SEP-2009, 20-DEC-2009, 20-MAR-2010]
 
+        ## forward CDS rule
         elif self.dg_type == DateGenRuleTypes.FORWARD:
 
             # We start at start date and step forwards
             # force the first date to be the one given by the user if not None
             if self.prev_coupon_dt is not None:
                 next_dt = self.prev_coupon_dt
-            else:  #  it is the start date
+            else:  # it is the start date
                 next_dt = start_dt
             # check if the first date is before the start date, then we make equal to the start date
             next_dt = min(next_dt, start_dt)
@@ -206,6 +206,7 @@ class CDS:
         # Accrual Start = [20-FEB-2009, 20-MAY-2009, 20-AUG-2009, 20-NOV-2009]
         # Accrual End   = [19-MAY-2009, 19-AUG-2009, 19-NOV-2009, 20-MAR-2010]
 
+        ## no rule was given, so we raise an error
         else:
             raise FinError("Unknown DATE_GEN_RULEType:" + str(self.dg_type))
 

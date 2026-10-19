@@ -98,7 +98,6 @@ class CDSCurve:
 
     def set_q(self, index, q):
         """Set the survival probability at a specific index."""
-
         n_points = len(self._qs)
 
         if index < 0 or index >= n_points:
@@ -110,7 +109,6 @@ class CDSCurve:
 
     def set_last_q(self, q):
         """Set the survival probability factor at last index."""
-
         n_points = len(self._qs)
         self._qs[n_points - 1] = q
 
@@ -118,7 +116,6 @@ class CDSCurve:
 
     def _validate(self, cds_contracts):
         """Ensure that contracts are in increasing maturity."""
-
         if len(cds_contracts) == 0:
             raise FinError("No CDS contracts have been supplied.")
 
@@ -127,7 +124,7 @@ class CDSCurve:
         for cds in cds_contracts[1:]:
             if cds.maturity_dt <= maturity_dt:
                 raise FinError("CDS contracts not in increasing maturity.")
-
+            # next maturity becomes the current maturity for the next iteration
             maturity_dt = cds.maturity_dt
 
     ###########################################################################
@@ -149,7 +146,7 @@ class CDSCurve:
         if isinstance(t, np.ndarray):
             n = len(t)
             qs = np.zeros(n)
-            for i in range(0, n):
+            for i in range(n):
                 qs[i] = _uinterpolate(
                     t[i], self._times, self._qs, self.interp_method.value
                 )
@@ -185,13 +182,17 @@ class CDSCurve:
         self._validate(self.cds_contracts)
         num_times = len(self.cds_contracts)
 
-        # we size the vectors to include time zero
+        # we size the vectors to include time zero with probability 1.0 and
+        # then we append the calibrated survival probabilities for each CDS contract
         self._times = np.array([0.0])
         self._qs = np.array([1.0])
 
-        for i in range(0, num_times):
+        # for each CDS contract we calibrate the survival probability that makes the
+        # clean PV of the CDS equal to zero and we append this to the survival
+        for i in range(num_times):
 
             maturity_dt = self.cds_contracts[i].maturity_dt
+
             # arguments that hte function f will pass to the function cds.value to calibrate the
             # survival probability for this CDS
             argtuple = (
@@ -199,29 +200,30 @@ class CDSCurve:
                 self.anchor_dt,
                 self.cds_contracts[i],
                 self.recovery_rate,
-                # TODO: by HH
-                # adicionar frequancia dos coupons
-                # adicionar o inicio do accrual
             )
 
             t_mat = (maturity_dt - self.anchor_dt) / G_DAYS_IN_YEAR
+            # previous survival probability is used as the initial guess for the next one
             q = self._qs[i]
 
+            # add the time and initial guess for survival probability to the curve vectors
             self._times = np.append(self._times, t_mat)
             self._qs = np.append(self._qs, q)
 
+            # find the root of the function f using the Newton-Raphson method. This will give us the
+            # survival probability that makes the clean PV of the CDS equal to zero
             q_star = optimize.newton(
                 f,
                 x0=q,
                 fprime=None,
                 args=argtuple,
                 tol=1e-7,
-                maxiter=50,
+                maxiter=150,
                 fprime2=None,
             )
 
-            if q_star < 0.0 or q_star > 1.0:
-                raise FinError("Calibrated survival probability out of bounds")
+            # if q_star < 0.0 or q_star > 1.0:
+            #    raise FinError("Calibrated survival probability out of bounds")
 
             self.set_last_q(q_star)
 

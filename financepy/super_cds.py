@@ -40,7 +40,7 @@ from .utils.date import Date
 from .utils.day_count import DayCountTypes
 from .utils.frequency import FrequencyTypes, annual_frequency
 from .utils.date import from_datetime
-from .utils.calendar import CalendarTypes, Calendar
+from .utils.calendar import CalendarTypes  # , Calendar
 
 # swap functions
 from .products.rates.ibor_swap import SwapTypes
@@ -350,22 +350,59 @@ def cds_single_name():
     recovery_rate = aba_cashflow_CDS.range((24, coluna)).value
     # CDS Flat Spread negociado com o mercado - spread do CDS em percentual
     cds_flat_spread = aba_cashflow_CDS.range((17, coluna)).value / 10000
+    # coupons' frequency - take the integer part of the value in the cell and convert to FrequencyTypes
+    freq_type = FrequencyTypes(int(aba_cashflow_CDS.range((7, coluna)).value))
+    # data do inicio do accrual do cupom atual
+    if aba_cashflow_CDS.range((21, coluna)).value is None:
+        accrual_start_date = None
+    else:
+        accrual_start_date = from_datetime(
+            aba_cashflow_CDS.range((21, coluna)).options(dates=dt.date).value
+        )
     # cria os vertices de CDS
     # cds6m = CDS(setp_in_date, "6M", cds_flat_spread)  # setp_in_date
     # cds1y = CDS(setp_in_date, "1Y", cds_flat_spread)
     # cds2y = CDS(setp_in_date, "2Y", cds_flat_spread)
-    cds3y = CDS(setp_in_date, "3Y", cds_flat_spread)
+    cds3y = CDS(
+        setp_in_date,
+        "3Y",
+        cds_flat_spread,
+        freq_type=freq_type,
+        accrual_dc_type=DayCountTypes.ACT_360,
+        prev_coupon_dt=accrual_start_date,
+    )
     # cds4y = CDS(setp_in_date, "4Y", cds_flat_spread)
-    cds5y = CDS(setp_in_date, "5Y", cds_flat_spread)
-    cds7y = CDS(setp_in_date, "7Y", cds_flat_spread)
-    cds10y = CDS(setp_in_date, "10Y", cds_flat_spread)
+    cds5y = CDS(
+        setp_in_date,
+        "5Y",
+        cds_flat_spread,
+        freq_type=freq_type,
+        accrual_dc_type=DayCountTypes.ACT_360,
+        prev_coupon_dt=accrual_start_date,
+    )
+    cds7y = CDS(
+        setp_in_date,
+        "7Y",
+        cds_flat_spread,
+        freq_type=freq_type,
+        accrual_dc_type=DayCountTypes.ACT_360,
+        prev_coupon_dt=accrual_start_date,
+    )
+    cds10y = CDS(
+        setp_in_date,
+        "10Y",
+        cds_flat_spread,
+        freq_type=freq_type,
+        accrual_dc_type=DayCountTypes.ACT_360,
+        prev_coupon_dt=accrual_start_date,
+    )
     # Lista dos vertices de CDS
     # cds_list = [cds6m, cds1y, cds2y, cds3y, cds4y, cds5y, cds7y, cds10y]
-    cds_list = [cds3y, cds5y, cds7y, cds10y]
     # Curva do CDS
     issuer_curve = CDSCurve(
         trade_date,
-        cds_list,
+        # [cds3y, cds5y, cds7y, cds10y],
+        [cds10y],
         curva_OIS,
         recovery_rate,
         DayCountTypes.ACT_360,
@@ -373,14 +410,47 @@ def cds_single_name():
     )
     linha_debug = ut.print_debug("debug", linha_debug, repr(issuer_curve), verbal_debug)
 
+    linha_debug = ut.print_debug(
+        "debug",
+        linha_debug,
+        f"issuer_curve.set_last_q: {issuer_curve.set_last_q}",
+        verbal_debug,
+    )
+    linha_debug = ut.print_debug("debug", linha_debug, repr(cds10y), verbal_debug)
+    linha_debug = ut.print_debug(
+        "debug",
+        linha_debug,
+        f"cds10y rpv01: {cds10y.rpv01(trade_date, issuer_curve)}",
+        verbal_debug,
+    )
+    # mostra todos os dados da curva de CDS caso o debug seja verbal
+    for dados in cds10y.print_payments_by_HH(
+        setp_in_date, issuer_curve, full_flow=True
+    ):
+        linha_debug = ut.print_debug("debug", linha_debug, dados, verbal_debug)
+    #
+    linha_debug = ut.print_debug(
+        "debug",
+        linha_debug,
+        f"issuer_curve._times: {issuer_curve._times}",
+        verbal_debug,
+    )
+    linha_debug = ut.print_debug(
+        "debug", linha_debug, f"issuer_curve._qs: {issuer_curve._qs}", verbal_debug
+    )
+
+    return
+    # HH
+    # HH
+    # HH
+    # HH
+    # HH
+    # HH
+
     """Cria o contrato de CDS"""
     # maturity date do CDS. Sempre 20 de junho ou dezembro de cada ano
     maturity_date = from_datetime(
         aba_cashflow_CDS.range((20, coluna)).options(dates=dt.date).value
-    )
-    # data do inicio do accrual do cupom atual
-    accrual_start_date = from_datetime(
-        aba_cashflow_CDS.range((21, coluna)).options(dates=dt.date).value
     )
     # spread do CDS em percentual
     running_coupon = aba_cashflow_CDS.range((24, coluna)).value / 10000
@@ -388,8 +458,6 @@ def cds_single_name():
     notional = aba_cashflow_CDS.range((6, coluna)).value
     # long protection? sempre true e troca o sinal na planilha
     long_protection = True  # True = compra CDS, False = vende CDS
-    # coupons' frequency - take the integer part of the value in the cell and convert to FrequencyTypes
-    freq_type = FrequencyTypes(int(aba_cashflow_CDS.range((7, coluna)).value))
     # contrato de CDS
     cds_contract = CDS(
         step_in_dt=setp_in_date,
