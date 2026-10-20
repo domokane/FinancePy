@@ -432,7 +432,11 @@ class Bond:
                 dp = (v ** (self.alpha)) * (term1 + term2 + term3 + term4)
         elif convention == YTMCalcType.US_TREASURY:
             if n == 0:
-                dp = (v ** (self.alpha)) * (1.0 + pay_first_cpn * c / f)
+                # 31 CFR 356 Appendix B discounts the fractional period at
+                # simple interest, which with no full periods left reduces to
+                # P = (100 + C/f) / (1 + alpha * y / f)
+                vw = 1.0 / (1.0 + self.alpha * ytm / f)
+                dp = vw * (1.0 + pay_first_cpn * c / f)
             else:
                 term1 = (c / f) * pay_first_cpn
                 term2 = (c / f) * v
