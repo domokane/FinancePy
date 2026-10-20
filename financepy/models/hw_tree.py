@@ -175,6 +175,27 @@ def build_tree_fast(a, sigma, tree_times, num_time_steps, discount_factors):
 
 
 @njit(fastmath=True, cache=True)
+def accrued_at_expiry(t_exp: float, cpn_times: np.ndarray, cpn_amounts: np.ndarray) -> float:
+    """Accrued cpn at the option expiry consistent with a dirty bond price
+    that includes every flow paid at or after t_exp. A cpn paid exactly at
+    t_exp is therefore fully accrued, so the cpn period is taken as (pct, nct]
+    whereas accrued_interpolator uses [pct, nct)."""
+
+    num_cpns = len(cpn_times)
+
+    for i in range(1, num_cpns):
+        pct = cpn_times[i - 1]
+        nct = cpn_times[i]
+        if t_exp > pct and t_exp <= nct:
+            return cpn_amounts[i] * (t_exp - pct) / (nct - pct)
+
+    return 0.0
+
+
+########################################################################################
+
+
+@njit(fastmath=True, cache=True)
 def american_bond_option_tree_fast(
     t_exp,
     strike_price,
@@ -265,6 +286,13 @@ def american_bond_option_tree_fast(
         # full accrued on flow date. Another scheme may work but so does this
         if tree_flows[m] > 0.0:
             accrued[m] = tree_flows[m] * face_amount
+
+    # The bond price at expiry is built from the exact flow times (t >= t_exp)
+    # so the accrued at expiry must also be evaluated at t_exp rather than at
+    # the nearest tree time, otherwise a flow falling between t_exp and the
+    # tree time is counted in the dirty price but not in the accrued.
+    accrued[expiry_step] = accrued_at_expiry(t_exp, cpn_times, cpn_amounts)
+    accrued[expiry_step] *= face_amount
 
     if debug:
         for i in range(0, expiry_step + 1):
@@ -848,7 +876,7 @@ def fwd_dirty_bond_price(r_t: float, *args: Any) -> float:
     strike_price = args[6]
     face = args[7]
 
-    dt = 0.001
+    dt = 1e-6
     t_delta = t_exp + dt
     pt_exp = _uinterpolate(t_exp, df_times, df_values, INTERP_TYPE_VALUE)
     pt_delta = _uinterpolate(t_delta, df_times, df_values, INTERP_TYPE_VALUE)
@@ -1150,7 +1178,7 @@ class HWTree:
             #            print(cpn_times)
             #            print(cpn_amounts)
 
-            accrued = accrued_interpolator(t_exp, cpn_times, cpn_amounts)
+            accrued = accrued_at_expiry(t_exp, cpn_times, cpn_amounts)
 
             pv = pv - accrued
             #            print(accrued)
@@ -1429,7 +1457,7 @@ class HWTree:
         if abs(fn1 - fn2) > 1e-6:
             raise FinError("Time not on tree time grid")
 
-        time_step = int(t_mat / self.dt) + 1
+        time_step = int(round(t_mat / self.dt))
 
         df = 0.0
         for i in range(0, num_nodes):
