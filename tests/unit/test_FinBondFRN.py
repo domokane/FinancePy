@@ -232,3 +232,33 @@ def test_bond_frn_principal_scales_with_face_without_prior_state():
 ########################################################################################
 
 test_bond_frn_1()
+
+
+def test_bond_frn_dm_pricing_without_prior_accrued_call():
+    """Pricing from a discount margin must not depend on accrued_interest
+    having been called first to set the coupon period."""
+
+    issue_dt = Date(20, 10, 2024)
+    maturity_dt = Date(20, 10, 2030)
+    bond = BondFRN(
+        issue_dt, maturity_dt, 0.0, FrequencyTypes.QUARTERLY, DayCountTypes.ACT_360
+    )
+    settle_dt = Date(20, 10, 2026)
+
+    fresh = bond.dirty_price_from_dm(settle_dt, 0.04, 0.04, 0.04, 0.0)
+
+    bond_primed = BondFRN(
+        issue_dt, maturity_dt, 0.0, FrequencyTypes.QUARTERLY, DayCountTypes.ACT_360
+    )
+    bond_primed.accrued_interest(settle_dt, 0.04)
+    primed = bond_primed.dirty_price_from_dm(settle_dt, 0.04, 0.04, 0.04, 0.0)
+
+    # On a coupon date, a zero-margin FRN discounted at its own index is at par
+    assert fresh == primed
+    assert abs(fresh - 100.0) < 1e-9
+
+    # The coupon period must follow the settlement date, not a stale one
+    later = Date(20, 1, 2029)
+    bond.dirty_price_from_dm(later, 0.04, 0.04, 0.04, 0.0)
+    assert bond._pcd == Date(20, 1, 2029)
+    assert bond._ncd == Date(20, 4, 2029)

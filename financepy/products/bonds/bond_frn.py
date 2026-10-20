@@ -124,6 +124,8 @@ class BondFRN:
         q = self.quoted_margin
         num_flows = len(self.cpn_dts)
 
+        self._set_cpn_period(settle_dt)
+
         # We discount using Libor over the period from settlement to the ncd
         (alpha, _, _) = dc_counter.year_frac(settle_dt, self._ncd)
 
@@ -413,6 +415,26 @@ class BondFRN:
 
     ###########################################################################
 
+    def _set_cpn_period(self, settle_dt: Date):
+        """Set the previous and next coupon dates that bracket the settlement
+        date so that the pricing and accrued interest methods can be called in
+        any order."""
+
+        num_flows = len(self.cpn_dts)
+
+        if num_flows == 0:
+            raise FinError("Not enough flow dates.")
+
+        for i in range(1, num_flows):
+            if self.cpn_dts[i] > settle_dt:
+                self._pcd = self.cpn_dts[i - 1]
+                self._ncd = self.cpn_dts[i]
+                return
+
+        raise FinError("Settlement date is after the final coupon date.")
+
+    ###########################################################################
+
     def accrued_interest(self, settle_dt: Date, next_cpn: float):
         """Calculate the amount of coupon that has accrued between the
         previous coupon date and the settlement date. Ex-dividend dates are
@@ -425,11 +447,7 @@ class BondFRN:
 
         dc = DayCount(self.accrual_dc_type)
 
-        for i in range(1, num_flows):
-            if self.cpn_dts[i] > settle_dt:
-                self._pcd = self.cpn_dts[i - 1]
-                self._ncd = self.cpn_dts[i]
-                break
+        self._set_cpn_period(settle_dt)
 
         (acc_factor, num, _) = dc.year_frac(
             self._pcd, settle_dt, self._ncd, self.freq_type
