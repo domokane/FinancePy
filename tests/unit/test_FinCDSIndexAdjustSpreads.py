@@ -126,3 +126,51 @@ def test_cds_index_adjust_spreads():
     assert round(intrinsic_spd_5yr, 3) == 35.538
     assert round(intrinsic_spd_7yr, 3) == 49.008
     assert round(intrinsic_spd_10yr, 3) == 61.407
+
+
+def test_cds_index_spread_adjust_intrinsic_reprices_index():
+    """The spread adjustment must move the intrinsic spread of the portfolio
+    onto the index spread for each index maturity (it used to be a no-op)."""
+
+    import numpy as np
+
+    from financepy.utils.frequency import FrequencyTypes
+    from financepy.utils.day_count import DayCountTypes
+    from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+
+    value_dt = Date(20, 12, 2027)
+    step_in_dt = value_dt.add_days(1)
+    libor_curve = FlatDiscountCurve(
+        value_dt, 0.03, FrequencyTypes.CONTINUOUS, DayCountTypes.ACT_365F
+    )
+    maturity_dts = [Date(20, 12, 2028), Date(20, 12, 2031)]
+
+    rng = np.random.default_rng(1)
+    issuer_curves = []
+    for spd in rng.uniform(0.005, 0.03, 10):
+        cds_contracts = [CDS(value_dt, mat_dt, spd) for mat_dt in maturity_dts]
+        issuer_curves.append(CDSCurve(value_dt, cds_contracts, libor_curve, 0.4))
+
+    index_cpns = [0.0100, 0.0150]
+    index_upfronts = [0.0, 0.0]
+    cds_index = CDSIndexPortfolio()
+
+    adjusted_curves = cds_index.spread_adjust_intrinsic(
+        value_dt, issuer_curves, index_cpns, index_upfronts, maturity_dts, 0.4
+    )
+
+    for mat_dt, cpn in zip(maturity_dts, index_cpns):
+        before = cds_index.intrinsic_spread(value_dt, step_in_dt, mat_dt, issuer_curves)
+        after = cds_index.intrinsic_spread(value_dt, step_in_dt, mat_dt, adjusted_curves)
+        assert abs(before - cpn) > 0.0020
+        assert abs(after - cpn) < 0.0001
+
+    # With a non-zero upfront the adjusted curves must reprice the index value
+    index_upfronts = [0.01, -0.005]
+    adjusted_curves = cds_index.spread_adjust_intrinsic(
+        value_dt, issuer_curves, index_cpns, index_upfronts, maturity_dts, 0.4
+    )
+    for mat_dt, cpn, upfront in zip(maturity_dts, index_cpns, index_upfronts):
+        index_cds = CDS(value_dt, mat_dt, cpn)
+        clean_values = [index_cds.value(value_dt, c, 0.4)[1] for c in adjusted_curves]
+        assert abs(np.mean(clean_values) / index_cds.notional - upfront) < 1e-6

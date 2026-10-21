@@ -261,7 +261,7 @@ class CDSIndexPortfolio:
 
         for i_mat in range(0, num_index_maturity_points):
 
-            alpha = 1.0
+            alpha = 0.0
             iterations = 0
 
             while abs(alpha - 1.0) > tolerance:
@@ -298,7 +298,7 @@ class CDSIndexPortfolio:
 
                     index_prot_pv = cds_index.prot_leg_pv(value_dt, adjusted_issuer_curve, index_recovery_rate)
 
-                    index_rpv01 = cds_index.risky_pv01(value_dt, adjusted_issuer_curve)["clean_rpv01"]
+                    index_rpv01 = cds_index.rpv01(value_dt, adjusted_issuer_curve)[CLEAN]
 
                     sum_rpv01 += index_rpv01
                     sum_prot += index_prot_pv
