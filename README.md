@@ -98,7 +98,9 @@ financepy/
 This product-oriented design helps users find the instrument they need without first navigating every available mathematical model.
 
 ## Media Coverage
+
 | [Stack to Street interview](https://stacktostreet.com/episodes/financepy/) | Dominic O'Kane on sell-side quant work and why transparent pricing code matters |
+
 
 ## Documentation and learning resources
 
