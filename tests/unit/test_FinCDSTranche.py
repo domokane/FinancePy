@@ -62,15 +62,15 @@ def test_homogeneous():
 
     method = DefaultLossDbnAlgoTypes.RECURSION
     v = tranche1.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 3) == 582.505
+    assert round(v[3] * 10000, 3) == 582.693
 
     method = DefaultLossDbnAlgoTypes.ADJUSTED_BINOMIAL
     v = tranche3.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 3) == 29.980
+    assert round(v[3] * 10000, 3) == 29.949
 
     method = DefaultLossDbnAlgoTypes.GAUSSIAN
     v = tranche5.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 3) == 4.583
+    assert round(v[3] * 10000, 3) == 4.575
 
     method = DefaultLossDbnAlgoTypes.LHP
     v = tranche7.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
@@ -88,19 +88,19 @@ def test_heterogeneous():
 
     intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, tranche_maturity, issuer_curves) * 10000.0
 
-    assert round(intrinsic_spd, 4) == 34.331
+    assert round(intrinsic_spd, 4) == 34.332
 
     method = DefaultLossDbnAlgoTypes.RECURSION
     v = tranche1.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 3) == 868.479
+    assert round(v[3] * 10000, 3) == 868.773
 
     method = DefaultLossDbnAlgoTypes.ADJUSTED_BINOMIAL
     v = tranche2.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 2) == 173.47
+    assert round(v[3] * 10000, 2) == 173.38
 
     method = DefaultLossDbnAlgoTypes.GAUSSIAN
     v = tranche4.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 4) == 16.1757
+    assert round(v[3] * 10000, 4) == 16.1496
 
     method = DefaultLossDbnAlgoTypes.LHP
     v = tranche6.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)

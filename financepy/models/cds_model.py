@@ -82,10 +82,15 @@ def risky_pv01_numba(
     q1 = _uinterpolate(t_ncd, np_surv_times, np_surv_values, method)
     z1 = _uinterpolate(t_ncd, np_ibor_times, np_ibor_values, method)
 
+    # The accrual factor of the current cpn period, from the previous cpn
+    # date to the next cpn date. The entries of year_fracs are aligned with
+    # payment_times so index 0 is the current period.
+    accrual_factor_ncd = year_fracs[0]
+
     # this is the part of the cpn accrued from previous cpn date to now
     # accrual_factor_pcd_to_now = day_count.year_frac(pcd,teff)
     # reference credit survives to the premium payment date
-    dirty_rpv01 = q1 * z1 * year_fracs[1]
+    dirty_rpv01 = q1 * z1 * accrual_factor_ncd
 
     # cpn accrued from previous cpn to today paid in full at default
     # before cpn payment
@@ -94,7 +99,7 @@ def risky_pv01_numba(
 
     # future accrued from now to cpn payment date assuming default roughly
     # midway
-    dirty_rpv01 += 0.5 * z1 * dq * (year_fracs[1] - accrual_factor_pcd_to_now) * cpn_accd_indicator
+    dirty_rpv01 += 0.5 * z1 * dq * (accrual_factor_ncd - accrual_factor_pcd_to_now) * cpn_accd_indicator
 
     for it in range(1, len(payment_times)):
 

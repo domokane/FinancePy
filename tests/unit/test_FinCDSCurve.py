@@ -65,7 +65,7 @@ def test_fin_cds_curve():
     assert round(issuer_curve._times[9], 4) == 9.0055
     assert round(issuer_curve._qs[0], 4) == 1.0
     assert round(issuer_curve._qs[5], 4) == 0.9249
-    assert round(issuer_curve._qs[9], 4) == 0.8071
+    assert round(issuer_curve._qs[9], 4) == 0.8072
 
     for i in [1, 5, 10]:
         maturity_dt = curve_dt.add_months(12 * i)

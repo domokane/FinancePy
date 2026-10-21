@@ -21,7 +21,7 @@ def test_cds_option():
 
     volatility = 0.3
 
-    strike_result = [(100, 4.0006), (150, 1.5873), (200, 0.0955), (300, 0.0)]
+    strike_result = [(100, 3.9972), (150, 1.5864), (200, 0.0956), (300, 0.0)]
 
     for strike, result in strike_result:
 
