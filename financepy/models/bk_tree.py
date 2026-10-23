@@ -3,7 +3,7 @@
 from math import ceil
 
 import numpy as np
-from numba import njit, float64, int64
+from numba import njit
 
 from ..utils.error import FinError
 from ..utils.math import accrued_interpolator
@@ -42,11 +42,7 @@ def option_exercise_types_to_int(option_exercise_type: ExerciseTypes) -> int:
 ########################################################################################
 
 
-@njit(
-    float64(float64, int64, float64[:], float64, float64, float64, int64),
-    fastmath=True,
-    cache=True,
-)
+@njit(fastmath=True, cache=True)
 def f(
     alpha: float,
     nm: int,
@@ -55,12 +51,14 @@ def f(
     dx: float,
     dt: float,
     n: int,
+    shift: float = 0.0,
 ) -> float:
 
     sum_qz = 0.0
     for j in range(-nm, nm + 1):
         x = alpha + j * dx
-        rdt = np.exp(x) * dt
+        r = np.exp(x) - shift
+        rdt = r * dt
         sum_qz += qq[j + n] * np.exp(-rdt)
 
     obj_fn = sum_qz - pp
@@ -70,11 +68,7 @@ def f(
 ########################################################################################
 
 
-@njit(
-    float64(float64, int64, float64[:], float64, float64, float64, int64),
-    fastmath=True,
-    cache=True,
-)
+@njit(fastmath=True, cache=True)
 def fprime(
     alpha: float,
     nm: int,
@@ -83,12 +77,14 @@ def fprime(
     dx: float,
     dt: float,
     n: int,
+    shift: float = 0.0,
 ) -> float:
     """Compute the derivative of the objective function."""
     sum_q_zd_z = 0.0
     for j in range(-nm, nm + 1):
         x = alpha + j * dx
-        rdt = np.exp(x) * dt
+        r = np.exp(x) - shift
+        rdt = r * dt
         sum_q_zd_z += qq[j + n] * np.exp(-rdt) * np.exp(x)
 
     deriv = -sum_q_zd_z * dt
@@ -101,11 +97,7 @@ def fprime(
 ########################################################################################
 
 
-@njit(
-    float64(float64, int64, float64[:], float64, float64, float64, int64),
-    fastmath=True,
-    cache=True,
-)
+@njit(fastmath=True, cache=True)
 def search_root(
     x0: float,
     nm: int,
@@ -114,6 +106,7 @@ def search_root(
     dx: float,
     dt: float,
     n: int,
+    shift: float = 0.0,
 ) -> float:
 
     #    print("Searching for root", x0)
@@ -125,8 +118,8 @@ def search_root(
     else:
         x1 = x0 * 1.0001
 
-    f0 = f(x0, nm, qq, pp, dx, dt, n)
-    f1 = f(x1, nm, qq, pp, dx, dt, n)
+    f0 = f(x0, nm, qq, pp, dx, dt, n, shift)
+    f1 = f(x1, nm, qq, pp, dx, dt, n, shift)
 
     for _ in range(0, max_iter):
 
@@ -139,7 +132,7 @@ def search_root(
         x0, f0 = x1, f1
 
         x1 = x
-        f1 = f(x1, nm, qq, pp, dx, dt, n)
+        f1 = f(x1, nm, qq, pp, dx, dt, n, shift)
 
         if abs(f1) <= max_error:
             return x1
@@ -153,11 +146,7 @@ def search_root(
 ########################################################################################
 
 
-@njit(
-    float64(float64, int64, float64[:], float64, float64, float64, int64),
-    fastmath=True,
-    cache=True,
-)
+@njit(fastmath=True, cache=True)
 def search_root_deriv(
     x0: float,
     nm: int,
@@ -166,6 +155,7 @@ def search_root_deriv(
     dx: float,
     dt: float,
     n: int,
+    shift: float = 0.0,
 ) -> float:
 
     max_iter = 50
@@ -173,12 +163,12 @@ def search_root_deriv(
 
     for _ in range(0, max_iter):
 
-        fval = f(x0, nm, qq, pp, dx, dt, n)
+        fval = f(x0, nm, qq, pp, dx, dt, n, shift)
 
         if abs(fval) <= max_error:
             return x0
 
-        fderiv = fprime(x0, nm, qq, pp, dx, dt, n)
+        fderiv = fprime(x0, nm, qq, pp, dx, dt, n, shift)
 
         if abs(fderiv) == 0.0:
             print(x0, fval, fderiv)
@@ -848,6 +838,7 @@ def build_tree_fast(
     tree_times: np.ndarray,
     num_time_steps: int,
     discount_factors: np.ndarray,
+    shift: float = 0.0,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, float]:
     """Calibrate the tree to a term structure of interest rates."""
 
@@ -864,7 +855,7 @@ def build_tree_fast(
     pd = np.zeros(shape=2 * j_max + 1)
 
     # The short rate goes out one step extra to have the final short rate
-    # This is the BK model so x = log(r)
+    # This is the shifted BK model so x = log(r + shift)
     x = np.zeros(shape=(num_time_steps + 2, 2 * j_max + 1))
     rt = np.zeros(shape=(num_time_steps + 2, 2 * j_max + 1))
 
@@ -903,22 +894,35 @@ def build_tree_fast(
     # Time zero is trivial for the Arrow-Debreu price
     qq[0, j_max] = 1.0
 
+    if discount_factors[1] <= 0.0:
+        raise FinError("Discount factors must be positive.")
+
     # Estimate short rate over first year
     r0 = -np.log(discount_factors[1]) / tree_times[1]
 
-    # We initialise x0 with value of log of r0
-    x0 = np.log(r0)
+    x_shifted_0 = r0 + shift
+    if x_shifted_0 <= 0.0:
+        raise FinError("Short rate plus shift must be positive.")
+
+    # We initialise x0 with value of log of (r0 + shift)
+    x0 = np.log(x_shifted_0)
 
     # Big loop over time steps
     for m in range(0, num_time_steps + 1):
 
         nm = min(m, j_max)
 
+        # Check bound: discount factor cannot exceed maximum possible discount
+        # at minimum shifted rate (r + shift -> 0, so r -> -shift)
+        max_possible_df = np.sum(qq[m]) * np.exp(shift * dt)
+        if discount_factors[m + 1] >= max_possible_df:
+            raise FinError("Short rate plus shift must be positive.")
+
         # Need to do drift adjustment which is non-linear and so requires
         # a root search algorithm to find value of x0.
 
         alpha[m] = search_root_deriv(
-            x0, nm, qq[m], discount_factors[m + 1], dx, dt, j_max
+            x0, nm, qq[m], discount_factors[m + 1], dx, dt, j_max, shift
         )
 
         x0 = alpha[m]
@@ -926,13 +930,13 @@ def build_tree_fast(
         for j in range(-nm, nm + 1):
             jn = j + j_max
             x[m, jn] = alpha[m] + j * dx
-            rt[m, jn] = np.exp(x[m, jn])
+            rt[m, jn] = np.exp(x[m, jn]) - shift
 
         # Loop over all nodes at time m to calculate next values of qq
         for j in range(-nm, nm + 1):
 
             jn = j + j_max
-            rdt = np.exp(x[m, jn]) * dt
+            rdt = rt[m, jn] * dt
             z = np.exp(-rdt)
 
             if j == j_max:
@@ -958,10 +962,16 @@ class BKTree:
 
     ####################################################################################
 
-    def __init__(self, sigma: float, a: float, num_time_steps: int = 100) -> None:
+    def __init__(
+        self,
+        sigma: float,
+        a: float,
+        num_time_steps: int = 100,
+        shift: float = 0.0,
+    ) -> None:
         """Constructs the Black Karasinski rate model. The speed of mean
         reversion a and volatility are passed in. The short rate process
-        is given by d(log(r)) = (theta(t) - a*log(r)) * dt  + sigma * dW"""
+        is given by d(log(r + shift)) = (theta(t) - a*log(r + shift)) * dt + sigma * dW"""
 
         if not isinstance(sigma, float) or sigma < 0.0:
             raise FinError("Negative volatility not allowed and must be float.")
@@ -972,15 +982,15 @@ class BKTree:
         if not isinstance(num_time_steps, int) or num_time_steps < 3:
             raise FinError("Drift fitting requires at least 3 time steps (int >= 3)")
 
+        if not isinstance(shift, (float, int)):
+            raise FinError("Shift parameter should be float or int.")
+
         a = max(a, 1e-10)
 
         self.a = a
         self.sigma = sigma
-
-        if num_time_steps < 3:
-            raise FinError("Drift fitting requires at least 3 time steps")
-
         self.num_time_steps = num_time_steps
+        self.shift = float(shift)
 
         self.qq = None
         self.rt = None
@@ -1034,7 +1044,7 @@ class BKTree:
         self.dfs = df_values
 
         self.qq, self.pu, self.pm, self.pd, self.rt, self.dt = build_tree_fast(
-            self.a, self.sigma, tree_times, self.num_time_steps, df_tree
+            self.a, self.sigma, tree_times, self.num_time_steps, df_tree, self.shift
         )
 
     ####################################################################################
@@ -1235,4 +1245,5 @@ class BKTree:
         s += label_to_string("Sigma", self.sigma)
         s += label_to_string("a", self.a)
         s += label_to_string("num_time_steps", self.num_time_steps)
+        s += label_to_string("shift", self.shift)
         return s
