@@ -2881,6 +2881,9 @@ class Calendar:
         if m == 8 and d == 15:  # ASSUMPTION
             return True
 
+        if m == 10 and d == 4 and y >= 2026:  # ST FRANCIS OF ASSISI
+            return True
+
         if m == 11 and d == 1:  # ALL SAINTS
             return True
 
