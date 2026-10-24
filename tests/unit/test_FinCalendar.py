@@ -231,6 +231,20 @@ def test_toronto_new_year_on_saturday_observed_on_monday():
     for y in [2011, 2022, 2028]:
         assert cal.is_holiday(Date(3, 1, y)), y
 
+def test_italy_st_francis_national_holiday_from_2026():
+    cal = Calendar(CalendarTypes.ITALY)
+
+    # Law 151/2025 made 4 October a national holiday from 2026
+    for y in [2026, 2027, 2028, 2029, 2030]:
+        assert cal.is_holiday(Date(4, 10, y)), y
+
+    assert not cal.is_business_day(Date(4, 10, 2027))
+    assert cal.adjust(Date(4, 10, 2027), BusDayAdjustTypes.FOLLOWING) == Date(5, 10, 2027)
+
+    # It was a working day before then
+    assert not cal.is_holiday(Date(4, 10, 2024))
+    assert cal.is_business_day(Date(4, 10, 2024))
+
 
 def test_modified_following_does_not_cross_month():
     cal = Calendar(CalendarTypes.WEEKEND)

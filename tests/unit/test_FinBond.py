@@ -493,3 +493,37 @@ def test_key_rate_durations_bloomberg_example():
 
 # test_bond_zero_ror()
 # test_key_rate_durations_bloomberg_example()
+
+
+def test_bond_us_treasury_final_period_uses_simple_interest():
+    """31 CFR 356 Appendix B discounts the fractional period at simple
+    interest. With no full coupon periods left the Treasury price is
+    (100 + C/f) / (1 + alpha * y / f), the same as the street convention,
+    while the UK DMO convention compounds over the fraction."""
+    bond = Bond(
+        Date(15, 5, 2020),
+        Date(15, 5, 2030),
+        0.04,
+        FrequencyTypes.SEMI_ANNUAL,
+        DayCountTypes.ACT_ACT_ICMA,
+    )
+    settle_dt = Date(20, 2, 2030)
+    ytm = 0.05
+
+    treasury = bond.dirty_price_from_ytm(settle_dt, ytm, YTMCalcType.US_TREASURY)
+    street = bond.dirty_price_from_ytm(settle_dt, ytm, YTMCalcType.US_STREET)
+    dmo = bond.dirty_price_from_ytm(settle_dt, ytm, YTMCalcType.UK_DMO)
+
+    alpha = bond.alpha
+    simple = (100.0 + 2.0) / (1.0 + alpha * ytm / 2.0)
+    compound = (100.0 + 2.0) / (1.0 + ytm / 2.0) ** alpha
+
+    assert abs(treasury - simple) < 1e-9
+    assert abs(street - simple) < 1e-9
+    assert abs(dmo - compound) < 1e-9
+
+    # Round trip through the yield solver
+    ytm_back = bond.yield_to_maturity(
+        settle_dt, treasury - bond.accrued_interest(settle_dt, 100.0), YTMCalcType.US_TREASURY
+    )
+    assert abs(ytm_back - ytm) < 1e-9
