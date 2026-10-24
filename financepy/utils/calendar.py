@@ -2710,6 +2710,9 @@ class Calendar:
         if m == 1 and d == 2 and weekday == Date.MON:
             return True
 
+        if m == 1 and d == 3 and weekday == Date.MON:
+            return True
+
         # --------------------------------------------------------------
         # Family Day
         # Third Monday in February (Ontario)

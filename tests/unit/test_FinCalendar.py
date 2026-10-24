@@ -225,6 +225,12 @@ def test_nz_new_year_on_sunday_observed_on_tuesday():
         assert cal.is_business_day(Date(4, 1, y)), y
 
 
+def test_toronto_new_year_on_saturday_observed_on_monday():
+    cal = Calendar(CalendarTypes.TORONTO)
+
+    for y in [2011, 2022, 2028]:
+        assert cal.is_holiday(Date(3, 1, y)), y
+
 def test_italy_st_francis_national_holiday_from_2026():
     cal = Calendar(CalendarTypes.ITALY)
 
