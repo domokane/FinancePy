@@ -24,9 +24,9 @@ def default_times_gc(
     """Generate a matrix of default times by credit and trial using a
     Gaussian copula model using a full rank correlation matrix."""
 
-    np.random.seed(seed)
+    rng = np.random.RandomState(seed)
     num_credits = len(issuer_curves)
-    x = np.random.normal(0.0, 1.0, size=(num_credits, num_trials))
+    x = rng.normal(0.0, 1.0, size=(num_credits, num_trials))
     c = np.linalg.cholesky(corr_matrix)
     y = np.dot(c, x)
 
