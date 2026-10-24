@@ -212,8 +212,7 @@ class EquityIndexOption:
         t_exp = np.maximum(t_exp, 1e-10)
 
         if t_exp < 1.0 / 366.0:
-            print("Expiry time is too close to zero.")
-            return -999
+            raise FinError("Expiry time is too close to zero.")
 
         r = discount_curve.fwd_zero_rate_cc(value_dt, self.expiry_dt)
 
