@@ -25,16 +25,16 @@ class StudentTCopula:
         seed: int,
     ) -> np.ndarray:
 
-        np.random.seed(seed)
+        rng = np.random.RandomState(seed)
         num_credits = len(issuer_curves)
-        x = np.random.normal(0.0, 1.0, size=(num_credits, num_trials))
+        x = rng.normal(0.0, 1.0, size=(num_credits, num_trials))
         c = np.linalg.cholesky(corr_matrix)
         y = np.dot(c, x)
 
         corr_times = np.empty(shape=(num_credits, 2 * num_trials))
 
         for i_trial in range(0, num_trials):
-            chi2 = np.random.chisquare(degrees_of_freedom)
+            chi2 = rng.chisquare(degrees_of_freedom)
             c = sqrt(chi2 / degrees_of_freedom)
             for i_credit in range(0, num_credits):
                 issuer_curve = issuer_curves[i_credit]
