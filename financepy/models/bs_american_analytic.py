@@ -408,7 +408,6 @@ def _value_leisen_reimer(
 
 ########################################################################################
 
-
 def _value_lsmc(
     spot_price: float,
     time_to_expiry: float,

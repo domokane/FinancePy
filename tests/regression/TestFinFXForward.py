@@ -11,7 +11,6 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 
 from financepy.products.fx.fx_forward import FXForward, fx_forward_rate
-from financepy.products.fx.fx_rate import FXRate
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
@@ -26,18 +25,18 @@ def test_fin_fx_forward():
 
     # Valuation date and currency pair.
     value_dt = Date(13, 2, 2018)
-    currency_pair = "EURUSD"
+    ccy_pair = "EURUSD"
 
     # FX rates are quoted USD per EUR.
-    spot_fx_rate = FXRate(currency_pair, 1.300)
-    strike_fx_rate = FXRate(currency_pair, 1.365)
+    spot_fx_rate = 1.300
+    strike_fx_rate = 1.365
 
     # EUR and USD interest rates.
     eur_interest_rate = 0.02
     usd_interest_rate = 0.05
 
     # Spot and forward settlement dates.
-    spot_dt = spot_fx_rate.spot_date(value_dt)
+    spot_dt = value_dt.add_days(2)
     settlement_dt = spot_dt.add_months(12)
 
     notional = 100.0
@@ -94,6 +93,7 @@ def test_fin_fx_forward():
     fx_fwd_buy = FXForward(
         settlement_dt=settlement_dt,
         strike_fx_rate=strike_fx_rate,
+        ccy_pair=ccy_pair,
         notional=notional,
         notional_ccy=notional_currency,
         buy_ccy="EUR",
@@ -102,6 +102,7 @@ def test_fin_fx_forward():
     buy_value = fx_fwd_buy.value(
         value_dt,
         spot_fx_rate,
+        ccy_pair,
         domestic_curve,
         foreign_curve,
     )
@@ -110,6 +111,7 @@ def test_fin_fx_forward():
         value_dt,
         settlement_dt,
         spot_fx_rate,
+        ccy_pair,
         domestic_curve,
         foreign_curve,
     )
@@ -133,6 +135,7 @@ def test_fin_fx_forward():
     fx_fwd_sell = FXForward(
         settlement_dt=settlement_dt,
         strike_fx_rate=strike_fx_rate,
+        ccy_pair=ccy_pair,
         notional=notional,
         notional_ccy=notional_currency,
         buy_ccy="USD",
@@ -141,6 +144,7 @@ def test_fin_fx_forward():
     sell_value = fx_fwd_sell.value(
         value_dt,
         spot_fx_rate,
+        ccy_pair,
         domestic_curve,
         foreign_curve,
     )
@@ -173,6 +177,7 @@ def test_fin_fx_forward():
     fx_fwd_fair = FXForward(
         settlement_dt=settlement_dt,
         strike_fx_rate=fair_fwd_rate,
+        ccy_pair=ccy_pair,
         notional=notional,
         notional_ccy="EUR",
         buy_ccy="EUR",
@@ -181,6 +186,7 @@ def test_fin_fx_forward():
     fair_value = fx_fwd_fair.value(
         value_dt,
         spot_fx_rate,
+        ccy_pair,
         domestic_curve,
         foreign_curve,
     )
@@ -208,6 +214,7 @@ def test_fin_fx_forward():
     fx_spot_equivalent = FXForward(
         settlement_dt=spot_dt,
         strike_fx_rate=spot_fx_rate,
+        ccy_pair=ccy_pair,
         notional=notional,
         notional_ccy="EUR",
         buy_ccy="EUR",
@@ -216,6 +223,7 @@ def test_fin_fx_forward():
     spot_value = fx_spot_equivalent.value(
         value_dt,
         spot_fx_rate,
+        ccy_pair,
         domestic_curve,
         foreign_curve,
     )
@@ -224,6 +232,7 @@ def test_fin_fx_forward():
         value_dt,
         spot_dt,
         spot_fx_rate,
+        ccy_pair,
         domestic_curve,
         foreign_curve,
     )
@@ -241,7 +250,7 @@ def test_fin_fx_forward():
     )
 
     assert abs(
-        spot_forward_rate.rate - spot_fx_rate.rate
+        spot_forward_rate - spot_fx_rate
     ) < 1e-12
 
     assert abs(spot_value["USD"]) < 1e-10

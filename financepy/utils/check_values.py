@@ -44,13 +44,27 @@ def check_currency_pair(ccy_pair: str) -> None:
 ###########################################################################
 
 
-def check_curve_dt(anchor_dt: Date, *curves):
-    """Check that curves are valid for the requested valuation date."""
+def check_curve_dt(value_dt: Date, *curves):
+    """Check that all curves share a valid anchor date."""
+
+    if not curves:
+        return
+
+    common_anchor_dt = curves[0].anchor_dt
 
     for curve in curves:
-        if curve.anchor_dt > anchor_dt:
+        if curve.anchor_dt > value_dt:
             raise FinError(
-                f"{type(curve).__name__} valuation date {curve.anchor_dt} " f"is after valuation date {anchor_dt}."
+                f"{type(curve).__name__} anchor date "
+                f"{curve.anchor_dt} is after valuation date "
+                f"{value_dt}."
+            )
+
+        if curve.anchor_dt != common_anchor_dt:
+            raise FinError(
+                f"{type(curve).__name__} anchor date "
+                f"{curve.anchor_dt} does not match "
+                f"expected anchor date {common_anchor_dt}."
             )
 
 

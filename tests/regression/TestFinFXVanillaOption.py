@@ -62,12 +62,11 @@ def test_fin_fx_vanilla_option_wystup_example1():
         currency_pair,
         OptionTypes.EUROPEAN_CALL,
         notional,
-        "EUR",
-        2,
+        "EUR"
     )
 
     value = call_option.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
     )
 
     notional = 1250000.0
@@ -77,16 +76,15 @@ def test_fin_fx_vanilla_option_wystup_example1():
         currency_pair,
         OptionTypes.EUROPEAN_CALL,
         notional,
-        "USD",
-        2,
+        "USD"
     )
 
     value = call_option.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
     )["v"]
 
     delta = call_option.delta(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
     )["pips_spot_delta"]
 
     test_cases.header("value", "delta")
@@ -133,16 +131,15 @@ def test_fin_fx_vanilla_option_wystup_example2():
         currency_pair,
         OptionTypes.EUROPEAN_PUT,
         notional,
-        "EUR",
-        2,
+        "EUR"
     )
 
     value = call_option.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
     )["v"]
 
     delta = call_option.delta(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
     )["pips_spot_delta"]
 
     test_cases.header("value", "delta")
@@ -169,8 +166,8 @@ def test_fin_fx_vanilla_option_bloomberg_example():
     dom_depo_rate = 0.02  # USD
 
     currency_pair = for_name + dom_name  # Always FORDOM
-    spot_fx_rate = 1.30
-    strike_fx_rate = 1.3650
+    spot_fx_rate = 1.300
+    strike_fx_rate = 1.365
     volatility = 0.20
 
     spot_days = 0
@@ -216,16 +213,15 @@ def test_fin_fx_vanilla_option_bloomberg_example():
         currency_pair,
         OptionTypes.EUROPEAN_CALL,
         notional,
-        notional_currency,
-        2,
+        notional_currency
     )
 
     value = call_option.value(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
     )["v"]
 
     delta = call_option.delta(
-        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
     )["pips_spot_delta"]
 
     test_cases.header("value", "delta")
@@ -248,6 +244,11 @@ def test_fin_fx_vanilla_option_hull_example():
     domestic_curve = FlatDiscountCurve(value_dt, dom_interest_rate)
     foreign_curve = FlatDiscountCurve(value_dt, for_interest_rate)
 
+    for_name = "EUR"
+    dom_name = "USD"
+
+    currency_pair = for_name + dom_name  # Always FORDOM
+
     num_paths_list = [10000, 20000, 40000, 80000, 160000, 320000]
 
     test_cases.header("NUMPATHS", "VALUE_BS", "VALUE_MC")
@@ -258,14 +259,14 @@ def test_fin_fx_vanilla_option_hull_example():
         call_option = FXVanillaOption(
             expiry_dt,
             strike_fx_rate,
-            "EURUSD",
+            currency_pair,
             OptionTypes.EUROPEAN_CALL,
             1000000,
             "USD",
         )
 
         value = call_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["v"]
 
         start = time.time()
@@ -273,6 +274,7 @@ def test_fin_fx_vanilla_option_hull_example():
         value_mc = call_option.value_mc(
             value_dt,
             spot_fx_rate,
+            currency_pair,
             domestic_curve,
             foreign_curve,
             model,
@@ -294,20 +296,21 @@ def test_fin_fx_vanilla_option_hull_example():
         call_option = FXVanillaOption(
             expiry_dt,
             strike_fx_rate,
-            "EURUSD",
+            currency_pair,
             OptionTypes.EUROPEAN_CALL,
             1000000,
             "USD",
         )
 
         value = call_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["v"]
 
         start = time.time()
         value_mc = call_option.value_mc(
             value_dt,
             spot_fx_rate,
+            currency_pair,
             domestic_curve,
             foreign_curve,
             model,
@@ -328,20 +331,21 @@ def test_fin_fx_vanilla_option_hull_example():
         put_option = FXVanillaOption(
             expiry_dt,
             strike_fx_rate,
-            "EURUSD",
+            currency_pair,
             OptionTypes.EUROPEAN_PUT,
             1000000,
             "USD",
         )
 
         value = put_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["v"]
 
         start = time.time()
         value_mc = put_option.value_mc(
             value_dt,
             spot_fx_rate,
+            currency_pair,
             domestic_curve,
             foreign_curve,
             model,
@@ -363,28 +367,32 @@ def test_fin_fx_vanilla_option_hull_example():
         "RHO_BS",
     )
 
-    for spot_fx_rate in spot_fx_rates:
+    for spot_fx_rate_value in spot_fx_rates:
+
         call_option = FXVanillaOption(
             expiry_dt,
             strike_fx_rate,
-            "EURUSD",
+            currency_pair,
             OptionTypes.EUROPEAN_CALL,
             1000000,
             "USD",
         )
+
+        spot_fx_rate = spot_fx_rate_value
+
         call_value = call_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["v"]
 
         delta = call_option.delta(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["pips_spot_delta"]
 
         vega = call_option.vega(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )
         theta = call_option.theta(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )
         #  call_option.rho(value_dt,stock_price, interest_rate,
         #  dividend_yield, modelType, model_params)
@@ -401,28 +409,29 @@ def test_fin_fx_vanilla_option_hull_example():
     )
 
     for spot_fx_rate in spot_fx_rates:
+
         put_option = FXVanillaOption(
             expiry_dt,
             strike_fx_rate,
-            "EURUSD",
+            currency_pair,
             OptionTypes.EUROPEAN_PUT,
             1000000,
             "USD",
         )
 
         put_value = put_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["v"]
 
         delta = put_option.delta(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["pips_spot_delta"]
 
         vega = put_option.vega(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )
         theta = put_option.theta(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )
         # put_option.rho(value_dt,stock_price, interest_rate, dividend_yield,
         # modelType, model_params)
@@ -438,18 +447,18 @@ def test_fin_fx_vanilla_option_hull_example():
         call_option = FXVanillaOption(
             expiry_dt,
             strike_fx_rate,
-            "EURUSD",
+            currency_pair,
             OptionTypes.EUROPEAN_CALL,
             1000000,
             "USD",
         )
 
         value = call_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["v"]
 
         implied_vol = call_option.implied_volatility(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model, value)
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model, value)
 
         test_cases.print(spot_fx_rate, value, volatility, implied_vol)
 
@@ -471,13 +480,14 @@ def test_fin_fx_vanilla_option_sabr_example():
     foreign_curve = FlatDiscountCurve(value_dt, for_cc_rate)
     currency_pair = for_name + dom_name
     spot_fx_rate = 131.32
-    strike_price = 130
+    strike_fx_rate = 130.00
     expiry_dt = value_dt.add_tenor("10M")
     notional = 70000000
+    currency_pair = "USDJPY"
 
     call_option = FXVanillaOption(
         expiry_dt,
-        strike_price,
+        strike_fx_rate,
         currency_pair,
         OptionTypes.EUROPEAN_CALL,
         notional,
@@ -496,7 +506,7 @@ def test_fin_fx_vanilla_option_sabr_example():
     black_vol = volatility
     t_exp = 0.8444  # 10M
     model.set_alpha_from_black_vol(
-        black_vol, spot_fx_rate, strike_price, t_exp
+        black_vol, spot_fx_rate, strike_fx_rate, t_exp
     )
 
     spot_fx_rates = np.linspace(80, 300, 1000)
@@ -506,7 +516,7 @@ def test_fin_fx_vanilla_option_sabr_example():
     for spot_fx_rate in spot_fx_rates:
 
         call_value = call_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["cash_dom"]
 
         test_cases.print(spot_fx_rate, call_value)

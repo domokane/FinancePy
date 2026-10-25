@@ -8,8 +8,8 @@ import add_fp_to_path
 from financepy.utils.global_types import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import FXDeltaMethodTypes
-from financepy.utils.global_types  import FXATMMethodTypes
-from financepy.market.volatility.fx_vol_surface  import FXVolSurface
+from financepy.utils.global_types import FXATMMethodTypes
+from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 from FinTestCases import FinTestCases, global_test_case_mode
@@ -17,7 +17,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
-PLOT_GRAPHS = False
+PLOT_GRAPHS = True
 
 ########################################################################################
 

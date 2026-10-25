@@ -12,8 +12,9 @@ from .date import Date
 from .global_vars import G_DAYS_IN_YEAR, G_SMALL
 from .error import FinError
 from .day_count import DayCountTypes, DayCount
+from .fx_conventions import G_FX_CONVENTIONS
 
-########################################################################################
+###############################################################################
 
 
 def _func_name():
@@ -23,7 +24,7 @@ def _func_name():
     return ff
 
 
-########################################################################################
+##############################################################################
 
 
 def option_years(value_dt: Date, expiry_dt: Date, floor=None, fail=True):

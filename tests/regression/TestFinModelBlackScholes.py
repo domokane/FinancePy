@@ -86,18 +86,16 @@ def test_black_scholes():
         model_anal = BlackScholes(volatility)
         model_BAW = BlackScholes(volatility)
 
-        algo_type = BlackScholesAlgorithmTypes.CRR_TREE
-
         v_am = amer_option.value(
             value_dt, stock_price, discount_curve, dividend_curve, model_tree,
-            algo_type=algo_type
+            algo_type=BlackScholesAlgorithmTypes.CRR_TREE,
+            num_steps_per_year=num_steps,
         )
-
-        algo_type = BlackScholesAlgorithmTypes.ANALYTICAL
 
         v_eu = ameu_option.value(
             value_dt, stock_price, discount_curve, dividend_curve, model_tree,
-            algo_type=algo_type
+            algo_type=BlackScholesAlgorithmTypes.CRR_TREE,
+            num_steps_per_year=num_steps,
         )
 
         algo_type = BlackScholesAlgorithmTypes.BARONE_ADESI_WHALEY
@@ -162,28 +160,24 @@ def test_barone_edesi():
 
     model = BlackScholes(volatility)
 
-    algo_type = BlackScholesAlgorithmTypes.DEFAULT
-
-    v = amer_option.value(
+    v_am = amer_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model,
-        algo_type=algo_type)
-
-    algo_type = BlackScholesAlgorithmTypes.BARONE_ADESI_WHALEY
-
-    v = amer_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model, algo_type=algo_type
+        algo_type=BlackScholesAlgorithmTypes.DEFAULT,
     )
 
-    algo_type = BlackScholesAlgorithmTypes.DEFAULT
-
-    v = ameu_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model, algo_type=algo_type
+    v_am_baw = amer_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model,
+        algo_type=BlackScholesAlgorithmTypes.BARONE_ADESI_WHALEY,
     )
 
-    algo_type = BlackScholesAlgorithmTypes.DEFAULT
+    v_eu = eu_option.value(
+        value_dt, stock_price, discount_curve, dividend_curve, model,
+    )
 
-    v = eu_option.value(
-        value_dt, stock_price, discount_curve, dividend_curve, model)
+    assert v_am >= v_eu - 1e-8
+    assert v_am_baw >= v_eu - 1e-8
+
+    assert abs(v_am - v_am_baw) < 0.05
 
 
 test_barone_edesi()

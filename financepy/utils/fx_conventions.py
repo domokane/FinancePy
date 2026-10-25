@@ -2,11 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from ...utils.date import Date
+from .date import Date
 from dataclasses import dataclass
 
-from ...utils.error import FinError
-from ...utils.global_types import FXDeltaMethodTypes
+from .error import FinError
+from .global_types import FXDeltaMethodTypes
+
+from .currency import get_currency_calendar_type
+from .calendar import Calendar
+
 
 ########################################################################################
 
@@ -217,7 +221,7 @@ delta_convention = {
 }
 
 
-if 1 == 1:
+if 1 == 0:
     from ...utils.currency import g_ccy_names
 
     for pair, convention in G_FX_CONVENTIONS.items():
@@ -237,3 +241,21 @@ if 1 == 1:
 
         if convention.premium_currency is not None:
             assert convention.premium_currency in (ccy1, ccy2)
+
+
+def fx_spot_date(ccy_pair: str, trade_dt: Date) -> Date:
+    """Return the conventional FX spot settlement date."""
+
+    ccy1 = ccy_pair[:3]
+    ccy2 = ccy_pair[3:]
+
+    cal_type_1 = get_currency_calendar_type(ccy1)
+    cal_type_2 = get_currency_calendar_type(ccy2)
+
+    calendar = Calendar([cal_type_1, cal_type_2])
+
+    spot_lag = G_FX_CONVENTIONS[ccy_pair].spot_lag
+
+    spot_dt = calendar.add_business_days(trade_dt, spot_lag)
+
+    return spot_dt

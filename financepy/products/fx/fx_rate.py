@@ -2,14 +2,15 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from ...utils.fx_conventions import G_FX_CONVENTIONS
+from ...utils.calendar import Calendar
+from ...utils.date import Date
+from ...utils.currency import get_currency_calendar_type
+from ...utils.check_values import check_currency_pair
+from ...utils.error import FinError
 import math
 
-from ...utils.error import FinError
-from ...utils.check_values import check_currency_pair
-from ...utils.currency import get_currency_calendar_type
-from ...utils.date import Date
-from ...utils.calendar import Calendar
-from .fx_conventions import G_FX_CONVENTIONS
+DO NOT USE
 
 
 class FXRate:
@@ -36,7 +37,7 @@ class FXRate:
         self.ccy_pair = ccy_pair
         self.ccy1 = ccy_pair[:3]
         self.ccy2 = ccy_pair[3:]
-        self.rate = rate
+        self.value = rate
 
     def ccy_pair_names(self):
         """Return the currency names."""
@@ -49,6 +50,13 @@ class FXRate:
         inverse_pair = self.ccy2 + self.ccy1
 
         return FXRate(inverse_pair, 1.0 / self.rate)
+
+    def bumnp(self, bump_size) -> "FXRate":
+        """Return the reciprocal FX quotation."""
+
+        bumped_rate = self.value + bump_size
+
+        return FXRate(self.ccy_pair, bumped_rate)
 
     def spot_date(self, trade_dt: Date) -> Date:
         """Return the conventional FX spot settlement date."""
@@ -71,10 +79,10 @@ class FXRate:
         if self.ccy_pair != other.ccy_pair:
             raise FinError("Cannot subtract FX rates with different currency pairs.")
 
-        return FXRate(self.ccy_pair, self.rate - other.rate)
+        return FXRate(self.ccy_pair, self.value - other.value)
 
     def __repr__(self) -> str:
         return (
             f"FXRate(currency_pair='{self.ccy_pair}', "
-            f"rate={self.rate})"
+            f"rate={self.value})"
         )

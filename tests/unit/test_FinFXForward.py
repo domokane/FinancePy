@@ -6,7 +6,6 @@ from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.products.fx.fx_forward import FXForward, fx_forward_rate
-from financepy.products.fx.fx_rate import FXRate
 
 ########################################################################################
 
@@ -23,10 +22,11 @@ def test_fin_fx_forward():
     for_name = "EUR"
     dom_name = "USD"
     currency_pair = for_name + dom_name  # Always ccy1ccy2
-    spot_fx_rate = FXRate(currency_pair, 1.300)  # USD per EUR
-    strike_fx_rate = FXRate(currency_pair, 1.365)  # USD per EUR
+    spot_fx_rate = 1.300  # USD per EUR
+    strike_fx_rate = 1.365  # USD per EUR
     ccy1_interest_rate = 0.02  # USD Rates
     ccy2_interest_rate = 0.05  # EUR rates
+    currency_pair = "EURUSD"
 
     spot_days = 0
     settle_dt = value_dt.add_weekdays(spot_days)
@@ -69,14 +69,16 @@ def test_fin_fx_forward():
     buy_currency = for_name
 
     fx_fwd = FXForward(
-        expiry_dt, strike_fx_rate, notional, notional_currency, buy_currency
+        expiry_dt, strike_fx_rate, currency_pair, notional, notional_currency, buy_currency
     )
 
-    fwd_value = fx_fwd.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
+    fwd_value = fx_fwd.value(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve)
 
-    fwd_fx_rate = fx_forward_rate(value_dt, expiry_dt, spot_fx_rate, domestic_curve, foreign_curve)
+    fwd_fx_rate = fx_forward_rate(value_dt, expiry_dt,
+                                  spot_fx_rate, currency_pair,
+                                  domestic_curve, foreign_curve)
 
-    assert round(fwd_fx_rate.rate, 4) == 1.3385
+    assert round(fwd_fx_rate, 4) == 1.3385
 
     assert round(fwd_value["USD"], 4) == -2.5183
     assert round(fwd_value["EUR"], 4) == -1.9375

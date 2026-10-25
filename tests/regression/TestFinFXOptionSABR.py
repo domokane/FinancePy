@@ -47,6 +47,8 @@ def test_fin_fx_option_sabr():
     # keeps the value unchanged
     notional = 1000000.0
 
+    currency_pair = "EURUSD"
+
     spot_fx_rates = np.arange(50, 200, 10) / 100.0
 
     test_cases.header("OPTION", "FX_RATE", "VALUE_BS", "VOL_IN", "DIFF")
@@ -56,27 +58,27 @@ def test_fin_fx_option_sabr():
         call_option = FXVanillaOption(
             expiry_dt,
             strike_fx_rate,
-            "EURUSD",
+            currency_pair,
             OptionTypes.EUROPEAN_CALL,
             notional,
             "USD",
         )
 
         value_european = call_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["v"]
 
         call_option = FXVanillaOption(
             expiry_dt,
             strike_fx_rate,
-            "EURUSD",
+            currency_pair,
             OptionTypes.AMERICAN_CALL,
             1000000,
             "USD",
         )
 
         value_american = call_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["v"]
 
         diff = value_american - value_european
@@ -96,27 +98,27 @@ def test_fin_fx_option_sabr():
         call_option = FXVanillaOption(
             expiry_dt,
             strike_fx_rate,
-            "EURUSD",
+            currency_pair,
             OptionTypes.EUROPEAN_PUT,
             1000000,
             "USD",
         )
 
         value_european = call_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["v"]
 
         call_option = FXVanillaOption(
             expiry_dt,
             strike_fx_rate,
-            "EURUSD",
+            currency_pair,
             OptionTypes.AMERICAN_PUT,
             1000000,
             "USD",
         )
 
         value_american = call_option.value(
-            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
         )["v"]
 
         diff = value_american - value_european

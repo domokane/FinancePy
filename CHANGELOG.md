@@ -1,5 +1,19 @@
 ## CHANGE LOG
-14 Oct 2016
+25 Oct 2026
+- Tidying up FXVolSurfaces
+- Added currency_pair to FXVolSurface
+- Switch to use value date as option start in FXVolSurfacePlus
+- Switch to use value date as option start in FXVanillaOption
+- Removed all FXRate references
+- Added EquityQuantoForward product type
+- Added EquityQuantoOption product type
+- Added Product class
+- Added Trade class
+- check_curve_dt now takes list of curve arguments
+- Moved fx_conventions to utilities
+- Restored regression tests to work without FXRate
+
+14 Oct 2026
 - Added example script for EquityGapOption
 - Renamed black_scholes_analytic to bs_european_analytic in models folder
 - Removed graph format setters from plot functionality

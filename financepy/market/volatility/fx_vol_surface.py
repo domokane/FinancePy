@@ -39,6 +39,7 @@ from ...utils.global_types import FXATMMethodTypes
 from ...utils.global_types import FXDeltaMethodTypes
 from ...utils.helpers import check_argument_types, label_to_string
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.fx_conventions import fx_spot_date
 
 from ...models.black_scholes import BlackScholes
 
@@ -309,7 +310,11 @@ def solve_to_horizon_fast(
     cache=True,
     fastmath=True,
 )
-def vol_function(vol_function_type_value: int, params: np.ndarray, f: float, k: float, t: float) -> float:
+def vol_function(vol_function_type_value: int,
+                 params: np.ndarray,
+                 f: float,
+                 k: float,
+                 t: float) -> float:
     """Return the volatility for a strike using a given polynomial
     interpolation following Section 3.9 of Iain Clark book."""
 
@@ -368,23 +373,7 @@ def delta_fit(k: float, *args: Any) -> float:
 ########################################################################################
 # Unable to cache this function due to dynamic globals warning. Revisit.
 
-
-@njit(
-    float64(
-        float64,
-        float64,
-        float64,
-        float64,
-        int64,
-        int64,
-        float64,
-        int64,
-        float64,
-        float64[:],
-    ),
-    fastmath=True,
-    cache=False,
-)
+@njit(fastmath=True, cache=False)
 def solver_for_smile_strike_fast(
     s: float,
     t: float,
@@ -731,21 +720,27 @@ class FXVolSurface:
         self.v_25d_ms = np.zeros(num_vol_curves)
         self.t_exp = np.zeros(num_vol_curves)
 
-        #######################################################################
-        # TODO: ADD SPOT DAYS
-        #######################################################################
-        spot_dt = self.anchor_dt
+        spot_dt = fx_spot_date(self.currency_pair, self.anchor_dt)
+
+        df_d_spot = self.domestic_curve.df(spot_dt)
+        df_f_spot = self.foreign_curve.df(spot_dt)
 
         for i in range(0, num_vol_curves):
 
             expiry_dt = self.expiry_dts[i]
-            t_exp = (expiry_dt - spot_dt) / G_DAYS_IN_YEAR
+            delivery_dt = fx_spot_date(self.currency_pair, expiry_dt)
+
+            # Volatility horizon: valuation date to expiry
+            t_exp = (expiry_dt - self.anchor_dt) / G_DAYS_IN_YEAR
 
             if t_exp <= 0.0:
                 raise FinError("Expiry time must be positive.")
 
-            dom_df = self.domestic_curve.df_t(t_exp)
-            for_df = self.foreign_curve.df_t(t_exp)
+            # Discount factors from spot settlement to delivery
+            dom_df = self.domestic_curve.df(delivery_dt) / df_d_spot
+            for_df = self.foreign_curve.df(delivery_dt) / df_f_spot
+
+            # Forward FX rate for delivery
             f = s * for_df / dom_df
 
             self.t_exp[i] = t_exp
@@ -1019,6 +1014,7 @@ class FXVolSurface:
             delta_call = call.delta(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1027,6 +1023,7 @@ class FXVolSurface:
             delta_put = put.delta(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1058,6 +1055,7 @@ class FXVolSurface:
             delta_call = call.delta(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1066,6 +1064,7 @@ class FXVolSurface:
             delta_put = put.delta(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1085,6 +1084,7 @@ class FXVolSurface:
             call_value = call.value(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1093,6 +1093,7 @@ class FXVolSurface:
             put_value = put.value(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1124,6 +1125,7 @@ class FXVolSurface:
             call_value = call.value(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1133,6 +1135,7 @@ class FXVolSurface:
             delta_call = call.delta(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1151,6 +1154,7 @@ class FXVolSurface:
             put_value = put.value(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1160,6 +1164,7 @@ class FXVolSurface:
             delta_put = put.delta(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1215,6 +1220,7 @@ class FXVolSurface:
             delta_call = call.delta(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1234,6 +1240,7 @@ class FXVolSurface:
             delta_put = put.delta(
                 self.anchor_dt,
                 self.spot_fx_rate,
+                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -1286,11 +1293,8 @@ class FXVolSurface:
 
             d_fx = (high_fx - low_fx) / num_intervals
 
-            dom_df = self.domestic_curve.df_t(t_exp)
-            for_df = self.foreign_curve.df_t(t_exp)
-
-            r_d = -np.log(dom_df) / t_exp
-            r_f = -np.log(for_df) / t_exp
+            r_d = self.rd[i_tenor]
+            r_f = self.rf[i_tenor]
 
             k_s = []
             vols = []

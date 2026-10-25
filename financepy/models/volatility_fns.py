@@ -12,7 +12,7 @@ from ..utils.error import FinError
 ########################################################################################
 
 
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+@njit(fastmath=True, cache=True)
 def vol_function_clark(
     params: np.ndarray,
     f: float,
@@ -46,7 +46,7 @@ def vol_function_clark(
 ########################################################################################
 
 
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+@njit(fastmath=True, cache=True)
 def vol_function_bloomberg(
     params: np.ndarray,
     f: float,
@@ -87,7 +87,7 @@ def vol_function_bloomberg(
 ########################################################################################
 
 
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+@njit(fastmath=True, cache=True)
 def vol_function_svi(
     params: np.ndarray,
     f: float,
@@ -121,7 +121,7 @@ def vol_function_svi(
 ########################################################################################
 
 
-@njit(float64(float64, float64), fastmath=True, cache=True)
+@njit(fastmath=True, cache=True)
 def phi_ssvi(
     theta: float,
     gamma: float
@@ -140,11 +140,7 @@ def phi_ssvi(
 ########################################################################################
 
 
-@njit(
-    float64(float64, float64, float64, float64, float64),
-    fastmath=True,
-    cache=True,
-)
+@njit(fastmath=True, cache=True)
 def ssvi(
     x: float,
     gamma: float,
@@ -165,11 +161,7 @@ def ssvi(
 ########################################################################################
 
 
-@njit(
-    float64(float64, float64, float64, float64, float64),
-    fastmath=True,
-    cache=True,
-)
+@njit(fastmath=True, cache=True)
 def ssvi1(
     x: float,
     gamma: float,
@@ -190,11 +182,7 @@ def ssvi1(
 ########################################################################################
 
 
-@njit(
-    float64(float64, float64, float64, float64, float64),
-    fastmath=True,
-    cache=True,
-)
+@njit(fastmath=True, cache=True)
 def ssvi2(
     x: float,
     gamma: float,
@@ -216,7 +204,6 @@ def ssvi2(
 
 
 @njit(
-    float64(float64, float64, float64, float64, float64),
     fastmath=True,
     cache=True,
 )
@@ -240,7 +227,6 @@ def ssvit(
 
 
 @njit(
-    float64(float64, float64, float64, float64, float64),
     fastmath=True,
     cache=True,
 )
@@ -268,7 +254,6 @@ def g(
 
 
 @njit(
-    float64(float64, float64, float64, float64, float64),
     fastmath=True,
     cache=True,
 )
@@ -289,7 +274,6 @@ def dminus(
 
 
 @njit(
-    float64(float64, float64, float64, float64, float64),
     fastmath=True,
     cache=True,
 )
@@ -311,7 +295,6 @@ def density_ssvi(
 
 
 @njit(
-    float64(float64, float64, float64, float64, float64),
     fastmath=True,
     cache=True,
 )
@@ -333,7 +316,7 @@ def ssvi_local_varg(
 ########################################################################################
 
 
-@njit(float64(float64[:], float64, float64, float64), fastmath=True, cache=True)
+@njit(fastmath=True, cache=True)
 def vol_function_ssvi(
     params: np.ndarray,
     f: float,

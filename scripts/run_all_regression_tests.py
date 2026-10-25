@@ -16,8 +16,9 @@ from pathlib import Path
 repo_root = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(repo_root))
 
-print("These tests run against local repo and not installed FinancePy. They are mainly used for local development work.\n")
-
+print("These tests run against local repo and not installed FinancePy.")
+print("They are mainly used for local development work.")
+print("")
 print("FinancePy imported successfully from:", financepy.__file__)
 print()
 
