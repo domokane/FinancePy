@@ -696,7 +696,7 @@ class DiscountCurve:
 
         # Build new curve
         bumped_curve = DiscountCurve(
-            value_dt=self.anchor_dt,
+            anchor_dt=self.anchor_dt,
             df_dates=self._df_dates,
             df_values=dfs,
             interp_type=interp_type,
