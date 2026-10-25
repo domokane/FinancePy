@@ -1187,6 +1187,11 @@ class Calendar:
 
         # One-off or moved bank holidays.
         special_holidays = {
+            (1995, 5, 8),   # Early May bank holiday moved for VE Day
+            (2002, 6, 3),   # Golden Jubilee
+            (2002, 6, 4),   # Spring bank holiday moved from 27 May
+            (2012, 6, 4),   # Spring bank holiday moved from 28 May
+            (2012, 6, 5),   # Diamond Jubilee
             (2020, 5, 8),   # Early May bank holiday moved for VE Day
             (2022, 6, 2),   # Spring bank holiday moved from 30 May
             (2022, 6, 3),   # Platinum Jubilee
@@ -1196,6 +1201,19 @@ class Calendar:
 
         if (y, m, d) in special_holidays:
             return True
+
+        # Usual bank holiday dates that were working days because the
+        # holiday was moved (see special_holidays above).
+        moved_holidays = {
+            (1995, 5, 1),   # Early May bank holiday moved to 8 May
+            (2002, 5, 27),  # Spring bank holiday moved to 4 June
+            (2012, 5, 28),  # Spring bank holiday moved to 4 June
+            (2020, 5, 4),   # Early May bank holiday moved to 8 May
+            (2022, 5, 30),  # Spring bank holiday moved to 2 June
+        }
+
+        if (y, m, d) in moved_holidays:
+            return False
 
         if m == 1 and d == 1:  # new years day
             return True
@@ -1837,6 +1855,10 @@ class Calendar:
         # Jan 1 Saturday -> Jan 3 Monday
         # Jan 2 Sunday   -> Jan 4 Tuesday
         if m == 1 and d == 3 and weekday == Date.MON:
+            return True
+
+        # Jan 1 Sunday -> Jan 3 Tuesday (Jan 2 is the Monday holiday)
+        if m == 1 and d == 3 and weekday == Date.TUE:
             return True
 
         if m == 1 and d == 4 and weekday in (Date.MON, Date.TUE):
@@ -2688,6 +2710,9 @@ class Calendar:
         if m == 1 and d == 2 and weekday == Date.MON:
             return True
 
+        if m == 1 and d == 3 and weekday == Date.MON:
+            return True
+
         # --------------------------------------------------------------
         # Family Day
         # Third Monday in February (Ontario)
@@ -2857,6 +2882,9 @@ class Calendar:
             return True
 
         if m == 8 and d == 15:  # ASSUMPTION
+            return True
+
+        if m == 10 and d == 4 and y >= 2026:  # ST FRANCIS OF ASSISI
             return True
 
         if m == 11 and d == 1:  # ALL SAINTS

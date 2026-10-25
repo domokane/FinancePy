@@ -18,6 +18,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...models.bs_asian_option_mc import asian_value_mc_fast_cv_numba
 from ...models.bs_asian_option_mc import asian_value_mc_fast_numba
 from ...models.bs_asian_option_mc import asian_value_mc_numba
+from ...models.bs_asian_option_mc import asian_value_mc_sobol
 
 from ...models.bs_asian_option import value_asian_curran
 from ...models.bs_asian_option import value_asian_turnbull_wakeman_discrete
@@ -216,6 +217,45 @@ class EquityAsianOption(EquityOption):
             accrued_average,
         )
 
+        return MCResult(v, e)
+
+    ####################################################################################
+
+    def value_mc_sobol(
+        self,
+        value_dt: Date,
+        stock_price: float,
+        discount_curve: DiscountCurve,
+        dividend_curve: DiscountCurve,
+        model: Model,
+        num_paths: int,
+        seed: int,
+        accrued_average: float = None,
+        num_scrambles: int = 8,
+    ) -> MCResult:
+        """Randomized Sobol/antithetic Asian option valuation.
+
+        Uses independent scrambled Sobol replications to estimate QMC
+        uncertainty. num_paths must equal 2 * num_scrambles * 2**m
+        with m >= 1, including antithetic paths. Does not alter the
+        pseudo-random Monte Carlo methods.
+        """
+        check_curve_dt(value_dt, discount_curve)
+        check_curve_dt(value_dt, dividend_curve)
+        check_stock_price(stock_price)
+        check_volatility(model.volatility)
+        check_num_paths(num_paths)
+
+        t_exp = option_years(value_dt, self.expiry_dt)
+        t_avg = option_years(value_dt, self.start_averaging_date, fail=False)
+        r = discount_curve.zero_rate_cc(self.expiry_dt)
+        q = dividend_curve.zero_rate_cc(self.expiry_dt)
+
+        v, e = asian_value_mc_sobol(
+            t_avg, t_exp, self.strike_price, self.num_obs_per_year,
+            self.opt_type.value, stock_price, r, q, model.volatility,
+            num_paths, seed, accrued_average, num_scrambles,
+        )
         return MCResult(v, e)
 
     ####################################################################################

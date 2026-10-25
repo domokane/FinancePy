@@ -2,6 +2,8 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
+from typing import Union
+
 import numpy as np
 
 from ...utils.frequency import FrequencyTypes
@@ -47,13 +49,17 @@ class EquityCliquetOption(EquityOption):
         payoff_type: CliquetTypes = CliquetTypes.PRICE,
         payoff_timing_type: PaymentTimingTypes = PaymentTimingTypes.PERIODIC,
         notional: float = 1.0,
+        local_floor: Union[float, None] = None,
+        local_cap: Union[float, None] = None,
+        global_floor: Union[float, None] = None,
+        global_cap: Union[float, None] = None,
         cal_type: CalendarTypes = CalendarTypes.WEEKEND,
         bd_type: BusDayAdjustTypes = BusDayAdjustTypes.FOLLOWING,
         dg_type: DateGenRuleTypes = DateGenRuleTypes.BACKWARD,
     ) -> None:
         """Create the EquityCliquetOption by passing in the start date
-        and the end date and whether it is a call or a put. Some additional
-        data is needed in order to calculate the individual payments."""
+        and the end date and whether it is a call or a put. Optional local and
+        global caps/floors can be specified."""
 
         check_argument_types(self.__init__, locals())
 
@@ -70,6 +76,10 @@ class EquityCliquetOption(EquityOption):
         self.payoff_type = payoff_type
         self.payoff_timing_type = payoff_timing_type
         self.notional = notional
+        self.local_floor = local_floor
+        self.local_cap = local_cap
+        self.global_floor = global_floor
+        self.global_cap = global_cap
         self.cal_type = cal_type
         self.bd_type = bd_type
         self.dg_type = dg_type
@@ -111,6 +121,11 @@ class EquityCliquetOption(EquityOption):
         if value_dt > self.final_expiry_dt:
             raise FinError("Value date after final expiry date.")
 
+        if self.global_floor is not None or self.global_cap is not None:
+            raise FinError(
+                "Analytical valuation does not support global floor or global cap. Use value_mc()."
+            )
+
         check_curve_dt(value_dt, discount_curve)
         check_curve_dt(value_dt, dividend_curve)
 
@@ -146,28 +161,90 @@ class EquityCliquetOption(EquityOption):
                 fwd_r = discount_curve.fwd_zero_rate_cc(dt_prev, dt)
                 fwd_q = dividend_curve.fwd_zero_rate_cc(dt_prev, dt)
 
-                v = european_value(
-                    1.0,
-                    t_vol,
-                    1.0,
-                    fwd_r,
-                    fwd_q,
-                    fwd_vol,
-                    self.opt_type.value,
-                )
-
-                # Value today assuming payment at period expiry dt
-                if self.payoff_type == CliquetTypes.PRICE:
-                    period_value = s0 * dq_start * v
-
-                elif self.payoff_type == CliquetTypes.RETURN:
-                    period_value = df_start * v
-
-                else:
-                    raise FinError(
-                        "Unknown CLIQUET_PAYOFF_TYPE "
-                        + str(self.payoff_type)
+                if self.local_floor is None and self.local_cap is None:
+                    v = european_value(
+                        1.0,
+                        t_vol,
+                        1.0,
+                        fwd_r,
+                        fwd_q,
+                        fwd_vol,
+                        self.opt_type.value,
                     )
+
+                    # Value today assuming payment at period expiry dt
+                    if self.payoff_type == CliquetTypes.PRICE:
+                        period_value = s0 * dq_start * v
+                    elif self.payoff_type == CliquetTypes.RETURN:
+                        period_value = df_start * v
+                    else:
+                        raise FinError(
+                            "Unknown CLIQUET_PAYOFF_TYPE "
+                            + str(self.payoff_type)
+                        )
+                else:
+                    if self.payoff_type != CliquetTypes.RETURN:
+                        raise FinError(
+                            "Analytical valuation with local floor or local cap currently "
+                            "supports CliquetTypes.RETURN only. Use value_mc() for PRICE cliquets."
+                        )
+
+                    df_period = df_end / df_start
+                    f = self.local_floor
+                    c = self.local_cap
+
+                    if self.opt_type == OptionTypes.EUROPEAN_CALL:
+                        if f is None:
+                            f = 0.0
+                        c1 = european_value(
+                            1.0,
+                            t_vol,
+                            1.0 + f,
+                            fwd_r,
+                            fwd_q,
+                            fwd_vol,
+                            OptionTypes.EUROPEAN_CALL.value,
+                        )
+                        c2 = (
+                            european_value(
+                                1.0,
+                                t_vol,
+                                1.0 + c,
+                                fwd_r,
+                                fwd_q,
+                                fwd_vol,
+                                OptionTypes.EUROPEAN_CALL.value,
+                            )
+                            if c is not None
+                            else 0.0
+                        )
+                        period_value = df_start * (f * df_period + c1 - c2)
+                    elif self.opt_type == OptionTypes.EUROPEAN_PUT:
+                        if f is None:
+                            f = 0.0
+                        p1 = european_value(
+                            1.0,
+                            t_vol,
+                            1.0 - f,
+                            fwd_r,
+                            fwd_q,
+                            fwd_vol,
+                            OptionTypes.EUROPEAN_PUT.value,
+                        )
+                        p2 = (
+                            european_value(
+                                1.0,
+                                t_vol,
+                                1.0 - c,
+                                fwd_r,
+                                fwd_q,
+                                fwd_vol,
+                                OptionTypes.EUROPEAN_PUT.value,
+                            )
+                            if c is not None
+                            else 0.0
+                        )
+                        period_value = df_start * (f * df_period + p1 - p2)
 
                 # If the payoff is deferred from dt to final maturity,
                 # discount the locked amount over [dt, final_expiry_dt].
@@ -251,9 +328,12 @@ class EquityCliquetOption(EquityOption):
                 "Monte Carlo valuation requires a BlackScholes model"
             )
 
-        if self.opt_type != OptionTypes.EUROPEAN_CALL:
+        if self.opt_type not in (
+            OptionTypes.EUROPEAN_CALL,
+            OptionTypes.EUROPEAN_PUT,
+        ):
             raise FinError(
-                "Monte Carlo valuation currently supports call cliquets only"
+                "Monte Carlo valuation supports EUROPEAN_CALL and EUROPEAN_PUT only"
             )
 
         check_curve_dt(value_dt, discount_curve)
@@ -284,6 +364,8 @@ class EquityCliquetOption(EquityOption):
 
         pv_plus = np.zeros(num_half_paths)
         pv_minus = np.zeros(num_half_paths)
+        total_plus = np.zeros(num_half_paths)
+        total_minus = np.zeros(num_half_paths)
 
         df_final = discount_curve.df(
             self.final_expiry_dt
@@ -354,35 +436,55 @@ class EquityCliquetOption(EquityOption):
 
             if self.payoff_type == CliquetTypes.PRICE:
 
-                payoff_plus = np.maximum(
-                    s_next_plus - s_plus,
-                    0.0,
-                )
+                diff_plus = s_next_plus - s_plus
+                diff_minus = s_next_minus - s_minus
 
-                payoff_minus = np.maximum(
-                    s_next_minus - s_minus,
-                    0.0,
-                )
+                if self.opt_type == OptionTypes.EUROPEAN_CALL:
+                    payoff_plus = diff_plus
+                    payoff_minus = diff_minus
+                    if self.local_floor is None:
+                        payoff_plus = np.maximum(payoff_plus, 0.0)
+                        payoff_minus = np.maximum(payoff_minus, 0.0)
+                else:
+                    payoff_plus = -diff_plus
+                    payoff_minus = -diff_minus
+                    if self.local_floor is None:
+                        payoff_plus = np.maximum(payoff_plus, 0.0)
+                        payoff_minus = np.maximum(payoff_minus, 0.0)
+
+                if self.local_floor is not None:
+                    payoff_plus = np.maximum(payoff_plus, self.local_floor)
+                    payoff_minus = np.maximum(payoff_minus, self.local_floor)
+
+                if self.local_cap is not None:
+                    payoff_plus = np.minimum(payoff_plus, self.local_cap)
+                    payoff_minus = np.minimum(payoff_minus, self.local_cap)
 
             elif self.payoff_type == CliquetTypes.RETURN:
 
-                ret_plus = (
-                    s_next_plus / s_plus - 1.0
-                )
+                ret_plus = s_next_plus / s_plus - 1.0
+                ret_minus = s_next_minus / s_minus - 1.0
 
-                ret_minus = (
-                    s_next_minus / s_minus - 1.0
-                )
+                if self.opt_type == OptionTypes.EUROPEAN_CALL:
+                    payoff_plus = ret_plus
+                    payoff_minus = ret_minus
+                    if self.local_floor is None:
+                        payoff_plus = np.maximum(payoff_plus, 0.0)
+                        payoff_minus = np.maximum(payoff_minus, 0.0)
+                else:
+                    payoff_plus = -ret_plus
+                    payoff_minus = -ret_minus
+                    if self.local_floor is None:
+                        payoff_plus = np.maximum(payoff_plus, 0.0)
+                        payoff_minus = np.maximum(payoff_minus, 0.0)
 
-                payoff_plus = np.maximum(
-                    ret_plus,
-                    0.0,
-                )
+                if self.local_floor is not None:
+                    payoff_plus = np.maximum(payoff_plus, self.local_floor)
+                    payoff_minus = np.maximum(payoff_minus, self.local_floor)
 
-                payoff_minus = np.maximum(
-                    ret_minus,
-                    0.0,
-                )
+                if self.local_cap is not None:
+                    payoff_plus = np.minimum(payoff_plus, self.local_cap)
+                    payoff_minus = np.minimum(payoff_minus, self.local_cap)
 
             else:
 
@@ -401,13 +503,16 @@ class EquityCliquetOption(EquityOption):
             ):
 
                 df_pay = discount_curve.df(dt)
+                pv_plus += df_pay * payoff_plus
+                pv_minus += df_pay * payoff_minus
 
             elif (
                 self.payoff_timing_type
                 == PaymentTimingTypes.MATURITY
             ):
 
-                df_pay = df_final
+                total_plus += payoff_plus
+                total_minus += payoff_minus
 
             else:
 
@@ -416,22 +521,25 @@ class EquityCliquetOption(EquityOption):
                     + str(self.payoff_timing_type)
                 )
 
-            pv_plus += (
-                df_pay
-                * payoff_plus
-            )
-
-            pv_minus += (
-                df_pay
-                * payoff_minus
-            )
-
             # The ending stock becomes the reset strike for
             # the next period.
             s_plus = s_next_plus
             s_minus = s_next_minus
 
             dt_prev = dt
+
+        if self.payoff_timing_type == PaymentTimingTypes.MATURITY:
+
+            if self.global_floor is not None:
+                total_plus = np.maximum(total_plus, self.global_floor)
+                total_minus = np.maximum(total_minus, self.global_floor)
+
+            if self.global_cap is not None:
+                total_plus = np.minimum(total_plus, self.global_cap)
+                total_minus = np.minimum(total_minus, self.global_cap)
+
+            pv_plus = df_final * total_plus
+            pv_minus = df_final * total_minus
 
         # -------------------------------------------------------------
         # Antithetic estimator
@@ -473,6 +581,22 @@ class EquityCliquetOption(EquityOption):
                 "opt_type must be EUROPEAN_CALL or EUROPEAN_PUT"
             )
 
+        # Caps and floors
+        if self.local_floor is not None and self.local_cap is not None:
+            if self.local_floor > self.local_cap:
+                raise FinError("local_floor must be less than or equal to local_cap")
+
+        if self.global_floor is not None and self.global_cap is not None:
+            if self.global_floor > self.global_cap:
+                raise FinError("global_floor must be less than or equal to global_cap")
+
+        if (self.global_floor is not None or self.global_cap is not None) and (
+            self.payoff_timing_type != PaymentTimingTypes.MATURITY
+        ):
+            raise FinError(
+                "global_floor and global_cap are only supported when payoff_timing_type is PaymentTimingTypes.MATURITY"
+            )
+
     ###########################################################################
 
     def print_payments(self):
@@ -494,6 +618,15 @@ class EquityCliquetOption(EquityOption):
         s += label_to_string("FREQUENCY_TYPE", self.freq_type)
         s += label_to_string("PAYOFF_TYPE", self.payoff_type)
         s += label_to_string("PAYMENT_TIME_TYPE", self.payoff_timing_type)
+        s += label_to_string("NOTIONAL", self.notional)
+        if self.local_floor is not None:
+            s += label_to_string("LOCAL_FLOOR", self.local_floor)
+        if self.local_cap is not None:
+            s += label_to_string("LOCAL_CAP", self.local_cap)
+        if self.global_floor is not None:
+            s += label_to_string("GLOBAL_FLOOR", self.global_floor)
+        if self.global_cap is not None:
+            s += label_to_string("GLOBAL_CAP", self.global_cap)
         s += label_to_string("CALENDAR_TYPE", self.cal_type)
         s += label_to_string("BUS_DAY_ADJUST_TYPE", self.bd_type)
         s += label_to_string("DATE_GEN_RULE_TYPE", self.dg_type, "")

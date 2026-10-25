@@ -20,6 +20,7 @@ from ...models.equity_crr_tree import crr_tree_val_avg
 from ...models.sabr import vol_function_sabr
 from ...models.sabr import SABR
 from ...models.black_scholes import BlackScholes
+from ...models.black import Black
 
 from ...models.bs_european_analytic import european_value, delta
 
@@ -194,11 +195,15 @@ class FXVanillaOption:
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         model: Model,
+        forward_fx_rate: float | None = None,
     ):
-        """This function calculates the value of the option using a specified
-        model with the resulting value being in domestic i.e. ccy2 terms.
-        Recall that Domestic = CCY2 and Foreign = CCY1 and FX rate is in
-        price in domestic of one unit of foreign currency."""
+        """Value the option in domestic currency.
+
+        BlackScholes and SABR use spot FX. A Black model prices European
+        options using Black-76 on an FX forward. For Black, the forward is
+        inferred from the spot and discount curves unless forward_fx_rate
+        is supplied explicitly (domestic currency per foreign unit).
+        """
 
         check_curve_dt(value_dt, domestic_curve, foreign_curve)
 
@@ -227,7 +232,25 @@ class FXVanillaOption:
 
         vdf = None
 
-        if isinstance(model, BlackScholes) or isinstance(model, SABR):
+        if isinstance(model, Black):
+            if self.opt_type not in (
+                OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT
+            ):
+                raise FinError("Black-76 FX pricing supports European options only.")
+
+            domestic_df = domestic_curve.df(self.expiry_dt)
+            foreign_df = foreign_curve.df(self.expiry_dt)
+            forward = (
+                s0 * foreign_df / domestic_df
+                if forward_fx_rate is None else forward_fx_rate
+            )
+            if np.any(np.asarray(forward) <= 0.0):
+                raise FinError("FX forward rate must be positive.")
+            vdf = model.value(forward, k, t_exp, domestic_df, self.opt_type)
+
+        elif isinstance(model, BlackScholes) or isinstance(model, SABR):
+            if forward_fx_rate is not None:
+                raise FinError("Explicit FX forward requires a Black model.")
 
             if isinstance(model, BlackScholes):
                 volatility = model.volatility

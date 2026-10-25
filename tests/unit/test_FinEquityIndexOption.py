@@ -1,6 +1,7 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
 import numpy as np
+import pytest
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.utils.date import Date
@@ -9,6 +10,7 @@ from financepy.utils.global_types import OptionTypes
 from financepy.models.black import Black, BlackTypes
 from financepy.models.equity_crr_tree import crr_tree_val_avg
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
+from financepy.utils.error import FinError
 
 ########################################################################################
 
@@ -109,3 +111,26 @@ def test_equity_american_index_option_price():
         )
         price_expected = result["value"]
         assert round(price, 4) == round(price_expected, 4)
+
+
+########################################################################################
+
+
+def test_implied_volatility_rejects_expiry_below_one_day():
+    """A round trip through the pricer must fail loudly, not return a sentinel.
+
+    implied_volatility() returns -999 when the expiry is under a day. The value
+    looks like a number (np.isfinite(-999) is True) and feeds straight back
+    into Black, so a caller cannot tell it apart from a real quote. The sibling
+    product EquityVanillaOption raises FinError for the same input.
+    """
+
+    value_dt = Date(1, 1, 2026)
+    expiry_dt = value_dt  # time to expiry is exactly zero
+    discount_curve = FlatDiscountCurve(value_dt, 0.03)
+    option = EquityIndexOption(expiry_dt, 100.0, OptionTypes.EUROPEAN_CALL)
+
+    with pytest.raises(FinError):
+        option.implied_volatility(
+            value_dt, 100.0, discount_curve, Black(0.20), 1.0
+        )

@@ -116,10 +116,10 @@ class IborFRA:
         df_value = discount_curve.df(value_dt)
         v = v * self.notional / df_value
 
-        pay_fixed_sign = 1
-        if self.pay_fixed_rate is True:
-            pay_fixed_sign = -1  # VP: is this the right sign?
-            v *= -1.0
+        # Paying the fixed FRA rate and receiving Ibor gains when the forward
+        # rate is above the contract rate, consistent with SwapTypes.PAY.
+        pay_fixed_sign = 1.0 if self.pay_fixed_rate else -1.0
+        v *= pay_fixed_sign
 
         if pv_only:
             return v
@@ -176,7 +176,7 @@ class IborFRA:
         df_to_value_date = discount_curve.df(value_dt)
         v = v * self.notional / df_to_value_date
 
-        if self.pay_fixed_rate is True:  # VP: ??? pay fixed should be positive notional
+        if not self.pay_fixed_rate:
             v *= -1.0
 
         out = {
@@ -192,8 +192,7 @@ class IborFRA:
             "fwd_pvbp": acc_factor * df_discount_2 / discount_curve.df(self.start_dt),
             "unit_value": acc_factor * df_discount_2 * (libor_fwd - self.fra_rate),
             "value": v,
-            # ignoring pay_fixed flag (which is wrong anyway I think),
-            # bus day adj type, calendar for now
+            # ignoring bus day adj type, calendar for now
         }
         return out
 
