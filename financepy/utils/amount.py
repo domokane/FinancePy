@@ -64,7 +64,7 @@ class Amount:
 
         return Amount(
             self.amount - other.amount,
-            self.currency_type,
+            self.ccy_name,
         )
 
     def __mul__(self, scalar):
@@ -97,7 +97,7 @@ class Amount:
             return False
 
         return (
-            self.currency_type == other.currency_type
+            self.ccy_name == other.ccy_name
             and self.amount == other.amount
         )
 
