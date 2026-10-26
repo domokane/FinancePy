@@ -611,6 +611,19 @@ class EquityVanillaOption:
 
         vol = model.volatility
 
+        print(
+            s0,
+            t_exp,
+            self.strike_price,
+            r,
+            q,
+            vol,
+            self.opt_type_value,
+            num_paths,
+            seed,
+            use_sobol,
+        )
+
         v, e = value_mc_numba_only(
             s0,
             t_exp,

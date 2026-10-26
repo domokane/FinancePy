@@ -1909,6 +1909,86 @@ class Bond:
 
     ###########################################################################
 
+    def payments_to_latex(
+        self,
+        settle_dt: Date,
+        filename: str,
+        face: float = 100,
+    ):
+        """Write the bond payment schedule as a LaTeX table."""
+
+        # Update alpha and ex-dividend date
+        self.accrued_interest(settle_dt, 1.0)
+
+        n_flows = len(self.cpn_dts)
+
+        rows = []
+
+        # Settlement row
+        rows.append(
+            f"{settle_dt} & & SETTLEMENT & \\\\"
+        )
+
+        # Find first future coupon
+        n_start = -1
+        for i in range(n_flows):
+            if self.cpn_dts[i] > settle_dt:
+                n_start = i
+                break
+
+        if n_start == -1:
+            rows.append(
+                r"\multicolumn{4}{c}{Bond has matured.} \\"
+            )
+        else:
+            # Ex-dividend payment
+            if settle_dt >= self.ex_div_dt:
+                cpn_dt = self.cpn_dts[n_start]
+                pmt_dt = self.payment_dts[n_start]
+
+                rows.append(
+                    f"{cpn_dt} & {pmt_dt} & EX-DIV & 0.00 \\\\"
+                )
+                n_start += 1
+
+            # Remaining payments
+            for i in range(n_start, n_flows):
+                cpn_dt = self.cpn_dts[i]
+                pmt_dt = self.payment_dts[i]
+
+                flow = self.flow_amounts[i] * face
+
+                status = "UNCHANGED"
+
+                if cpn_dt != pmt_dt:
+                    status = "HOLIDAY ROLL"
+
+                if cpn_dt == self.maturity_dt:
+                    status = "MATURITY"
+
+                if i == n_flows - 1:
+                    flow += face
+
+                rows.append(
+                    f"{cpn_dt} & {pmt_dt} & {status} & {flow:.2f} \\\\"
+                )
+
+        latex = "\n".join([
+            r"\begin{tabular}{llll}",
+            r"\hline",
+            r"Coupon Date & Payment Date & Status & Amount \\",
+            r"\hline",
+            *rows,
+            r"\hline",
+            r"\end{tabular}",
+        ])
+
+        print(latex)
+        # with open(filename, "w", encoding="utf-8") as f:
+        #     f.write(latex + "\n")
+
+    ###########################################################################
+
     def _print(self):
         """Print a list of the unadjusted coupon payment dts used in
         analytic calculations for the bond."""

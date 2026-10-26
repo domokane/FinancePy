@@ -7,7 +7,8 @@ import numpy as np
 
 
 from financepy.models.cir_montecarlo import zero_price_mc, zero_price
-from financepy.utils.global_types import CIRNumericalSchemeTypes
+from financepy.models.process_simulator import CIRNumericalSchemeTypes
+
 
 # ============================================================================
 # FINANCEPY EXAMPLES - Model Cir
@@ -15,8 +16,6 @@ from financepy.utils.global_types import CIRNumericalSchemeTypes
 
 
 ########################################################################################
-
-
 
 
 ########################################################################################
@@ -114,4 +113,3 @@ for t in np.linspace(0, 10, 21):
     end = time.time()
     elapsed = end - start
     print(t, elapsed, p, p_mc1, p_mc2, p_mc3, p_mc4, p_mc5)
-

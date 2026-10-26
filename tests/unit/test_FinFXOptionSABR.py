@@ -56,7 +56,7 @@ def test_european_call():
         "USD",
     )
     value_european = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     assert round(value_european, 4) == 0.0251
@@ -72,7 +72,7 @@ def test_european_call():
         "USD",
     )
     value_european = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     assert round(value_european, 4) == 0.5276
@@ -94,7 +94,7 @@ def test_american_call():
         "USD",
     )
     value_american = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     assert round(value_american, 4) == 0.0255
@@ -110,7 +110,7 @@ def test_american_call():
         "USD",
     )
     value_american = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     assert round(value_american, 4) == 0.5499
@@ -132,7 +132,7 @@ def test_european_put():
         "USD",
     )
     value_european = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     assert round(value_european, 4) == 0.0797
@@ -148,7 +148,7 @@ def test_european_put():
         "USD",
     )
     value_european = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     assert round(value_european, 4) == 0.0000
@@ -170,7 +170,7 @@ def test_american_put():
         "USD",
     )
     value_american = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     assert round(value_american, 4) == 0.0798
@@ -186,7 +186,7 @@ def test_american_put():
         "USD",
     )
     value_american = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     assert round(value_american, 4) == 0.0000

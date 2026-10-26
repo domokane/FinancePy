@@ -48,7 +48,7 @@
 
 #         spot_lag = get_fx_spot_lag(self.currency_pair)
 
-#         ccy_pair_names = self.strike_fx_rate.ccy_pair_names()
+#         currency_pair_names = self.strike_fx_rate.currency_pair_names()
 
 #         asjusted_dt = trade
 #         return trade_dt.add_weekdays(spot_lag)

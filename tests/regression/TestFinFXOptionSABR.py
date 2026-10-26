@@ -65,7 +65,7 @@ def test_fin_fx_option_sabr():
         )
 
         value_european = call_option.value(
-            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
         )["v"]
 
         call_option = FXVanillaOption(
@@ -78,7 +78,7 @@ def test_fin_fx_option_sabr():
         )
 
         value_american = call_option.value(
-            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
         )["v"]
 
         diff = value_american - value_european
@@ -105,7 +105,7 @@ def test_fin_fx_option_sabr():
         )
 
         value_european = call_option.value(
-            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
         )["v"]
 
         call_option = FXVanillaOption(
@@ -118,7 +118,7 @@ def test_fin_fx_option_sabr():
         )
 
         value_american = call_option.value(
-            value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+            value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
         )["v"]
 
         diff = value_american - value_european

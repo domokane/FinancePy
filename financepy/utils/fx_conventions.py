@@ -243,18 +243,18 @@ if 1 == 0:
             assert convention.premium_currency in (ccy1, ccy2)
 
 
-def fx_spot_date(ccy_pair: str, trade_dt: Date) -> Date:
+def fx_spot_date(currency_pair: str, trade_dt: Date) -> Date:
     """Return the conventional FX spot settlement date."""
 
-    ccy1 = ccy_pair[:3]
-    ccy2 = ccy_pair[3:]
+    ccy1 = currency_pair[:3]
+    ccy2 = currency_pair[3:]
 
     cal_type_1 = get_currency_calendar_type(ccy1)
     cal_type_2 = get_currency_calendar_type(ccy2)
 
     calendar = Calendar([cal_type_1, cal_type_2])
 
-    spot_lag = G_FX_CONVENTIONS[ccy_pair].spot_lag
+    spot_lag = G_FX_CONVENTIONS[currency_pair].spot_lag
 
     spot_dt = calendar.add_business_days(trade_dt, spot_lag)
 

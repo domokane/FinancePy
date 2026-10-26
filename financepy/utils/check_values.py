@@ -24,16 +24,16 @@ def check_currency(ccy_name: str) -> None:
 ###########################################################################
 
 
-def check_currency_pair(ccy_pair: str) -> None:
+def check_currency_pair(currency_pair: str) -> None:
     """Check that an FX currency pair contains two valid currencies."""
 
-    ccy_pair = ccy_pair.upper()
+    currency_pair = currency_pair.upper()
 
-    if len(ccy_pair) != 6:
+    if len(currency_pair) != 6:
         raise FinError("Currency pair must contain six letters.")
 
-    ccy_1 = ccy_pair[:3]
-    ccy_2 = ccy_pair[3:]
+    ccy_1 = currency_pair[:3]
+    ccy_2 = currency_pair[3:]
 
     check_currency(ccy_1)
     check_currency(ccy_2)

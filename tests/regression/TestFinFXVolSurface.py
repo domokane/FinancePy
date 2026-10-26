@@ -17,7 +17,7 @@ from FinTestCases import FinTestCases, global_test_case_mode
 test_cases = FinTestCases(__file__, global_test_case_mode)
 
 
-PLOT_GRAPHS = True
+PLOT_GRAPHS = False
 
 ########################################################################################
 
@@ -98,10 +98,12 @@ def test_fin_fx_mkt_vol_surface1(verbose_calibration):
 
             dbns = fx_market.implied_dbns(0.00001, 5.0, 10000)
 
+            dK = (5.0-0.00001) / 10000
+
             for i in range(0, len(dbns)):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
                 plt.title(vol_function_type)
-                print("SUM:", dbns[i].sum())
+                print("SUM:", dbns[i].sum()*dK)
 
 
 ########################################################################################

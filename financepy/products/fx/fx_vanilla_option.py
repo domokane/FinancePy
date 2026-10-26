@@ -49,11 +49,10 @@ def f(volatility: float, *args):
     domestic_curve = args[3]
     foreign_curve = args[4]
     price = args[5]
-    ccy_pair = args[6]
 
     model = BlackScholes(volatility)
 
-    vdf = self.value(value_dt, spot_fx_rate, ccy_pair, domestic_curve, foreign_curve, model)["v"]
+    vdf = self.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)["v"]
 
     obj_fn = vdf - price
 
@@ -74,11 +73,11 @@ def fvega(volatility: float, *args):
     domestic_curve = args[3]
     foreign_curve = args[4]
 #    price = args[5]
-    ccy_pair = args[6]
+    currency_pair = args[6]
 
     model = BlackScholes(volatility)
 
-    fprime = self.vega(value_dt, spot_fx_rate, ccy_pair, domestic_curve, foreign_curve, model)
+    fprime = self.vega(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     return fprime
 
@@ -191,7 +190,6 @@ class FXVanillaOption:
         self,
         value_dt: Date,
         spot_fx_rate: float | np.ndarray,
-        currency_pair: str,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         model: Model,
@@ -207,9 +205,7 @@ class FXVanillaOption:
 
         check_curve_dt(value_dt, domestic_curve, foreign_curve)
 
-        check_currency_pair(currency_pair)
-
-        spot_dt = fx_spot_date(currency_pair, value_dt)
+        spot_dt = fx_spot_date(self.currency_pair, value_dt)
 
         # Volatility horizon: valuation date to option expiry
         t_exp = option_years(value_dt, self.expiry_dt)
@@ -238,12 +234,12 @@ class FXVanillaOption:
             ):
                 raise FinError("Black-76 FX pricing supports European options only.")
 
-            domestic_df = domestic_curve.df(self.expiry_dt)
-            foreign_df = foreign_curve.df(self.expiry_dt)
+            domestic_df = df_d_del
+
             forward = (
-                s0 * foreign_df / domestic_df
-                if forward_fx_rate is None else forward_fx_rate
+                f0t if forward_fx_rate is None else forward_fx_rate
             )
+
             if np.any(np.asarray(forward) <= 0.0):
                 raise FinError("FX forward rate must be positive.")
             vdf = model.value(forward, k, t_exp, domestic_df, self.opt_type)
@@ -370,21 +366,21 @@ class FXVanillaOption:
         bump_size = 0.0001 * spot_fx_rate
 
         v = self.value(value_dt,
-                       spot_fx_rate.value,
+                       spot_fx_rate,
                        ccy1_discount_curve,
                        ccy2_discount_curve,
                        model)
 
         v_bumped = self.value(
             value_dt,
-            spot_fx_rate.bump(bump_size),
+            spot_fx_rate + bump_size,
             ccy1_discount_curve,
             ccy2_discount_curve,
             model,
         )
 
         if isinstance(v_bumped, dict):
-            delta = (v_bumped["value"] - v["value"]) / bump_size
+            delta = (v_bumped["v"] - v["v"]) / bump_size
         else:
             delta = (v_bumped - v) / bump_size
 
@@ -394,7 +390,6 @@ class FXVanillaOption:
 
     def delta(self, value_dt: Date,
               spot_fx_rate: float,
-              currency_pair: str,
               domestic_curve: DiscountCurve,
               foreign_curve: DiscountCurve,
               model: Model):
@@ -404,10 +399,9 @@ class FXVanillaOption:
         by Iain Clark, published by Wiley Finance."""
 
         check_curve_dt(value_dt, domestic_curve, foreign_curve)
-        spot_dt = fx_spot_date(currency_pair, value_dt)
 
         s0 = spot_fx_rate
-        t_exp = option_years(spot_dt, self.expiry_dt)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         r_d = domestic_curve.zero_rate_cc(self.expiry_dt)
         r_f = foreign_curve.zero_rate_cc(self.expiry_dt)
@@ -474,7 +468,6 @@ class FXVanillaOption:
         self,
         value_dt: Date,
         spot_fx_rate: float,
-        currency_pair: str,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         model: Model,
@@ -482,18 +475,12 @@ class FXVanillaOption:
         """This function calculates the FX Option Gamma using spot delta."""
         check_curve_dt(value_dt, domestic_curve, foreign_curve)
 
-        spot_dt = fx_spot_date(currency_pair, value_dt)
-
-        s0 = spot_fx_rate
-
-        check_curve_dt(value_dt, domestic_curve, foreign_curve)
-
-        t_exp = option_years(spot_dt, self.expiry_dt)
+        t_exp = option_years(value_dt, self.expiry_dt)
         r_d = domestic_curve.zero_rate_cc(self.expiry_dt)
         r_f = foreign_curve.zero_rate_cc(self.expiry_dt)
 
         k = self.strike_fx_rate
-        s0 = spot_fx_rate.rate
+        s0 = spot_fx_rate
 
         if isinstance(model, BlackScholes):
 
@@ -523,7 +510,6 @@ class FXVanillaOption:
         self,
         value_dt: Date,
         spot_fx_rate: float,
-        currency_pair: str,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         model: Model,
@@ -531,14 +517,13 @@ class FXVanillaOption:
         """This function calculates the FX Option Vega using the spot delta."""
 
         check_curve_dt(value_dt, domestic_curve, foreign_curve)
-        spot_dt = fx_spot_date(currency_pair, value_dt)
 
         s0 = spot_fx_rate
 
         r_d = domestic_curve.zero_rate_cc(self.expiry_dt)
         r_f = foreign_curve.zero_rate_cc(self.expiry_dt)
         k = self.strike_fx_rate
-        t_exp = option_years(spot_dt, self.expiry_dt)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         if isinstance(model, BlackScholes):
 
@@ -567,7 +552,6 @@ class FXVanillaOption:
         self,
         value_dt: Date,
         spot_fx_rate: float,
-        currency_pair: str,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
         model: Model,
@@ -575,14 +559,13 @@ class FXVanillaOption:
         """This function calculates the time decay of the FX option."""
 
         check_curve_dt(value_dt, domestic_curve, foreign_curve)
-        spot_dt = fx_spot_date(currency_pair, value_dt)
 
         s0 = spot_fx_rate
 
         r_d = domestic_curve.zero_rate_cc(self.expiry_dt)
         r_f = foreign_curve.zero_rate_cc(self.expiry_dt)
         k = self.strike_fx_rate
-        t_exp = option_years(spot_dt, self.expiry_dt)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         if isinstance(model, BlackScholes):
 
@@ -622,7 +605,6 @@ class FXVanillaOption:
     def implied_volatility(self,
                            value_dt: Date,
                            spot_fx_rate: float,
-                           currency_pair: str,
                            domestic_curve: DiscountCurve,
                            foreign_curve: DiscountCurve,
                            model: Model,
@@ -659,7 +641,6 @@ class FXVanillaOption:
     def value_mc(self,
                  value_dt: Date,
                  spot_fx_rate: float,  # DOM per unit of FOR
-                 currency_pair: str,
                  domestic_curve: DiscountCurve,
                  foreign_curve: DiscountCurve,
                  model: Model,
@@ -674,14 +655,17 @@ class FXVanillaOption:
 
         check_curve_dt(value_dt, domestic_curve, foreign_curve)
 
-        spot_dt = fx_spot_date(currency_pair, value_dt)
+        spot_dt = fx_spot_date(self.currency_pair, value_dt)
 
-        s0 = spot_fx_rate
+        df_d_spot = domestic_curve.df(spot_dt)
+        df_f_spot = foreign_curve.df(spot_dt)
+        df_d_del = domestic_curve.df(self.delivery_dt)
+        df_f_del = foreign_curve.df(self.delivery_dt)
 
-        r_d = domestic_curve.zero_rate_cc(self.expiry_dt)
-        r_f = foreign_curve.zero_rate_cc(self.expiry_dt)
+        f0t = spot_fx_rate * (df_f_del / df_f_spot) / (df_d_del / df_d_spot)
+
         k = self.strike_fx_rate
-        t_exp = option_years(spot_dt, self.expiry_dt)
+        t_exp = option_years(value_dt, self.expiry_dt)
 
         if isinstance(model, BlackScholes):
             volatility = model.volatility
@@ -690,7 +674,8 @@ class FXVanillaOption:
 
         np.random.seed(seed)
 
-        mu = r_d - r_f
+        mu = np.log(f0t / spot_fx_rate) / t_exp
+
         v2 = volatility**2
         k = self.strike_fx_rate
         sqrt_dt = np.sqrt(t_exp)
@@ -713,7 +698,7 @@ class FXVanillaOption:
             raise FinError("Unknown OPTION_TYPE.")
 
         payoff = np.mean(payoff_a_1) + np.mean(payoff_a_2)
-        v = payoff * np.exp(-r_d * t_exp) / 2.0
+        v = payoff * df_d_del / 2.0
         return v
 
     ###########################################################################
@@ -721,6 +706,7 @@ class FXVanillaOption:
     def __repr__(self):
         s = label_to_string("OBJECT_TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("DELIVERY DATE", self.delivery_dt)
         s += label_to_string("CURRENCY PAIR", self.currency_pair)
         s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
         s += label_to_string("PREMIUM CCY", self.prem_currency)

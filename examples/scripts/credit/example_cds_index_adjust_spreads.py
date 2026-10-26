@@ -26,7 +26,6 @@ import time
 import matplotlib.pyplot as plt
 
 from financepy.utils.date import Date
-from financepy.utils.format_graphs import set_plot_style
 
 from financepy.products.credit.cds_index_portfolio import CDSIndexPortfolio
 

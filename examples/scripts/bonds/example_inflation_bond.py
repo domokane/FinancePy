@@ -40,7 +40,6 @@ from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 from financepy.products.bonds.bond import YTMCalcType
-from financepy.utils.format_graphs import set_plot_style
 
 from financepy.products.bonds.bond_inflation import BondInflation
 from financepy.market.curves.inflation_index_curve import (
@@ -54,8 +53,6 @@ from financepy.market.curves.zero_rates_discount_curve import (
 from financepy.market.curves.flat_discount_curve import (
     FlatDiscountCurve,
 )
-
-set_plot_style()
 
 
 # ============================================================================

@@ -2,16 +2,18 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 ##############################################################################
 
-from .asian_option_mc import error_str
 from ..utils.math import normcdf
 from ..utils.global_types import OptionTypes
 from ..utils.error import FinError
 from numba import njit
 import numpy as np
 
-print("DO NOT USE THIS MODULE - USE ASIAN_OPTION_BS.py !!!")
+error_str = "In averaging period so need to enter accrued average."
+
+# DO NOT USE !!!!!!!!!!!!!!
 
 
+@njit(fastmath=True, cache=True)
 def _geom_sum(x, n):
     """Return sum(exp(j*x), j=0,...,n-1) stably."""
     if abs(x) < 1e-10:
@@ -19,6 +21,7 @@ def _geom_sum(x, n):
     return np.expm1(n * x) / np.expm1(x)
 
 
+@njit(fastmath=True, cache=True)
 def value_asian_kemna_vorst_geometric(
     t_avg,
     t_exp,
@@ -96,6 +99,7 @@ def value_asian_kemna_vorst_geometric(
 ####################################################################################
 
 
+@njit(fastmath=True, cache=True)
 def value_asian_curran(
     t_avg,
     t_exp,
@@ -455,6 +459,7 @@ def value_asian_curran(
 ####################################################################################
 
 
+@njit(fastmath=True, cache=True)
 def value_asian_turnbull_wakeman_discrete(
     t_avg,
     t_exp,
@@ -601,6 +606,7 @@ def value_asian_turnbull_wakeman_discrete(
 ####################################################################################
 
 
+@njit(fastmath=True, cache=True)
 def value_asian_turnbull_wakeman(
     t_avg,
     t_exp,

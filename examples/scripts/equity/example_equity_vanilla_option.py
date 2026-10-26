@@ -186,14 +186,14 @@ for num_paths in num_paths_list:
     )
 
     elapsed = time.time() - start
-    error = value_mc - call_value
+    error = value_mc.value - call_value
 
-    mc_call_values.append(value_mc)
+    mc_call_values.append(value_mc.value)
     mc_call_errors.append(error)
     mc_times.append(elapsed)
 
     print(
-        f"{num_paths:12d}{call_value:16.8f}{value_mc:16.8f}"
+        f"{num_paths:12d}{call_value:16.8f}{value_mc.value:16.8f}"
         f"{error:16.8f}{elapsed:14.6f}"
     )
 
@@ -268,6 +268,8 @@ print(
 )
 print("-" * 80)
 
+seed = 42
+
 for spot in comparison_spots:
     value_bs = call_option.value(
         value_dt, spot, discount_curve, dividend_curve, model
@@ -280,6 +282,7 @@ for spot in comparison_spots:
         dividend_curve,
         model,
         num_paths,
+        seed,
         False,
     )
 
@@ -290,21 +293,22 @@ for spot in comparison_spots:
         dividend_curve,
         model,
         num_paths,
+        seed,
         True,
     )
 
-    err_random = value_random - value_bs
-    err_sobol = value_sobol - value_bs
+    err_random = value_random.value - value_bs
+    err_sobol = value_sobol.value - value_bs
 
     call_bs_values.append(value_bs)
-    call_mc_random.append(value_random)
-    call_mc_sobol.append(value_sobol)
+    call_mc_random.append(value_random.value)
+    call_mc_sobol.append(value_sobol.value)
     call_random_errors.append(err_random)
     call_sobol_errors.append(err_sobol)
 
     print(
-        f"{spot:10.2f}{value_bs:14.8f}{value_random:14.8f}"
-        f"{value_sobol:14.8f}{err_random:14.8f}{err_sobol:14.8f}"
+        f"{spot:10.2f}{value_bs:14.8f}{value_random.value:14.8f}"
+        f"{value_sobol.value:14.8f}{err_random:14.8f}{err_sobol:14.8f}"
     )
 
 plt.figure(figsize=(10, 6))

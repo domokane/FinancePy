@@ -19,7 +19,6 @@ from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 # ============================================================================
 
 
-
 PLOT_GRAPHS = False
 
 # TODO: ADD LOGGING TO TEST CASES
@@ -97,10 +96,12 @@ def test_fin_fx_mkt_vol_surface1(verbose):
 
             dbns = fx_market_plus.implied_dbns(0.5, 2.0, 1000)
 
+            dK = (2-0.5) / 1000
+
             for i in range(0, len(dbns)):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
                 plt.title(vol_function_type)
-                print("SUM:", dbns[i].sum())
+                print("SUM:", dbns[i].sum()*dK)
 
 
 ########################################################################################

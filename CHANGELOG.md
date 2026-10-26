@@ -1,4 +1,7 @@
 ## CHANGE LOG
+26 Octo 2026
+- Removed currency pair from FX Vanilla option value function call
+- Removed currency pair from FX Vanilla option greeks function call
 25 Oct 2026
 - Tidying up FXVolSurfaces
 - Added currency_pair to FXVolSurface

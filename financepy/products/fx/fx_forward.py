@@ -19,7 +19,7 @@ def fx_forward_rate(
     value_dt: Date,
     settlement_dt: Date,
     spot_fx_rate: np.ndarray | float,
-    ccy_pair: str,
+    currency_pair: str,
     domestic_curve: DiscountCurve,
     foreign_curve: DiscountCurve,
 ) -> float:
@@ -29,13 +29,13 @@ def fx_forward_rate(
     conventional spot settlement date determined
     from the valuation date and currency pair.
     """
-    check_currency_pair(ccy_pair)
+    check_currency_pair(currency_pair)
 
     s0 = spot_fx_rate
 
     check_curve_dt(value_dt, domestic_curve, foreign_curve)
 
-    spot_settle_dt = fx_spot_date(ccy_pair, value_dt)
+    spot_settle_dt = fx_spot_date(currency_pair, value_dt)
 
     if settlement_dt < spot_settle_dt:
         raise FinError("Forward settlement date before spot settlement date.")
@@ -78,7 +78,7 @@ class FXForward:
         self,
         settlement_dt: Date,
         strike_fx_rate: float,
-        ccy_pair: str,
+        currency_pair: str,
         notional: float,
         notional_ccy: str,
         buy_ccy: str,
@@ -89,13 +89,13 @@ class FXForward:
         notional_ccy = notional_ccy.upper()
         buy_ccy = buy_ccy.upper()
 
-        check_currency_pair(ccy_pair)
+        check_currency_pair(currency_pair)
 
         if not np.isfinite(notional) or notional <= 0.0:
             raise FinError("Notional must be positive and finite.")
 
-        self.for_ccy = ccy_pair[0:3]
-        self.dom_ccy = ccy_pair[3:]
+        self.for_ccy = currency_pair[0:3]
+        self.dom_ccy = currency_pair[3:]
 
         if self.for_ccy == self.dom_ccy:
             raise FinError("Currencies in pair must be different.")
@@ -108,7 +108,7 @@ class FXForward:
 
         self.settlement_dt = settlement_dt
         self.strike_fx_rate = strike_fx_rate
-        self.ccy_pair = ccy_pair
+        self.currency_pair = currency_pair
 
         self.notional = notional
         self.notional_ccy = notional_ccy
@@ -136,7 +136,6 @@ class FXForward:
         self,
         value_dt: Date,
         spot_fx_rate: float,
-        ccy_pair: str,
         domestic_curve: DiscountCurve,
         foreign_curve: DiscountCurve,
     ) -> dict[str, float]:
@@ -145,13 +144,10 @@ class FXForward:
         if value_dt > self.settlement_dt:
             raise FinError("Valuation date after settlement date.")
 
-        if ccy_pair != self.ccy_pair:
-            raise FinError("Spot FX currency pair does not match contract.")
-
         check_curve_dt(value_dt, domestic_curve)
         check_curve_dt(value_dt, foreign_curve)
 
-        self.spot_dt = fx_spot_date(ccy_pair, value_dt)
+        self.spot_dt = fx_spot_date(self.currency_pair, value_dt)
 
         if self.settlement_dt < self.spot_dt:
             raise FinError("Settlement date before conventional spot date.")
@@ -160,7 +156,7 @@ class FXForward:
             value_dt,
             self.settlement_dt,
             spot_fx_rate,
-            ccy_pair,
+            self.currency_pair,
             domestic_curve,
             foreign_curve,
         )
@@ -189,7 +185,7 @@ class FXForward:
         s += label_to_string("SPOT DATE", self.spot_dt)
         s += label_to_string("SETTLEMENT DATE", self.settlement_dt)
         s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
-        s += label_to_string("CURRENCY PAIR", self.ccy_pair)
+        s += label_to_string("CURRENCY PAIR", self.currency_pair)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("NOTIONAL CCY", self.notional_ccy)
         s += label_to_string("BUY CURRENCY", self.buy_ccy)

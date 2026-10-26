@@ -1296,6 +1296,7 @@ class FXVolSurfacePlus:
         self.dom_name = self.currency_pair[3:6]
 
         self.value_dt = value_dt
+        self.anchor_dt = value_dt
         self.spot_dt = fx_spot_date(self.currency_pair, value_dt)
 
         self.notional_currency = notional_currency
@@ -2122,7 +2123,6 @@ class FXVolSurfacePlus:
             delta_call = call.delta(
                 self.value_dt,
                 self.spot_fx_rate,
-                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -2131,7 +2131,6 @@ class FXVolSurfacePlus:
             delta_put = put.delta(
                 self.value_dt,
                 self.spot_fx_rate,
-                self.currency_pair,
                 self.domestic_curve,
                 self.foreign_curve,
                 model,
@@ -2165,7 +2164,6 @@ class FXVolSurfacePlus:
                 delta_call = call.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2174,7 +2172,6 @@ class FXVolSurfacePlus:
                 delta_put = put.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2196,7 +2193,6 @@ class FXVolSurfacePlus:
                 call_value = call.value(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2205,7 +2201,6 @@ class FXVolSurfacePlus:
                 put_value = put.value(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2239,7 +2234,6 @@ class FXVolSurfacePlus:
                 call_value = call.value(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2249,7 +2243,6 @@ class FXVolSurfacePlus:
                 delta_call = call.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2270,7 +2263,6 @@ class FXVolSurfacePlus:
                 put_value = put.value(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2280,7 +2272,6 @@ class FXVolSurfacePlus:
                 delta_put = put.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2342,7 +2333,6 @@ class FXVolSurfacePlus:
                 delta_call = call.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2364,7 +2354,6 @@ class FXVolSurfacePlus:
                 delta_put = put.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2425,7 +2414,6 @@ class FXVolSurfacePlus:
                 delta_call = call.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2434,7 +2422,6 @@ class FXVolSurfacePlus:
                 delta_put = put.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2457,7 +2444,6 @@ class FXVolSurfacePlus:
                 call_value = call.value(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2466,7 +2452,6 @@ class FXVolSurfacePlus:
                 put_value = put.value(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2501,7 +2486,6 @@ class FXVolSurfacePlus:
                 call_value = call.value(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2511,7 +2495,6 @@ class FXVolSurfacePlus:
                 delta_call = call.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2532,7 +2515,6 @@ class FXVolSurfacePlus:
                 put_value = put.value(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2542,7 +2524,6 @@ class FXVolSurfacePlus:
                 delta_put = put.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2601,7 +2582,6 @@ class FXVolSurfacePlus:
                 delta_call = call.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,
@@ -2623,7 +2603,6 @@ class FXVolSurfacePlus:
                 delta_put = put.delta(
                     self.value_dt,
                     self.spot_fx_rate,
-                    self.currency_pair,
                     self.domestic_curve,
                     self.foreign_curve,
                     model,

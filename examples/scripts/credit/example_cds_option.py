@@ -12,7 +12,6 @@ from financepy.utils.global_vars import CLEAN, DIRTY
 from financepy.utils.date import Date
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_option import CDSOption
-from financepy.utils.format_graphs import set_plot_style
 
 from helpers import build_ibor_curve
 from helpers import build_issuer_curve

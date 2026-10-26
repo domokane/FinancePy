@@ -8,6 +8,7 @@ from financepy.models.black_scholes import BlackScholes
 from financepy.products.fx.fx_vanilla_option import FXVanillaOption
 from financepy.utils.date import Date
 from financepy.utils.error import FinError
+from financepy.utils.fx_conventions import fx_spot_date
 from financepy.utils.global_types import OptionTypes
 
 
@@ -26,9 +27,15 @@ def test_fx_black76_inferred_forward_matches_direct_black(option_type):
     )
     model = Black(0.18)
 
-    df_dom = domestic_curve.df(expiry_dt)
-    df_for = foreign_curve.df(expiry_dt)
-    forward = spot * df_for / df_dom
+    spot_dt = fx_spot_date("EURUSD", value_dt)
+
+    df_dom_spot = domestic_curve.df(spot_dt)
+    df_for_spot = foreign_curve.df(spot_dt)
+
+    df_dom = domestic_curve.df(option.delivery_dt)
+    df_for = foreign_curve.df(option.delivery_dt)
+
+    forward = spot * (df_for / df_for_spot) / (df_dom / df_dom_spot)
     t_exp = (expiry_dt - value_dt) / 365.0
     expected = model.value(forward, strike, t_exp, df_dom, option_type)
 
@@ -46,9 +53,13 @@ def test_fx_black76_accepts_market_forward_quote():
     )
     model = Black(0.2)
     market_forward = 1.18
+
     expected = model.value(
-        market_forward, 1.15, 1.0,
-        domestic_curve.df(expiry_dt), OptionTypes.EUROPEAN_CALL,
+        market_forward,
+        1.15,
+        (expiry_dt - value_dt) / 365.0,
+        domestic_curve.df(option.delivery_dt),
+        OptionTypes.EUROPEAN_CALL,
     )
 
     actual = option.value(
@@ -98,6 +109,7 @@ def test_fx_black76_matches_spot_model_under_interest_parity(option_type):
     value_dt, expiry_dt = Date(2, 1, 2026), Date(2, 1, 2027)
     domestic_curve = FlatDiscountCurve(value_dt, 0.045)
     foreign_curve = FlatDiscountCurve(value_dt, 0.025)
+
     option = FXVanillaOption(
         expiry_dt, 1.10, "EURUSD", option_type, 100_000, "USD"
     )
@@ -108,4 +120,5 @@ def test_fx_black76_matches_spot_model_under_interest_parity(option_type):
     spot_model_price = option.value(
         value_dt, 1.12, domestic_curve, foreign_curve, BlackScholes(0.18)
     )["v"]
+
     assert forward_model_price == pytest.approx(spot_model_price, rel=1e-12)

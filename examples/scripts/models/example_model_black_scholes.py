@@ -3,13 +3,14 @@
 
 # Allow this example to run directly from its category folder.
 
+import matplotlib.pyplot as plt
 from financepy.utils.date import Date
 from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.day_count import DayCountTypes
 
 
 from financepy.utils.global_types import OptionTypes
-from financepy.utils.global_types import BlackScholesTypes
+from financepy.utils.global_types import BlackScholesAlgorithmTypes
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.models.black_scholes import BlackScholes
@@ -20,9 +21,6 @@ from financepy.products.equity.equity_american_option import EquityAmericanOptio
 PLOT_GRAPHS = False
 
 
-
-import matplotlib.pyplot as plt
-
 # ============================================================================
 # FINANCEPY EXAMPLES - BlackScholes
 # ============================================================================
@@ -30,8 +28,6 @@ import matplotlib.pyplot as plt
 # TODO Complete output of results to log files
 
 ########################################################################################
-
-
 
 
 ########################################################################################
@@ -75,29 +71,29 @@ dividend_curve = FlatDiscountCurve(
 
 num_steps_per_year = 400
 
-model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps_per_year)
+model_tree = BlackScholes(volatility, BlackScholesAlgorithmTypes.CRR_TREE, num_steps_per_year)
 
 v = am_option.value(
-     value_dt, stock_price, discount_curve, dividend_curve, model_tree
- )
+    value_dt, stock_price, discount_curve, dividend_curve, model_tree
+)
 assert round(v, 4) == 6.8398
 
-model_approx = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
+model_approx = BlackScholes(volatility, BlackScholesAlgorithmTypes.BARONE_ADESI)
 
 v = am_option.value(
-     value_dt, stock_price, discount_curve, dividend_curve, model_approx
+    value_dt, stock_price, discount_curve, dividend_curve, model_approx
 )
 
 assert round(v, 4) == 6.8277
 
 v = ameu_option.value(
-     value_dt, stock_price, discount_curve, dividend_curve, model_tree
+    value_dt, stock_price, discount_curve, dividend_curve, model_tree
 )
 
 assert round(v, 4) == 6.7512
 
 v = eu_option.value(
-     value_dt, stock_price, discount_curve, dividend_curve, model_tree
+    value_dt, stock_price, discount_curve, dividend_curve, model_tree
 )
 
 assert round(v, 4) == 6.7493
@@ -164,9 +160,9 @@ print(
 
 for num_steps in num_steps_per_year:
 
-    model_tree = BlackScholes(volatility, BlackScholesTypes.CRR_TREE, num_steps)
-    model_anal = BlackScholes(volatility, BlackScholesTypes.ANALYTICAL)
-    model_BAW = BlackScholes(volatility, BlackScholesTypes.BARONE_ADESI)
+    model_tree = BlackScholes(volatility, BlackScholesAlgorithmTypes.CRR_TREE, num_steps)
+    model_anal = BlackScholes(volatility, BlackScholesAlgorithmTypes.ANALYTICAL)
+    model_BAW = BlackScholes(volatility, BlackScholesAlgorithmTypes.BARONE_ADESI)
 
     v_am = am_option.value(
         value_dt, stock_price, discount_curve, dividend_curve, model_tree
@@ -201,4 +197,3 @@ if PLOT_GRAPHS:
     plt.ylabel("Value")
     plt.legend()
     plt.show()
-

@@ -296,7 +296,8 @@ financepy.products.fx.fx_forward
 
 <code>FXForward(
     settlement_dt: Date,
-    strike_fx_rate: FXRate,
+    strike_fx_rate: float,
+    currency_pair: str,
     notional: float,
     notional_ccy: str,
     buy_ccy: str,
@@ -330,7 +331,7 @@ per unit of the first currency.</div>
 value(
     self,
     value_dt: Date,
-    spot_fx_rate: FXRate,
+    spot_fx_rate: float,
     domestic_curve: DiscountCurve,
     foreign_curve: DiscountCurve,
 ) -&gt; dict[str, float]
@@ -356,10 +357,11 @@ value(
 fx_forward_rate(
     value_dt: Date,
     settlement_dt: Date,
-    spot_fx_rate: FXRate,
+    spot_fx_rate: numpy.ndarray | float,
+    currency_pair: str,
     domestic_curve: DiscountCurve,
     foreign_curve: DiscountCurve,
-) -&gt; FXRate
+) -&gt; float
 </code>
 
 </div>

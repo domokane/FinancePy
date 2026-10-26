@@ -37,9 +37,6 @@ from financepy.market.volatility.equity_vol_curve import EquityVolCurve
 from financepy.products.equity.equity_variance_swap import EquityVarianceSwap
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
-from financepy.utils.format_graphs import set_plot_style
-
-set_plot_style()
 
 # ============================================================================
 # HELPER FUNCTION

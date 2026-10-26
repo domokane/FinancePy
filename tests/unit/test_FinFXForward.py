@@ -72,7 +72,7 @@ def test_fin_fx_forward():
         expiry_dt, strike_fx_rate, currency_pair, notional, notional_currency, buy_currency
     )
 
-    fwd_value = fx_fwd.value(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve)
+    fwd_value = fx_fwd.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
 
     fwd_fx_rate = fx_forward_rate(value_dt, expiry_dt,
                                   spot_fx_rate, currency_pair,

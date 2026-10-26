@@ -15,10 +15,7 @@ from financepy.products.fx.fx_forward import FXForward
 # ============================================================================
 
 
-
 ########################################################################################
-
-
 
 
 ########################################################################################
@@ -85,7 +82,7 @@ notional = 100.0
 notional_currency = for_name
 
 fx_fwd = FXForward(
-    expiry_dt, strike_fx_rate, currency_pair, notional, notional_currency
+    expiry_dt, strike_fx_rate, currency_pair, notional, notional_currency, "USD"
 )
 
 print("SPOT FX", "FX FWD", "VALUE_BS")
@@ -95,4 +92,3 @@ fwd_value = fx_fwd.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
 fwd_fx_rate = fx_fwd.forward(value_dt, spot_fx_rate, domestic_curve, foreign_curve)
 
 print(spot_fx_rate, fwd_fx_rate, fwd_value)
-

@@ -49,7 +49,7 @@ def test_call():
     )
 
     value_european = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     call_option = FXVanillaOption(
@@ -62,7 +62,7 @@ def test_call():
     )
 
     value_american = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     diff = value_american - value_european
@@ -81,7 +81,7 @@ def test_call():
     )
 
     value_european = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     call_option = FXVanillaOption(
@@ -94,7 +94,7 @@ def test_call():
     )
 
     value_american = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     diff = value_american - value_european
@@ -113,7 +113,7 @@ def test_call():
     )
 
     value_european = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     call_option = FXVanillaOption(
@@ -126,7 +126,7 @@ def test_call():
     )
 
     value_american = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     diff = value_american - value_european
@@ -151,7 +151,7 @@ def test_put():
     )
 
     value_european = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     call_option = FXVanillaOption(
@@ -164,7 +164,7 @@ def test_put():
     )
 
     value_american = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     diff = value_american - value_european
@@ -183,7 +183,7 @@ def test_put():
     )
 
     value_european = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     call_option = FXVanillaOption(
@@ -196,7 +196,7 @@ def test_put():
     )
 
     value_american = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     diff = value_american - value_european
@@ -215,7 +215,7 @@ def test_put():
     )
 
     value_european = call_option.value(
-        value_dt, spot_fx_rate, currency_pair,  domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate,  domestic_curve, foreign_curve, model
     )["v"]
 
     call_option = FXVanillaOption(
@@ -228,7 +228,7 @@ def test_put():
     )
 
     value_american = call_option.value(
-        value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model
+        value_dt, spot_fx_rate, domestic_curve, foreign_curve, model
     )["v"]
 
     diff = value_american - value_european

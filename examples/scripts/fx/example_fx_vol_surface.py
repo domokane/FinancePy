@@ -9,15 +9,13 @@ import matplotlib.pyplot as plt
 from financepy.utils.global_types import VolFuncTypes
 from financepy.utils.date import Date
 from financepy.utils.global_types import FXDeltaMethodTypes
-from financepy.utils.global_types  import FXATMMethodTypes
-from financepy.market.volatility.fx_vol_surface  import FXVolSurface
+from financepy.utils.global_types import FXATMMethodTypes
+from financepy.market.volatility.fx_vol_surface import FXVolSurface
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 
 # ============================================================================
 # FINANCEPY EXAMPLES - FXVolSurface
 # ============================================================================
-
-
 
 
 PLOT_GRAPHS = False
@@ -99,12 +97,14 @@ def test_fin_fx_mkt_vol_surface1(verbose_calibration):
 
             fx_market.plot_vol_curves()
 
+            dK = (10000-0.00001) / 5.0
+
             dbns = fx_market.implied_dbns(0.00001, 5.0, 10000)
 
             for i in range(0, len(dbns)):
                 plt.plot(dbns[i]._x, dbns[i]._densitydx)
                 plt.title(vol_function_type)
-                print("SUM:", dbns[i].sum())
+                print("SUM:", dbns[i].sum()*dK)
 
 
 ########################################################################################

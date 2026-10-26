@@ -1,10 +1,11 @@
 import warnings
 import numpy as np
 from scipy.optimize.linesearch import (
-    LineSearchWarning,
     line_search_wolfe1,
     line_search_wolfe2,
 )
+
+from scipy.optimize import LineSearchWarning
 
 Inf = np.inf
 EPSILON = 1.4901161193847656e-8

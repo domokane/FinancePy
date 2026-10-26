@@ -15,7 +15,7 @@ from financepy.utils.date import Date
 from financepy.products.equity.equity_american_option import EquityAmericanOption
 from financepy.utils.global_types import OptionTypes
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
+from financepy.models.black_scholes import BlackScholes, BlackScholesAlgorithmTypes
 
 # ============================================================================
 # 1. EQUITY AMERICAN OPTION
@@ -319,7 +319,7 @@ for num_steps in num_steps_list:
 
     model = BlackScholes(
         volatility,
-        BlackScholesTypes.CRR_TREE,
+        BlackScholesAlgorithmTypes.CRR_TREE,
         num_steps,
     )
 
@@ -407,7 +407,7 @@ benchmark_steps = 10000
 
 benchmark_model = BlackScholes(
     volatility,
-    BlackScholesTypes.CRR_TREE,
+    BlackScholesAlgorithmTypes.CRR_TREE,
     benchmark_steps,
 )
 
@@ -533,7 +533,7 @@ num_steps = 1000
 
 model = BlackScholes(
     volatility,
-    BlackScholesTypes.CRR_TREE,
+    BlackScholesAlgorithmTypes.CRR_TREE,
     num_steps,
 )
 

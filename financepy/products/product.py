@@ -5,7 +5,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from ...utils.date import Date
+from financepy.utils.date import Date
 
 
 class Product(ABC):

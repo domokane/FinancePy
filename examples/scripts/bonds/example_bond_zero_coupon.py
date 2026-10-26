@@ -22,12 +22,10 @@ import numpy as np
 import pandas as pd
 
 from financepy.utils.date import Date
-from financepy.utils.format_graphs import set_plot_style
 
 from financepy.products.bonds.bond import YTMCalcType
 from financepy.products.bonds.bond_zero import BondZero
 
-set_plot_style()
 
 # ============================================================================
 # 1. BOND ZERO

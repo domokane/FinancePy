@@ -296,12 +296,11 @@ financepy.products.fx.fx_vanilla_option
 
 <code>FXVanillaOption(
     expiry_dt: Date,
-    strike_fx_rate: float | numpy.ndarray,
+    strike_fx_rate: float,
     currency_pair: str,
-    opt_type: OptionTypes | list,
+    opt_type: OptionTypes,
     notional: float,
     prem_currency: str,
-    spot_days: int = 0,
 ) -&gt; None</code>
 
 </div>
@@ -327,20 +326,23 @@ well as the various Greek risk sensitivies.</div>
 value(
     self,
     value_dt: Date,
-    spot_fx_rate: float,
+    spot_fx_rate: float | numpy.ndarray,
     domestic_curve: DiscountCurve,
     foreign_curve: DiscountCurve,
     model: Model,
+    forward_fx_rate: float | None = None,
 )
 </code>
 
 </div>
 
 
-<div class="docstring">This function calculates the value of the option using a specified
-model with the resulting value being in domestic i.e. ccy2 terms.
-Recall that Domestic = CCY2 and Foreign = CCY1 and FX rate is in
-price in domestic of one unit of foreign currency.</div>
+<div class="docstring">Value the option in domestic currency.
+
+BlackScholes and SABR use spot FX. A Black model prices European
+options using Black-76 on an FX forward. For Black, the forward is
+inferred from the spot and discount curves unless forward_fx_rate
+is supplied explicitly (domestic currency per foreign unit).</div>
 
 </div>
 
@@ -411,8 +413,8 @@ fast_delta(
     self,
     t,
     s,
-    rd,
-    rf,
+    r_d,
+    r_f,
     vol,
 )
 </code>
@@ -421,7 +423,7 @@ fast_delta(
 
 
 <div class="docstring">Calculation of the FX Option delta. Used in the determination of
-the volatility surface. Avoids discount curve interpolation so it
+the volatility sur_face. Avoids discount curve interpolation so it
 should be slightly faster than the full calculation of delta.</div>
 
 </div>

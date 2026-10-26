@@ -39,7 +39,7 @@ from financepy.utils.date import Date
 from financepy.utils.global_types import OptionTypes
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
-from financepy.models.black_scholes import BlackScholes, BlackScholesTypes
+from financepy.models.black_scholes import BlackScholes, BlackScholesAlgorithmTypes
 from financepy.models.bs_european_analytic import value as bs_value
 from financepy.models.equity_crr_tree import crr_tree_val
 from financepy.models.equity_lsmc import equity_lsmc, BoundaryFitTypes
@@ -131,11 +131,11 @@ def available_american_models(
 
     available = []
 
-    for model_type in BlackScholesTypes:
+    for model_type in BlackScholesAlgorithmTypes:
 
         if model_type in (
-            BlackScholesTypes.CRR_TREE,
-            BlackScholesTypes.LSMC,
+            BlackScholesAlgorithmTypes.CRR_TREE,
+            BlackScholesAlgorithmTypes.LSMC,
         ):
             continue
 
@@ -317,7 +317,7 @@ num_steps = 500
 
 crr_model = BlackScholes(
     volatility,
-    BlackScholesTypes.CRR_TREE,
+    BlackScholesAlgorithmTypes.CRR_TREE,
     num_steps,
 )
 
@@ -575,7 +575,7 @@ print("\n" + LINE)
 print("4. AVAILABLE FINANCEPY BLACK-SCHOLES MODEL TYPES")
 print(LINE)
 
-for model_type in BlackScholesTypes:
+for model_type in BlackScholesAlgorithmTypes:
     print(model_type)
 
 
@@ -597,7 +597,7 @@ benchmark_steps = 2000
 
 benchmark_model = BlackScholes(
     volatility,
-    BlackScholesTypes.CRR_TREE,
+    BlackScholesAlgorithmTypes.CRR_TREE,
     benchmark_steps,
 )
 
@@ -719,7 +719,7 @@ lsmc_steps = 100
 
 lsmc_model = BlackScholes(
     volatility,
-    BlackScholesTypes.LSMC,
+    BlackScholesAlgorithmTypes.LSMC,
     lsmc_steps,
     num_paths,
 )
@@ -800,7 +800,7 @@ call_intrinsic_values = []
 
 plot_model = BlackScholes(
     volatility,
-    BlackScholesTypes.CRR_TREE,
+    BlackScholesAlgorithmTypes.CRR_TREE,
     500,
 )
 
@@ -1158,7 +1158,7 @@ for vol in volatilities:
 
     vol_model = BlackScholes(
         vol,
-        BlackScholesTypes.CRR_TREE,
+        BlackScholesAlgorithmTypes.CRR_TREE,
         500,
     )
 
@@ -1255,7 +1255,7 @@ for days in days_to_expiry:
 
     moving_model = BlackScholes(
         volatility,
-        BlackScholesTypes.CRR_TREE,
+        BlackScholesAlgorithmTypes.CRR_TREE,
         500,
     )
 
@@ -1463,7 +1463,7 @@ for steps in tree_steps:
 
     convergence_model = BlackScholes(
         volatility,
-        BlackScholesTypes.CRR_TREE,
+        BlackScholesAlgorithmTypes.CRR_TREE,
         int(steps),
     )
 
@@ -1555,7 +1555,7 @@ for steps in [
 
     speed_model = BlackScholes(
         volatility,
-        BlackScholesTypes.CRR_TREE,
+        BlackScholesAlgorithmTypes.CRR_TREE,
         steps,
     )
 
@@ -1650,7 +1650,7 @@ test_option = american_put
 
 test_model = BlackScholes(
     volatility,
-    BlackScholesTypes.CRR_TREE,
+    BlackScholesAlgorithmTypes.CRR_TREE,
     2000,
 )
 

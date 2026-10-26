@@ -334,7 +334,7 @@ check_currency(
 
 <code>
 check_currency_pair(
-    ccy_pair: str,
+    currency_pair: str,
 ) -&gt; None
 </code>
 
@@ -352,14 +352,14 @@ check_currency_pair(
 
 <code>
 check_curve_dt(
-    anchor_dt: Date,
+    value_dt: Date,
     *curves,
 )
 </code>
 
 </div>
 
-<div class="docstring">Check that curves are valid for the requested valuation date.</div>
+<div class="docstring">Check that all curves share a valid anchor date.</div>
 
 </div>
 

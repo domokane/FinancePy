@@ -82,8 +82,7 @@ call_option = FXVanillaOption(
     currency_pair,
     OptionTypes.EUROPEAN_CALL,
     notional,
-    "EUR",
-    2,
+    "EUR"
 )
 
 value = call_option.value(
@@ -97,8 +96,7 @@ call_option = FXVanillaOption(
     currency_pair,
     OptionTypes.EUROPEAN_CALL,
     notional,
-    "USD",
-    2,
+    "USD"
 )
 
 value = call_option.value(

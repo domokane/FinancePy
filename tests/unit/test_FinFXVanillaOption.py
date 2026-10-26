@@ -55,7 +55,7 @@ def test_fin_fx_vanilla_option_wystup_example1():
         "EUR",
     )
 
-    value = call_option.value(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model)
+    value = call_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     notional = 1250000.0
     call_option = FXVanillaOption(
@@ -67,7 +67,7 @@ def test_fin_fx_vanilla_option_wystup_example1():
         "USD",
     )
 
-    value = call_option.value(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model)
+    value = call_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(value["v"], 4) == 0.0251
     assert round(value["cash_dom"], 4) == 25121.7356
@@ -81,12 +81,12 @@ def test_fin_fx_vanilla_option_wystup_example1():
     assert value["ccy_dom"] == "USD"
     assert value["ccy_for"] == "EUR"
 
-    delta = call_option.delta(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model)
+    delta = call_option.delta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
-    assert round(delta["pips_spot_delta"], 4) == 0.3311
-    assert round(delta["pips_fwd_delta"], 4) == 0.3411
-    assert round(delta["pct_spot_delta_prem_adj"], 4) == 0.3103
-    assert round(delta["pct_fwd_delta_prem_adj"], 4) == 0.3197
+    assert round(delta["pips_spot_delta"], 4) == 0.3315
+    assert round(delta["pips_fwd_delta"], 4) == 0.3416
+    assert round(delta["pct_spot_delta_prem_adj"], 4) == 0.3105
+    assert round(delta["pct_fwd_delta_prem_adj"], 4) == 0.32
 
 
 ########################################################################################
@@ -132,7 +132,7 @@ def test_fin_fx_vanilla_option_wystup_example2():
         "EUR",
     )
 
-    value = call_option.value(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model)
+    value = call_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(value["v"], 4) == 0.0436
     assert round(value["cash_dom"], 4) == 43604.3464
@@ -146,12 +146,12 @@ def test_fin_fx_vanilla_option_wystup_example2():
     assert value["ccy_dom"] == "USD"
     assert value["ccy_for"] == "EUR"
 
-    delta = call_option.delta(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model)
+    delta = call_option.delta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
-    assert round(delta["pips_spot_delta"], 4) == -0.4702
-    assert round(delta["pips_fwd_delta"], 4) == -0.4891
+    assert round(delta["pips_spot_delta"], 4) == -0.47
+    assert round(delta["pips_fwd_delta"], 4) == -0.489
     assert round(delta["pct_spot_delta_prem_adj"], 4) == -0.5180
-    assert round(delta["pct_fwd_delta_prem_adj"], 4) == -0.5388
+    assert round(delta["pct_fwd_delta_prem_adj"], 4) == -0.5389
 
 
 ########################################################################################
@@ -224,7 +224,7 @@ def test_fin_fx_vanilla_option_bloomberg_example():
         notional_currency,
     )
 
-    value = call_option.value(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model)
+    value = call_option.value(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
     assert round(value["v"], 4) == 0.06
     assert round(value["cash_dom"], 4) == 60013.8642
@@ -238,12 +238,12 @@ def test_fin_fx_vanilla_option_bloomberg_example():
     assert value["ccy_dom"] == "USD"
     assert value["ccy_for"] == "EUR"
 
-    delta = call_option.delta(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model)
+    delta = call_option.delta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
-    assert round(delta["pips_spot_delta"], 4) == 0.367
-    assert round(delta["pips_fwd_delta"], 4) == 0.3856
-    assert round(delta["pct_spot_delta_prem_adj"], 4) == 0.3209
-    assert round(delta["pct_fwd_delta_prem_adj"], 4) == 0.3371
+    assert round(delta["pips_spot_delta"], 4) == 0.3671
+    assert round(delta["pips_fwd_delta"], 4) == 0.3858
+    assert round(delta["pct_spot_delta_prem_adj"], 4) == 0.3208
+    assert round(delta["pct_fwd_delta_prem_adj"], 4) == 0.3372
 
 
 ########################################################################################
@@ -262,7 +262,6 @@ def test_value_mc():
     domestic_curve = FlatDiscountCurve(value_dt, dom_interest_rate)
     foreign_curve = FlatDiscountCurve(value_dt, for_interest_rate)
     num_paths = 100000
-    currency_pair = "EURUSD"
 
     strike_fx_rate = 1.6
 
@@ -275,10 +274,10 @@ def test_value_mc():
         "USD",
     )
 
-    value_mc = call_option.value_mc(value_dt, spot_fx_rate, currency_pair,
+    value_mc = call_option.value_mc(value_dt, spot_fx_rate,
                                     domestic_curve, foreign_curve, model, num_paths)
 
-    assert round(value_mc, 4) == 0.0423
+    assert round(value_mc, 4) == 0.0429
 
     put_option = FXVanillaOption(
         expiry_dt,
@@ -289,10 +288,10 @@ def test_value_mc():
         "USD",
     )
 
-    value_mc = put_option.value_mc(value_dt, spot_fx_rate, currency_pair,
+    value_mc = put_option.value_mc(value_dt, spot_fx_rate,
                                    domestic_curve, foreign_curve, model, num_paths)
 
-    assert round(value_mc, 4) == 0.0571
+    assert round(value_mc, 4) == 0.0581
 
 
 ########################################################################################
@@ -323,13 +322,13 @@ def test_vega_theta():
         "USD",
     )
 
-    vega = call_option.vega(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model)
+    vega = call_option.vega(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
-    assert round(vega, 4) == 0.3464
+    assert round(vega, 4) == 0.3518
 
-    theta = call_option.theta(value_dt, spot_fx_rate, currency_pair, domestic_curve, foreign_curve, model)
+    theta = call_option.theta(value_dt, spot_fx_rate, domestic_curve, foreign_curve, model)
 
-    assert round(theta, 4) == -0.0518
+    assert round(theta, 4) == -0.0504
 
 
 ########################################################################################

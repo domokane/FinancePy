@@ -37,7 +37,6 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.utils.global_types import ExerciseTypes
 from financepy.utils.global_types import OptionTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
-from financepy.utils.format_graphs import set_plot_style
 
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
@@ -47,7 +46,6 @@ from financepy.models.hw_tree import HWTree, HWEuropeanCalcTypes
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.bond_option import BondOption
 
-set_plot_style()
 
 # ============================================================================
 # 1. BOND OPTION - JAMSHIDIAN VERSUS TREE
