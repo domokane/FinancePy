@@ -12,3 +12,4 @@ if EAGER_IMPORTS:
     from .bond_option import *
     from .bond_mortgage import *
     from .bond_inflation import *
+    from .bond_perpetual import *
