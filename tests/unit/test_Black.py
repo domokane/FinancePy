@@ -244,7 +244,6 @@ def test_black_implied_volatility_recovers_input_vol():
         (FWD, STRIKE, -1.0, DF),
         (FWD, STRIKE, TEXP, 0.0),
         (FWD, STRIKE, TEXP, -0.1),
-        (FWD, STRIKE, TEXP, 1.1),
     ],
 )
 def test_black_rejects_bad_inputs(bad_args):
@@ -279,3 +278,19 @@ def test_black_repr():
     assert "VOLATILITY" in s
     assert "IMPLEMENTATION" in s
     assert "NUMSTEPS" in s
+
+
+@pytest.mark.parametrize(
+    "option_type", [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT]
+)
+def test_black_negative_interest_rate(option_type):
+    model = Black(VOL)
+    discount_factor = np.exp(0.02 * TEXP)
+    # With the forward fixed, value and forward Greeks scale with the discount factor.
+    for method in [model.value, model.delta, model.gamma, model.vega]:
+        expected = discount_factor * method(FWD, STRIKE, TEXP, 1.0, option_type)
+        actual = method(FWD, STRIKE, TEXP, discount_factor, option_type)
+        assert actual == pytest.approx(expected)
+    call = model.value(FWD, STRIKE, TEXP, discount_factor, OptionTypes.EUROPEAN_CALL)
+    put = model.value(FWD, STRIKE, TEXP, discount_factor, OptionTypes.EUROPEAN_PUT)
+    assert call - put == pytest.approx(discount_factor * (FWD - STRIKE))
