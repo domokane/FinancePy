@@ -179,6 +179,9 @@ def vectorisation_helper(func):
     """Decorator to allow a function to be vectorised over an iterable"""
 
     def wrapper(self_, other):
+        # Fast path: a plain Date is never iterable, so skip the ABC check
+        if type(other) is Date:
+            return func(self_, other)
         if isinstance(other, Iterable):
             # Store the type of other, then cast the output to be the same type
             output_type = type(other)
