@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
+from financepy.market.curves.zero_rates_discount_curve import ZeroRatesDiscountCurve
 from financepy.products.bonds.bond import YTMCalcType
 from financepy.products.bonds.bond_perpetual import BondPerpetual
 from financepy.utils.date import Date
@@ -207,3 +208,68 @@ def test_perpetual_bond_repr_and_print():
     assert "15-JAN-1923" in rep
     assert "0.025" in rep
     bond._print()
+
+def _reference_dirty_price(bond, settle_dt, curve, last_year=2190):
+    # Discount every coupon off the curve to the end of the supported date
+    # range, then add the geometric remainder using the forward rate the curve
+    # extrapolates over the final year, averaged over a year so that the day
+    # counts of single periods do not bias it.
+    bond._calc_pcd_ncd(settle_dt)
+    freq = int(bond.freq)
+    months_step = 12 // freq
+    pv = 0.0
+    dfs = []
+    i = 0
+    while True:
+        flow_dt = bond._ncd.add_months(i * months_step)
+        if flow_dt.y > last_year:
+            break
+        dfs.append(curve.df(flow_dt))
+        if flow_dt > settle_dt:
+            pv += bond.cpn / freq * dfs[-1]
+        i += 1
+    q = (dfs[-1] / dfs[-1 - freq]) ** (1.0 / freq)
+    pv += bond.cpn / freq * dfs[-1] * q / (1.0 - q)
+    return pv / curve.df(settle_dt) * bond.par
+
+
+def test_perpetual_bond_sloped_discount_curve_all_frequencies():
+    # An upward-sloping curve: the perpetuity tail must continue the curve's
+    # forward rates rather than the spot zero rate at the last summed coupon.
+    settle_dt = Date(15, 1, 2026)
+    issue_dt = Date(15, 7, 2025)
+    years = [1, 2, 5, 10, 20, 30, 50]
+    zero_rates = [0.02, 0.023, 0.03, 0.035, 0.04, 0.043, 0.045]
+    curve = ZeroRatesDiscountCurve(
+        settle_dt,
+        [settle_dt.add_years(y) for y in years],
+        zero_rates,
+        FrequencyTypes.CONTINUOUS,
+        DayCountTypes.ACT_365F,
+    )
+
+    for freq_type in [
+        FrequencyTypes.ANNUAL,
+        FrequencyTypes.SEMI_ANNUAL,
+        FrequencyTypes.QUARTERLY,
+        FrequencyTypes.MONTHLY,
+    ]:
+        bond = BondPerpetual(issue_dt, 0.05, freq_type)
+        dp = bond.dirty_price_from_discount_curve(settle_dt, curve)
+        expected = _reference_dirty_price(bond, settle_dt, curve)
+        assert dp == pytest.approx(expected, abs=5e-3), freq_type
+
+        # The horizon only moves coupons between the sum and the tail
+        dp_60 = bond.dirty_price_from_discount_curve(settle_dt, curve, horizon_years=60.0)
+        assert dp_60 == pytest.approx(dp, abs=5e-3), freq_type
+
+
+def test_perpetual_bond_flat_curve_matches_ytm_formula():
+    settle_dt = Date(15, 1, 2026)
+    issue_dt = Date(15, 1, 2020)
+    for freq_type in [FrequencyTypes.ANNUAL, FrequencyTypes.QUARTERLY, FrequencyTypes.MONTHLY]:
+        bond = BondPerpetual(issue_dt, 0.05, freq_type)
+        curve = FlatDiscountCurve(settle_dt, 0.04, freq_type=freq_type)
+        dp_curve = bond.dirty_price_from_discount_curve(settle_dt, curve)
+        # On a coupon date the dirty price is the coupon over the yield
+        assert dp_curve == pytest.approx(100.0 * 0.05 / 0.04, rel=2e-3), freq_type

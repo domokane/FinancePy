@@ -238,3 +238,36 @@ def test_bond_annuity_rebuilds_flows_when_face_changes_at_same_settlement():
 ########################################################################################
 
 test_semi_annual__bond_annuity()
+
+
+########################################################################################
+
+
+def test_act_act_icma__bond_annuity():
+
+    # ACT/ACT ICMA needs the period end date and the frequency type. Both the
+    # payment schedule and the accrued interest used to raise with it.
+    settle_dt = Date(20, 6, 2018)
+    face = 1000000
+    maturity_dt = Date(20, 6, 2021)
+    coupon = 0.05
+
+    annuity = BondAnnuity(
+        maturity_dt,
+        coupon,
+        FrequencyTypes.SEMI_ANNUAL,
+        DayCountTypes.ACT_ACT_ICMA,
+        CalendarTypes.WEEKEND,
+        BusDayAdjustTypes.FOLLOWING,
+        DateGenRuleTypes.BACKWARD,
+    )
+
+    annuity.calculate_payments(settle_dt, face)
+
+    assert len(annuity.flow_amounts) == 2 * 3 + 1
+    assert annuity.flow_amounts[0] == 0.0
+    for flow in annuity.flow_amounts[1:]:
+        assert flow == pytest.approx(face * coupon / 2.0)
+
+    # The annuity starts at settlement, so nothing has accrued there
+    assert annuity.accrued_interest(settle_dt, face) == 0.0
