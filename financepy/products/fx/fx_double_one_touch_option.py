@@ -78,13 +78,12 @@ class FXDoubleOneTouchOption(FXOption):
         r_d = domestic_curve.zero_rate_cc(self.expiry_dt)
         r_f = foreign_curve.zero_rate_cc(self.expiry_dt)
 
-        if spot_fx_rate < self.lower_barrier_fx_rate:
-            v = self.payment_size * df_d
-            return v
-
-        if spot_fx_rate > self.upper_barrier_fx_rate:
-            v = self.payment_size * df_d
-            return v
+        # A spot on or beyond either barrier has already touched it: the double
+        # no-touch is worthless and the double one-touch pays K at expiry.
+        if spot_fx_rate <= self.lower_barrier_fx_rate or spot_fx_rate >= self.upper_barrier_fx_rate:
+            if self.option_type == DoubleBarrierTypes.KNOCK_OUT:
+                return 0.0
+            return self.payment_size * df_d
 
         opt_type_value = self.option_type.value
 
