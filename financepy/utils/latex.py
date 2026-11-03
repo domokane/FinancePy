@@ -119,21 +119,36 @@ def print_object_to_latex(obj, caption=None, label=None):
                 escape_latex(format_value(value))
             ))
 
+    # Exclude OBJECT TYPE
+    rows = [(k, v) for k, v in rows if k != "OBJECT TYPE"]
+
+    mid = (len(rows) + 1) // 2
+    left_rows = rows[:mid]
+    right_rows = rows[mid:]
+
     name_line = rf"\begin{{termsheet}}{{{name}}}"
 
     lines = [
         name_line,
         r"\centering",
-        r"\begin{tabular}{ll}",
+        r"\renewcommand{\arraystretch}{1.05}",
+        r"\begin{tabular}{@{}ll@{\hspace{1.5em}}ll@{}}"
     ]
 
-    # We omit Object Type as it is in header of term sheet
-    for key, value in rows[1:]:
-        lines.append(f"{key} & {value} " + r"\\")
+    for i in range(mid):
+        key1, value1 = left_rows[i]
 
-    lines.extend([
-        r"\end{tabular}",
-    ])
+        if i < len(right_rows):
+            key2, value2 = right_rows[i]
+        else:
+            key2, value2 = "", ""
+
+        lines.append(
+            f"{key1} & \\textbf{{{value1}}} & "
+            f"{key2} & \\textbf{{{value2}}} " + r"\\"
+        )
+
+    lines.append(r"\end{tabular}")
 
     if caption is not None:
         lines.append(r"\caption{" + caption + "}")
@@ -147,8 +162,55 @@ def print_object_to_latex(obj, caption=None, label=None):
     print(out)
 
 
+def format_value_old(value):
+    value = value.strip()
+
+    match = re.fullmatch(
+        r"([-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?)(\s*[a-zA-Z%]*)",
+        value,
+    )
+
+    if not match:
+        return value
+
+    number, unit = match.groups()
+    x = float(number)
+
+    if x.is_integer():
+        return f"{int(x):,}{unit}"
+
+    return f"{x:,.5f}{unit}"
+
+
+DAY_COUNT_NAMES = {
+    "ACT_360": "ACT/360",
+    "ACT_365F": "ACT/365F",
+    "ACT_ACT_ISDA": "ACT/ACT (ISDA)",
+    "ACT_ACT_ICMA": "ACT/ACT (ICMA)",
+    "ACT_ACT_AFB": "ACT/ACT (AFB)",
+    "THIRTY_360_BOND": "30/360 (Bond)",
+    "THIRTY_E_360": "30E/360",
+    "THIRTY_E_360_ISDA": "30E/360 (ISDA)",
+    "THIRTY_E_PLUS_360": "30E+/360",
+}
+
+
 def format_value(value):
     value = value.strip()
+
+    if value == "True":
+        return "Yes"
+    if value == "False":
+        return "No"
+
+    # Remove FinancePy enum type prefix
+    # e.g. DayCountTypes.ACT_360 -> ACT_360
+    value = re.sub(r"\b\w+Types\.", "", value)
+
+    value = re.sub(r"\b\w+Types\.", "", value)
+
+    if value in DAY_COUNT_NAMES:
+        return DAY_COUNT_NAMES[value]
 
     match = re.fullmatch(
         r"([-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?)(\s*[a-zA-Z%]*)",

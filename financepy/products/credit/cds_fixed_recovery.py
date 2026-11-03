@@ -393,7 +393,7 @@ class CDSFixedRecovery(CDS):
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("FIXED RECOVERY", self.fixed_recovery*100, "%\n")
         s += label_to_string("LONG PROTECTION", self.long_protect)
-        s += label_to_string("COUPON", self.running_cpn * 10000, "bp\n")
+        s += label_to_string("RUNNING SPREAD", self.running_cpn * 10000, " bp\n")
         s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)

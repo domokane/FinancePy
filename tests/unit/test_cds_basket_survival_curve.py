@@ -8,7 +8,7 @@ from financepy.market.curves.flat_discount_curve import FlatDiscountCurve
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_basket import CDSBasket
 from financepy.utils.date import Date
-from financepy.utils.global_vars import DIRTY
+from financepy.utils.global_vars import CLEAN
 
 value_dt = Date(2, 1, 2026)
 maturity_dt = Date(20, 12, 2030)
@@ -34,7 +34,7 @@ def test_single_name_basket_reprices_the_cds(spread, beta):
     cds = basket.cds_contract
 
     prot_leg_pv = cds.prot_leg_pv(value_dt, issuer_curve, recovery)
-    rpv01 = cds.rpv01(value_dt, issuer_curve)[DIRTY]
+    rpv01 = cds.rpv01(value_dt, issuer_curve)[CLEAN]
 
     output = basket.value_1f_gaussian_homo(value_dt, [issuer_curve], np.array([beta]), 50)
 
@@ -57,7 +57,7 @@ def test_independent_first_to_default_matches_product_of_survival_curves():
     )
     cds = basket.cds_contract
     prot_leg_pv = cds.prot_leg_pv(value_dt, product_curve, recovery)
-    rpv01 = cds.rpv01(value_dt, product_curve)[DIRTY]
+    rpv01 = cds.rpv01(value_dt, product_curve)[CLEAN]
 
     output = basket.value_1f_gaussian_homo(value_dt, issuer_curves, np.zeros(2), 50)
 
