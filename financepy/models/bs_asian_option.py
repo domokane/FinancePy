@@ -183,6 +183,23 @@ def value_asian_kemna_vorst_geometric(
     if np.abs(var_geo) < 1e-10:
         raise FinError("Asian option geometric variance is zero.")
 
+    # Once the value date is far enough into the averaging window the accrued
+    # average can push the adjusted strike below zero, at which point
+    # log(s0 / k) is no longer real. The payoff is still well defined -- the
+    # adjusted strike being non-positive means the option is guaranteed to
+    # finish in the money -- so it degenerates to a forward on the average.
+    # This matches what value_asian_curran already returns for the same inputs.
+    if k <= 0.0:
+
+        if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
+            v = np.exp(-r * t_exp) * (eg - k)
+        elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
+            v = 0.0
+        else:
+            raise FinError("Unknown OPTION_TYPE " + str(opt_type_value))
+
+        return v * multiplier
+
     d1 = (mean_geo + np.log(s0 / k) + var_geo) / np.sqrt(var_geo)
     d2 = d1 - np.sqrt(var_geo)
 
@@ -716,6 +733,26 @@ def value_asian_turnbull_wakeman_discrete(
 
         elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
             v = df * max(k - m1, 0.0)
+
+        else:
+            raise FinError(
+                "Unknown OPTION_TYPE " + str(opt_type_value)
+            )
+
+        return multiplier * v
+
+    # A non-positive adjusted strike, which the accrued average can produce once
+    # the value date is far enough into the averaging window, makes log(m1 / k)
+    # undefined. The payoff is still well defined -- the option is guaranteed to
+    # finish in the money -- so it degenerates to a forward on the average. This
+    # matches what value_asian_curran already returns for the same inputs.
+    if k <= 0.0:
+
+        if opt_type_value == OptionTypes.EUROPEAN_CALL.value:
+            v = df * (m1 - k)
+
+        elif opt_type_value == OptionTypes.EUROPEAN_PUT.value:
+            v = 0.0
 
         else:
             raise FinError(

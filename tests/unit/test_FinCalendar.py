@@ -255,6 +255,14 @@ def test_modified_following_does_not_cross_month():
     assert adjusted == Date(30, 7, 2021)
 
 
+def test_weekend_add_business_days_from_weekend_start():
+    cal = Calendar(CalendarTypes.WEEKEND)
+
+    assert cal.add_business_days(Date(24, 10, 2026), 5) == Date(30, 10, 2026)  # Sat
+    assert cal.add_business_days(Date(25, 10, 2026), 5) == Date(30, 10, 2026)  # Sun
+    assert cal.add_business_days(Date(24, 10, 2026), -5) == Date(19, 10, 2026)
+
+
 @pytest.mark.parametrize("cal_type", list(CalendarTypes))
 def test_add_zero_business_days_returns_same_date(cal_type):
     cal = Calendar(cal_type)

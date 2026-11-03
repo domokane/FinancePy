@@ -633,8 +633,9 @@ class Calendar:
         days_left = abs(num_days)
         dt = start_dt
 
-        # Safe fast path for weekend-only calendar
-        if self.cal_type == CalendarTypes.WEEKEND:
+        # Safe fast path for weekend-only calendar (whole weeks only
+        # preserve the weekday when starting on a business day)
+        if self.cal_type == CalendarTypes.WEEKEND and self.is_business_day(dt):
             weeks, days_left = divmod(days_left, 5)
             dt = dt.add_days(step * 7 * weeks)
 
