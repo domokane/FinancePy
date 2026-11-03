@@ -228,28 +228,61 @@ def calculate_fd_matrix(x, r, mu, var, dt, theta, wind=0):
 
 @njit(cache=True, fastmath=True)
 def fd_roll_backwards(res, theta, ai, ae):
+    """Roll each vector in res back one theta-scheme step, in place."""
 
     num_vectors = res.shape[0]
     num_points = res.shape[1]
-    mm = 1
 
-    if theta != 1.0:
-        for k in range(num_vectors):
-            tmp = band_matrix_multiplication(
-                ae, mm, mm, res[k]
-            )
+    # Thomas algorithm gam values for the implicit solve
+    gam = np.empty(num_points)
 
-            for j in range(num_points):
-                res[k, j] = tmp[j]
+    for k in range(num_vectors):
+        v = res[k]
 
-    if theta != 0.0:
-        for k in range(num_vectors):
-            tmp = solve_tridiagonal_matrix(
-                ai, res[k]
-            )
+        # Unmodified neighbours of v[j] for the explicit product
+        v_prev = 0.0
+        v_cur = v[0]
+        bet = 1.0
+        u = 0.0
 
-            for j in range(num_points):
-                res[k, j] = tmp[j]
+        # One pass: explicit product rhs = (ae v)[j] fused with the forward sweep
+        for j in range(num_points):
+            if theta != 1.0:
+                last = j + 1 == num_points
+                v_next = 0.0 if last else v[j + 1]
+                rhs = 0.0
+                if j > 0:
+                    rhs += ae[j, 0] * v_prev
+                rhs += ae[j, 1] * v_cur
+                if not last:
+                    rhs += ae[j, 2] * v_next
+                v_prev = v_cur
+                v_cur = v_next
+            else:
+                rhs = v[j]
+
+            if theta == 0.0:
+                v[j] = rhs
+            elif j == 0:
+                bet = ai[0, 1]
+                if bet == 0:
+                    raise ValueError("First entry is zero, rewrite as set of N-1 eqns")
+                u = rhs / bet
+                v[0] = u
+            else:
+                g = ai[j - 1, 2] / bet
+                gam[j] = g
+                bet = ai[j, 1] - ai[j, 0] * g
+                if bet == 0:
+                    raise ValueError("Variable bet should be non-zero. " "Perhaps this algorithm is not suited to the problem")
+                u = (rhs - ai[j, 0] * u) / bet
+                v[j] = u
+
+        # Implicit part: back substitution
+        if theta != 0.0:
+            for j in range(num_points - 2, -1, -1):
+                u = v[j] - gam[j + 1] * u
+                v[j] = u
 
     return res
 
@@ -445,6 +478,15 @@ def black_scholes_fd(
     # Store original res as res0
     res = payoff.copy()
 
+    is_american = opt_type_value in {
+        OptionTypes.AMERICAN_CALL.value,
+        OptionTypes.AMERICAN_PUT.value,
+    }
+
+    # Rows rolled in place and the exercise values they are floored at
+    value = res[0]
+    exercise_value = payoff[0]
+
     for h in range(num_steps):
         if update or h == 0:
             if theta != 1:
@@ -452,15 +494,11 @@ def black_scholes_fd(
             if theta != 0:
                 ai = calculate_fd_matrix(s, r_, mu_, var_, -dt, theta, wind)
 
-        res = fd_roll_backwards(res, theta, ai=ai, ae=ae)
+        fd_roll_backwards(res, theta, ai, ae)
 
         # Early exercise (American)
-        if opt_type_value in {
-            OptionTypes.AMERICAN_CALL.value,
-            OptionTypes.AMERICAN_PUT.value,
-        }:
-            idx = res[0] < payoff[0]
-            res[0][idx] = payoff[0][idx]
+        if is_american:
+            np.maximum(value, exercise_value, out=value)
 
     # By default, keep old behaviour (scalar @ center node)
     center_val = res[0][num_samples // 2]
