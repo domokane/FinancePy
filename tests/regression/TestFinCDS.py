@@ -1,4 +1,6 @@
-# Copyright (C) 2018, 2019, 2020 Dominic O'Kane
+#############################################################################
+# Copyright (C) 2018-2026 Dominic O'Kane
+#############################################################################
 
 from FinTestCases import FinTestCases, global_test_case_mode
 import time

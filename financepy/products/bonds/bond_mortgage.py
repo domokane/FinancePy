@@ -139,7 +139,7 @@ class BondMortgage:
         print("FREQUENCY:", self.freq_type)
         print("DC_TYPE:", self.accrual_dc_type)
         print("CALENDAR:", self.cal_type)
-        print("BUS DAY RULE:", self.bd_type)
+        print("BUS DAY ADJUST:", self.bd_type)
         print("DATE GEN RULE:", self.dg_type)
 
         num_flows = len(self.schedule.adjusted_dts)

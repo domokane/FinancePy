@@ -132,11 +132,25 @@ class CDSBasket:
                                             use_moment_matching,
                                             use_sobol)
 
-        risky_pv01, prot_leg_pv = self.value_legs_mc(value_dt,
-                                                     default_times,
-                                                     issuer_curves)
+        dirty_rpv01, prot_leg_pv = self.value_legs_mc(value_dt,
+                                                      default_times,
+                                                      issuer_curves)
 
-        if risky_pv01 <= 0.0:
+        # Need to calculate Clean RPV01
+        day_count = DayCount(self.accrual_dc_type)
+
+        accrual_start_dt = self.cds_contract.accrual_start_dts[0]
+
+        accrued = day_count.year_frac(
+            accrual_start_dt,
+            value_dt,
+        )[0]
+
+        clean_rpv01 = dirty_rpv01 - accrued
+
+        risky_pv01 = np.array([dirty_rpv01, clean_rpv01])
+
+        if clean_rpv01 <= 0.0:
             raise FinError("Cannot compute basket spread: risky PV01 is non-positive."
                            )
         mtm = self.notional * (prot_leg_pv - self.running_cpn * risky_pv01)
@@ -145,11 +159,11 @@ class CDSBasket:
             mtm = mtm * -1.0
 
         basket_output = np.zeros(5)
-        basket_output[DIRTY] = mtm
-        basket_output[CLEAN] = np.nan
-        basket_output[2] = risky_pv01 * self.notional * self.running_cpn
+        basket_output[DIRTY] = mtm[DIRTY]
+        basket_output[CLEAN] = mtm[CLEAN]
+        basket_output[2] = risky_pv01[DIRTY] * self.notional * self.running_cpn
         basket_output[3] = prot_leg_pv * self.notional
-        basket_output[4] = prot_leg_pv / risky_pv01  # This is the fair spread
+        basket_output[4] = prot_leg_pv / risky_pv01[CLEAN]  # This is the fair spread
 
         return basket_output
 
@@ -189,12 +203,26 @@ class CDSBasket:
                                                 use_moment_matching,
                                                 use_sobol)
 
-        risky_pv01, prot_leg_pv = self.value_legs_mc(value_dt,
-                                                     default_times,
-                                                     issuer_curves)
+        dirty_rpv01, prot_leg_pv = self.value_legs_mc(value_dt,
+                                                      default_times,
+                                                      issuer_curves)
 
-        if risky_pv01 <= 0.0:
+        # Need to calculate Clean RPV01
+        day_count = DayCount(self.accrual_dc_type)
+
+        accrual_start_dt = self.cds_contract.accrual_start_dts[0]
+
+        accrued = day_count.year_frac(
+            accrual_start_dt,
+            value_dt,
+        )[0]
+
+        clean_rpv01 = dirty_rpv01 - accrued
+
+        if clean_rpv01 <= 0.0:
             raise FinError("Cannot compute basket spread: risky PV01 is non-positive.")
+
+        risky_pv01 = np.array([dirty_rpv01, clean_rpv01])
 
         mtm = self.notional * (prot_leg_pv - self.running_cpn * risky_pv01)
 
@@ -202,11 +230,11 @@ class CDSBasket:
             mtm = mtm * -1.0
 
         basket_output = np.zeros(5)
-        basket_output[0] = mtm
-        basket_output[1] = np.nan
-        basket_output[2] = risky_pv01 * self.notional * self.running_cpn
+        basket_output[DIRTY] = mtm[DIRTY]
+        basket_output[CLEAN] = mtm[CLEAN]
+        basket_output[2] = risky_pv01[DIRTY] * self.notional * self.running_cpn
         basket_output[3] = prot_leg_pv * self.notional
-        basket_output[4] = prot_leg_pv / risky_pv01  # This is the fair spread
+        basket_output[4] = prot_leg_pv / risky_pv01[CLEAN]  # This is the fair spread
 
         return basket_output
 
@@ -323,7 +351,7 @@ class CDSBasket:
         basket_output[CLEAN] = mtm[CLEAN]
         basket_output[2] = risky_pv01[DIRTY] * self.notional * self.running_cpn
         basket_output[3] = prot_leg_pv * self.notional
-        basket_output[4] = prot_leg_pv / risky_pv01[DIRTY]
+        basket_output[4] = prot_leg_pv / risky_pv01[CLEAN]
 
         return basket_output
 
@@ -503,7 +531,7 @@ class CDSBasket:
         s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS DAY RULE", self.bd_type)
+        s += label_to_string("BUS DAY ADJUST", self.bd_type)
         s += label_to_string("DATE GEN RULE", self.dg_type)
 
         #  header = "PAYMENT_DT, YEAR_FRAC, PAYMENT"

@@ -200,7 +200,7 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
-        contract_recovery_rate: float,
+        recovery_rate: float,
         pv01_method: int = 0,
         prot_method: int = 0,
         num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
@@ -217,7 +217,7 @@ class CDS:
         prot_pv = self.prot_leg_pv(
             value_dt,
             issuer_curve,
-            contract_recovery_rate,
+            recovery_rate,
             num_steps_per_year,
             prot_method,
         )
@@ -245,7 +245,7 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
-        contract_recovery_rate: float,
+        recovery_rate: float,
         pv01_method=0,
         prot_method=0,
         num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
@@ -256,7 +256,7 @@ class CDS:
         v0 = self.value(
             value_dt,
             issuer_curve,
-            contract_recovery_rate,
+            recovery_rate,
             pv01_method,
             prot_method,
             num_steps_per_year,
@@ -274,7 +274,7 @@ class CDS:
         v1 = self.value(
             value_dt,
             bumped_issuer_curve,
-            contract_recovery_rate,
+            recovery_rate,
             pv01_method,
             prot_method,
             num_steps_per_year,
@@ -289,7 +289,7 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
-        contract_recovery_rate: float,
+        recovery_rate: float,
         pv01_method: int = 0,
         prot_method: int = 0,
         num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
@@ -300,7 +300,7 @@ class CDS:
         v0 = self.value(
             value_dt,
             issuer_curve,
-            contract_recovery_rate,
+            recovery_rate,
             pv01_method,
             prot_method,
             num_steps_per_year,
@@ -323,7 +323,7 @@ class CDS:
         v1 = self.value(
             value_dt,
             bumped_issuer_curve,
-            contract_recovery_rate,
+            recovery_rate,
             pv01_method,
             prot_method,
             num_steps_per_year,
@@ -338,7 +338,7 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
-        contract_recovery_rate: float,
+        recovery_rate: float,
         pv01_method: int = 0,
         prot_method: int = 0,
         num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
@@ -354,10 +354,10 @@ class CDS:
 
         bump = ONE_PCT  # 0.01
 
-        if not 0.0 <= contract_recovery_rate < 1.0:
+        if not 0.0 <= recovery_rate < 1.0:
             raise FinError("Contract recovery rate must lie in [0.0, 1.0).")
 
-        if contract_recovery_rate + bump >= 1.0:
+        if recovery_rate + bump >= 1.0:
             raise FinError("Bumped contract recovery rate must be less than 1.0.")
 
         if not hasattr(issuer_curve, "recovery_rate"):
@@ -380,7 +380,7 @@ class CDS:
         value_base = self.value(
             value_dt,
             issuer_curve,
-            contract_recovery_rate,
+            recovery_rate,
             pv01_method,
             prot_method,
             num_steps_per_year,
@@ -400,7 +400,7 @@ class CDS:
         value_bumped = self.value(
             value_dt,
             bumped_issuer_curve,
-            contract_recovery_rate + bump,
+            recovery_rate + bump,
             pv01_method,
             prot_method,
             num_steps_per_year,
@@ -415,7 +415,7 @@ class CDS:
         value_dt: Date,
         settle_dt: Date,
         issuer_curve: CDSCurve,
-        contract_recovery_rate: float,
+        recovery_rate: float,
         pv01_method=0,
         prot_method=0,
         num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
@@ -434,7 +434,7 @@ class CDS:
         values = self.value(
             value_dt,
             issuer_curve,
-            contract_recovery_rate,
+            recovery_rate,
             pv01_method,
             prot_method,
             num_steps_per_year,
@@ -458,7 +458,7 @@ class CDS:
         value_dt: Date,
         settle_dt: Date,
         issuer_curve: CDSCurve,
-        contract_recovery_rate: float,
+        recovery_rate: float,
         pv01_method=0,
         prot_method=0,
         num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
@@ -477,7 +477,7 @@ class CDS:
         values = self.value(
             value_dt,
             issuer_curve,
-            contract_recovery_rate,
+            recovery_rate,
             pv01_method,
             prot_method,
             num_steps_per_year,
@@ -500,7 +500,7 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
-        contract_recovery_rate: float,
+        recovery_rate: float,
         pv01_method=0,
         prot_method=0,
         num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
@@ -515,7 +515,7 @@ class CDS:
         prot_pv = self.prot_leg_pv(
             value_dt,
             issuer_curve,
-            contract_recovery_rate,
+            recovery_rate,
             num_steps_per_year,
             prot_method,
         )
@@ -560,7 +560,7 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
-        contract_recovery_rate: float = STANDARD_RECOVERY_RATE,
+        recovery_rate: float = STANDARD_RECOVERY_RATE,
         num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
         prot_method=0,
     ):
@@ -586,7 +586,7 @@ class CDS:
             libor_curve._dfs,
             issuer_curve._times,
             issuer_curve._qs,
-            contract_recovery_rate,
+            recovery_rate,
             num_steps_per_year,
             prot_method,
         )
@@ -661,14 +661,13 @@ class CDS:
             pv01_method,
         )
 
-        dirty_rpv01 = value_rpv01[DIRTY]
-        clean_rpv01 = value_rpv01[CLEAN]
-
         return value_rpv01
 
     ###########################################################################
 
-    def premium_leg_pv(self, value_dt: Date, issuer_curve: CDSCurve, pv01_method=0):
+    def premium_leg_pv(self, value_dt: Date,
+                       issuer_curve: CDSCurve,
+                       pv01_method=0):
         """Value of the premium leg of a CDS."""
 
         dirty_rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)[DIRTY]
@@ -681,7 +680,7 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
-        contract_recovery_rate: float = STANDARD_RECOVERY_RATE,
+        recovery_rate: float = STANDARD_RECOVERY_RATE,
         num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
         pv01_method=0,
         prot_method=0,
@@ -694,7 +693,7 @@ class CDS:
         prot = self.prot_leg_pv(
             value_dt,
             issuer_curve,
-            contract_recovery_rate,
+            recovery_rate,
             num_steps_per_year,
             prot_method,
         )
@@ -711,7 +710,7 @@ class CDS:
         flat_cont_interest_rate: float,
         flat_cds_curve_spread,
         curve_recovery: float = STANDARD_RECOVERY_RATE,
-        contract_recovery_rate: float = STANDARD_RECOVERY_RATE,
+        recovery_rate: float = STANDARD_RECOVERY_RATE,
         bump_size: float = ONE_BP,
         recovery_bump_size: float = ONE_PCT,
     ):
@@ -772,7 +771,7 @@ class CDS:
         rate = np.asarray(flat_cont_interest_rate, dtype=float)
         spread = np.asarray(flat_cds_curve_spread, dtype=float)
         curve_rec = np.asarray(curve_recovery, dtype=float)
-        contract_rec = np.asarray(contract_recovery_rate, dtype=float)
+        contract_rec = np.asarray(recovery_rate, dtype=float)
         bump = np.asarray(bump_size, dtype=float)
         rec_bump = np.asarray(recovery_bump_size, dtype=float)
 
@@ -825,8 +824,11 @@ class CDS:
         else:
             direction = -1.0
 
-        accrued = self.accrued_interest(value_dt)  # positive
-        delta = accrued / self.notional / self.running_cpn
+        pcd, _ = self.get_pcd(value_dt)
+        eff_dt = max(value_dt, self.step_in_dt)
+
+        day_count = DayCount(self.accrual_dc_type)
+        delta = day_count.year_frac(pcd, eff_dt)[0]
 
         horizon = t_mat - t_eff
 
@@ -939,11 +941,12 @@ class CDS:
         """print out details of the CDS contract and all the calculated
         cash flows"""
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("STEP-IN DATE", self.step_in_dt)
-        s += label_to_string("MATURITY", self.maturity_dt)
+        s += label_to_string("REFERENCE ENTITY", self.step_in_dt)
+        s += label_to_string("PROTECTION EFFECTIVE DATE", self.step_in_dt)
+        s += label_to_string("SCHEDULED TERMINATION DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
-        s += label_to_string("LONG PROT", self.long_protect)
-        s += label_to_string("COUPON", self.running_cpn * 10000, "bp\n")
+        s += label_to_string("LONG PROTECTION", self.long_protect)
+        s += label_to_string("RUNNING SPREAD", self.running_cpn * 10000, "bp\n")
         s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)

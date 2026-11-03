@@ -145,7 +145,7 @@ class InflationSwap:
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("PAY FIXED RATE", self.pay_fixed_rate)
         s += label_to_string("DC TYPE", self.accrual_dc_type)
-        s += label_to_string("BUS DAY ADJUST TYPE", self.bd_type)
+        s += label_to_string("BUS DAY ADJUST", self.bd_type)
         s += label_to_string("CALENDAR", self.cal_type)
         return s
 
