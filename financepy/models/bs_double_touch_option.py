@@ -125,14 +125,15 @@ def barrier_pay_at_expiry_double_hit(s, k1, k2):
 @njit(fastmath=True, cache=True)
 def fast_double_no_touch_pricer(s0, L, U, K, t_exp, opt_type, r_d, r_f, sigma):
 
+    # This function always returns the double no-touch (DNT) value. The caller
+    # obtains the double one-touch as K * df_d minus this value, so the edge
+    # cases below must not depend on opt_type, which is kept for compatibility.
+
     df_d = np.exp(-r_d * t_exp)
 
-    # Immediate touch
+    # Immediate touch: the no-touch is worthless
     if s0 <= L or s0 >= U:
-        if opt_type == 2:  # DNT
-            return 0.0
-        else:  # DOT
-            return K * df_d
+        return 0.0
 
     b = r_d - r_f
 
@@ -141,7 +142,7 @@ def fast_double_no_touch_pricer(s0, L, U, K, t_exp, opt_type, r_d, r_f, sigma):
     if t_exp <= 0.0 or sigma == 0.0:
         terminal_s = s0 * np.exp((b - 0.5 * sigma * sigma) * t_exp)
         touched = terminal_s <= L or terminal_s >= U
-        if (opt_type == 2 and touched) or (opt_type != 2 and not touched):
+        if touched:
             return 0.0
         return K * df_d
 
