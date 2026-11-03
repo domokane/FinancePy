@@ -246,11 +246,8 @@ class CDSBasket:
         recovery_rates = np.zeros(num_credits)
         # The basket survival curve needs a node at the value date with
         # survival probability one, followed by one node per payment date.
-        basket_times = np.zeros(num_times + 1)
-        basket_surv_curve = np.zeros(num_times + 1)
-
-        basket_times[0] = 0.0
-        basket_surv_curve[0] = 1.0
+        basket_times = [0.0]
+        basket_surv_curve = [1.0]
 
         for i_credit in range(0, num_credits):
             issuer_curve = issuer_curves[i_credit]
@@ -289,16 +286,17 @@ class CDSBasket:
                                                             beta_vector,
                                                             num_points)
 
-            basket_surv_curve[i_time + 1] = 1.0
-            for i_to_default in range(n_to_default, num_credits + 1):
-                basket_surv_curve[i_time + 1] -= loss_dbn[i_to_default]
+            basket_surv_prob = 1.0
+            for i_to_default in range(self.n_to_default, num_credits + 1):
+                basket_surv_prob -= loss_dbn[i_to_default]
 
-            basket_times[i_time + 1] = t
+            basket_times.append(t)
+            basket_surv_curve.append(basket_surv_prob)
 
         curve_recovery = recovery_rates[0]
         basket_curve = CDSCurve(value_dt, [], libor_curve, curve_recovery)
-        basket_curve._times = basket_times
-        basket_curve._qs = basket_surv_curve
+        basket_curve._times = np.array(basket_times)
+        basket_curve._qs = np.array(basket_surv_curve)
 
         prot_leg_pv = self.cds_contract.prot_leg_pv(value_dt,
                                                     basket_curve,
