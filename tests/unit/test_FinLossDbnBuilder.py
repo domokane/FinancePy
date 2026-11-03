@@ -3,10 +3,10 @@
 import numpy as np
 import pytest
 
-from financepy.models.gauss_copula_onefactor import loss_dbn_hetero_adj_binomial
-from financepy.models.gauss_copula_onefactor import loss_dbn_recursion_gcd
-from financepy.models.loss_dbn_builder import portfolio_gcd
-from financepy.models.gauss_copula_onefactor import tranche_surv_prob_recursion
+from financepy.models.gauss_copula_onefactor import gauss_loss_dbn_hetero_adj_binomial
+from financepy.models.gauss_copula_onefactor import gauss_loss_dbn_recursion_gcd
+from financepy.models.indep_loss_dbn_builder import portfolio_gcd
+from financepy.models.gauss_copula_onefactor import gauss_tranche_surv_prob_recursion
 from financepy.utils.math import pair_gcd
 
 ########################################################################################
@@ -14,7 +14,7 @@ from financepy.utils.math import pair_gcd
 
 def test_fin_loss_dbn_builder():
 
-    num_steps = 25
+    num_steps = 100
 
     num_credits = 125
     default_prob = 0.30
@@ -27,10 +27,10 @@ def test_fin_loss_dbn_builder():
         (0.2, [0.0, 0.0, 0.0002, 0.0007]),
         (0.3, [0.0024, 0.0137, 0.0452, 0.112]),
         (0.4, [0.1385, 0.4565, 0.9554, 1.6197]),
-        (0.5, [1.8407, 3.7058, 5.4378, 7.0117]),
-        (0.6, [10.886, 13.7233, 15.1383, 15.91]),
-        (0.7, [39.9844, 31.0789, 27.4473, 25.1626]),
-        (0.8, [110.1321, 48.1134, 34.0898, 31.7425]),
+        (0.5, [1.8407, 3.7058, 5.438, 7.0129]),
+        (0.6, [10.8867, 13.7192, 15.1243, 15.9465]),
+        (0.7, [40.0004, 31.1565, 27.1576, 24.6269]),
+        (0.8, [109.9206, 49.5193, 35.5341, 28.7603]),
     ]
 
     for beta, results in beta_results:
@@ -38,12 +38,12 @@ def test_fin_loss_dbn_builder():
         default_probs = np.ones(num_credits) * default_prob
         beta_vector = np.ones(num_credits) * beta
 
-        dbn1 = loss_dbn_recursion_gcd(
+        dbn1 = gauss_loss_dbn_recursion_gcd(
             num_credits, default_probs, loss_units, beta_vector, num_steps
         )
         assert [round(x * 1000, 4) for x in dbn1[:4]] == results
 
-        dbn2 = loss_dbn_hetero_adj_binomial(
+        dbn2 = gauss_loss_dbn_hetero_adj_binomial(
             num_credits, default_probs, loss_ratio, beta_vector, num_steps
         )
         assert [round(x * 1000, 4) for x in dbn2[:4]] == results
@@ -65,7 +65,7 @@ def test_portfolio_gcd_preserves_heterogeneous_loss_units(losses, expected):
 
 
 def test_tranche_survival_handles_zero_loss_credits():
-    result = tranche_surv_prob_recursion(
+    result = gauss_tranche_surv_prob_recursion(
         0.0,
         0.25,
         2,
@@ -79,7 +79,7 @@ def test_tranche_survival_handles_zero_loss_credits():
 
 
 def test_tranche_survival_is_one_when_all_recoveries_are_full():
-    result = tranche_surv_prob_recursion(
+    result = gauss_tranche_surv_prob_recursion(
         0.0,
         0.25,
         2,

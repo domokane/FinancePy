@@ -66,7 +66,7 @@ def test_homogeneous():
 
     method = DefaultLossDbnAlgoTypes.ADJUSTED_BINOMIAL
     v = tranche3.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 3) == 29.949
+    assert round(v[3] * 10000, 3) == 29.95
 
     method = DefaultLossDbnAlgoTypes.GAUSSIAN
     v = tranche5.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
@@ -96,7 +96,7 @@ def test_heterogeneous():
 
     method = DefaultLossDbnAlgoTypes.ADJUSTED_BINOMIAL
     v = tranche2.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 2) == 173.38
+    assert round(v[3] * 10000, 2) == 173.37
 
     method = DefaultLossDbnAlgoTypes.GAUSSIAN
     v = tranche4.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)

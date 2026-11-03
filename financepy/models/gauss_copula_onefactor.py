@@ -1,17 +1,18 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+from typing import Sequence
 from numba import njit, float64, int64
 import numpy as np
 
 
 from ..utils.math import norminvcdf, normcdf, INV_ROOT_2_PI
 from ..utils.error import FinError
-from .loss_dbn_builder import indep_loss_dbn_recursion_gcd
-from .loss_dbn_builder import indep_loss_dbn_hetero_adj_binomial
-from .loss_dbn_builder import portfolio_gcd
+from .indep_loss_dbn_builder import indep_loss_dbn_recursion_gcd
+from .indep_loss_dbn_builder import indep_loss_dbn_hetero_adj_binomial
+from .indep_loss_dbn_builder import portfolio_gcd
 
 
-MIN_Z = -6.0
+MIN_Z = -7.0
 
 # This implements the one-factor latent variable formulation of the Gaussian
 # Copula model as well as some approximations
@@ -19,14 +20,8 @@ MIN_Z = -6.0
 ########################################################################################
 
 
-from typing import Sequence
-
-@njit(
-    float64[:](int64, float64[:], float64[:], float64[:], int64),
-    fastmath=True,
-    cache=True,
-)
-def loss_dbn_recursion_gcd(
+@njit(fastmath=True, cache=True)
+def gauss_loss_dbn_recursion_gcd(
     num_credits: int,
     default_probs: Sequence[float],
     loss_units: Sequence[float],
@@ -51,8 +46,8 @@ def loss_dbn_recursion_gcd(
 
     uncond_loss_dbn = np.zeros(num_loss_units)
 
-    z = MIN_Z
-    dz = 2.0 * abs(z) / num_integration_steps
+    dz = 2.0 * abs(MIN_Z) / num_integration_steps
+    z = MIN_Z + 0.5 * dz  # Composite midpoint rule
 
     cond_default_probs = np.zeros(num_credits)
 
@@ -63,9 +58,19 @@ def loss_dbn_recursion_gcd(
     for _ in range(0, num_integration_steps):
         for i_credit in range(0, num_credits):
             beta = beta_vector[i_credit]
-            denom = np.sqrt(1.0 - beta * beta)
-            argz = (thresholds[i_credit] - beta * z) / denom
-            cond_default_probs[i_credit] = normcdf(argz)
+
+            if beta == 1.0:
+                cond_default_probs[i_credit] = (
+                    1.0 if z < thresholds[i_credit] else 0.0
+                )
+            elif beta == -1.0:
+                cond_default_probs[i_credit] = (
+                    1.0 if z > -thresholds[i_credit] else 0.0
+                )
+            else:
+                denom = np.sqrt(1.0 - beta * beta)
+                argz = (thresholds[i_credit] - beta * z) / denom
+                cond_default_probs[i_credit] = normcdf(argz)
 
         indep_dbn = indep_loss_dbn_recursion_gcd(
             num_credits, cond_default_probs, loss_units
@@ -86,13 +91,58 @@ def loss_dbn_recursion_gcd(
 
 ########################################################################################
 
+def gauss_homog_basket_loss_dbn_adaptive(
+    survival_probs,
+    recovery_rates,
+    beta_vector,
+    initial_steps=25,
+    tol=1e-8,
+    max_steps=12800,
+):
+    num_steps = initial_steps
 
-@njit(
-    float64[:](float64[:], float64[:], float64[:], int64),
-    fastmath=True,
-    cache=True,
-)
-def homog_basket_loss_dbn(
+    prev = gauss_homog_basket_loss_dbn(
+        survival_probs,
+        recovery_rates,
+        beta_vector,
+        num_steps,
+    )
+
+    while num_steps * 2 <= max_steps:
+
+        num_steps *= 2
+
+        curr = gauss_homog_basket_loss_dbn(
+            survival_probs,
+            recovery_rates,
+            beta_vector,
+            num_steps,
+        )
+
+        # Compare both the individual probabilities
+        # and the cumulative loss distribution.
+        err_pmf = np.max(np.abs(curr - prev))
+        err_cdf = np.max(
+            np.abs(np.cumsum(curr) - np.cumsum(prev))
+        )
+
+        err = max(err_pmf, err_cdf)
+
+#        print(num_steps, err, tol)
+
+        if err < tol:
+            return curr
+
+        prev = curr
+
+    raise FinError(
+        f"Loss distribution failed to converge: "
+        f"steps={num_steps}, error={err:.3e}"
+    )
+
+
+@njit(fastmath=True, cache=True)
+def gauss_homog_basket_loss_dbn(
     survival_probs: Sequence[float],
     recovery_rates: Sequence[float],
     beta_vector: Sequence[float],
@@ -107,29 +157,42 @@ def homog_basket_loss_dbn(
     if num_credits == 0:
         raise FinError("Number of credits equals zero")
 
+    if len(beta_vector) != num_credits:
+        raise FinError("Number of beta values must equal number of credits")
+
     for i_credit in range(1, num_credits):
         if recovery_rates[i_credit] != recovery_rates[0]:
             raise FinError("Losses are not homogeneous")
 
-    m = 0.0
-    for beta in beta_vector:
-        m += beta
-    m /= len(beta_vector)
-
-    # High beta requires more integration steps
-    if m > 0.7:
-        num_integration_steps *= 2
-
-    if m > 0.9:
-        num_integration_steps *= 5
-
     loss_units = np.ones(num_credits)
-
     default_probs = np.zeros(num_credits)
+
     for i_credit in range(0, num_credits):
+
         default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
-    loss_dbn = loss_dbn_recursion_gcd(
+    all_beta_same = True
+
+    for beta in beta_vector:
+        if beta != beta_vector[0]:
+            all_beta_same = False
+            break
+
+    if all_beta_same and abs(beta_vector[0]) == 1.0:
+
+        p = np.sort(default_probs)
+
+        loss_dbn = np.zeros(num_credits + 1)
+        loss_dbn[0] = 1.0 - p[-1]
+
+        for k in range(1, num_credits):
+            loss_dbn[k] = p[num_credits - k] - p[num_credits - k - 1]
+
+        loss_dbn[num_credits] = p[0]
+
+        return loss_dbn
+
+    loss_dbn = gauss_loss_dbn_recursion_gcd(
         num_credits,
         default_probs,
         loss_units,
@@ -139,7 +202,6 @@ def homog_basket_loss_dbn(
 
     return loss_dbn
 
-
 ########################################################################################
 
 
@@ -147,7 +209,7 @@ def homog_basket_loss_dbn(
     float64(float64, float64, int64, float64[:], float64[:], float64[:], int64),
     fastmath=True,
 )
-def tranche_surv_prob_recursion(
+def gauss_tranche_surv_prob_recursion(
     k1: float,
     k2: float,
     num_credits: int,
@@ -181,9 +243,6 @@ def tranche_surv_prob_recursion(
         m += beta_vector[i]
     m /= len(beta_vector)
 
-    if m > 0.8:
-        num_integration_steps *= 2
-
     if common_recovery_flag == 1:
         gcd = loss_amounts[0]
     else:
@@ -204,7 +263,7 @@ def tranche_surv_prob_recursion(
     for i_credit in range(0, num_credits):
         default_probs[i_credit] = 1.0 - survival_probs[i_credit]
 
-    loss_dbn = loss_dbn_recursion_gcd(
+    loss_dbn = gauss_loss_dbn_recursion_gcd(
         num_credits,
         default_probs,
         loss_units,
@@ -266,7 +325,7 @@ def gauss_approx_tranche_loss(
     fastmath=True,
     cache=True,
 )
-def tranch_surv_prob_gaussian(
+def gauss_tranch_surv_prob_gauss_fit(
     k1: float,
     k2: float,
     num_credits: int,
@@ -336,7 +395,7 @@ def tranch_surv_prob_gaussian(
     fastmath=True,
     cache=True,
 )
-def loss_dbn_hetero_adj_binomial(
+def gauss_loss_dbn_hetero_adj_binomial(
     num_credits: int,
     default_probs: Sequence[float],
     loss_ratio: Sequence[float],
@@ -392,7 +451,7 @@ def loss_dbn_hetero_adj_binomial(
     fastmath=True,
     cache=True,
 )
-def tranche_surv_prob_adj_binomial(
+def gauss_tranche_surv_prob_adj_binomial(
     k1: float,
     k2: float,
     num_credits: int,
@@ -424,10 +483,11 @@ def tranche_surv_prob_adj_binomial(
     avg_loss = total_loss / num_credits
 
     loss_ratio = np.zeros(num_credits)
+    total_loss = num_credits * avg_loss
     for i_credit in range(0, num_credits):
-        loss_ratio[i_credit] = (1.0 - recovery_rates[i_credit]) / num_credits / avg_loss
+        loss_ratio[i_credit] = (1.0 - recovery_rates[i_credit]) / total_loss
 
-    loss_dbn = loss_dbn_hetero_adj_binomial(
+    loss_dbn = gauss_loss_dbn_hetero_adj_binomial(
         num_credits,
         default_probs,
         loss_ratio,

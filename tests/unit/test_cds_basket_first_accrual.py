@@ -17,9 +17,9 @@ def test_no_default_pv01_includes_first_coupon(basis):
     today = Date(2, 1, 2026)
     maturity = Date(20, 12, 2026)
     curve = FlatDiscountCurve(today, .03)
-    basket = CDSBasket(today, maturity, accrual_dc_type=basis)
+    basket = CDSBasket(today, maturity, 1, 1, accrual_dc_type=basis)
     issuer = CDSCurve(today, [CDS(today, maturity, .01)], curve, 0.4)
-    pv01, protection = basket.value_legs_mc(today, 1, np.array([[100.0, 100.0]]), [issuer], curve)
+    pv01, protection = basket.value_legs_mc(today, np.array([[100.0, 100.0]]), [issuer])
     contract = basket.cds_contract
     starts = [contract.accrual_start_dts[0]] + contract.payment_dts[:-1]
     day_count = DayCount(basis)
@@ -36,11 +36,11 @@ def test_first_period_default_accrues_from_actual_first_start():
     today = Date(2, 1, 2026)
     maturity = Date(20, 12, 2026)
     curve = FlatDiscountCurve(today, .03)
-    basket = CDSBasket(today, maturity, accrual_dc_type=DayCountTypes.ACT_365F)
+    basket = CDSBasket(today, maturity, 1, 1, accrual_dc_type=DayCountTypes.ACT_365F)
     issuer = CDSCurve(today, [CDS(today, maturity, .01)], curve, 0.4)
     tau = 0.02
     assert tau < (basket.cds_contract.payment_dts[0] - today) / 365.0
-    pv01, protection = basket.value_legs_mc(today, 1, np.array([[tau]]), [issuer], curve)
+    pv01, protection = basket.value_legs_mc(today, np.array([[tau]]), [issuer])
     start = (basket.cds_contract.accrual_start_dts[0] - today) / 365.0
 
     df = curve.df_t(tau)

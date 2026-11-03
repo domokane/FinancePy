@@ -481,43 +481,6 @@ def to_usable_type(t):
 ########################################################################################
 
 
-@njit(float64(float64, float64[:], float64[:]), fastmath=True, cache=True)
-def uniform_to_default_time(u, t, v):
-    """Fast mapping of a uniform random variable to a default time given a
-    survival probability curve."""
-
-    if u == 0.0:
-        return 99999.0
-
-    if u == 1.0:
-        return 0.0
-
-    num_points = len(v)
-    index = 0
-
-    for i in range(1, num_points):
-        if u <= v[i - 1] and u > v[i]:
-            index = i
-            break
-
-    if index == 0:
-        # Extrapolate beyond the final curve node using its last forward hazard.
-        left = num_points - 2
-        right = num_points - 1
-        lam = np.log(v[left] / v[right]) / (t[right] - t[left])
-        if lam <= 0.0:
-            return 99999.0
-        tau = t[right] + np.log(v[right] / u) / lam
-    else:
-        t1 = t[index - 1]
-        q1 = v[index - 1]
-        t2 = t[index]
-        q2 = v[index]
-        tau = (t1 * np.log(q2 / u) + t2 * np.log(u / q1)) / np.log(q2 / q1)
-
-    return tau
-
-
 ########################################################################################
 # THIS IS NOT USED
 

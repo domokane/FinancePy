@@ -1,108 +1,167 @@
-########################################################################################
-# Some code to convert output to latex tables
-########################################################################################
+import re
 
 
-def convert_to_latex_table(txt, sep=" ", header_list=None):
-    if header_list is None:
-        header_list = []
-
-    num_header_cols = len(header_list)
-
-    txt = txt.replace("_", r"\_")
-    txt = txt.replace("\t", "")
-    txt = txt.replace("      ", " ")
-    txt = txt.replace("     ", " ")
-    txt = txt.replace("    ", " ")
-    txt = txt.replace("   ", " ")
-    txt = txt.replace("  ", " ")
-
-    col_str = "{"
-    for i in range(0, num_header_cols):
-        col_str += "r"
-    col_str += "}"
-
-    table_str = "\\begin{table}[htbp]\n"
-    table_str += "\\begin{center}\n"
-    table_str += "\\begin{tabular} " + col_str + "\n"
-
-    if header_list != []:
-        header_str = header_list[0]
-        for i in range(1, num_header_cols):
-            header_str += " & " + header_list[i]
-        header_str += r"\\\ \n"
-        table_str += header_str
-
-    rows = txt.split("\n")
-
-    num_rows = len(rows)
-
-    for i in range(0, num_rows):
-
-        row_str = rows[i]
-        cols = row_str.split(sep)
-
-        num_cols = len(cols)
-
-        if num_header_cols > 0:
-            if num_cols != num_header_cols:
-                print(
-                    "Num row cols "
-                    + str(num_cols)
-                    + " is not the same as the number of header cols "
-                    + str(num_header_cols)
-                )
-                return ""
-
-        col_str = cols[0]
-        for j in range(1, num_cols):
-            col_str += " & " + cols[j]
-
-        table_str += col_str + r"\\\ \n"
-
-    table_str += r"\end{tabular}\n"
-    table_str += r"\end{center}\n"
-    table_str += r"\end{table}\n"
-
-    return table_str
+def print_table_start(columns_str):
+    text = (
+        "\\begin{center}\n"
+        "\\begin{tabular}{" + columns_str + "}\n"
+        "\\toprule\n"
+    )
+    print(text, end="")
 
 
-########################################################################################
+PRECISION = 6
 
 
-# if 1 == 0:
+def print_table_header(*args):
 
-#     TXT = "NOV-15-2017      11875.00\n\
-#     MAY-15-2018      11875.00\n\
-#     NOV-15-2018      11875.00\n\
-#     MAY-15-2019      11875.00\n\
-#     NOV-15-2019      11875.00\n\
-#     MAY-15-2020      11875.00\n\
-#     NOV-15-2020      11875.00\n\
-#     MAY-15-2021      11875.00\n\
-#     NOV-15-2021      11875.00\n\
-#     MAY-15-2022      11875.00\n\
-#     NOV-15-2022      11875.00\n\
-#     MAY-15-2023      11875.00\n\
-#     NOV-15-2023      11875.00\n\
-#     MAY-15-2024      11875.00\n\
-#     NOV-15-2024      11875.00\n\
-#     MAY-15-2025      11875.00\n\
-#     NOV-15-2025      11875.00\n\
-#     MAY-15-2026      11875.00\n\
-#     NOV-15-2026      11875.00\n\
-#     MAY-15-2027    1011875.00"
+    values = []
 
-#     latex_str = convertToLatexTable(TXT, " ", ["Dates","Flows"])
-#     print(latex_str)
+    for arg in args:
+        text = "\\textbf{" + str(arg) + "}"
+        values.append(text)
 
-#     txt="OBJECT TYPE: Bond\n\
-#     ISSUE DATE: MAY-15-2010\n\
-#     MATURITY DATE: MAY-15-2027\n\
-#     COUPON: 0.02375\n\
-#     FREQUENCY: FrequencyTypes.SEMI_ANNUAL\n\
-#     DAY COUNT TYPE: DayCountTypes.ACT_ACT_ICMA\n\
-#     FACE AMOUNT: 1000000"
+    print(" & ".join(values) + r" \\")
+    print(r"\midrule")
 
-#     latex_str = convertToLatexTable(TXT, ":", ["FIELD", "VALUE"])
-#     print(latex_str)
+
+def print_table_row(*args):
+
+    values = []
+
+    for arg in args:
+
+        if isinstance(arg, float):
+            text = f"{arg:.{PRECISION}f}"
+        elif isinstance(arg, int):
+            text = str(arg)
+        else:
+            text = str(arg)
+
+        values.append(text)
+
+    print(" & ".join(values) + r" \\")
+
+
+def print_table_end():
+    text = (
+        "\\bottomrule\n"
+        "\\end{tabular}\n"
+        "\\end{center}\n"
+        "\\noindent\n"
+    )
+    print(text, end="")
+
+
+def print_latex_text(obj):
+    text = str(obj)
+
+    replacements = {
+        "\\": r"\textbackslash{}",
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
+    }
+
+    text = re.sub(
+        r"[\\&%$#_{}~^]",
+        lambda m: replacements[m.group()],
+        text
+    )
+
+    print(r"\par\noindent")
+
+    for line in text.splitlines():
+        print(line + r"\par")
+
+    print(r"\medskip")
+
+
+def print_object_to_latex(obj, caption=None, label=None):
+    """Convert a FinancePy object's string representation to a LaTeX table."""
+
+    name = type(obj).__name__
+
+    def escape_latex(s):
+        chars = {
+            "\\": r"\textbackslash{}",
+            "&": r"\&",
+            "%": r"\%",
+            "$": r"\$",
+            "#": r"\#",
+            "_": r"\_",
+            "{": r"\{",
+            "}": r"\}",
+            "~": r"\textasciitilde{}",
+            "^": r"\textasciicircum{}",
+        }
+        return "".join(chars.get(c, c) for c in str(s))
+
+    rows = []
+
+    for line in str(obj).splitlines():
+        if ":" not in line:
+            continue
+
+        key, value = line.split(":", 1)
+        key = key.strip()
+        value = value.strip()
+
+        if key:
+            rows.append((
+                escape_latex(key),
+                escape_latex(format_value(value))
+            ))
+
+    name_line = rf"\begin{{termsheet}}{{{name}}}"
+
+    lines = [
+        name_line,
+        r"\centering",
+        r"\begin{tabular}{ll}",
+    ]
+
+    # We omit Object Type as it is in header of term sheet
+    for key, value in rows[1:]:
+        lines.append(f"{key} & {value} " + r"\\")
+
+    lines.extend([
+        r"\end{tabular}",
+    ])
+
+    if caption is not None:
+        lines.append(r"\caption{" + caption + "}")
+
+    if label is not None:
+        lines.append(r"\label{" + label + "}")
+
+    lines.append(r"\end{termsheet}")
+
+    out = "\n".join(lines)
+    print(out)
+
+
+def format_value(value):
+    value = value.strip()
+
+    match = re.fullmatch(
+        r"([-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?)(\s*[a-zA-Z%]*)",
+        value,
+    )
+
+    if not match:
+        return value
+
+    number, unit = match.groups()
+    x = float(number)
+
+    if x.is_integer():
+        return f"{int(x):,}{unit}"
+
+    return f"{x:,.5f}{unit}"

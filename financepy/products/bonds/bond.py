@@ -397,6 +397,9 @@ class Bond:
         if settle_dt > self.ex_div_dt:
             pay_first_cpn = 0.0
 
+        if settle_dt == self.maturity_dt:
+            return self.par * (1.0 + self.cpn * pay_first_cpn / self.freq)
+
         #######################################################################
 
         ytm = np.array(ytm)  # VECTORIZED
@@ -680,9 +683,11 @@ class Bond:
         _validate_yield(ytm)
 
         dy = 0.0001  # 1 bp
-        p_0 = self.dirty_price_from_ytm(settle_dt, ytm, convention)
-        p_1 = self.dirty_price_from_ytm(settle_dt, ytm + dy, convention)
-        dP = p_0 - p_1
+        p_up = self.dirty_price_from_ytm(settle_dt, ytm + dy, convention)
+        p_dn = self.dirty_price_from_ytm(settle_dt, ytm - dy, convention)
+
+        dP = (p_dn - p_up) / 2.0
+
         return dP
 
     ###########################################################################
@@ -1117,6 +1122,12 @@ class Bond:
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
 
+        if settle_dt > self.maturity_dt:
+            raise FinError("Settlement date falls after maturity date")
+
+        if settle_dt == self.maturity_dt:
+            return self.par
+
         dp = self.dirty_price_from_ytm(settle_dt, ytm, convention)
         accrued_int = self.accrued_interest(settle_dt, self.par)
         cp = dp - accrued_int
@@ -1238,26 +1249,18 @@ class Bond:
     ###########################################################################
 
     def current_yield(self, settle_dt: Date, clean_price: float | list | np.ndarray):
-        """Calculate the bond's simple yield."""
+        """Calculate the current yield as annual coupon divided by clean price."""
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
 
-        self.accrued_interest(settle_dt, 1.0)
-        accrued_amount = self.accrued_int * self.par
-
         clean_prices = _vectorise_price(clean_price)
-        dirty_prices = clean_prices + accrued_amount
-        simple_ys = []
+        yields = self.cpn * self.par / clean_prices
 
-        for dirty_price in dirty_prices:
-            simple_y = self.cpn * self.par / dirty_price
-            simple_ys.append(simple_y)
+        if yields.size == 1:
+            return yields[0]
 
-        if len(simple_ys) == 1:
-            return simple_ys[0]
-        else:
-            return np.array(simple_ys)
+        return yields
 
     ###########################################################################
 
@@ -1299,12 +1302,13 @@ class Bond:
         # Calculation of the ex-dividend date
         self.ex_div_dt = cal.add_business_days(self._ncd, -1 * self.ex_div_days)
 
-        acc_factor, num, _ = dc.year_frac(self._pcd, settle_dt, self._ncd, self.freq_type)
+        acc_factor, num, den = dc.year_frac(self._pcd, settle_dt, self._ncd, self.freq_type)
 
         self.alpha = 1.0 - acc_factor * self.freq
 
         if settle_dt > self.ex_div_dt:
             self.accrued_int = acc_factor - 1.0 / self.freq
+#            print(cal, dc, self.ex_div_dt, acc_factor, num, den, self.accrued_int)
         else:
             self.accrued_int = acc_factor
 
@@ -1688,12 +1692,12 @@ class Bond:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
         s += label_to_string("MATURITY_DATE", self.maturity_dt)
         s += label_to_string("COUPON (%)", self.cpn * 100.0)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY_COUNT", self.accrual_dc_type)
+        s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("EX-DIVIDEND DAYS", self.ex_div_days)
         s += label_to_string("CALENDAR TYPE", self.cal_type)
         s += label_to_string("BUS DAYS ADJUST", self.bd_type)
@@ -1912,7 +1916,6 @@ class Bond:
     def payments_to_latex(
         self,
         settle_dt: Date,
-        filename: str,
         face: float = 100,
     ):
         """Write the bond payment schedule as a LaTeX table."""
@@ -1974,18 +1977,18 @@ class Bond:
                 )
 
         latex = "\n".join([
-            r"\begin{tabular}{llll}",
-            r"\hline",
+            r"\begin{center}"
+            r"\begin{tabular}{lllr}",
+            r"\toprule",
             r"Coupon Date & Payment Date & Status & Amount \\",
-            r"\hline",
+            r"\midrule",
             *rows,
-            r"\hline",
+            r"\bottomrule",
             r"\end{tabular}",
+            r"\end{center}"
         ])
 
         print(latex)
-        # with open(filename, "w", encoding="utf-8") as f:
-        #     f.write(latex + "\n")
 
     ###########################################################################
 

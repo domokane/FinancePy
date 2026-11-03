@@ -293,7 +293,7 @@ class CDSCurve:
 
     def __repr__(self):
         """Print out the details of the survival probability curve."""
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         header = "TIME,SURVIVAL_PROBABILITY"
 
         value_table = [self._times, self._qs]

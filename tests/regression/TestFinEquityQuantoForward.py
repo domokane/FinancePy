@@ -51,7 +51,7 @@ def test_equity_quanto_forward():
         expiry_dt,
         forward_price,
         notional,
-        LongShortTypes.LONG,
+        True,
     )
 
     test_cases.header(
@@ -115,7 +115,7 @@ def test_zero_correlation():
         expiry_dt,
         forward_price,
         notional,
-        LongShortTypes.LONG,
+        True,
     )
 
     fwd_price = equity_quanto_forward.forward(
@@ -155,11 +155,11 @@ def test_long_short_symmetry():
     dividend_curve = FlatDiscountCurve(value_dt, 0.02)
 
     long_forward = EquityQuantoForward(
-        expiry_dt, 125.0, 100.0, LongShortTypes.LONG
+        expiry_dt, 125.0, 100.0, True
     )
 
     short_forward = EquityQuantoForward(
-        expiry_dt, 125.0, 100.0, LongShortTypes.SHORT
+        expiry_dt, 125.0, 100.0, False
     )
 
     args = (

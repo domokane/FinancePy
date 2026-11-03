@@ -307,9 +307,9 @@ class SABR:
 
     def __repr__(self):
         """Return string with class details."""
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("Alpha", self.alpha)
-        s += label_to_string("Beta", self.beta)
-        s += label_to_string("Nu", self.nu)
-        s += label_to_string("Rho", self.rho)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("ALPHA", self.alpha)
+        s += label_to_string("BETA", self.beta)
+        s += label_to_string("NU", self.nu)
+        s += label_to_string("RHO", self.rho)
         return s

@@ -14,8 +14,8 @@ from ..utils.helpers import label_to_string
 ########################################################################################
 
 
-
 from typing import Any
+
 
 class ModelRatesVasicek:
 
@@ -31,10 +31,10 @@ class ModelRatesVasicek:
 
     def __repr__(self) -> str:
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("a", self._a)
-        s += label_to_string("b", self._b)
-        s += label_to_string("sigma", self._sigma)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("A", self._a)
+        s += label_to_string("B", self._b)
+        s += label_to_string("SIGMA", self._sigma)
         return s
 
 

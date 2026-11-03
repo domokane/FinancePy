@@ -322,14 +322,15 @@ class CDSIndexOption:
 
         day_count = DayCount(self.accrual_dc_type)
 
-        #  Previous cpn date is last cpn date before valuation date
-        for dt in flow_dts:
-            pcd = dt
-            if dt > value_dt:
-                break
-
+        # The forward CDS starts at expiry and its first coupon accrues from
+        # the previous coupon date, so the buyer owes the accrued premium from
+        # that date to expiry. The forward contract is built with expiry as its
+        # step-in date, so that date is its first accrual start date. It can
+        # fall after expiry when a business day adjustment moves it, in which
+        # case nothing has accrued.
+        pcd = self.cds_contract.accrual_start_dts[0]
         eff = self.expiry_dt
-        accrual_factor_pcd_to_expiry = day_count.year_frac(pcd, eff)[0]
+        accrual_factor_pcd_to_expiry = max(day_count.year_frac(pcd, eff)[0], 0.0)
 
         s0 = exp(-0.5 * sigma * sigma * t_exp)
 
@@ -339,7 +340,7 @@ class CDSIndexOption:
             z = z + dz
 
             fwd_rpv01 = 0.0
-            for i_flow in range(1, num_flows):
+            for i_flow in range(0, num_flows):
                 acc_factor = self.cds_contract.accrual_factors[i_flow]
                 surv_prob = exp(-s * expiry_to_flow_times[i_flow] / lgd)
                 fwd_rpv01 += acc_factor * surv_prob * fwd_dfs[i_flow]
@@ -360,10 +361,10 @@ class CDSIndexOption:
     def __repr__(self):
         """print out details of the CDS contract and all of the calculated
         cash flows"""
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("MATURITY_DATE", self.maturity_dt)
-        s += label_to_string("INDEX cpn", self.index_cpn * 10000, "bp\n")
+        s += label_to_string("INDEX COUPON", self.index_cpn * 10000, "bp\n")
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("LONG PROTECTION", self.long_protect)
         s += label_to_string("FREQUENCY", self.freq_type)

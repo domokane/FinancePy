@@ -456,12 +456,12 @@ class CDSIndexPortfolio:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DC_TYPE", self.accrual_dc_type)
+        s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
-        s += label_to_string("DATE_GEN_RULE", self.dg_type)
+        s += label_to_string("BUS DAY ADJUST", self.bd_type)
+        s += label_to_string("DATE GEN RULE", self.dg_type)
         return s
 
     ####################################################################################

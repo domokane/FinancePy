@@ -2792,7 +2792,7 @@ class FXVolSurfacePlus:
 
     def __repr__(self) -> str:
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self.value_dt)
         s += label_to_string("SPOT DATE", self.spot_dt)
         s += label_to_string("FX RATE", self.spot_fx_rate)
@@ -2820,18 +2820,18 @@ class FXVolSurfacePlus:
             s += label_to_string("ATM Strike", self.k_atm[i])
             s += label_to_string("ATM Delta", self.delta_atm[i])
 
-            s += label_to_string("k_atm", self.k_atm[i])
+            s += label_to_string("K_ATM", self.k_atm[i])
 
             s += label_to_string("MS 25d Call Strike", self.k_25d_c_ms[i])
             s += label_to_string("MS 25d Put Strike", self.k_25d_p_ms[i])
-            s += label_to_string("SkkEW 25d CALL STRIkkE", self.k_25d_c[i])
-            s += label_to_string("SkkEW 25d PUT STRIkkE", self.k_25d_p[i])
+            s += label_to_string("SKEW 25d CALL STRIkkE", self.k_25d_c[i])
+            s += label_to_string("SKEW 25d PUT STRIkkE", self.k_25d_p[i])
             s += label_to_string("PARAMS", self.parameters[i])
 
             s += label_to_string("MS 10d Call Strike", self.k_10d_c_ms[i])
             s += label_to_string("MS 10d Put Strike", self.k_10d_p_ms[i])
-            s += label_to_string("SkkEW 10d CALL STRIkkE", self.k_10d_c[i])
-            s += label_to_string("SkkEW 10d PUT STRIkkE", self.k_10d_p[i])
+            s += label_to_string("SKEW 10d CALL STRIkkE", self.k_10d_c[i])
+            s += label_to_string("SKEW 10d PUT STRIkkE", self.k_10d_p[i])
 
         return s
 

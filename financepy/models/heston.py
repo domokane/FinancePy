@@ -167,6 +167,37 @@ def get_paths(
 ########################################################################################
 
 
+########################################################################################
+# Fourier integrals for the Heston P1 and P2 probabilities.
+#
+# The integrands behave like Im(phi(u)) / u near u = 0. When kappa - rho * xi < 0 the
+# variance process is mean-fleeing under the share measure, and the P1 characteristic
+# function then only reaches its limit phi(0) = 1 inside a layer of width about
+# exp(-(rho * xi - kappa) * t_exp) around u = 0. Outside that layer the integrand
+# carries a 1/u tail that can span tens of decades for long maturities. Adaptive
+# quadrature on [0, inf) does not resolve either feature and can return a call price
+# below its no-arbitrage bounds (issue #430). Integrating in s = log(u) turns the
+# 1/u tail into a bounded integrand and places the layer at a finite, resolvable s.
+########################################################################################
+
+HESTON_LOG_U_MIN = 1e-300
+HESTON_LOG_U_MAX = 1e4
+HESTON_QUAD_LIMIT = 500
+
+
+def integrate_heston_prob(integrand) -> float:
+    """Integrate a Heston P1 or P2 integrand over u in (0, inf) using the variable
+    s = log(u), so that integrand(u) du = integrand(u) u ds. Returns the integral."""
+
+    def integrand_log_u(s):
+        u = np.exp(s)
+        return integrand(u) * u
+
+    lower = np.log(HESTON_LOG_U_MIN)
+    upper = np.log(HESTON_LOG_U_MAX)
+    return integrate.quad(integrand_log_u, lower, upper, limit=HESTON_QUAD_LIMIT)[0]
+
+
 class Heston:
 
     def __init__(self, v0: float, kappa: float, theta: float, xi: float, rho: float):
@@ -480,7 +511,7 @@ class Heston:
                 v = np.exp(aa * theta + bb * v0 + 1j * u * np.log(s0 / (k * np.exp(-(r - q) * tau)))) / (u * 1j)
                 return v.real
 
-            area = 0.50 + (1.0 / pi) * integrate.quad(integrand, 0, np.inf)[0]
+            area = 0.50 + (1.0 / pi) * integrate_heston_prob(integrand)
             return area
 
         v = s0 * exp(-q * tau) * fn(1.0, kappa - rho * xi)
@@ -532,7 +563,7 @@ class Heston:
                 phi = np.exp(cc * theta + dd * v0 + 1j * u * x0) / (1j * u)
                 return phi.real
 
-            area = 0.50 + 1.0 / pi * integrate.quad(integrand, 0.0, np.inf)[0]
+            area = 0.50 + 1.0 / pi * integrate_heston_prob(integrand)
             return area
 
         v = s0 * exp(-q * tau) * ff(1) - k * exp(-r * tau) * ff(0)

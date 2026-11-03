@@ -400,11 +400,11 @@ class FXOneTouchOption(FXOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("EXPIRY_DATE", self.expiry_dt)
-        s += label_to_string("OPTION_TYPE", self.opt_type)
-        s += label_to_string("BARRIER_LEVEL", self.barrier_rate)
-        s += label_to_string("PAYMENT_SIZE", self.payment_size, "")
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("EXPIRY DATE", self.expiry_dt)
+        s += label_to_string("OPTION TYPE", self.opt_type)
+        s += label_to_string("BARRIER LEVEL", self.barrier_rate)
+        s += label_to_string("PAYMENT SIZE", self.payment_size, "")
         return s
 
     ###########################################################################

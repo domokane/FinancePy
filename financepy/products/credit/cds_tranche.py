@@ -8,9 +8,9 @@ from enum import Enum
 
 import numpy as np
 
-from ...models.gauss_copula_onefactor import tranch_surv_prob_gaussian
-from ...models.gauss_copula_onefactor import tranche_surv_prob_adj_binomial
-from ...models.gauss_copula_onefactor import tranche_surv_prob_recursion
+from ...models.gauss_copula_onefactor import gauss_tranch_surv_prob_gauss_fit
+from ...models.gauss_copula_onefactor import gauss_tranche_surv_prob_adj_binomial
+from ...models.gauss_copula_onefactor import gauss_tranche_surv_prob_recursion
 from ...models.gauss_copula_lhp import tr_surv_prob_lhp
 
 from ...utils.day_count import DayCountTypes
@@ -178,7 +178,7 @@ class CDSTranche:
 
             if algorithm == DefaultLossDbnAlgoTypes.RECURSION:
 
-                qt1[i] = tranche_surv_prob_recursion(
+                qt1[i] = gauss_tranche_surv_prob_recursion(
                     0.0,
                     k1,
                     num_credits,
@@ -188,7 +188,7 @@ class CDSTranche:
                     num_points,
                 )
 
-                qt2[i] = tranche_surv_prob_recursion(
+                qt2[i] = gauss_tranche_surv_prob_recursion(
                     0.0,
                     k2,
                     num_credits,
@@ -200,7 +200,7 @@ class CDSTranche:
 
             elif algorithm == DefaultLossDbnAlgoTypes.ADJUSTED_BINOMIAL:
 
-                qt1[i] = tranche_surv_prob_adj_binomial(
+                qt1[i] = gauss_tranche_surv_prob_adj_binomial(
                     0.0,
                     k1,
                     num_credits,
@@ -210,7 +210,7 @@ class CDSTranche:
                     num_points,
                 )
 
-                qt2[i] = tranche_surv_prob_adj_binomial(
+                qt2[i] = gauss_tranche_surv_prob_adj_binomial(
                     0.0,
                     k2,
                     num_credits,
@@ -222,7 +222,7 @@ class CDSTranche:
 
             elif algorithm == DefaultLossDbnAlgoTypes.GAUSSIAN:
 
-                qt1[i] = tranch_surv_prob_gaussian(
+                qt1[i] = gauss_tranch_surv_prob_gauss_fit(
                     0.0,
                     k1,
                     num_credits,
@@ -232,7 +232,7 @@ class CDSTranche:
                     num_points,
                 )
 
-                qt2[i] = tranch_surv_prob_gaussian(
+                qt2[i] = gauss_tranch_surv_prob_gauss_fit(
                     0.0,
                     k2,
                     num_credits,

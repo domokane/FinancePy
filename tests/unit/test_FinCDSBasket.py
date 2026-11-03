@@ -25,7 +25,9 @@ issuer_curves = load_hetero_spread_curves(value_dt, libor_curve)
 issuer_curves = issuer_curves[0:num_credits]
 
 seed = 1967
-basket = CDSBasket(value_dt, basket_maturity)
+ntd = 1
+
+basket = CDSBasket(value_dt, basket_maturity, num_credits, ntd)
 
 ########################################################################################
 
