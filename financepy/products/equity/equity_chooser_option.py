@@ -404,7 +404,7 @@ class EquityChooserOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("CHOOSER DATE", self.choose_dt)
         s += label_to_string("CALL EXPIRY DATE", self.call_expiry_dt)
         s += label_to_string("CALL STRIKE PRICE", self.call_strike)

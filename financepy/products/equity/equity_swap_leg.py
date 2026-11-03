@@ -569,9 +569,9 @@ class EquitySwapLeg:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EFFECTIVE DATE", self.effective_dt)
-        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.strike * self.quantity)
         s += label_to_string("SWAP TYPE", self.leg_type)
         s += label_to_string("RETURN TYPE", self.return_type)

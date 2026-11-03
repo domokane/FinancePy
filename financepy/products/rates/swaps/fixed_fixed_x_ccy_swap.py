@@ -414,7 +414,7 @@ class FixedFixedXCcySwap:
         prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
 
-        for next_dt in self._adjusted_float_dts[start_index + 1 :]:
+        for next_dt in self._adjusted_float_dts[start_index + 1:]:
             alpha = basis.year_frac(prev_dt, next_dt)[0]
             df2_index = index_curve.df(next_dt)
             # The accrual factors cancel
@@ -565,10 +565,10 @@ class FixedFixedXCcySwap:
     ####################################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("START_DATE", self.effective_dt)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START DATE", self.effective_dt)
         s += label_to_string("TERMINATION DATE", self._termination_dt)
-        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("FIXED LEG TYPE", self._fixed_leg_type)
         s += label_to_string("FIXED CPN", self._fixed_cpn)
@@ -579,7 +579,7 @@ class FixedFixedXCcySwap:
         s += label_to_string("FLOAT DAY COUNT", self._float_dc_type)
         s += label_to_string("CALENDAR", self._cal_type)
         s += label_to_string("BUS DAY ADJUST", self._bd_type)
-        s += label_to_string("DATE GEN TYPE", self._dg_type)
+        s += label_to_string("DATE GEN RULE", self._dg_type)
         return s
 
     ####################################################################################

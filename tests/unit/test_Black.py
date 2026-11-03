@@ -278,4 +278,4 @@ def test_black_repr():
     assert "Black" in s
     assert "VOLATILITY" in s
     assert "IMPLEMENTATION" in s
-    assert "NUMSTEPS" in s
+    assert "NUM STEPS" in s

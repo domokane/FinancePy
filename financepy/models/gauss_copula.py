@@ -2,47 +2,76 @@
 
 # TODO: Use Numba to speed this up more.
 
+from scipy.stats import qmc
+from scipy.special import ndtri
+from scipy.special import ndtr
+
+from numba.typed import List
+import math
 import numpy as np
-
-from ..utils.math import normcdf
-from ..utils.helpers import uniform_to_default_time
-
-# TODO:
-
-########################################################################################
-
+from .default_times import default_times_from_uniforms_numba
 
 from typing import Sequence, Any
 
 
-def default_times_gc(
-    issuer_curves: Sequence[Any],
-    corr_matrix: np.ndarray,
-    num_trials: int,
-    seed: int,
-) -> np.ndarray:
-    """Generate a matrix of default times by credit and trial using a
-    Gaussian copula model using a full rank correlation matrix."""
+def gauss_default_times(
+        issuer_curves: Sequence[Any],
+        corr_matrix: np.ndarray,
+        num_trials: int,
+        seed: int,
+        use_moment_matching: bool = True,
+        use_sobol: bool = False):
 
-    rng = np.random.RandomState(seed)
     num_credits = len(issuer_curves)
-    x = rng.normal(0.0, 1.0, size=(num_credits, num_trials))
-    c = np.linalg.cholesky(corr_matrix)
-    y = np.dot(c, x)
 
-    corr_times = np.empty(shape=(num_credits, 2 * num_trials))
+    if use_sobol:
+        sampler = qmc.Sobol(
+            d=num_credits,
+            scramble=True,
+            seed=seed
+        )
 
-    for i_credit in range(0, num_credits):
-        issuer_curve = issuer_curves[i_credit]
-        for i_trial in range(0, num_trials):
-            g = y[i_credit, i_trial]
-            u1 = 1.0 - normcdf(g)
-            u2 = 1.0 - u1
-            times = issuer_curve._times
-            qs = issuer_curve._qs
-            t1 = uniform_to_default_time(u1, times, qs)
-            t2 = uniform_to_default_time(u2, times, qs)
-            corr_times[i_credit, i_trial] = t1
-            corr_times[i_credit, num_trials + i_trial] = t2
+        m = (num_trials - 1).bit_length()
+        u = sampler.random_base2(m)
 
-    return corr_times
+        num_trials = len(u)
+
+        x = ndtri(np.clip(u, 1e-15, 1.0 - 1e-15)).T
+
+    else:
+
+        rng = np.random.RandomState(seed)
+
+        x = rng.normal(
+            0.0, 1.0, size=(num_credits, num_trials)
+        )
+
+    # Moment matching
+    if use_moment_matching:
+        x -= np.mean(x, axis=1, keepdims=True)
+        x /= np.std(x, axis=1, keepdims=True)
+
+    if np.allclose(corr_matrix, 1.0, rtol=0.0, atol=1e-14):
+        # Perfect positive correlation: one common Gaussian factor
+        y = np.broadcast_to(x[0:1, :], x.shape).copy()
+    else:
+        c = np.linalg.cholesky(corr_matrix)
+        y = c @ x
+
+    u1 = ndtr(-y)
+    u2 = ndtr(y)
+
+    curve_times = List()
+    curve_qs = List()
+
+    for curve in issuer_curves:
+        curve_times.append(
+            np.asarray(curve._times, dtype=np.float64)
+        )
+        curve_qs.append(
+            np.asarray(curve._qs, dtype=np.float64)
+        )
+
+    return default_times_from_uniforms_numba(
+        u1, u2, curve_times, curve_qs
+    )

@@ -165,15 +165,15 @@ class BondMortgage:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("START_DATE", self.start_dt)
-        s += label_to_string("MATURITY_DATE", self.end_dt)
+        s = label_to_string("OBJECT TPE", type(self).__name__)
+        s += label_to_string("START DATE", self.start_dt)
+        s += label_to_string("MATURITY DATE", self.end_dt)
         s += label_to_string("MORTGAGE TYPE", self.mortgage_type)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DAY_COUNT", self.accrual_dc_type)
+        s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
-        s += label_to_string("DATE_GEN_RULE", self.dg_type)
+        s += label_to_string("BUS DAY_ADJUST", self.bd_type)
+        s += label_to_string("DATE GEN RULE", self.dg_type)
         return s
 
     ###########################################################################

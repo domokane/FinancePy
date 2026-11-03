@@ -41,9 +41,9 @@ def test_cir_repr():
     s = repr(model)
 
     assert "CIRMonteCarlo" in s
-    assert "Sigma" in s
-    assert "a" in s
-    assert "b" in s
+    assert "SIGMA" in s
+    assert "A" in s
+    assert "B" in s
 
 
 def test_satisfies_feller():

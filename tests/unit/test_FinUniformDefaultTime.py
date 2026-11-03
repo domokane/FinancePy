@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from financepy.utils.helpers import uniform_to_default_time
+from financepy.models.default_times import uniform_to_default_time
 
 
 def test_uniform_to_default_time_extrapolates_with_last_forward_hazard():

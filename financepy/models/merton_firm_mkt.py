@@ -217,7 +217,7 @@ class MertonFirmMkt(MertonFirm):
 
     def __repr__(self) -> str:
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string(
             "EQUITY VALUE",
             self._market_equity_value,

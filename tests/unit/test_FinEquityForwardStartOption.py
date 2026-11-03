@@ -130,9 +130,9 @@ def test_forward_start_repr():
     text = repr(option)
 
     assert "EquityForwardStartOption" in text
-    assert "START_DATE" in text
+    assert "START DATE" in text
     assert "FINAL EXPIRY DATE" in text
-    assert "OPTION_TYPE" in text
+    assert "OPTION TYPE" in text
 
 
 def test_forward_start_on_start_date():

@@ -135,7 +135,7 @@ class OIS:
 
     ##########################################################################
 
-    def value(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate: float=None):
+    def value(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate: float = None):
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
 
@@ -157,7 +157,7 @@ class OIS:
 
     ###########################################################################
 
-    def swap_rate(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate: float=None):
+    def swap_rate(self, value_dt: Date, ois_curve: DiscountCurve, first_fixing_rate: float = None):
         """Calculate the fixed leg cpn that makes the swap worth zero.
         If the valuation date is before the swap payments start then this
         is the forward swap rate as it starts in the future. The swap rate
@@ -203,7 +203,7 @@ class OIS:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += self.fixed_leg.__repr__()
         s += "\n"
         s += self.float_leg.__repr__()

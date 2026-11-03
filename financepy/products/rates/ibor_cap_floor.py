@@ -363,13 +363,13 @@ class IborCapFloor:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("START_DATE", self.start_dt)
-        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START DATE", self.start_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("STRIKE COUPON", self.strike_rate * 100)
-        s += label_to_string("OPTION_TYPE", str(self.opt_type))
+        s += label_to_string("OPTION TYPE", str(self.opt_type))
         s += label_to_string("FREQUENCY", str(self.freq_type))
-        s += label_to_string("DAY_COUNT", str(self.accrual_dc_type), "")
+        s += label_to_string("DAY COUNT", str(self.accrual_dc_type), "")
         return s
 
     ###########################################################################

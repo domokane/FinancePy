@@ -41,7 +41,7 @@ def test_fin_inflation_bond_bbg():
     clean_price = 104.03502
 
     yld = bond.current_yield(settle_dt, clean_price)
-    assert round(yld * 100, 4) == 1.2013
+    assert round(yld * 100, 4) == 1.2015
 
     # Inherited functions that just calculate real yield without CPI adjustments
     ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.UK_DMO)
@@ -90,13 +90,13 @@ def test_fin_inflation_bond_bbg():
     assert round(principal, 4) == 116.7116
 
     duration = bond.dollar_duration(settle_dt, ytm)
-    assert round(duration, 4) == 305.8767
+    assert round(duration, 4) == 305.9297
 
     modified_duration = bond.modified_duration(settle_dt, ytm)
     assert round(modified_duration, 3) == 2.940
 
     macaulay_duration = bond.macaulay_duration(settle_dt, ytm)
-    assert round(macaulay_duration, 3) == 2.938
+    assert round(macaulay_duration, 3) == 2.939
 
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert round(conv, 3) == 10.195

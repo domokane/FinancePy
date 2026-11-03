@@ -664,7 +664,7 @@ class CDS:
         dirty_rpv01 = value_rpv01[DIRTY]
         clean_rpv01 = value_rpv01[CLEAN]
 
-        return (dirty_rpv01, clean_rpv01)
+        return value_rpv01
 
     ###########################################################################
 
@@ -938,17 +938,17 @@ class CDS:
     def __repr__(self):
         """print out details of the CDS contract and all the calculated
         cash flows"""
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("STEP_IN_DATE", self.step_in_dt)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("STEP-IN DATE", self.step_in_dt)
         s += label_to_string("MATURITY", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
-        s += label_to_string("LONG_PROT", self.long_protect)
+        s += label_to_string("LONG PROT", self.long_protect)
         s += label_to_string("COUPON", self.running_cpn * 10000, "bp\n")
-        s += label_to_string("DAY_COUNT", self.accrual_dc_type)
+        s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
-        s += label_to_string("DATE_GEN_RULE", self.dg_type)
+        s += label_to_string("BUS DAY ADJUST", self.bd_type)
+        s += label_to_string("DATE GEN RULE", self.dg_type)
 
         header = "PAYMENT_DT, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, PAYMENT"
         value_table = [

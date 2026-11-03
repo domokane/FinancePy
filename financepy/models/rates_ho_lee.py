@@ -1,5 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+from typing import Any, Dict
 import numpy as np
 from numba import njit
 
@@ -14,8 +15,6 @@ INTERP = InterpTypes.FLAT_FWD_RATES.value
 
 ########################################################################################
 
-
-from typing import Any, Dict
 
 @njit(fastmath=True, cache=True)
 def p_fast(
@@ -46,7 +45,6 @@ def p_fast(
 
 
 ########################################################################################
-
 
 
 class ModelRatesHoLee:
@@ -128,6 +126,6 @@ class ModelRatesHoLee:
     def __repr__(self) -> str:
         """Return string with class details."""
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("Sigma", self._sigma)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("SIGMA", self._sigma)
         return s

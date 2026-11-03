@@ -212,7 +212,6 @@ def test_fin_cds_basket():
     test_cases.print("MAXIMUM SPD BASKET MATURITY", max_spd)
 
     seed = 1967
-    basket = CDSBasket(value_dt, basket_maturity)
 
     test_cases.banner(
         "==================================================================="
@@ -227,6 +226,9 @@ def test_fin_cds_basket():
     test_cases.header("TIME", "Trials", "RHO", "NTD", "SPRD", "SPRD_HOMO")
 
     for ntd in range(1, num_credits + 1):
+
+        basket = CDSBasket(value_dt, basket_maturity, num_credits, ntd)
+
         for beta in [0.0, 0.5]:
             rho = beta * beta
             beta_vector = np.ones(num_credits) * beta
@@ -236,16 +238,14 @@ def test_fin_cds_basket():
 
                 v1 = basket.value_gaussian_mc(
                     value_dt,
-                    ntd,
                     issuer_curves,
                     corr_matrix,
-                    libor_curve,
                     num_trials,
                     seed,
                 )
 
                 v2 = basket.value_1f_gaussian_homo(
-                    value_dt, ntd, issuer_curves, beta_vector, libor_curve
+                    value_dt, issuer_curves, beta_vector
                 )
 
                 end = time.time()
@@ -270,16 +270,17 @@ def test_fin_cds_basket():
         rho = beta**2
         corr_matrix = corr_matrix_generator(rho, num_credits)
         for ntd in range(1, num_credits + 1):
+
+            basket = CDSBasket(value_dt, basket_maturity, num_credits, ntd)
+
             for do_f in [3, 4]:
                 start = time.time()
 
                 v = basket.value_student_t_mc(
                     value_dt,
-                    ntd,
                     issuer_curves,
                     corr_matrix,
                     do_f,
-                    libor_curve,
                     num_trials,
                     seed,
                 )
@@ -291,10 +292,8 @@ def test_fin_cds_basket():
             start = time.time()
             v = basket.value_gaussian_mc(
                 value_dt,
-                ntd,
                 issuer_curves,
                 corr_matrix,
-                libor_curve,
                 num_trials,
                 seed,
             )
@@ -318,16 +317,17 @@ def test_fin_cds_basket():
         rho = beta**2
         corr_matrix = corr_matrix_generator(rho, num_credits)
         for ntd in range(1, num_credits + 1):
+
+            basket = CDSBasket(value_dt, basket_maturity, num_credits, ntd)
+
             for num_trials in [1000]:
                 start = time.time()
 
                 v = basket.value_student_t_mc(
                     value_dt,
-                    ntd,
                     issuer_curves,
                     corr_matrix,
                     do_f,
-                    libor_curve,
                     num_trials,
                     seed,
                 )

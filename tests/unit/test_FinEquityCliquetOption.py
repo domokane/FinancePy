@@ -300,10 +300,11 @@ def test_cliquet_repr_includes_caps_floors():
         global_cap=0.20,
     )
     rep = repr(cliquet)
-    assert "LOCAL_FLOOR" in rep
-    assert "LOCAL_CAP" in rep
-    assert "GLOBAL_FLOOR" in rep
-    assert "GLOBAL_CAP" in rep
+    print(rep)
+    assert "LOCAL FLOOR" in rep
+    assert "LOCAL CAP" in rep
+    assert "GLOBAL FLOOR" in rep
+    assert "GLOBAL CAP" in rep
 
 
 def test_one_period_cliquet_with_cap_matches_bull_spread():
@@ -369,4 +370,3 @@ def test_cliquet_high_cap_converges_to_uncapped():
     v_high_cap = c_high_cap.value(start, s0, curve, dividend, model)
 
     assert v_high_cap == pytest.approx(v_uncapped, rel=1e-8)
-

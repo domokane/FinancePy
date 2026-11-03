@@ -181,7 +181,7 @@ class FXForward:
     ##########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("SPOT DATE", self.spot_dt)
         s += label_to_string("SETTLEMENT DATE", self.settlement_dt)
         s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)

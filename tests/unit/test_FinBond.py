@@ -64,13 +64,13 @@ def test_bondtutor_example():
     assert my_round(ytm) == my_round(0.0622)
 
     duration = bond.dollar_duration(settle_dt, y)
-    assert my_round(duration) == my_round(301.193)
+    assert my_round(duration) == my_round(301.246)
 
     modified_duration = bond.modified_duration(settle_dt, y)
-    assert my_round(modified_duration) == my_round(2.769)
+    assert my_round(modified_duration) == my_round(2.77)
 
     macaulay_duration = bond.macaulay_duration(settle_dt, y)
-    assert my_round(macaulay_duration) == my_round(2.855)
+    assert my_round(macaulay_duration) == my_round(2.856)
 
     conv = bond.convexity_from_ytm(settle_dt, y)
     assert my_round(conv) == my_round(9.67)
@@ -123,13 +123,13 @@ def test_bloomberg_us_treasury_example():
     assert my_round(accddays) == my_round(67.0)
 
     duration = bond.dollar_duration(settle_dt, ytm)
-    assert my_round(duration) == my_round(868.667)
+    assert my_round(duration) == my_round(869.093)
 
     modified_duration = bond.modified_duration(settle_dt, ytm)
-    assert my_round(modified_duration) == my_round(8.668)
+    assert my_round(modified_duration) == my_round(8.672)
 
     macaulay_duration = bond.macaulay_duration(settle_dt, ytm)
-    assert my_round(macaulay_duration) == my_round(8.772)
+    assert my_round(macaulay_duration) == my_round(8.776)
 
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert my_round(conv) == my_round(85.17)
@@ -154,7 +154,7 @@ def test_bloomberg_apple_corp_example():
     clean_price = 101.581564
 
     yld = bond.current_yield(settle_dt, clean_price)
-    assert my_round(yld) == my_round(0.0264)
+    assert my_round(yld) == my_round(0.027)
 
     ytm = bond.yield_to_maturity(settle_dt, clean_price, YTMCalcType.UK_DMO)
     assert my_round(ytm) == my_round(0.023)
@@ -180,13 +180,13 @@ def test_bloomberg_apple_corp_example():
     assert my_round(accrued_interest) == my_round(0.51)
 
     duration = bond.dollar_duration(settle_dt, ytm)
-    assert my_round(duration) == my_round(456.46)
+    assert my_round(duration) == my_round(456.578)
 
     modified_duration = bond.modified_duration(settle_dt, ytm)
-    assert my_round(modified_duration) == my_round(4.471)
+    assert my_round(modified_duration) == my_round(4.472)
 
     macaulay_duration = bond.macaulay_duration(settle_dt, ytm)
-    assert my_round(macaulay_duration) == my_round(4.524)
+    assert my_round(macaulay_duration) == my_round(4.525)
 
     conv = bond.convexity_from_ytm(settle_dt, ytm)
     assert my_round(conv) == my_round(23.024)

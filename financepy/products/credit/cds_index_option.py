@@ -360,10 +360,10 @@ class CDSIndexOption:
     def __repr__(self):
         """print out details of the CDS contract and all of the calculated
         cash flows"""
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("MATURITY_DATE", self.maturity_dt)
-        s += label_to_string("INDEX cpn", self.index_cpn * 10000, "bp\n")
+        s += label_to_string("INDEX COUPON", self.index_cpn * 10000, "bp\n")
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("LONG PROTECTION", self.long_protect)
         s += label_to_string("FREQUENCY", self.freq_type)

@@ -5,6 +5,8 @@
 # TODO: There are several speed ups for the Monte-Carlo including calculating
 # all default baskets at the same time.
 
+from copy import deepcopy
+
 import numpy as np
 
 from ...utils.error import FinError
@@ -18,20 +20,21 @@ from ...utils.helpers import check_argument_types
 from ...utils.date import Date
 from ...utils.helpers import label_to_string
 
-from ...models.gauss_copula_onefactor import homog_basket_loss_dbn
-from ...models.gauss_copula import default_times_gc
-from ...models.student_t_copula import StudentTCopula
+from ...models.gauss_copula_onefactor import gauss_homog_basket_loss_dbn_adaptive
+# from ...models.gauss_copula_onefactor import homog_basket_loss_dbn
+
+from ...models.gauss_copula import gauss_default_times
+from ...models.student_t_copula import student_t_default_times
 
 from ...market.curves.interpolator import interpolate, InterpTypes
-from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.cds_curve import CDSCurve
 from ...products.credit.cds import CDS
 
 from ...utils.check_values import check_curve_dt
-from ...utils.global_vars import CLEAN
+from ...utils.global_vars import CLEAN, DIRTY
 
 ########################################################################################
-# TODO: Convert functions to use NUMBA!!
+# TODO: Implement Student-t recursion
 ########################################################################################
 
 
@@ -42,6 +45,8 @@ class CDSBasket:
         self,
         step_in_dt: Date,
         maturity_dt: Date,
+        num_credits: int,
+        n_to_default: int,
         notional: float = ONE_MILLION,
         running_cpn: float = 0.0,
         long_protect: bool = True,
@@ -54,8 +59,22 @@ class CDSBasket:
 
         check_argument_types(self.__init__, locals())
 
+        if num_credits < 1:
+            raise FinError("Num Credits is zero")
+
+        if n_to_default < 1:
+            raise FinError("N-to-Default is zero")
+
+        if n_to_default > num_credits:
+            raise FinError("N-to-Default is greater than num_credits")
+
+        if step_in_dt > maturity_dt:
+            raise FinError("Step-in date after maturity date")
+
         self.step_in_dt = step_in_dt
         self.maturity_dt = maturity_dt
+        self.num_credits = num_credits
+        self.n_to_default = n_to_default
         self.notional = notional
         self.running_cpn = running_cpn / 10000.0
         self.long_protect = long_protect
@@ -78,309 +97,140 @@ class CDSBasket:
             self.dg_type,
         )
 
-    ###########################################################################
-
-    def value_legs_mc_old(self, value_dt: Date,
-                          n_to_default: int,
-                          default_times: np.ndarray,
-                          issuer_curves: list[DiscountCurve],
-                          libor_curve: DiscountCurve):
-        """Value the legs of the default basket using Monte Carlo. The default
-        times are an input so this valuation is not model dependent."""
-
-        num_credits, num_trials = default_times.shape
-
-        payment_dts = self.cds_contract.payment_dts
-        num_payments = len(payment_dts)
-        day_count = DayCount(self.accrual_dc_type)
-
-        avg_acc_factor = 0.0
-
-        rpv01_to_times = np.zeros(num_payments)
-
-        for i_time in range(1, num_payments):
-
-            t = (payment_dts[i_time] - value_dt) / G_DAYS_IN_YEAR
-            dt0 = payment_dts[i_time - 1]
-            dt1 = payment_dts[i_time]
-            accrual_factor = day_count.year_frac(dt0, dt1)[0]
-            avg_acc_factor += accrual_factor
-            rpv01_to_times[i_time] = rpv01_to_times[i_time - 1] + accrual_factor * libor_curve.df_t(t)
-
-        avg_acc_factor /= num_payments
-
-        t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
-
-        rpv01 = 0.0
-        prot = 0.0
-
-        asset_tau = np.zeros(num_credits)
-
-        for i_trial in range(0, num_trials):
-
-            for i_credit in range(0, num_credits):
-
-                asset_tau[i_credit] = default_times[i_credit, i_trial]
-
-            # ORDER THE DEFAULT TIMES
-            asset_tau.sort()
-
-            # GET THE Nth DEFAULT TIME
-            min_tau = asset_tau[n_to_default - 1]
-
-            if min_tau < t_mat:
-
-                index_float = min_tau / avg_acc_factor
-                index_int = int(index_float)
-
-                print(index_float, index_int)
-
-                num_payment_amounts_index = int(min_tau / avg_acc_factor)
-                rpv01_trial = rpv01_to_times[num_payment_amounts_index]
-                rpv01_trial += min_tau - num_payment_amounts_index * avg_acc_factor
-
-                # DETERMINE IDENTITY OF N-TO-DEFAULT CREDIT IF BASKET NOT HOMO
-                asset_index = 0
-                for i_credit in range(0, num_credits):
-                    if min_tau == default_times[i_credit, i_trial]:
-                        asset_index = i_credit
-                        break
-
-                prot_trial = 1.0 - issuer_curves[asset_index].recovery_rate
-                prot_trial *= libor_curve.df_t(min_tau)
-
-            else:
-
-                num_payment_amounts_index = int(t_mat / avg_acc_factor)
-                rpv01_trial = rpv01_to_times[-1]
-                prot_trial = 0.0
-
-            rpv01 += rpv01_trial
-            prot += prot_trial
-
-        rpv01 = rpv01 / num_trials
-
-        prot = prot / num_trials
-        return (rpv01, prot)
-
-    ####################################################################################
-
-    def value_legs_mc(self,
-                      value_dt: Date,
-                      n_to_default: int,
-                      default_times: np.ndarray,
-                      issuer_curves: list[DiscountCurve],
-                      libor_curve: DiscountCurve):
-        """
-        Value the premium PV01 and protection legs of an n-to-default basket via
-        Monte Carlo `default_times` is (num_credits x num_trials) of default times
-        in YEARS from value_dt. The valuation is pathwise (no model dependence
-        beyond the given default times).
-        """
-
-        # TODO: You can do it much faster by vectorizing on trials
-
-        def to_years(dt, value_dt: Date, days_in_year=365.0):
-            """Convert date difference into year fraction."""
-            delta = dt - value_dt
-            if hasattr(delta, "days"):  # datetime.timedelta
-                return delta.days / days_in_year
-            else:  # numeric (serial day count)
-                return delta / days_in_year
-
-        num_credits, num_trials = default_times.shape
-
-        if n_to_default < 1 or n_to_default > num_credits:
-            raise FinError("n_to_default must be in [1, num_credits]")
-
-        # Contract schedule
-        payment_dts = self.cds_contract.payment_dts
-        num_payments = len(payment_dts)
-        day_count = DayCount(self.accrual_dc_type)
-
-        # CDS stores one accrual start per payment period. Use its first date
-        # so the initial stub is included in both scheduled and default accrual.
-        accrual_start_dt = self.cds_contract.accrual_start_dts[0]
-
-        # Times in years from value_dt
-        pay_times = np.array(
-            [to_years(dt, value_dt, G_DAYS_IN_YEAR) for dt in payment_dts],
-            dtype=float,
-        )
-        accrual_start_time = to_years(accrual_start_dt, value_dt, G_DAYS_IN_YEAR)
-
-        # Period year-fractions and discount factors
-        accrual_factors = np.zeros(num_payments, dtype=float)
-        accrual_factors[0] = day_count.year_frac(accrual_start_dt, payment_dts[0])[0]
-        for i in range(1, num_payments):
-            accrual_factors[i] = day_count.year_frac(payment_dts[i - 1], payment_dts[i])[0]
-
-        df_pay = np.array([libor_curve.df_t(t) for t in pay_times], dtype=float)
-
-        # Cumulative PV01 to each payment date
-        rpv01_to_times = np.cumsum(accrual_factors * df_pay)
-
-        # Maturity time and full PV01
-        t_mat = to_years(self.maturity_dt, value_dt, G_DAYS_IN_YEAR)
-        full_rpv01 = rpv01_to_times[-1]
-
-        rpv01_sum = 0.0
-        prot_sum = 0.0
-
-        asset_tau = np.empty(num_credits)
-
-        for j in range(num_trials):
-
-            # sort the trial’s default times to get nth-to-default time
-            asset_tau[:] = default_times[:, j]
-            order = np.argsort(asset_tau)
-            tau_sorted = asset_tau[order]
-            min_tau = tau_sorted[n_to_default - 1]
-
-            if min_tau < t_mat:
-                # find number of payment dates before default
-                pos = int(np.searchsorted(pay_times, min_tau, side="left"))
-
-                if pos == 0:
-                    rpv01_trial = 0.0
-                    last_start_time = accrual_start_time
-                else:
-                    rpv01_trial = rpv01_to_times[pos - 1]
-                    last_start_time = pay_times[pos - 1]
-
-                # partial accrual from last coupon date to default
-                partial_accrual = max(0.0, (min_tau - last_start_time) * G_DAYS_IN_YEAR / 360.0)
-
-                rpv01_trial += partial_accrual * libor_curve.df_t(min_tau)
-
-                # nth defaulter identity
-                nth_defaulter_index = order[n_to_default - 1]
-                lgd = 1.0 - issuer_curves[nth_defaulter_index].recovery_rate
-                prot_trial = lgd * libor_curve.df_t(min_tau)
-
-            else:
-                rpv01_trial = full_rpv01
-                prot_trial = 0.0
-
-            rpv01_sum += rpv01_trial
-            prot_sum += prot_trial
-
-        rpv01 = rpv01_sum / num_trials
-        prot = prot_sum / num_trials
-        return (rpv01, prot)
-
     ####################################################################################
 
     def value_gaussian_mc(
         self,
         value_dt: Date,
-        n_to_default: int,
-        issuer_curves: list[DiscountCurve],
+        issuer_curves: list[CDSCurve],
         corr_matrix: np.ndarray,
-        libor_curve: DiscountCurve,
         num_trials: int,
         seed: int,
+        use_moment_matching: bool = False,
+        use_sobol: bool = False
     ):
         """Value the default basket using a Gaussian copula model. This
         depends on the issuer discount and correlation matrix."""
 
+        num_credits = len(issuer_curves)
+
+        if num_credits != self.num_credits:
+            raise FinError("Num curves not same as num credits")
+
+        if num_trials <= 0:
+            raise FinError("Number of Monte Carlo trials must be positive.")
+
+        libor_curve = issuer_curves[0].libor_curve
+
         check_curve_dt(value_dt, libor_curve)
         check_curve_dt(value_dt, *issuer_curves)
 
-        num_credits = len(issuer_curves)
+        default_times = gauss_default_times(issuer_curves,
+                                            corr_matrix,
+                                            num_trials,
+                                            seed,
+                                            use_moment_matching,
+                                            use_sobol)
 
-        if n_to_default > num_credits or n_to_default < 1:
-            raise FinError("n_to_default must be 1 to num_credits")
+        risky_pv01, prot_leg_pv = self.value_legs_mc(value_dt,
+                                                     default_times,
+                                                     issuer_curves)
 
-        default_times = default_times_gc(issuer_curves, corr_matrix, num_trials, seed)
-
-        rpv01, prot_pv = self.value_legs_mc(value_dt,
-                                            n_to_default,
-                                            default_times,
-                                            issuer_curves,
-                                            libor_curve)
-
-        if rpv01 <= 0.0:
+        if risky_pv01 <= 0.0:
             raise FinError("Cannot compute basket spread: risky PV01 is non-positive."
                            )
-        spd = prot_pv / rpv01
-        value = self.notional * (prot_pv - self.running_cpn * rpv01)
+        mtm = self.notional * (prot_leg_pv - self.running_cpn * risky_pv01)
 
         if not self.long_protect:
-            value = value * -1.0
+            mtm = mtm * -1.0
 
-        return (value, rpv01, spd)
+        basket_output = np.zeros(5)
+        basket_output[DIRTY] = mtm
+        basket_output[CLEAN] = np.nan
+        basket_output[2] = risky_pv01 * self.notional * self.running_cpn
+        basket_output[3] = prot_leg_pv * self.notional
+        basket_output[4] = prot_leg_pv / risky_pv01  # This is the fair spread
+
+        return basket_output
 
     ###########################################################################
 
     def value_student_t_mc(
         self,
         value_dt: Date,
-        n_to_default: int,
-        issuer_curves: list[DiscountCurve],
+        issuer_curves: list[CDSCurve],
         corr_matrix: np.ndarray,
-        degrees_of_freedom,
-        libor_curve: DiscountCurve,
+        degrees_of_freedom: int,
         num_trials: int,
         seed: int,
+        use_moment_matching: bool = False,
+        use_sobol: bool = False
     ):
         """Value the default basket using the Student-T copula."""
-        check_curve_dt(value_dt, libor_curve)
-        check_curve_dt(value_dt, *issuer_curves)
 
         num_credits = len(issuer_curves)
 
-        if n_to_default > num_credits or n_to_default < 1:
-            raise FinError("n_to_default must be 1 to num_credits")
+        if num_credits != self.num_credits:
+            raise FinError("Num curves not same as num credits")
 
-        model = StudentTCopula()
+        if num_trials <= 0:
+            raise FinError("Number of Monte Carlo trials must be positive.")
 
-        default_times = model.default_times(issuer_curves,
-                                            corr_matrix,
-                                            degrees_of_freedom,
-                                            num_trials, seed)
+        libor_curve = issuer_curves[0].libor_curve
 
-        rpv01, prot_pv = self.value_legs_mc(value_dt,
-                                            n_to_default,
-                                            default_times,
-                                            issuer_curves,
-                                            libor_curve)
+        check_curve_dt(value_dt, libor_curve)
+        check_curve_dt(value_dt, *issuer_curves)
 
-        if rpv01 <= 0.0:
+        default_times = student_t_default_times(issuer_curves,
+                                                corr_matrix,
+                                                degrees_of_freedom,
+                                                num_trials,
+                                                seed,
+                                                use_moment_matching,
+                                                use_sobol)
+
+        risky_pv01, prot_leg_pv = self.value_legs_mc(value_dt,
+                                                     default_times,
+                                                     issuer_curves)
+
+        if risky_pv01 <= 0.0:
             raise FinError("Cannot compute basket spread: risky PV01 is non-positive.")
 
-        spd = prot_pv / rpv01
-        value = self.notional * (prot_pv - self.running_cpn * rpv01)
+        mtm = self.notional * (prot_leg_pv - self.running_cpn * risky_pv01)
 
         if not self.long_protect:
-            value = value * -1.0
+            mtm = mtm * -1.0
 
-        return (value, rpv01, spd)
+        basket_output = np.zeros(5)
+        basket_output[0] = mtm
+        basket_output[1] = np.nan
+        basket_output[2] = risky_pv01 * self.notional * self.running_cpn
+        basket_output[3] = prot_leg_pv * self.notional
+        basket_output[4] = prot_leg_pv / risky_pv01  # This is the fair spread
+
+        return basket_output
 
     ###########################################################################
 
     def value_1f_gaussian_homo(
         self,
         value_dt: Date,
-        n_to_default: int,
-        issuer_curves: list[DiscountCurve],
+        issuer_curves: list[CDSCurve],
         beta_vector: np.ndarray,
-        libor_curve: DiscountCurve,
-        num_points: int = 50,
+        num_points: int = 25,
     ):
         """Value default basket using 1 factor Gaussian copula and analytical
         approach which is only exact when all recovery rates are the same."""
 
-        check_curve_dt(value_dt, libor_curve)
-        check_curve_dt(value_dt, *issuer_curves)
-
         num_credits = len(issuer_curves)
 
-        if num_credits == 0:
-            raise FinError("Num Credits is zero")
+        if num_credits != self.num_credits:
+            raise FinError("Num curves not same as num credits")
 
-        if n_to_default < 1 or n_to_default > num_credits:
-            raise FinError("n_to_default must be 1 to num_credits")
+        libor_curve = issuer_curves[0].libor_curve
+
+        check_curve_dt(value_dt, libor_curve)
+        check_curve_dt(value_dt, *issuer_curves)
 
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
@@ -389,6 +239,8 @@ class CDSBasket:
 
         payment_dts = self.cds_contract.payment_dts
         num_times = len(payment_dts)
+
+        libor_curve = issuer_curves[0].libor_curve
 
         issuer_surv_probs = np.zeros(num_credits)
         recovery_rates = np.zeros(num_credits)
@@ -417,7 +269,11 @@ class CDSBasket:
 
             t = (payment_dts[i_time] - value_dt) / G_DAYS_IN_YEAR
 
+            if t <= 1e-12:
+                continue
+
             for i_credit in range(0, num_credits):
+
                 issuer_curve = issuer_curves[i_credit]
                 issuer_surv_probs[i_credit] = interpolate(
                     t,
@@ -426,54 +282,225 @@ class CDSBasket:
                     InterpTypes.FLAT_FWD_RATES.value,
                 )
 
-            loss_dbn = homog_basket_loss_dbn(issuer_surv_probs, recovery_rates, beta_vector, num_points)
+            loss_dbn = gauss_homog_basket_loss_dbn_adaptive(issuer_surv_probs,
+                                                            recovery_rates,
+                                                            beta_vector,
+                                                            num_points)
 
             basket_surv_curve[i_time] = 1.0
-            for i_to_default in range(n_to_default, num_credits + 1):
+            for i_to_default in range(self.n_to_default, num_credits + 1):
                 basket_surv_curve[i_time] -= loss_dbn[i_to_default]
 
             basket_times[i_time] = t
 
         curve_recovery = recovery_rates[0]
-        libor_curve = issuer_curves[0].libor_curve
         basket_curve = CDSCurve(value_dt, [], libor_curve, curve_recovery)
         basket_curve._times = basket_times
         basket_curve._qs = basket_surv_curve
 
-        prot_leg_pv = self.cds_contract.prot_leg_pv(value_dt, basket_curve, curve_recovery)
-        risky_pv01 = self.cds_contract.rpv01(value_dt, basket_curve)[CLEAN]
+        prot_leg_pv = self.cds_contract.prot_leg_pv(value_dt,
+                                                    basket_curve,
+                                                    curve_recovery)
 
-        if risky_pv01 <= 0.0:
-            raise FinError(
-                "Cannot compute basket spread: "
-                "risky PV01 is non-positive."
-            )
+        # Dirty and clean risky PV01
+        risky_pv01 = np.asarray(
+            self.cds_contract.rpv01(value_dt, basket_curve)
+        )
 
-        # Long protection
-        mtm = self.notional * (prot_leg_pv - risky_pv01 * self.running_cpn)
+        if np.any(risky_pv01 <= 0.0):
+            raise FinError("Cannot compute basket spread: risky PV01 is non-positive.")
+
+        # Dirty and clean MTMs
+        mtm = self.notional * (
+            prot_leg_pv - risky_pv01 * self.running_cpn
+        )
 
         if not self.long_protect:
             mtm *= -1.0
 
-        basket_output = np.zeros(4)
-        basket_output[0] = mtm
-        basket_output[1] = risky_pv01 * self.notional * self.running_cpn
-        basket_output[2] = prot_leg_pv * self.notional
-        basket_output[3] = prot_leg_pv / risky_pv01
+        basket_output = np.zeros(5)
+        basket_output[DIRTY] = mtm[DIRTY]
+        basket_output[CLEAN] = mtm[CLEAN]
+        basket_output[2] = risky_pv01[DIRTY] * self.notional * self.running_cpn
+        basket_output[3] = prot_leg_pv * self.notional
+        basket_output[4] = prot_leg_pv / risky_pv01[DIRTY]
 
         return basket_output
+
+    ###########################################################################
+
+    def value_legs_mc(
+        self,
+        value_dt: Date,
+        default_times: np.ndarray,
+        issuer_curves: list[CDSCurve],
+    ):
+        """Vectorised MC valuation of n-to-default basket legs."""
+
+        num_credits, num_trials = default_times.shape
+
+        if num_credits != self.num_credits:
+            raise FinError("Num curves not same as num credits")
+
+        if not 1 <= self.n_to_default <= num_credits:
+            raise FinError("Invalid n_to_default")
+
+        if self.num_credits != len(issuer_curves):
+            raise FinError("Default-time dimension does not match issuer curves.")
+
+        if num_trials == 0:
+            raise FinError("Number of Monte Carlo trials must be positive.")
+
+        payment_dts = self.cds_contract.payment_dts
+        day_count = DayCount(self.accrual_dc_type)
+
+        # Schedule times
+        pay_times = np.array([
+            (dt - value_dt) / G_DAYS_IN_YEAR
+            for dt in payment_dts
+        ])
+
+        accrual_start_dt = self.cds_contract.accrual_start_dts[0]
+        accrual_start_time = (
+            accrual_start_dt - value_dt
+        ) / G_DAYS_IN_YEAR
+
+        accrual_factors = np.empty(len(payment_dts))
+
+        accrual_factors[0] = day_count.year_frac(
+            accrual_start_dt, payment_dts[0]
+        )[0]
+
+        for i in range(1, len(payment_dts)):
+            accrual_factors[i] = day_count.year_frac(
+                payment_dts[i - 1], payment_dts[i]
+            )[0]
+
+        libor_curve = issuer_curves[0].libor_curve
+        df_pay = libor_curve.df_t(pay_times)
+
+        cum_pv01 = np.cumsum(accrual_factors * df_pay)
+        full_risky_pv01 = cum_pv01[-1]
+
+        t_mat = (
+            self.maturity_dt - value_dt
+        ) / G_DAYS_IN_YEAR
+
+        recoveries = np.array([
+            curve.recovery_rate for curve in issuer_curves
+        ])
+
+        # Find nth defaulter in every simulation.
+        path_indices = np.arange(num_trials)
+
+        if self.n_to_default == 1:
+            nth_indices = np.argmin(default_times, axis=0)
+
+        elif self.n_to_default == num_credits:
+            nth_indices = np.argmax(default_times, axis=0)
+
+        else:
+            nth_indices = np.argpartition(
+                default_times,
+                self.n_to_default - 1,
+                axis=0
+            )[self.n_to_default - 1, :]
+
+        tau = default_times[nth_indices, path_indices]
+
+        # Start with the full premium annuity and zero protection.
+        risky_pv01_paths = np.full(num_trials, full_risky_pv01)
+        prot_paths = np.zeros(num_trials)
+
+        # Only paths triggered before maturity need further work.
+        triggered = tau < t_mat
+
+        if np.any(triggered):
+
+            tau_def = tau[triggered]
+            nth_def = nth_indices[triggered]
+
+            # Number of scheduled payment dates before default.
+            pos = np.searchsorted(
+                pay_times, tau_def, side="left"
+            )
+
+            previous = np.maximum(pos - 1, 0)
+
+            scheduled_pv01 = np.where(
+                pos > 0,
+                cum_pv01[previous],
+                0.0
+            )
+
+            last_start_time = np.where(
+                pos > 0,
+                pay_times[previous],
+                accrual_start_time
+            )
+
+            partial_accrual = np.maximum(
+                0.0,
+                (tau_def - last_start_time)
+                * G_DAYS_IN_YEAR / 360.0
+            )
+
+            # vectorised discount factors for all default times
+            df_def = libor_curve.df_t(tau_def)
+
+            risky_pv01_paths[triggered] = (
+                scheduled_pv01 + partial_accrual * df_def
+            )
+
+            prot_paths[triggered] = (
+                (1.0 - recoveries[nth_def]) * df_def
+            )
+
+        return np.mean(risky_pv01_paths), np.mean(prot_paths)
+
+    ###########################################################################
+
+    def spread_dv01s(self, value_dt, issuer_curves, beta_vector):
+
+        v0 = self.value_1f_gaussian_homo(
+            value_dt, issuer_curves, beta_vector
+        )
+
+        bump = 0.0001
+        spread_dv01_vector = []
+
+        for i_credit in range(self.num_credits):
+
+            bumped_curves = list(issuer_curves)
+            bumped_curve = deepcopy(issuer_curves[i_credit])
+
+            for cds in bumped_curve.cds_contracts:
+                cds.running_cpn += bump
+
+            bumped_curve.build_curve()
+            bumped_curves[i_credit] = bumped_curve
+
+            v1 = self.value_1f_gaussian_homo(
+                value_dt, bumped_curves, beta_vector
+            )
+
+            spread_dv01_vector.append(v1[0] - v0[0])
+
+        return spread_dv01_vector
 
     ###########################################################################
 
     def __repr__(self):
         """print out details of the CDS contract and all of the calculated
         cash flows"""
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("STEP-IN DATE", self.step_in_dt)
         s += label_to_string("MATURITY", self.maturity_dt)
+        s += label_to_string("NUM CREDITS", self.num_credits)
+        s += label_to_string("N-TO-DEFAULT", self.n_to_default)
         s += label_to_string("NOTIONAL", self.notional)
-        s += label_to_string("RUNNING COUPON", self.running_cpn * 10000, "bp\n")
-        s += label_to_string("DAY_COUNT", self.accrual_dc_type)
+        s += label_to_string("RUNNING COUPON", self.running_cpn * 10000, " bp\n")
+        s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
         s += label_to_string("BUS DAY RULE", self.bd_type)

@@ -1484,9 +1484,9 @@ class HWTree:
     def __repr__(self) -> str:
         """Return string with class details."""
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("Sigma", self.sigma)
-        s += label_to_string("a", self.a)
-        s += label_to_string("num_time_steps", self.num_time_steps)
-        s += label_to_string("european_calc_types", self.european_calc_type)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("SIGMA", self.sigma)
+        s += label_to_string("A", self.a)
+        s += label_to_string("NUM TIME STEPS", self.num_time_steps)
+        s += label_to_string("EUROPEAN CALC TYPES", self.european_calc_type)
         return s

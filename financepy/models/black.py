@@ -245,10 +245,10 @@ class Black:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self.volatility)
         s += label_to_string("IMPLEMENTATION", self.implementation_type)
-        s += label_to_string("NUMSTEPS", self.num_steps)
+        s += label_to_string("NUM STEPS", self.num_steps)
         return s
 
 

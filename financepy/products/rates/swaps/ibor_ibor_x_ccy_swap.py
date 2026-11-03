@@ -411,7 +411,7 @@ class IborIborXCcySwap:
         prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
 
-        for next_dt in self._adjusted_float_dts[start_index + 1 :]:
+        for next_dt in self._adjusted_float_dts[start_index + 1:]:
             alpha = basis.year_frac(prev_dt, next_dt)[0]
             df2_index = index_curve.df(next_dt)
             # The accrual factors cancel
@@ -571,10 +571,10 @@ class IborIborXCcySwap:
     ##########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("START_DATE", self.effective_dt)
         s += label_to_string("TERMINATION DATE", self.termination_dt)
-        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("FIXED LEG TYPE", self.fixed_leg_type)
         s += label_to_string("FIXED COUPON", self.fixed_cpn)
@@ -584,7 +584,7 @@ class IborIborXCcySwap:
         s += label_to_string("FIXED DAY COUNT", self.fixed_dc_type)
         s += label_to_string("FLOAT DAY COUNT", self.float_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
+        s += label_to_string("BUS DAY ADJUST", self.bd_type)
         s += label_to_string("DATE GEN TYPE", self.dg_type)
         return s
 

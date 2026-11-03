@@ -122,6 +122,18 @@ def check_volatility(volatility: float):
 
 ########################################################################################
 
+def check_yield(ytm):
+
+    ytm = np.asarray(ytm)
+
+    if np.any(ytm < -0.20):
+        raise FinError("YTM cannot be below -20%")
+
+    if np.any(ytm > 2.0):
+        raise FinError("YTM cannot exceed 200%")
+
+########################################################################################
+
 
 def check_strike_price(strike_price: float):
 

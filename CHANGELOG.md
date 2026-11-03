@@ -1,5 +1,18 @@
 ## CHANGE LOG
-26 Octo 2026
+2 Nov 2026
+- Widespread removal of _ in printing of objects
+- Added default_times.py to models
+- Added moment matching and sobol to gauss_copula
+- Renamed loss_dbn_builder to indep_loss_dbn_builder
+- Added adaptive integration to gauss_copula_one_factor model
+- Added moment matching and sobol to student_t_copula default times simulation
+- Bond handles settlement = maturity
+- Many improvements to CDS Basket to speed up code and homogenize API
+- Added spread_dv01s to CDSBasket
+- Removed uniform_to_default times from helpers to models folder
+- Added latex class with helpful output functions
+
+26 Oct 2026
 - Removed currency pair from FX Vanilla option value function call
 - Removed currency pair from FX Vanilla option greeks function call
 25 Oct 2026
