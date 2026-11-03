@@ -16,7 +16,7 @@ from ...products.bonds.bond import (
 from ...products.product import Product
 from ...utils.calendar import BusDayAdjustTypes, Calendar, CalendarTypes
 from ...utils.check_values import check_curve_dt
-from ...utils.date import Date
+from ...utils.date import END_YEAR, Date
 from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.error import FinError
 from ...utils.frequency import FrequencyTypes, annual_frequency
@@ -367,44 +367,56 @@ class BondPerpetual(Product):
         self,
         settle_dt: Date,
         discount_curve: DiscountCurve,
-        num_coupons: int = 200,
+        horizon_years: float = 100.0,
     ) -> float:
         """Calculate the dirty price of the perpetual bond from an arbitrary
-        discount curve using coupon stream summation with a terminal perpetuity
-        tail adjustment."""
+        discount curve. Coupons falling within horizon_years of settlement are
+        discounted off the curve one by one. The perpetuity beyond the horizon
+        is valued as a tail that continues the curve's forward rate over the
+        final coupon period, so a sloped curve is not truncated at a spot rate."""
         check_curve_dt(settle_dt, discount_curve)
 
         if settle_dt < self.issue_dt:
             raise FinError("Settlement date falls before issue date")
 
+        if horizon_years <= 0.0:
+            raise FinError("Horizon in years must be positive")
+
         self._calc_pcd_ncd(settle_dt)
         cal = Calendar(self.cal_type)
         self.ex_div_dt = cal.add_business_days(self._ncd, -self.ex_div_days)
 
-        months_step = 12 // self.freq
-        cpn_amount = (self.cpn / self.freq)
+        freq = int(self.freq)
+        months_step = 12 // freq
+        cpn_amount = self.cpn / freq
+
+        # At least one year of coupons, and every coupon date inside the
+        # supported date range
+        num_coupons = int(np.ceil(horizon_years * freq))
+        max_coupons = (END_YEAR - 1 - self._ncd.y) * freq
+        num_coupons = max(freq + 1, min(num_coupons, max_coupons))
 
         px_pv = 0.0
-        last_dt = self._ncd
+        dfs = np.zeros(num_coupons)
 
         for i in range(num_coupons):
             flow_dt = self._ncd.add_months(i * months_step)
-            last_dt = flow_dt
+            dfs[i] = discount_curve.df(flow_dt)
             if flow_dt > settle_dt:
-                df = discount_curve.df(flow_dt)
                 if i == 0 and settle_dt > self.ex_div_dt:
                     flow = 0.0
                 else:
                     flow = cpn_amount
-                px_pv += flow * df
+                px_pv += flow * dfs[i]
 
-        # Terminal perpetuity tail beyond num_coupons
-        df_terminal = discount_curve.df(last_dt)
-        r_terminal = discount_curve.zero_rate_cc(last_dt)
-        if r_terminal > 1e-6:
-            y_terminal = self.freq * (np.exp(r_terminal / self.freq) - 1.0)
-            tail_pv = (cpn_amount / (y_terminal / self.freq)) * df_terminal
-            px_pv += tail_pv
+        # Perpetuity tail beyond the horizon. It continues the forward rate of
+        # the final year of summed coupons, measured over a whole year so that
+        # the day counts of individual periods do not bias it, as the geometric
+        # sum cpn * df_last * (q + q^2 + ...) with q the one-period forward df.
+        df_fwd_year = dfs[-1] / dfs[-1 - freq]
+        if 0.0 < df_fwd_year < 1.0:
+            q = df_fwd_year ** (1.0 / freq)
+            px_pv += cpn_amount * dfs[-1] * q / (1.0 - q)
 
         df_settle = discount_curve.df(settle_dt)
         dirty_price = (px_pv / df_settle) * self.par
@@ -416,12 +428,12 @@ class BondPerpetual(Product):
         self,
         settle_dt: Date,
         discount_curve: DiscountCurve,
-        num_coupons: int = 200,
+        horizon_years: float = 100.0,
     ) -> float:
         """Calculate the clean price of the perpetual bond from a discount curve."""
         check_curve_dt(settle_dt, discount_curve)
         dirty_price = self.dirty_price_from_discount_curve(
-            settle_dt, discount_curve, num_coupons
+            settle_dt, discount_curve, horizon_years
         )
         accrued = self.accrued_interest(settle_dt, self.par)
         return float(dirty_price - accrued)
