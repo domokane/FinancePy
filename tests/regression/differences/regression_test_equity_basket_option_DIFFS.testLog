@@ -1,0 +1,4 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_equity_basket_option 
+Row#  46  WARNING: Calculation time has changed by 84.82  percent. 
+Analysis of  regression_test_equity_basket_option  completed with  0  errors and  43  warnings. 
+NUM LINES: 49 ====> ERRORS: 0  WARNINGS: 43 

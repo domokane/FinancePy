@@ -57,8 +57,8 @@ class Black:
         if time_to_expiry < 0.0:
             raise FinError("time_to_expiry must be non-negative.")
 
-        if df <= 0.0 or df > 1.0:
-            raise FinError("df must be in (0, 1].")
+        if df <= 0.0:
+            raise FinError("df must be positive.")
 
     @staticmethod
     def _rate_from_df(df: float, time_to_expiry: float) -> float:
@@ -245,10 +245,10 @@ class Black:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VOLATILITY", self.volatility)
         s += label_to_string("IMPLEMENTATION", self.implementation_type)
-        s += label_to_string("NUMSTEPS", self.num_steps)
+        s += label_to_string("NUM STEPS", self.num_steps)
         return s
 
 

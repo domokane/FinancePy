@@ -32,7 +32,7 @@ class EquityQuantoForward:
         expiry_dt: Date,
         forward_price: float,
         notional: float,
-        long_short: LongShortTypes = LongShortTypes.LONG,
+        is_long: bool = True,
     ) -> None:
 
         check_argument_types(self.__init__, locals())
@@ -40,7 +40,7 @@ class EquityQuantoForward:
         self.expiry_dt = expiry_dt
         self.forward_price = forward_price
         self.notional = notional
-        self.long_short = long_short
+        self.is_long = is_long
 
     ###########################################################################
 
@@ -137,7 +137,7 @@ class EquityQuantoForward:
             * domestic_df
         )
 
-        if self.long_short == LongShortTypes.SHORT:
+        if self.is_long is False:
             v = -v
 
         return v
@@ -169,10 +169,10 @@ class EquityQuantoForward:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("FORWARD PRICE", self.forward_price)
-        s += label_to_string("LONG OR SHORT", self.long_short)
+        s += label_to_string("IS LONG", self.is_long)
         s += label_to_string("NOTIONAL", self.notional, "")
         return s
 

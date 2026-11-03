@@ -166,7 +166,7 @@ def prot_leg_pv_numba(
     np_ibor_values,
     np_surv_times,
     np_surv_values,
-    contract_recovery_rate,
+    recovery_rate,
     num_steps_per_year,
     prot_method,
 ):
@@ -227,7 +227,7 @@ def prot_leg_pv_numba(
             q1 = q2
             z1 = z2
 
-    prot_pv = prot_pv * (1.0 - contract_recovery_rate)
+    prot_pv = prot_pv * (1.0 - recovery_rate)
     return prot_pv
 
 

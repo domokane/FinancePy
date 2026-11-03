@@ -10,13 +10,9 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...utils.frequency import FrequencyTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.check_values import check_curve_dt
+from ...utils.check_values import check_yield
 
 from ...products.bonds.bond import YTMCalcType
-
-
-def validate_yield(ytm):
-    if ytm < -0.20 or ytm > 2.0:
-        raise FinError("YTM must be between -20% and +200%")
 
 
 ###############################################################################
@@ -76,7 +72,7 @@ class BondZero:
         if settle_dt > self.maturity_dt:
             raise FinError("Bond settles on or after maturity")
 
-        validate_yield(ytm)
+        check_yield(ytm)
 
         # year fraction from settlement to maturity
         dc = DayCount(self.curve_dc_type)
@@ -102,7 +98,7 @@ class BondZero:
     ):
         """Return BBG principal value for a given face amount."""
 
-        validate_yield(ytm)
+        check_yield(ytm)
 
         dirty_price = self.dirty_price_from_ytm(settle_dt, ytm, convention)
         accrued = self.accrued_interest(settle_dt, face)
@@ -134,6 +130,8 @@ class BondZero:
         dirty_price = clean_price + accrued
 
         annual_accretion = (self.par - dirty_price) / T
+
+        # Convention is to divide by clean price TBC
         y = annual_accretion / clean_price
 
         if y.ndim:
@@ -143,14 +141,15 @@ class BondZero:
 
     ###########################################################################
 
-    def current_yield(self, clean_price: float):
+    def zero_current_yield(self, clean_price: float):
         """
-        Calculate the current yield of the bond which is the
+        Calculate the current yield of the zero coupon bond which is the
         cpn divided by the clean price (not the full price).
         The cpn of a zero cpn bond is defined as:
         (par - issue_price) / tenor
         """
-        dc = DayCount(self.dc_type)
+        dc = DayCount(self.curve_dc_type)
+
         T, _, _ = dc.year_frac(
             self.issue_dt,
             self.maturity_dt,
@@ -239,13 +238,10 @@ class BondZero:
         if T <= 0:
             raise FinError("Invalid time to maturity")
 
-        # analytic inversion
         if T <= 1.0:
-            # simple interest convention
             dr = (1.0 - dirty_price / self.par) / T
         else:
-            # annual compounding
-            dr = (1.0 - dirty_price / self.par) ** (1.0 / T) - 1.0
+            dr = 1.0 - (dirty_price / self.par) ** (1.0 / T)
 
         return dr if dr.ndim else float(dr)
 
@@ -284,27 +280,23 @@ class BondZero:
 
     def dollar_duration(
         self,
-        settle_dt: (Date, List),
-        ytm: (float, List),
+        settle_dt: Date,
+        ytm: float,
         convention: YTMCalcType = YTMCalcType.ZERO,
     ):
-        """Calculate dollar duration from a 1bp bumped-yield DV01.
+        """Calculate the analytical dollar duration of a zero coupon bond."""
 
-        Dollar duration is the dirty-price change for a 100bp change in yield,
-        approximated as:
+        check_yield(ytm)
 
-            dollar_duration = 10000 * DV01
+        dirty_price = self.dirty_price_from_ytm(
+            settle_dt, ytm, convention
+        )
 
-        where DV01 is the positive dirty-price change for a +1bp yield shift.
-        """
+        modified_duration = self.modified_duration(
+            settle_dt, ytm, convention
+        )
 
-        validate_yield(ytm)
-
-        if settle_dt < self.issue_dt:
-            raise FinError("Settlement date falls before issue date")
-
-        dd = 10000 * self.dv01(settle_dt, ytm, convention)
-        return dd
+        return dirty_price * modified_duration
 
     ###########################################################################
 
@@ -320,7 +312,7 @@ class BondZero:
         """
 
         # Change in price for a
-        validate_yield(ytm)
+        check_yield(ytm)
 
         dy = 0.0001  # 1 bp
         p_0 = self.dirty_price_from_ytm(settle_dt, ytm, convention)
@@ -336,18 +328,26 @@ class BondZero:
         ytm: float,
         convention: YTMCalcType = YTMCalcType.ZERO,
     ):
-        """Return Macaulay duration of a zero coupon bond."""
-        validate_yield(ytm)
+        """Calculate the analytical Macaulay duration of a zero coupon bond."""
+
+        check_yield(ytm)
+
+        if convention != YTMCalcType.ZERO:
+            raise FinError("Need YTMCalcType.ZERO for zero coupon bond")
+
+        if settle_dt < self.issue_dt or settle_dt >= self.maturity_dt:
+            raise FinError("Invalid settlement date")
 
         dc = DayCount(self.curve_dc_type)
-        T, _, _ = dc.year_frac(
+
+        tau, _, _ = dc.year_frac(
             settle_dt,
             self.maturity_dt,
             self.maturity_dt,
             FrequencyTypes.ZERO,
         )
 
-        return T
+        return tau
 
     ###########################################################################
 
@@ -357,14 +357,23 @@ class BondZero:
         ytm: float,
         convention: YTMCalcType = YTMCalcType.ZERO,
     ):
-        """Calculate the modified duration of the bondon a settlement date
-        given its yield to maturity."""
-        validate_yield(ytm)
+        """Calculate the analytical modified duration of a zero coupon bond."""
 
-        dd = self.dollar_duration(settle_dt, ytm, convention)
-        fp = self.dirty_price_from_ytm(settle_dt, ytm, convention)
-        md = dd / fp
-        return md
+        check_yield(ytm)
+
+        if convention != YTMCalcType.ZERO:
+            raise FinError("Need YTMCalcType.ZERO for zero coupon bond")
+
+        tau = self.macaulay_duration(settle_dt, ytm, convention)
+
+        ytm = np.asarray(ytm)
+
+        if tau <= 1.0:
+            md = tau / (1.0 + ytm * tau)
+        else:
+            md = tau / (1.0 + ytm)
+
+        return md if md.ndim else float(md)
 
     ###########################################################################
 
@@ -377,7 +386,7 @@ class BondZero:
         """Calculate the bond convexity from the yield to maturity. This
         function is vectorised with respect to the yield input."""
 
-        validate_yield(ytm)
+        check_yield(ytm)
 
         dy = 0.0001
         p0 = self.dirty_price_from_ytm(settle_dt, ytm - dy, convention)
@@ -395,7 +404,7 @@ class BondZero:
         convention: YTMCalcType = YTMCalcType.ZERO,
     ):
         """Calculate the clean price of a zero coupon bond from its YTM."""
-        validate_yield(ytm)
+        check_yield(ytm)
 
         dirty_price = self.dirty_price_from_ytm(settle_dt, ytm, convention)
         accrued = self.accrued_interest(settle_dt, self.par)
@@ -560,12 +569,12 @@ class BondZero:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("ISSUE DATE", self.issue_dt)
-        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("COUPON (%)", 0)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("TIME DAY COUNT TYPE", self.curve_dc_type)
+        s += label_to_string("DAY COUNT", self.curve_dc_type)
         return s
 
     ###########################################################################

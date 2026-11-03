@@ -611,25 +611,25 @@ class EquityCliquetOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("START_DATE", self.start_dt)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START DATE", self.start_dt)
         s += label_to_string("FINAL EXPIRY DATE", self.final_expiry_dt)
-        s += label_to_string("OPTION_TYPE", self.opt_type)
-        s += label_to_string("FREQUENCY_TYPE", self.freq_type)
-        s += label_to_string("PAYOFF_TYPE", self.payoff_type)
-        s += label_to_string("PAYMENT_TIME_TYPE", self.payoff_timing_type)
+        s += label_to_string("OPTION TYPE", self.opt_type)
+        s += label_to_string("FREQUENCY TYPE", self.freq_type)
+        s += label_to_string("PAYOFF TYPE", self.payoff_type)
+        s += label_to_string("PAYMENT TIME TYPE", self.payoff_timing_type)
         s += label_to_string("NOTIONAL", self.notional)
         if self.local_floor is not None:
-            s += label_to_string("LOCAL_FLOOR", self.local_floor)
+            s += label_to_string("LOCAL FLOOR", self.local_floor)
         if self.local_cap is not None:
-            s += label_to_string("LOCAL_CAP", self.local_cap)
+            s += label_to_string("LOCAL CAP", self.local_cap)
         if self.global_floor is not None:
-            s += label_to_string("GLOBAL_FLOOR", self.global_floor)
+            s += label_to_string("GLOBAL FLOOR", self.global_floor)
         if self.global_cap is not None:
-            s += label_to_string("GLOBAL_CAP", self.global_cap)
-        s += label_to_string("CALENDAR_TYPE", self.cal_type)
-        s += label_to_string("BUS_DAY_ADJUST_TYPE", self.bd_type)
-        s += label_to_string("DATE_GEN_RULE_TYPE", self.dg_type, "")
+            s += label_to_string("GLOBAL CAP", self.global_cap)
+        s += label_to_string("CALENDAR TYPE", self.cal_type)
+        s += label_to_string("BUS DAY ADJUST", self.bd_type)
+        s += label_to_string("DATE GEN RULE", self.dg_type, "")
         return s
 
     ###########################################################################

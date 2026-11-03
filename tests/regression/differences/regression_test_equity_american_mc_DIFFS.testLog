@@ -1,0 +1,4 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_equity_american_mc 
+Row#  20  WARNING: Calculation time has changed by 76.11  percent. 
+Analysis of  regression_test_equity_american_mc  completed with  0  errors and  7  warnings. 
+NUM LINES: 22 ====> ERRORS: 0  WARNINGS: 7 

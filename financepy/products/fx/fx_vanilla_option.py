@@ -704,13 +704,13 @@ class FXVanillaOption:
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("DELIVERY DATE", self.delivery_dt)
         s += label_to_string("CURRENCY PAIR", self.currency_pair)
         s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
         s += label_to_string("PREMIUM CCY", self.prem_currency)
-        s += label_to_string("OPTION_TYPE", self.opt_type)
+        s += label_to_string("OPTION TYPE", self.opt_type)
         s += label_to_string("NOTIONAL", self.notional, "")
         return s
 

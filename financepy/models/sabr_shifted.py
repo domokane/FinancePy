@@ -263,10 +263,10 @@ class SABRShifted:
     def __repr__(self) -> str:
         """Return string with class details."""
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("Alpha", self._alpha)
-        s += label_to_string("Beta", self._beta)
-        s += label_to_string("Nu", self._nu)
-        s += label_to_string("Rho", self._rho)
-        s += label_to_string("Shift", self._shift)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("ALPHA", self._alpha)
+        s += label_to_string("BETA", self._beta)
+        s += label_to_string("NU", self._nu)
+        s += label_to_string("RHO", self._rho)
+        s += label_to_string("SHIFT", self._shift)
         return s

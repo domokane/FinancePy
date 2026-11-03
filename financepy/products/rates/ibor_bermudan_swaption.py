@@ -210,9 +210,9 @@ class IborBermudanSwaption:
     ######################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXERCISE DATE", self.exercise_dt)
-        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("SWAP FIXED LEG TYPE", self.fixed_leg_type)
         s += label_to_string("EXERCISE TYPE", self.exercise_type)
         s += label_to_string("FIXED COUPON", self.fixed_cpn)

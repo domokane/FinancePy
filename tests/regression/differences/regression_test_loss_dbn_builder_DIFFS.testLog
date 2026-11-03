@@ -1,0 +1,4 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_loss_dbn_builder 
+Row#  2  WARNING: Calculation time has changed by -95.15  percent. 
+Analysis of  regression_test_loss_dbn_builder  completed with  0  errors and  19  warnings. 
+NUM LINES: 22 ====> ERRORS: 0  WARNINGS: 19 

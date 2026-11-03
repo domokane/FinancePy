@@ -938,7 +938,7 @@ class IborSingleCurve(DiscountCurve):
     def __repr__(self):
         """Print out the details of the Ibor curve."""
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUATION DATE", self.anchor_dt)
 
         s += label_to_string("INTERP TYPE", self._interp_type)

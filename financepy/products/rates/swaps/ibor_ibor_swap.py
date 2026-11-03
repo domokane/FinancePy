@@ -223,7 +223,7 @@ class IborIborSwap:
         prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
 
-        for next_dt in self._adjusted_float_dts[start_index + 1 :]:
+        for next_dt in self._adjusted_float_dts[start_index + 1:]:
             alpha = basis.year_frac(prev_dt, next_dt)[0]
             df2_index = index_curve.df(next_dt)
             # The accrual factors cancel
@@ -303,10 +303,10 @@ class IborIborSwap:
     ##########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("START_DATE", self.effective_dt)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("START DATE", self.effective_dt)
         s += label_to_string("TERMINATION DATE", self.termination_dt)
-        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("SWAP FIXED LEG TYPE", self.fixed_leg_swap_type)
         s += label_to_string("FIXED COUPON", self.fixed_cpn)

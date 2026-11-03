@@ -1,0 +1,7 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_equity_american_option 
+Row#  17  WARNING: Calculation time has changed by 113.16  percent. 
+Row#  18  WARNING: Calculation time has changed by 123.71  percent. 
+Row#  27  WARNING: Calculation time has changed by -50.96  percent. 
+Row#  32  WARNING: Calculation time has changed by 51.29  percent. 
+Analysis of  regression_test_equity_american_option  completed with  0  errors and  39  warnings. 
+NUM LINES: 62 ====> ERRORS: 0  WARNINGS: 39 

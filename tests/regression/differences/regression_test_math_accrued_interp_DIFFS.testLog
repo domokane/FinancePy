@@ -1,0 +1,4 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_math_accrued_interp 
+ERROR: Mismatch in headers. Rerun! 
+Analysis of  regression_test_math_accrued_interp  completed with  0  errors and  0  warnings. 
+NUM LINES: 3 ====> ERRORS: 0  WARNINGS: 0 

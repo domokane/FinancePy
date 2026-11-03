@@ -1,0 +1,9 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_equity_rainbow_option 
+Row#  28  WARNING: Calculation time has changed by 110.12  percent. 
+Row#  46  WARNING: Calculation time has changed by 53.60  percent. 
+Row#  47  WARNING: Calculation time has changed by 51.87  percent. 
+Row#  48  WARNING: Calculation time has changed by 57.08  percent. 
+Row#  49  WARNING: Calculation time has changed by 50.91  percent. 
+Row#  119  WARNING: Calculation time has changed by 73.53  percent. 
+Analysis of  regression_test_equity_rainbow_option  completed with  0  errors and  96  warnings. 
+NUM LINES: 129 ====> ERRORS: 0  WARNINGS: 96 

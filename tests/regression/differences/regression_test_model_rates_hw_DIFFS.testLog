@@ -1,0 +1,16 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_model_rates_hw 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+Analysis of  regression_test_model_rates_hw  completed with  0  errors and  4  warnings. 
+NUM LINES: 23 ====> ERRORS: 0  WARNINGS: 4 

@@ -161,7 +161,7 @@ class IborSwap:
         value_dt: Date,
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve = None,
-        first_fixing_rate: float=None,
+        first_fixing_rate: float = None,
         pv_only=True,
     ):
         """Value the interest rate swap on a value date given a single Ibor
@@ -199,7 +199,7 @@ class IborSwap:
         value_dt: Date,
         discount_curve: DiscountCurve,
         index_curve: DiscountCurve = None,
-        first_fixing_rate: float=None,
+        first_fixing_rate: float = None,
     ):
         """
         A long-hand method that returns various details relevant to valuation in
@@ -449,7 +449,7 @@ class IborSwap:
 
     def __repr__(self):
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += self.fixed_leg.__repr__()
         s += "\n"
         s += self.float_leg.__repr__()

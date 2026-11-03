@@ -1386,7 +1386,7 @@ class FXVolSurface:
     ###########################################################################
 
     def __repr__(self) -> str:
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("VALUE DATE", self.anchor_dt)
         s += label_to_string("FX RATE", self.spot_fx_rate)
         s += label_to_string("CCY PAIR", self.currency_pair)

@@ -98,10 +98,10 @@ class EquityAmericanOption(EquityOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE PRICE", self.strike_price)
-        s += label_to_string("OPTION_TYPE", self.opt_type)
+        s += label_to_string("OPTION TYPE", self.opt_type)
         s += label_to_string("NUMBER", self.num_options, "")
         return s
 

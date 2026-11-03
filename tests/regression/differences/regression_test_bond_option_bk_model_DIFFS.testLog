@@ -1,0 +1,5 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_bond_option_bk_model 
+Row#  52  WARNING: Calculation time has changed by -84.09  percent. 
+Row#  55  WARNING: Calculation time has changed by -54.20  percent. 
+Analysis of  regression_test_bond_option_bk_model  completed with  0  errors and  4  warnings. 
+NUM LINES: 61 ====> ERRORS: 0  WARNINGS: 4 

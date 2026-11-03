@@ -381,13 +381,13 @@ class IborSwaption:
     def __repr__(self):
         """Function to allow us to print the swaption details."""
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("SETTLEMENT DATE", self.settle_dt)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("SETTLE DATE", self.settle_dt)
         s += label_to_string("EXERCISE DATE", self.exercise_dt)
         s += label_to_string("SWAP FIXED LEG TYPE", str(self.fixed_leg_type))
         s += label_to_string("SWAP MATURITY DATE", self.maturity_dt)
         s += label_to_string("SWAP NOTIONAL", self.notional)
-        s += label_to_string("FIXED cpn", self.fixed_cpn * 100)
+        s += label_to_string("FIXED COUPON", self.fixed_cpn * 100)
         s += label_to_string("FIXED FREQUENCY", str(self.fixed_freq_type))
         s += label_to_string("FIXED DAY COUNT", str(self.fixed_dc_type))
         s += label_to_string("FLOAT FREQUENCY", str(self.float_freq_type))

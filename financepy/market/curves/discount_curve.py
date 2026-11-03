@@ -827,7 +827,7 @@ class DiscountCurve:
     def __repr__(self):
 
         # Hardcode this as we want this not parent class
-        s = label_to_string("OBJECT_TYPE", "DiscountCurve")
+        s = label_to_string("OBJECT TYPE", "DiscountCurve")
         s += label_to_string("VALUE DATE", (self.anchor_dt.str()))
 
         s += "    DATES      TIMES(YRS) DISC FACTORS\n"

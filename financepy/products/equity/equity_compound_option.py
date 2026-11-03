@@ -196,13 +196,13 @@ class EquityCompoundOption(EquityOption):
     ####################################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("CPD EXPIRY DATE", self.c_expiry_dt)
         s += label_to_string("CPD STRIKE PRICE", self.c_strike_price)
-        s += label_to_string("CPD OPTION_TYPE", self.c_opt_type)
+        s += label_to_string("CPD OPTION TYPE", self.c_opt_type)
         s += label_to_string("UND EXPIRY DATE", self.u_expiry_dt)
         s += label_to_string("UND STRIKE PRICE", self.u_strike_price)
-        s += label_to_string("UND OPTION_TYPE", self.u_opt_type)
+        s += label_to_string("UND OPTION TYPE", self.u_opt_type)
         return s
 
     ####################################################################################

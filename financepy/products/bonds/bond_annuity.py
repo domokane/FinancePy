@@ -123,7 +123,7 @@ class BondAnnuity:
         prev_dt = self._pcd
 
         for next_dt in self.cpn_dts[1:]:
-            alpha = dc_counter.year_frac(prev_dt, next_dt)[0]
+            alpha = dc_counter.year_frac(prev_dt, next_dt, next_dt, self.freq_type)[0]
             flow = self.cpn * alpha * face
             self.flow_amounts.append(flow)
             prev_dt = next_dt
@@ -143,7 +143,7 @@ class BondAnnuity:
         dc_counter = DayCount(self.accrual_dc_type)
 
         acc_factor, num, _ = dc_counter.year_frac(
-            self._pcd, settle_dt, self._ncd, self.freq
+            self._pcd, settle_dt, self._ncd, self.freq_type
         )
 
         self.alpha = 1.0 - acc_factor * self.freq
@@ -172,13 +172,13 @@ class BondAnnuity:
         """Print a list of the unadjusted coupon payment dates used in
         analytic calculations for the bond."""
 
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
-        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("FREQUENCY", self.freq_type)
-        s += label_to_string("DC_TYPE", self.accrual_dc_type)
+        s += label_to_string("DC TYPE", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS_DAY_ADJUST", self.bd_type)
-        s += label_to_string("DATE_GEN_RULE", self.dg_type)
+        s += label_to_string("BUS DAY ADJUST", self.bd_type)
+        s += label_to_string("DATE GEN RULE", self.dg_type)
 
         return s
 

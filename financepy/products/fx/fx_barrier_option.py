@@ -161,7 +161,7 @@ class FXBarrierOption(FXOption):
     ###########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("EXPIRY DATE", self.expiry_dt)
         s += label_to_string("STRIKE FX RATE", self.strike_fx_rate)
         s += label_to_string("CURRENCY PAIR", self.currency_pair)

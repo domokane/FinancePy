@@ -115,8 +115,8 @@ class OISBasisSwap:
         discount_curve: DiscountCurve,
         index_ibor_curve: DiscountCurve = None,
         index_ois_curve: DiscountCurve = None,
-        first_fixing_rate_leg_1: float=None,
-        first_fixing_rate_leg_2: float=None,
+        first_fixing_rate_leg_1: float = None,
+        first_fixing_rate_leg_2: float = None,
     ):
         """Value the interest rate swap on a value date given a single Ibor
         discount curve and an index curve for the Ibors on each swap leg."""
@@ -154,7 +154,7 @@ class OISBasisSwap:
     ##########################################################################
 
     def __repr__(self):
-        s = label_to_string("OBJECT_TYPE", type(self).__name__)
+        s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += self.float_ibor_leg.__repr__()
         s += "\n"
         s += self.float_ois_leg.__repr__()

@@ -7,7 +7,7 @@ from financepy.models.bk_tree import BKTree
 from financepy.models.hw_tree import HWTree
 from financepy.utils.error import FinError
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
-from . import test_FinIborSwaption as fixture
+from . import test_ibor_swaption as fixture
 
 
 def make_option():
