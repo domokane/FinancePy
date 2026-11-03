@@ -1,0 +1,7 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_date 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+ERROR: Mismatch in headers. Rerun! 
+Row#  539  WARNING: Calculation time has changed by 53.05  percent. 
+Analysis of  regression_test_date  completed with  0  errors and  1  warnings. 
+NUM LINES: 561 ====> ERRORS: 0  WARNINGS: 1 

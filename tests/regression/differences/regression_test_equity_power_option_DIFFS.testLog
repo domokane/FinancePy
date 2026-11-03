@@ -1,0 +1,11 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_equity_power_option 
+Row#  3  WARNING: Calculation time has changed by 61.64  percent. 
+Row#  4  WARNING: Calculation time has changed by 59.82  percent. 
+Row#  8  WARNING: Calculation time has changed by 77.13  percent. 
+Row#  9  WARNING: Calculation time has changed by 63.31  percent. 
+Row#  11  WARNING: Calculation time has changed by 51.08  percent. 
+Row#  12  WARNING: Calculation time has changed by 67.22  percent. 
+Row#  13  WARNING: Calculation time has changed by 67.67  percent. 
+Row#  14  WARNING: Calculation time has changed by 80.72  percent. 
+Analysis of  regression_test_equity_power_option  completed with  0  errors and  11  warnings. 
+NUM LINES: 20 ====> ERRORS: 0  WARNINGS: 11 

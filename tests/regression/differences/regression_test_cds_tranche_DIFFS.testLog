@@ -1,0 +1,9 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_cds_tranche 
+Row#  34  WARNING: Calculation time has changed by 101.47  percent. 
+Row#  35  WARNING: Calculation time has changed by 79.81  percent. 
+Row#  36  WARNING: Calculation time has changed by 71.62  percent. 
+Row#  37  WARNING: Calculation time has changed by 85.84  percent. 
+Row#  38  WARNING: Calculation time has changed by 92.97  percent. 
+Row#  39  WARNING: Calculation time has changed by 86.98  percent. 
+Analysis of  regression_test_cds_tranche  completed with  0  errors and  56  warnings. 
+NUM LINES: 76 ====> ERRORS: 0  WARNINGS: 56 
