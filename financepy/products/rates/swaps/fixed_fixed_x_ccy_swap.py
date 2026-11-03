@@ -135,9 +135,8 @@ class FixedFixedXCcySwap:
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
 
-        fixed_leg_value = self.fixed_leg_value(value_dt, discount_curve, principal)
-
         float_leg_value = self.float_leg_value(value_dt, discount_curve, index_curve, first_fixing_rate, principal)
+        fixed_leg_value = self.fixed_leg_value(value_dt, discount_curve, principal)
 
         value = fixed_leg_value - float_leg_value
 
