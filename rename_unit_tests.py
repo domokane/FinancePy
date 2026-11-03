@@ -5,10 +5,11 @@ import sys
 import uuid
 from pathlib import Path
 
-TEST_DIR = Path(__file__).resolve().parent / "tests" / "unit"
+TEST_DIR = Path(__file__).resolve().parent / "tests" / "regression"
 
 
 def to_snake_case(name):
+
     # Remove Fin prefix, but only when followed by an uppercase letter.
     name = re.sub(r"^Fin(?=[A-Z])", "", name)
 
@@ -22,11 +23,11 @@ def to_snake_case(name):
 
 
 def new_filename(filename):
-    if not filename.startswith("test_") or not filename.endswith(".py"):
+    if not filename.startswith("Test") or not filename.endswith(".py"):
         return filename
 
-    body = filename[5:-3]
-    return "test_" + to_snake_case(body) + ".py"
+    body = filename[4:-3]
+    return "regression_test_" + to_snake_case(body) + ".py"
 
 
 def main():
@@ -36,7 +37,7 @@ def main():
         raise SystemExit(f"Directory not found: {TEST_DIR}")
 
     changes = []
-    for path in sorted(TEST_DIR.glob("test_*.py")):
+    for path in sorted(TEST_DIR.glob("Test*.py")):
         target = path.with_name(new_filename(path.name))
         if path.name != target.name:
             changes.append((path, target))
