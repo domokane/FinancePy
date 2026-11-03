@@ -289,23 +289,24 @@ financepy.models.gauss_copula
 <h1>Functions</h1>
 <div class="member">
 
-<h3>default_times_gc</h3>
+<h3>gauss_default_times</h3>
 
 <div class="signature">
 
 <code>
-default_times_gc(
+gauss_default_times(
     issuer_curves: Sequence[Any],
     corr_matrix: numpy.ndarray,
     num_trials: int,
     seed: int,
-) -&gt; numpy.ndarray
+    use_moment_matching: bool = True,
+    use_sobol: bool = False,
+)
 </code>
 
 </div>
 
-<div class="docstring">Generate a matrix of default times by credit and trial using a
-Gaussian copula model using a full rank correlation matrix.</div>
+<p><em>No description available.</em></p>
 
 </div>
 

@@ -388,13 +388,13 @@ accretion_yield(
 
 <div class="member">
 
-<h4>current_yield</h4>
+<h4>zero_current_yield</h4>
 
 
 <div class="signature">
 
 <code>
-current_yield(
+zero_current_yield(
     self,
     clean_price: float,
 )
@@ -403,7 +403,7 @@ current_yield(
 </div>
 
 
-<div class="docstring">Calculate the current yield of the bond which is the
+<div class="docstring">Calculate the current yield of the zero coupon bond which is the
 cpn divided by the clean price (not the full price).
 The cpn of a zero cpn bond is defined as:
 (par - issue_price) / tenor</div>
@@ -492,8 +492,8 @@ Convention:
 <code>
 dollar_duration(
     self,
-    settle_dt: (&lt;class &#x27;financepy.utils.date.Date&#x27;&gt;, typing.List),
-    ytm: (&lt;class &#x27;float&#x27;&gt;, typing.List),
+    settle_dt: Date,
+    ytm: float,
     convention: YTMCalcType = &lt;YTMCalcType.ZERO: 0&gt;,
 )
 </code>
@@ -501,14 +501,7 @@ dollar_duration(
 </div>
 
 
-<div class="docstring">Calculate dollar duration from a 1bp bumped-yield DV01.
-
-Dollar duration is the dirty-price change for a 100bp change in yield,
-approximated as:
-
-    dollar_duration = 10000 * DV01
-
-where DV01 is the positive dirty-price change for a +1bp yield shift.</div>
+<div class="docstring">Calculate the analytical dollar duration of a zero coupon bond.</div>
 
 </div>
 
@@ -555,7 +548,7 @@ macaulay_duration(
 </div>
 
 
-<div class="docstring">Return Macaulay duration of a zero coupon bond.</div>
+<div class="docstring">Calculate the analytical Macaulay duration of a zero coupon bond.</div>
 
 </div>
 
@@ -578,8 +571,7 @@ modified_duration(
 </div>
 
 
-<div class="docstring">Calculate the modified duration of the bondon a settlement date
-given its yield to maturity.</div>
+<div class="docstring">Calculate the analytical modified duration of a zero coupon bond.</div>
 
 </div>
 
@@ -796,24 +788,6 @@ calc_ror(
 
 
 </section>
-<h1>Functions</h1>
-<div class="member">
-
-<h3>validate_yield</h3>
-
-<div class="signature">
-
-<code>
-validate_yield(
-    ytm,
-)
-</code>
-
-</div>
-
-<p><em>No description available.</em></p>
-
-</div>
 
 <div class="generated">
 

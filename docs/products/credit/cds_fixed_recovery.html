@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<title>cds fixed recovery - FinancePy</title>
+
+
+<style>
+
+:root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --text: #172033;
+    --muted: #667085;
+    --border: #e3e8ef;
+    --primary: #3157a4;
+    --primary-dark: #243f78;
+    --primary-soft: #eef3ff;
+    --accent: #0f766e;
+    --code-bg: #f4f7fb;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.05);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+}
+
+header {
+    background: linear-gradient(135deg, #172554 0%, #274690 100%);
+    color: white;
+    padding: 26px max(32px, calc((100vw - 1180px) / 2));
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+}
+
+header p {
+    margin: 5px 0 0;
+    color: #dbe5ff;
+    font-size: 14px;
+}
+
+main {
+    max-width: 1180px;
+    margin: 28px auto 56px;
+    padding: 38px 48px 72px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+nav {
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 14px;
+}
+
+nav a, a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover { text-decoration: underline; }
+
+h1, h2, h3, h4 {
+    color: var(--text);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+}
+
+main > h1 {
+    margin: 0 0 14px;
+    font-size: 30px;
+}
+
+main > h1:not(:first-of-type) {
+    margin-top: 64px;
+    padding: 12px 0 10px;
+    color: var(--primary-dark);
+    font-size: 23px;
+    border-bottom: 2px solid #d9e3f7;
+}
+
+h2 {
+    margin: 38px 0 14px;
+    padding-bottom: 8px;
+    font-size: 21px;
+    border-bottom: 1px solid var(--border);
+}
+
+h3 {
+    margin: 28px 0 12px;
+    font-size: 17px;
+    color: var(--primary-dark);
+}
+
+h4 {
+    margin: 28px 0 9px;
+    font-size: 16px;
+}
+
+code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: .94em;
+}
+
+pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    line-height: 1.5;
+}
+
+.signature {
+    background: var(--code-bg);
+    border: 1px solid #dce4f0;
+    border-left: 4px solid var(--primary);
+    border-radius: 7px;
+    padding: 14px 16px;
+    margin: 10px 0 18px;
+    overflow-x: auto;
+    color: #24324a;
+}
+
+.signature code {
+    white-space: pre;
+    font-size: 13.5px;
+}
+
+.docstring {
+    white-space: pre-wrap;
+    line-height: 1.68;
+    color: #344054;
+    max-width: 92ch;
+}
+
+.member {
+    margin: 0 0 26px;
+    padding: 2px 0 22px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.member:last-child { border-bottom: 0; }
+
+.inheritance {
+    display: inline-block;
+    color: var(--muted);
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin: 0 0 16px;
+    font-size: 13px;
+}
+
+.source-name {
+    display: inline-block;
+    margin: 0 0 24px;
+    padding: 5px 9px;
+    color: #475467;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: "SFMono-Regular", Consolas, "Courier New", monospace;
+    font-size: 12.5px;
+}
+
+.enum-members {
+    display: grid;
+    gap: 7px;
+    margin: 12px 0 26px;
+}
+
+.enum-members > div {
+    padding: 8px 11px;
+    background: var(--surface-soft);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.enum-members code:first-child {
+    color: var(--primary-dark);
+    font-weight: 650;
+}
+
+.package-list,
+.module-list { line-height: 1.9; }
+
+.module-list ul {
+    columns: 2;
+    column-gap: 32px;
+    padding-left: 22px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 17px 18px;
+    background: var(--surface);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .03);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+
+.card:hover {
+    transform: translateY(-1px);
+    border-color: #cbd7eb;
+    box-shadow: 0 5px 16px rgba(16, 24, 40, .06);
+}
+
+.card h3 { margin: 0 0 6px; }
+.card p { margin: 0; color: var(--muted); font-size: 13px; }
+
+.generated {
+    margin-top: 64px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    color: #98a2b3;
+    font-size: 12.5px;
+}
+
+@media (max-width: 760px) {
+    header { padding: 22px 20px; }
+    main {
+        margin: 0;
+        padding: 28px 20px 56px;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .module-list ul { columns: 1; }
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<header>
+
+<h1>FinancePy</h1>
+
+<p>FinancePy API Reference</p>
+
+</header>
+
+<main>
+<nav><a href="../../index.html">FinancePy</a> &rsaquo; <a href="../index.html">products</a> &rsaquo; <a href="index.html">credit</a> &rsaquo; cds fixed recovery</nav>
+<h1>cds fixed recovery</h1>
+
+<p class="source-name">
+financepy.products.credit.cds_fixed_recovery
+</p>
+<h1>Class</h1>
+<section>
+
+<h2>CDSFixedRecovery</h2>
+
+
+<div class="signature">
+
+<code>CDSFixedRecovery(
+    step_in_dt: Date,
+    maturity_dt_or_tenor: Date | str,
+    running_cpn: float,
+    fixed_recovery: float,
+    notional: float = 1000000,
+    long_protect: bool = True,
+    freq_type: FrequencyTypes = &lt;FrequencyTypes.QUARTERLY: 4&gt;,
+    accrual_dc_type: DayCountTypes = &lt;DayCountTypes.ACT_360: 8&gt;,
+    cal_type: CalendarTypes | list | tuple = &lt;CalendarTypes.WEEKEND: 2&gt;,
+    bd_type: BusDayAdjustTypes = &lt;BusDayAdjustTypes.FOLLOWING: 2&gt;,
+    dg_type: DateGenRuleTypes = &lt;DateGenRuleTypes.BACKWARD: 2&gt;,
+)</code>
+
+</div>
+
+
+<div class="inheritance">Inherits from: CDS</div>
+
+<div class="docstring">Fixed-recovery credit default swap.</div>
+
+<h3>Methods</h3>
+<div class="member">
+
+<h4>prot_leg_pv</h4>
+
+
+<div class="signature">
+
+<code>
+prot_leg_pv(
+    self,
+    value_dt: Date,
+    issuer_curve: CDSCurve,
+    recovery_rate: float = None,
+    num_steps_per_year: int = 25,
+    prot_method = 0,
+)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>value</h4>
+
+
+<div class="signature">
+
+<code>
+value(
+    self,
+    value_dt: Date,
+    issuer_curve: CDSCurve,
+    recovery_rate: float = None,
+    pv01_method = 0,
+    prot_method = 0,
+    num_steps_per_year: int = 25,
+)
+</code>
+
+</div>
+
+
+<p><em>No description available.</em></p>
+
+</div>
+
+<div class="member">
+
+<h4>recovery_dv01</h4>
+
+
+<div class="signature">
+
+<code>
+recovery_dv01(
+    self,
+    value_dt: Date,
+    issuer_curve: CDSCurve,
+    pv01_method: int = 0,
+    prot_method: int = 0,
+    num_steps_per_year: int = 25,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">PV change for a 1% increase in the issuer curve recovery assumption.
+
+The contractual fixed recovery, market CDS quotes, and discount
+curve are held unchanged.
+
+Returns:
+    PV(curve recovery + 0.01, fixed recovery)
+    - PV(curve recovery, fixed recovery)</div>
+
+</div>
+
+<div class="member">
+
+<h4>value_fast_approx</h4>
+
+
+<div class="signature">
+
+<code>
+value_fast_approx(
+    self,
+    value_dt: Date,
+    flat_cont_interest_rate: float,
+    flat_cds_curve_spread,
+    curve_recovery: float = 0.4,
+    bump_size: float = 0.0001,
+    recovery_bump_size: float = 0.01,
+)
+</code>
+
+</div>
+
+
+<div class="docstring">Fast approximate CDS valuation using flat hazard and discount curves.
+
+The hazard rate is implied from the flat CDS spread via the credit
+triangle ``h = spread / (1 - curve_recovery)`` and both survival
+and discounting are treated as flat exponentials. The premium leg
+ignores the actual coupon schedule; accrual-on-default is captured
+only heuristically through the 365/360 clean-RPV01 adjustment. All
+PVs are in currency units of the contract notional.
+
+Args:
+    value_dt: Valuation date (a ``Date``). Scalar only.
+    flat_cont_interest_rate: Flat continuously compounded discount
+        rate. Scalar or array-like.
+    flat_cds_curve_spread: Flat CDS par spread (decimal, e.g. 0.01
+        for 100 bp). Must be non-negative. Scalar or array-like.
+    curve_recovery: Recovery rate used to imply the hazard rate
+        from the spread. Must lie in ``[0, 1)``. Scalar or
+        array-like.
+    contract_recovery_rate: Contractual recovery rate used on the
+        protection leg. Must lie in ``[0, 1]``. Scalar or
+        array-like.
+    bump_size: Absolute bump applied to the spread and to the
+        interest rate for the finite-difference sensitivities.
+        Scalar or array-like, strictly positive.
+    recovery_bump_size: Absolute bump applied to the contractual
+        recovery rate for the recovery sensitivity. Scalar or
+        array-like, strictly positive.
+
+Returns:
+    A tuple ``(full_pv, clean_pv, spread_dv01, ir_dv01, recovery01)``:
+        full_pv: Clean PV plus accrued interest.
+        clean_pv: PV excluding accrued interest.
+        credit01: PV change for a 1 bp increase in the CDS spread.
+        ir01: PV change for a 1 bp increase in the interest rate.
+        recovery01: PV change for a 1 percentage-point increase in
+            the contractual recovery.
+
+    Elements are floats if every input was scalar, otherwise ndarrays
+    with the broadcast shape of the inputs. The sensitivities are
+    one-sided (upward) finite differences, rescaled to the stated
+    units whatever bump sizes are supplied. Recovery01 bumps the
+    recovery assumption everywhere it enters: the hazard rate is
+    re-implied from the unchanged quoted spread under the bumped
+    curve recovery, and the contractual loss uses the bumped
+    contract recovery. It is therefore small and vanishes for an
+    at-market contract.
+
+Raises:
+    FinError: If any input is invalid, the inputs cannot be
+        broadcast together, or the contract has matured.</div>
+
+</div>
+
+
+</section>
+
+<div class="generated">
+
+Generated automatically from the FinancePy source code.
+Do not edit this file manually.
+
+</div>
+
+</main>
+
+</body>
+
+</html>

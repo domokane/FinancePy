@@ -583,6 +583,25 @@ volatility_smile(
 
 
 </section>
+<h1>Functions</h1>
+<div class="member">
+
+<h3>integrate_heston_prob</h3>
+
+<div class="signature">
+
+<code>
+integrate_heston_prob(
+    integrand,
+) -&gt; float
+</code>
+
+</div>
+
+<div class="docstring">Integrate a Heston P1 or P2 integrand over u in (0, inf) using the variable
+s = log(u), so that integrand(u) du = integrand(u) u ds. Returns the integral.</div>
+
+</div>
 
 <div class="generated">
 

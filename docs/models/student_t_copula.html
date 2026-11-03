@@ -286,51 +286,30 @@ pre {
 <p class="source-name">
 financepy.models.student_t_copula
 </p>
-<h1>Class</h1>
-<section>
-
-<h2>StudentTCopula</h2>
-
-
-<div class="signature">
-
-<code>StudentTCopula()</code>
-
-</div>
-
-
-
-
-<p><em>No description available.</em></p>
-
-<h3>Methods</h3>
+<h1>Functions</h1>
 <div class="member">
 
-<h4>default_times</h4>
-
+<h3>student_t_default_times</h3>
 
 <div class="signature">
 
 <code>
-default_times(
-    self,
+student_t_default_times(
     issuer_curves: Sequence[Any],
     corr_matrix: numpy.ndarray,
     degrees_of_freedom: float,
     num_trials: int,
     seed: int,
-) -&gt; numpy.ndarray
+    use_moment_matching: bool = True,
+    use_sobol: bool = False,
+)
 </code>
 
 </div>
 
-
 <p><em>No description available.</em></p>
 
 </div>
-
-
-</section>
 
 <div class="generated">
 
