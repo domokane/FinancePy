@@ -148,3 +148,5 @@ def test_market_calibration_is_invariant_to_monetary_units():
     assert calibrated[1][0] == pytest.approx(calibrated[0][0], rel=1.0e-10)
     assert calibrated[1][1] == pytest.approx(equity_volatility, rel=1.0e-9)
     assert calibrated[0][1] == pytest.approx(equity_volatility, rel=1.0e-9)
+
+
