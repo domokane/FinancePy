@@ -123,3 +123,38 @@ def _create_test_swap(value_dt):
 
 if __name__ == "__main__":
     test_zero_bump_has_no_effect_on_base_ibor_single_curve()
+
+
+########################################################################################
+
+
+def test_composite_df_t_returns_float_for_scalar_and_array_for_array():
+    """df_t must have the same return types as the other discount curves"""
+    import numpy as np
+
+    value_dt = Date(6, 10, 2022)
+    base_curve = FlatDiscountCurve(value_dt, 0.03)
+    shock_curve = FlatDiscountCurve(value_dt, 0.01)
+    composite_curve = CompositeDiscountCurve([base_curve, shock_curve])
+
+    df_scalar = composite_curve.df_t(1.0)
+    assert isinstance(df_scalar, float)
+    assert abs(df_scalar - base_curve.df_t(1.0) * shock_curve.df_t(1.0)) < 1e-14
+
+    df_scalar_int = composite_curve.df_t(2)
+    assert isinstance(df_scalar_int, float)
+
+    times = np.array([0.5, 1.0, 2.0])
+    df_array = composite_curve.df_t(times)
+    assert isinstance(df_array, np.ndarray)
+    assert df_array.shape == times.shape
+    assert np.allclose(df_array, base_curve.df_t(times) * shock_curve.df_t(times))
+
+    df_list = composite_curve.df_t([0.5, 1.0])
+    assert isinstance(df_list, np.ndarray)
+    assert df_list.shape == (2,)
+
+    # the date interface is unchanged
+    df_dt = composite_curve.df(value_dt.add_years(1))
+    assert isinstance(df_dt, float)
+    assert abs(df_dt - df_scalar) < 1e-12
