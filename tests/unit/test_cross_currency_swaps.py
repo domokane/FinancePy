@@ -8,6 +8,8 @@ from financepy.market.curves.interpolator import InterpTypes
 from financepy.products.rates.swaps.fixed_fixed_cross_ccy import FixedFixedCrossCurrencySwap
 from financepy.products.rates.swaps.fixed_fixed_x_ccy_swap import FixedFixedXCcySwap
 from financepy.products.rates.swaps.fixed_float_cross_ccy_swap import FixedFloatCrossCurrencySwap
+from financepy.products.rates.swaps.ibor_ibor_x_ccy_swap import IborIborXCcySwap
+from financepy.products.rates.ibor_swap import IborSwap
 from financepy.utils.calendar import CalendarTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
@@ -19,6 +21,7 @@ SWAP_TYPES = (
     FixedFloatCrossCurrencySwap,
     FixedFixedXCcySwap,
     FixedFixedCrossCurrencySwap,
+    IborIborXCcySwap,
 )
 
 
@@ -83,3 +86,25 @@ def test_cross_currency_swap_value_is_stable_and_changes_sign_with_leg_direction
 
     assert repeated_value == pytest.approx(receive_value)
     assert pay_value == pytest.approx(-receive_value)
+
+
+@pytest.mark.parametrize("swap_type", SWAP_TYPES)
+def test_cross_currency_swap_matches_ibor_swap_on_a_single_curve(swap_type):
+    value_dt = Date(1, 1, 2024)
+    curve = _build_curve(value_dt)
+    common_args = dict(
+        effective_dt=value_dt,
+        term_dt_or_tenor="18M",
+        fixed_leg_type=SwapTypes.PAY,
+        fixed_cpn=0.02,
+        fixed_freq_type=FrequencyTypes.SEMI_ANNUAL,
+        fixed_dc_type=DayCountTypes.ACT_360,
+        float_freq_type=FrequencyTypes.QUARTERLY,
+        float_dc_type=DayCountTypes.ACT_360,
+        cal_type=CalendarTypes.WEEKEND,
+    )
+    swap = swap_type(**common_args)
+    reference = IborSwap(**common_args)
+
+    assert swap.value(value_dt, curve, curve) == pytest.approx(reference.value(value_dt, curve, curve), rel=1e-10)
+    assert swap.swap_rate(value_dt, curve) == pytest.approx(reference.swap_rate(value_dt, curve), rel=1e-10)

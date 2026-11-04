@@ -9,10 +9,11 @@ from ....utils import Date
 from ....utils import DayCount, DayCountTypes
 from ....utils import FrequencyTypes
 from ....utils import CalendarTypes, DateGenRuleTypes
-from ....utils import BusDayAdjustTypes
+from ....utils import Calendar, BusDayAdjustTypes
 from ....utils import Schedule
 from ....utils import label_to_string, check_argument_types
 from ....utils import ONE_MILLION
+from ....utils import SwapTypes
 
 ##########################################################################
 
@@ -58,7 +59,7 @@ class FloatFloatCrossCurrencySwap:
         else:
             self._termination_dt = effective_dt.add_tenor(term_dt_or_tenor)
 
-        calendar = CalendarTypes(cal_type)
+        calendar = Calendar(cal_type)
         self.maturity_dt = calendar.adjust(self._termination_dt, bd_type)
 
         if effective_dt > self.maturity_dt:
@@ -81,20 +82,8 @@ class FloatFloatCrossCurrencySwap:
         self._pay_float_dts = self._generate_float_leg_dts(self._pay_freq_type)
         self._rec_float_dts = self._generate_float_leg_dts(self._rec_freq_type)
 
-        self._float_year_fracs = []
-        self._float_flows = []
-        self._float_rates = []
-        self._float_dfs = []
-        self._float_flow_pvs = []
-        self._float_total_pv = []
-
-        self._pay_float_year_fracs = []
-        self._rec_float_year_fracs = []
-
-        self._pay_float_flow_pvs = []
-        self._rec_float_flow_pvs = []
-
-        self._first_fixing_rate = None
+        self._pay_leg = None
+        self._rec_leg = None
 
         self.value_dt = None
 
@@ -127,22 +116,31 @@ class FloatFloatCrossCurrencySwap:
         rec_first_fixing_rate=None,
         principal=0.0,
     ):
-        """Value the LIBOR basis swap on a value date given a single Ibor
-        discount curve and each of the index discount for the two floating legs
-        of the swap."""
+        """Value the basis swap on a value date given a discount curve and an
+        index curve for each of the two floating legs. The basis swap spread
+        is added to the floating rate on the received leg. The value is the
+        PV of the received leg less the PV of the paid leg."""
 
-        pay_float_leg_value = self.float_leg_value(
+        self.value_dt = value_dt
+
+        pay_float_leg_value, self._pay_leg = self._float_leg_value(
             value_dt,
             discount_curve,
             pay_index_curve,
+            self._pay_float_dts,
+            self._pay_dc_type,
+            0.0,
             pay_first_fixing_rate,
             principal,
         )
 
-        rec_float_leg_value = self.float_leg_value(
+        rec_float_leg_value, self._rec_leg = self._float_leg_value(
             value_dt,
             discount_curve,
             rec_index_curve,
+            self._rec_float_dts,
+            self._rec_dc_type,
+            self._basis_swap_spread,
             rec_first_fixing_rate,
             principal,
         )
@@ -152,179 +150,160 @@ class FloatFloatCrossCurrencySwap:
 
     ##########################################################################
 
-    def float_leg_value(
+    def _float_leg_value(
         self,
         value_dt,  # This should be the settlement date
         discount_curve,
         index_curve,
-        first_fixing_rate=None,
-        principal=0.0,
+        float_dts,
+        dc_type,
+        spread,
+        first_fixing_rate,
+        principal,
     ):
-        """Value the floating leg with payments from an index curve and
-        discounting based on a supplied discount curve. The valuation date can
-        be the today date. In this case the price of the floating leg will not
-        be par (assuming we added on a principal repayment). This is only the
-        case if we set the valuation date to be the swap's actual settlement
-        date."""
+        """Value one floating leg with payments from an index curve and
+        discounting based on a supplied discount curve. The leg is described
+        by its payment dates, day count and spread. Returns the leg PV and a
+        dictionary of the per-payment details used by the print methods."""
 
-        self.value_dt = value_dt
-        self._float_year_fracs = []
-        self._float_flows = []
-        self._float_rates = []
-        self._float_dfs = []
-        self._float_flow_pvs = []
-        self._float_total_pv = []
-        self._first_fixing_rate = first_fixing_rate
-
-        basis = DayCount(self.float_dc_type)
+        basis = DayCount(dc_type)
 
         # The swap may have started in the past but we can only value
-        # payments that have occurred after the start date.
+        # payments that occur after the valuation date.
         start_index = 0
-        while self._adjusted_float_dts[start_index] < value_dt:
+        while float_dts[start_index] < value_dt:
             start_index += 1
 
         # If the swap has yet to settle then we do not include the
-        # start date of the swap as a cpn payment date. """
+        # start date of the swap as a cpn payment date.
         if value_dt <= self.effective_dt:
             start_index = 1
 
-        self._float_start_index = start_index
-
-        # Forward price to settlement date (if valuation is settlement date)
-        self._df_value_dt = discount_curve.df(value_dt)
-
-        # The first floating payment is usually already fixed so is
-        # not implied by the index curve. """
-        prev_dt = self._adjusted_float_dts[start_index - 1]
-        next_dt = self._adjusted_float_dts[start_index]
-        alpha = basis.year_frac(prev_dt, next_dt)[0]
-        # Cannot be pcd as has past
-        df1_index = index_curve.df(self.effective_dt)
-        df2_index = index_curve.df(next_dt)
-
-        float_rate = 0.0
-
-        if self._first_fixing_rate is None:
-            fwd_rate = (df1_index / df2_index - 1.0) / alpha
-            flow = (fwd_rate + self.float_spread) * alpha * self.notional
-            float_rate = fwd_rate
-        else:
-            flow = self._first_fixing_rate * alpha * self.notional
-            float_rate = self._first_fixing_rate
-
         # All discounting is done forward to the valuation date
-        df_discount = discount_curve.df(next_dt) / self._df_value_dt
+        df_value_dt = discount_curve.df(value_dt)
 
-        pv = flow * df_discount
+        leg = {
+            "start_index": start_index,
+            "first_fixing_rate": first_fixing_rate,
+            "year_fracs": [],
+            "flows": [],
+            "rates": [],
+            "dfs": [],
+            "flow_pvs": [],
+            "total_pv": [],
+        }
 
-        self._float_year_fracs.append(alpha)
-        self._float_flows.append(flow)
-        self._float_rates.append(float_rate)
-        self._float_dfs.append(df_discount)
-        self._float_flow_pvs.append(flow * df_discount)
-        self._float_total_pv.append(pv)
-
-        prev_dt = next_dt
+        pv = 0.0
+        prev_dt = float_dts[start_index - 1]
         df1_index = index_curve.df(prev_dt)
 
-        for next_dt in self._adjusted_float_dts[start_index + 1 :]:
+        for i_flow, next_dt in enumerate(float_dts[start_index:]):
+
             alpha = basis.year_frac(prev_dt, next_dt)[0]
             df2_index = index_curve.df(next_dt)
-            # The accrual factors cancel
-            fwd_rate = (df1_index / df2_index - 1.0) / alpha
-            flow = (fwd_rate + self.float_spread) * alpha * self.notional
 
-            # All discounting is done forward to the valuation date
-            df_discount = discount_curve.df(next_dt) / self._df_value_dt
+            # The first floating payment is usually already fixed so is
+            # not implied by the index curve.
+            if i_flow == 0 and first_fixing_rate is not None:
+                float_rate = first_fixing_rate
+            else:
+                float_rate = (df1_index / df2_index - 1.0) / alpha
 
+            flow = (float_rate + spread) * alpha * self.notional
+            df_discount = discount_curve.df(next_dt) / df_value_dt
             pv += flow * df_discount
+
+            leg["year_fracs"].append(alpha)
+            leg["flows"].append(flow)
+            leg["rates"].append(float_rate)
+            leg["dfs"].append(df_discount)
+            leg["flow_pvs"].append(flow * df_discount)
+            leg["total_pv"].append(pv)
+
             df1_index = df2_index
             prev_dt = next_dt
 
-            self._float_flows.append(flow)
-            self._float_year_fracs.append(alpha)
-            self._float_rates.append(fwd_rate)
-            self._float_dfs.append(df_discount)
-            self._float_flow_pvs.append(flow * df_discount)
-            self._float_total_pv.append(pv)
-
         flow = principal * self.notional
         pv = pv + flow * df_discount
-        self._float_flows[-1] += flow
-        self._float_flow_pvs[-1] += flow * df_discount
-        self._float_total_pv[-1] = pv
+        leg["flows"][-1] += flow
+        leg["flow_pvs"][-1] += flow * df_discount
+        leg["total_pv"][-1] = pv
 
-        return pv
+        return pv, leg
 
     ##########################################################################
 
-    def print_float_leg_pv(self):
-        """Prints the floating leg dates, accrual factors, discount factors,
-        forward libor rates, implied cash amounts, their present value and
-        their cumulative PV using the last valuation performed."""
+    def print_float_leg_pv(self, leg_type: SwapTypes = SwapTypes.PAY):
+        """Prints the dates, accrual factors, discount factors, forward rates,
+        implied cash amounts, their present value and their cumulative PV for
+        the paid or received floating leg using the last valuation."""
+
+        if leg_type == SwapTypes.PAY:
+            leg = self._pay_leg
+            float_dts = self._pay_float_dts
+            freq_type = self._pay_freq_type
+            dc_type = self._pay_dc_type
+            spread = 0.0
+        else:
+            leg = self._rec_leg
+            float_dts = self._rec_float_dts
+            freq_type = self._rec_freq_type
+            dc_type = self._rec_dc_type
+            spread = self._basis_swap_spread
 
         print("START DATE:", self.effective_dt)
         print("MATURITY DATE:", self.maturity_dt)
-        print("SPREAD cpn (%):", self.float_spread * 100)
-        print("FLOAT LEG FREQUENCY:", str(self.float_freq_type))
-        print("FLOAT LEG DAY COUNT:", str(self.float_dc_type))
+        print("LEG TYPE:", str(leg_type))
+        print("SPREAD cpn (%):", spread * 100)
+        print("FLOAT LEG FREQUENCY:", str(freq_type))
+        print("FLOAT LEG DAY COUNT:", str(dc_type))
         print("VALUATION DATE", self.value_dt)
 
-        if len(self._float_flows) == 0:
+        if leg is None or len(leg["flows"]) == 0:
             print("Floating Flows not calculated.")
             return
 
-        if self._first_fixing_rate is None:
+        if leg["first_fixing_rate"] is None:
             print("         *** FIRST FLOATING RATE PAYMENT IS IMPLIED ***")
 
         header = "PAYMENT_DT     YEAR_FRAC    RATE(%)       PAYMENT         DF"
         header += "         DF*PAYMENT       CUM_PV"
         print(header)
 
-        start_index = self._float_start_index
-
         # By definition the discount factor is 1.0 on the valuation date
+        print("%15s %10s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", "-", 1.0, "-", "-"))
 
-        print(
-            "%15s %10s %10s %12s %12.8f %12s %12s"
-            % (self.value_dt, "-", "-", "-", 1.0, "-", "-")
-        )
+        start_index = leg["start_index"]
 
-        i_flow = 0
-        for PAYMENT_DT in self._adjusted_float_dts[start_index:]:
+        for i_flow, PAYMENT_DT in enumerate(float_dts[start_index:]):
             print(
                 "%15s %10.7f %10.5f %12.2f %12.8f %12.2f %12.2f"
                 % (
                     PAYMENT_DT,
-                    self._float_year_fracs[i_flow],
-                    self._float_rates[i_flow] * 100.0,
-                    self._float_flows[i_flow],
-                    self._float_dfs[i_flow],
-                    self._float_flow_pvs[i_flow],
-                    self._float_total_pv[i_flow],
+                    leg["year_fracs"][i_flow],
+                    leg["rates"][i_flow] * 100.0,
+                    leg["flows"][i_flow],
+                    leg["dfs"][i_flow],
+                    leg["flow_pvs"][i_flow],
+                    leg["total_pv"][i_flow],
                 )
             )
-
-            i_flow += 1
 
     ##########################################################################
 
     def __repr__(self):
         s = label_to_string("OBJECT TYPE", type(self).__name__)
-        s += label_to_string("START_DATE", self.effective_dt)
-        s += label_to_string("TERMINATION DATE", self.termination_dt)
-        s += label_to_string("MATURITY_DATE", self.maturity_dt)
+        s += label_to_string("START DATE", self.effective_dt)
+        s += label_to_string("TERMINATION DATE", self._termination_dt)
+        s += label_to_string("MATURITY DATE", self.maturity_dt)
         s += label_to_string("NOTIONAL", self.notional)
-        s += label_to_string("SWAP FIXED LEG TYPE", self.fixed_leg_swap_type)
-        s += label_to_string("FIXED COUPON", self.fixed_cpn)
-        s += label_to_string("FLOAT SPREAD", self.float_spread)
-        s += label_to_string("FIXED FREQUENCY", self.fixed_freq_type)
-        s += label_to_string("FLOAT FREQUENCY", self.float_freq_type)
-        s += label_to_string("FIXED DAY COUNT", self.fixed_dc_type)
-        s += label_to_string("FLOAT DAY COUNT", self.float_dc_type)
+        s += label_to_string("BASIS SWAP SPREAD", self._basis_swap_spread)
+        s += label_to_string("PAY FREQUENCY", self._pay_freq_type)
+        s += label_to_string("REC FREQUENCY", self._rec_freq_type)
+        s += label_to_string("PAY DAY COUNT", self._pay_dc_type)
+        s += label_to_string("REC DAY COUNT", self._rec_dc_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS_DAY_ADJUST", self._bd_type)
+        s += label_to_string("BUS DAY ADJUST", self._bd_type)
         s += label_to_string("DATE GEN TYPE", self._dg_type)
         return s
 

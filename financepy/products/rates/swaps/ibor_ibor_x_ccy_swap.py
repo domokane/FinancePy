@@ -96,10 +96,10 @@ class IborIborXCcySwap:
 
         # Need to know latest payment date for bootstrap - DO I NEED THIS ??!
         self.last_PAYMENT_DT = self.maturity_dt
-        if self.adjusted_fixed_dts[-1] > self.last_PAYMENT_DT:
+        if self._adjusted_fixed_dts[-1] > self.last_PAYMENT_DT:
             self.last_PAYMENT_DT = self._adjusted_fixed_dts[-1]
 
-        if self.adjusted_float_dts[-1] > self.last_PAYMENT_DT:
+        if self._adjusted_float_dts[-1] > self.last_PAYMENT_DT:
             self.last_PAYMENT_DT = self._adjusted_float_dts[-1]
 
         # NOT TO BE PRINTED
