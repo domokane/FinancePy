@@ -160,13 +160,18 @@ def test_ibor_ibor_swap_prints_each_leg_after_valuation(swap_type, capsys):
     swap.print_float_leg_pv(SwapTypes.RECEIVE)
     rec_out = capsys.readouterr().out
 
+    # Dates print in the library's current global format
+    first_quarter_end = str(Date(1, 4, 2024))
+    first_half_end = str(Date(1, 7, 2024))
+    maturity = str(Date(1, 1, 2029))
+
     assert "Floating Flows not calculated." not in pay_out
     assert "Floating Flows not calculated." not in rec_out
     assert "FIRST FLOATING RATE PAYMENT IS IMPLIED" in pay_out
-    assert "01-APR-2024" in pay_out  # quarterly pay leg
-    assert "01-APR-2024" not in rec_out  # semi-annual receive leg
-    assert "01-JUL-2024" in rec_out
-    assert "01-JAN-2029" in rec_out
+    assert first_quarter_end in pay_out  # quarterly pay leg
+    assert first_quarter_end not in rec_out  # semi-annual receive leg
+    assert first_half_end in rec_out
+    assert maturity in rec_out
 
     text = repr(swap)
     assert swap_type.__name__ in text

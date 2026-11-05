@@ -181,5 +181,6 @@ def test_cross_currency_swap_prints_after_valuation(swap_type, capsys):
     swap.print_fixed_leg_flows()
     out = capsys.readouterr().out
 
+    # Dates print in the library's current global format
     assert "not calculated" not in out
-    assert "01-JUL-2025" in out
+    assert str(Date(1, 7, 2025)) in out
