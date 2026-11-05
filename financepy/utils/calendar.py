@@ -862,6 +862,9 @@ class Calendar:
         if m == 6 and d > 7 and d < 15 and weekday == Date.MON:  # Queen
             return True
 
+        if y == 2022 and m == 9 and d == 22:  # National Day of Mourning
+            return True
+
         # REMOVED AS BEING SYDNEY ONLY
         # if m == 8 and d < 8 and weekday == Date.MON:  # BANK holiday
         #    return True
@@ -998,6 +1001,13 @@ class Calendar:
             return True
 
         # --------------------------------------------------------------
+        # National Day of Mourning for Queen Elizabeth II (2022 only)
+        # --------------------------------------------------------------
+
+        if y == 2022 and m == 9 and d == 22:
+            return True
+
+        # --------------------------------------------------------------
         # Labour Day
         # First Monday in October
         # --------------------------------------------------------------
@@ -1120,6 +1130,14 @@ class Calendar:
             return True
 
         # --------------------------------------------------------------
+        # National Day of Mourning for Queen Elizabeth II (2022 only)
+        # A public holiday in both NSW and Victoria.
+        # --------------------------------------------------------------
+
+        if y == 2022 and m == 9 and d == 22:
+            return True
+
+        # --------------------------------------------------------------
         # Christmas
         # --------------------------------------------------------------
 
@@ -1188,9 +1206,12 @@ class Calendar:
 
         # One-off or moved bank holidays.
         special_holidays = {
+            (1981, 7, 29),  # Royal wedding
             (1995, 5, 8),   # Early May bank holiday moved for VE Day
+            (1999, 12, 31),  # Millennium
             (2002, 6, 3),   # Golden Jubilee
             (2002, 6, 4),   # Spring bank holiday moved from 27 May
+            (2011, 4, 29),  # Royal wedding
             (2012, 6, 4),   # Spring bank holiday moved from 28 May
             (2012, 6, 5),   # Diamond Jubilee
             (2020, 5, 8),   # Early May bank holiday moved for VE Day
@@ -1832,6 +1853,7 @@ class Calendar:
           - ANZAC Day
           - King's / Queen's Birthday
           - Matariki
+          - Queen Elizabeth II Memorial Day (2022 only)
           - Labour Day
           - Christmas Day
           - Boxing Day
@@ -1969,6 +1991,13 @@ class Calendar:
 
             if m == mm and d == dd:
                 return True
+
+        # --------------------------------------------------------------
+        # Queen Elizabeth II Memorial Day (2022 only)
+        # --------------------------------------------------------------
+
+        if y == 2022 and m == 9 and d == 26:
+            return True
 
         # --------------------------------------------------------------
         # Labour Day
@@ -3061,6 +3090,10 @@ class Calendar:
             return True
 
         if m == 12 and d == 26:  # Xmas bank holiday
+            return True
+
+        # Additional closing days for the Year 2000 and euro cash changeovers
+        if m == 12 and d == 31 and y in (1999, 2001):
             return True
 
         return False
