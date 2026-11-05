@@ -120,6 +120,8 @@ class FixedFloatCrossCurrencySwap:
         self._first_fixing_rate = None
         self._fixed_start_index = None
 
+        self.value_dt = None
+
         self._calc_fixed_leg_flows()
 
     ##########################################################################
@@ -252,7 +254,7 @@ class FixedFloatCrossCurrencySwap:
         self._fixed_start_index = start_index
 
         # Now PV fixed leg flows
-        self._df_valuation_dt = discount_curve.df(value_dt)
+        self._df_value_dt = discount_curve.df(value_dt)
 
         pv = 0.0
         prev_dt = self._adjusted_fixed_dts[start_index - 1]
@@ -385,18 +387,19 @@ class FixedFloatCrossCurrencySwap:
         prev_dt = self._adjusted_float_dts[start_index - 1]
         next_dt = self._adjusted_float_dts[start_index]
         alpha = basis.year_frac(prev_dt, next_dt)[0]
-        # Cannot be pcd as has past
-        df1_index = index_curve.df(self.effective_dt)
-        df2_index = index_curve.df(next_dt)
 
         float_rate = 0.0
 
         if self._first_fixing_rate is None:
+            # The first forward starts at the accrual start of the period,
+            # which is the previous payment date for a seasoned swap
+            df1_index = index_curve.df(prev_dt)
+            df2_index = index_curve.df(next_dt)
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwd_rate + self._float_spread) * alpha * self.notional
             float_rate = fwd_rate
         else:
-            flow = self._first_fixing_rate * alpha * self.notional
+            flow = (self._first_fixing_rate + self._float_spread) * alpha * self.notional
             float_rate = self._first_fixing_rate
 
         # All discounting is done forward to the valuation date
@@ -471,14 +474,20 @@ class FixedFloatCrossCurrencySwap:
         start_index = self._fixed_start_index
 
         # By definition the discount factor is 1.0 on the valuation date
-        print(f"{self.value_dt:15} {'-':10} {'-':12} {1.0:12.8f} {'-':12} {'-':12}")
+        print("%15s %10s %12s %12.8f %12s %12s" % (self.value_dt, "-", "-", 1.0, "-", "-"))
 
         i_flow = 0
         for i_flow, PAYMENT_DT in enumerate(self._adjusted_fixed_dts[start_index:]):
             print(
-                f"{PAYMENT_DT:15} {self._fixed_year_fracs[i_flow]:10.7f} "
-                f"{self._fixed_flows[i_flow]:12.2f} {self._fixed_dfs[i_flow]:12.8f} "
-                f"{self._fixed_flow_pvs[i_flow]:12.2f} {self._fixed_total_pv[i_flow]:12.2f}"
+                "%15s %10.7f %12.2f %12.8f %12.2f %12.2f"
+                % (
+                    PAYMENT_DT,
+                    self._fixed_year_fracs[i_flow],
+                    self._fixed_flows[i_flow],
+                    self._fixed_dfs[i_flow],
+                    self._fixed_flow_pvs[i_flow],
+                    self._fixed_total_pv[i_flow],
+                )
             )
 
     ##########################################################################

@@ -14,6 +14,7 @@ from ....utils import Schedule
 from ....utils import label_to_string, check_argument_types
 from ....utils import ONE_MILLION
 from ....utils import SwapTypes
+from ....utils.check_values import check_curve_dt
 
 ##########################################################################
 
@@ -118,6 +119,8 @@ class IborIborSwap:
         is added to the floating rate on the received leg. The value is the
         PV of the received leg less the PV of the paid leg."""
 
+        check_curve_dt(value_dt, discount_curve, pay_index_curve, rec_index_curve)
+
         self.value_dt = value_dt
 
         pay_float_leg_value, self._pay_leg = self._float_leg_value(
@@ -166,18 +169,16 @@ class IborIborSwap:
         basis = DayCount(dc_type)
 
         # The swap may have started in the past but we can only value
-        # payments that occur after the valuation date.
+        # payments that fall after the valuation date. A payment on the
+        # valuation date is treated as already paid, as in SwapFloatLeg.
         start_index = 0
-        while float_dts[start_index] < value_dt:
+        while start_index < len(float_dts) and float_dts[start_index] <= value_dt:
             start_index += 1
 
         # If the swap has yet to settle then we do not include the
         # start date of the swap as a cpn payment date.
         if value_dt <= self.effective_dt:
             start_index = 1
-
-        # All discounting is done forward to the valuation date
-        df_value_dt = discount_curve.df(value_dt)
 
         leg = {
             "start_index": start_index,
@@ -190,21 +191,34 @@ class IborIborSwap:
             "total_pv": [],
         }
 
+        # The swap has matured so there is nothing left to value
+        if start_index >= len(float_dts):
+            return 0.0, leg
+
+        # All discounting is done forward to the valuation date
+        df_value_dt = discount_curve.df(value_dt)
+
         pv = 0.0
         prev_dt = float_dts[start_index - 1]
-        df1_index = index_curve.df(prev_dt)
+        df1_index = None
 
         for i_flow, next_dt in enumerate(float_dts[start_index:]):
 
             alpha = basis.year_frac(prev_dt, next_dt)[0]
-            df2_index = index_curve.df(next_dt)
 
             # The first floating payment is usually already fixed so is
-            # not implied by the index curve.
+            # not implied by the index curve. The index curve is only read
+            # once a rate has to be implied, so a seasoned swap with a
+            # supplied fixing never needs a discount factor from before
+            # the valuation date.
             if i_flow == 0 and first_fixing_rate is not None:
                 float_rate = first_fixing_rate
             else:
+                if df1_index is None:
+                    df1_index = index_curve.df(prev_dt)
+                df2_index = index_curve.df(next_dt)
                 float_rate = (df1_index / df2_index - 1.0) / alpha
+                df1_index = df2_index
 
             flow = (float_rate + spread) * alpha * self.notional
             df_discount = discount_curve.df(next_dt) / df_value_dt
@@ -217,7 +231,6 @@ class IborIborSwap:
             leg["flow_pvs"].append(flow * df_discount)
             leg["total_pv"].append(pv)
 
-            df1_index = df2_index
             prev_dt = next_dt
 
         flow = principal * self.notional
