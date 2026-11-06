@@ -96,10 +96,10 @@ class IborIborXCcySwap:
 
         # Need to know latest payment date for bootstrap - DO I NEED THIS ??!
         self.last_PAYMENT_DT = self.maturity_dt
-        if self.adjusted_fixed_dts[-1] > self.last_PAYMENT_DT:
+        if self._adjusted_fixed_dts[-1] > self.last_PAYMENT_DT:
             self.last_PAYMENT_DT = self._adjusted_fixed_dts[-1]
 
-        if self.adjusted_float_dts[-1] > self.last_PAYMENT_DT:
+        if self._adjusted_float_dts[-1] > self.last_PAYMENT_DT:
             self.last_PAYMENT_DT = self._adjusted_float_dts[-1]
 
         # NOT TO BE PRINTED
@@ -115,6 +115,8 @@ class IborIborXCcySwap:
 
         self.first_fixing_rate = None
         self.fixed_start_index = None
+
+        self.value_dt = None
 
         self._calc_fixed_leg_flows()
 
@@ -382,18 +384,19 @@ class IborIborXCcySwap:
         prev_dt = self._adjusted_float_dts[start_index - 1]
         next_dt = self._adjusted_float_dts[start_index]
         alpha = basis.year_frac(prev_dt, next_dt)[0]
-        # Cannot be pcd as has past
-        df1_index = index_curve.df(self.effective_dt)
-        df2_index = index_curve.df(next_dt)
 
         float_rate = 0.0
 
         if self._first_fixing_rate is None:
+            # The first forward starts at the accrual start of the period,
+            # which is the previous payment date for a seasoned swap
+            df1_index = index_curve.df(prev_dt)
+            df2_index = index_curve.df(next_dt)
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwd_rate + self.float_spread) * alpha * self.notional
             float_rate = fwd_rate
         else:
-            flow = self._first_fixing_rate * alpha * self.notional
+            flow = (self._first_fixing_rate + self.float_spread) * alpha * self.notional
             float_rate = self._first_fixing_rate
 
         # All discounting is done forward to the valuation date

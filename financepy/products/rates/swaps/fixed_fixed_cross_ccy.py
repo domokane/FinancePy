@@ -104,7 +104,7 @@ class FixedFixedCrossCurrencySwap:
         if self._adjusted_float_dts[-1] > self._last_PAYMENT_DT:
             self._last_PAYMENT_DT = self._adjusted_float_dts[-1]
 
-        # self.value_dt = None
+        self.value_dt = None
 
         # NOT TO BE PRINTED
         self._float_year_fracs = []
@@ -233,6 +233,7 @@ class FixedFixedCrossCurrencySwap:
 
     def fixed_leg_value(self, value_dt, discount_curve, principal=0.0):
         """Calculate the present value of the fixed leg cash flows."""
+        self.value_dt = value_dt
         self._fixed_year_fracs = []
         self._fixed_flows = []
         self._fixed_dfs = []
@@ -255,7 +256,7 @@ class FixedFixedCrossCurrencySwap:
         self._fixed_start_index = start_index
 
         # Now PV fixed leg flows
-        self._df_valuation_dt = discount_curve.df(value_dt)
+        self._df_value_dt = discount_curve.df(value_dt)
 
         pv = 0.0
         prev_dt = self._adjusted_fixed_dts[start_index - 1]
@@ -356,6 +357,7 @@ class FixedFixedCrossCurrencySwap:
         case if we set the valuation date to be the swap's actual settlement
         date."""
 
+        self.value_dt = value_dt
         self._float_year_fracs = []
         self._float_flows = []
         self._float_rates = []
@@ -387,18 +389,19 @@ class FixedFixedCrossCurrencySwap:
         prev_dt = self._adjusted_float_dts[start_index - 1]
         next_dt = self._adjusted_float_dts[start_index]
         alpha = basis.year_frac(prev_dt, next_dt)[0]
-        # Cannot be pcd as has past
-        df1_index = index_curve.df(self.effective_dt)
-        df2_index = index_curve.df(next_dt)
 
         float_rate = 0.0
 
         if self._first_fixing_rate is None:
+            # The first forward starts at the accrual start of the period,
+            # which is the previous payment date for a seasoned swap
+            df1_index = index_curve.df(prev_dt)
+            df2_index = index_curve.df(next_dt)
             fwd_rate = (df1_index / df2_index - 1.0) / alpha
             flow = (fwd_rate + self._float_spread) * alpha * self.notional
             float_rate = fwd_rate
         else:
-            flow = self._first_fixing_rate * alpha * self.notional
+            flow = (self._first_fixing_rate + self._float_spread) * alpha * self.notional
             float_rate = self._first_fixing_rate
 
         # All discounting is done forward to the valuation date
