@@ -25,3 +25,6 @@ perturbatory calculation of option Greeks.
 
 ## FX Variance Swap
 
+## FX Power Option
+Calculates the price, analytical delta, and Monte Carlo simulation of European FX Power Options.
+
