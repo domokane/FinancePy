@@ -219,6 +219,8 @@ class Tenor:
             True or False depending if teh two tenors are equal
         """
 
+        if not isinstance(other, Tenor):
+            return NotImplemented
         return self._units == other._units and self._num_periods == other._num_periods
 
     ####################################################################################
