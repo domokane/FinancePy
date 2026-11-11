@@ -376,10 +376,11 @@ class DiscountCurve:
         if not isinstance(freq_type, FrequencyTypes):
             raise FinError("Invalid Frequency type.")
 
-        if np.any(t < 0):
+        times, scalar_input = self._to_time_array(t)
+
+        if np.any(times < 0):
             raise FinError("Times to maturity cannot be negative.")
 
-        times, scalar_input = self._to_time_array(t)
         times = np.maximum(times, G_SMALL)
 
         dfs = self.df_t(times)
