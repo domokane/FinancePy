@@ -1,10 +1,13 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import pytest
+
+from financepy.products.bonds.bond import Bond
+from financepy.products.bonds.bond_future import BondFuture
+from financepy.utils.calendar import BusDayAdjustTypes, CalendarTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
-from financepy.products.bonds.bond import Bond
-from financepy.products.bonds.bond_future import BondFuture
 
 freq = FrequencyTypes.SEMI_ANNUAL
 basis = DayCountTypes.ACT_ACT_ICMA
@@ -187,3 +190,67 @@ def test_future_bond_ctd():
             )
         ]
     )
+
+
+@pytest.fixture
+def repo_bond():
+    return Bond(
+        Date(15, 2, 2020),
+        Date(15, 2, 2032),
+        0.06,
+        FrequencyTypes.SEMI_ANNUAL,
+        DayCountTypes.ACT_ACT_ICMA,
+        cal_type=CalendarTypes.NONE,
+        bd_type=BusDayAdjustTypes.NONE,
+    )
+
+
+@pytest.mark.parametrize("repo_rate", [0.01, 0.05])
+@pytest.mark.parametrize(
+    "settle_dt,delivery_dt",
+    [
+        (Date(1, 5, 2026), Date(1, 8, 2026)),  # no intervening coupon
+        (Date(1, 8, 2026), Date(15, 8, 2026)),  # coupon on delivery
+        (Date(15, 8, 2026), Date(1, 12, 2026)),  # coupon on settlement
+        (Date(1, 8, 2026), Date(1, 12, 2026)),  # early coupon
+        (Date(1, 3, 2026), Date(1, 9, 2026)),  # late coupon
+        (Date(1, 1, 2026), Date(1, 3, 2027)),  # multiple coupons
+    ],
+)
+def test_implied_repo_inverts_forward_price(
+    repo_bond, settle_dt, delivery_dt, repo_rate
+):
+    future = BondFuture("TEST", delivery_dt, delivery_dt, 100_000, 0.06)
+    clean_price = 99.0
+    forward_price = repo_bond.forward_price(
+        settle_dt, delivery_dt, clean_price, repo_rate
+    )
+    futures_price = forward_price / future.conversion_factor(repo_bond)
+
+    implied = future.implied_repo_rate(repo_bond, settle_dt, clean_price, futures_price)
+
+    assert implied == pytest.approx(repo_rate, abs=1e-12, rel=0.0)
+
+
+@pytest.mark.parametrize("repo_rate", [-0.005, 0.0, 0.03])
+def test_implied_repo_balances_coupon_reinvestment_cashflows(repo_bond, repo_rate):
+    settle_dt = Date(1, 8, 2026)
+    coupon_dt = Date(15, 8, 2026)
+    delivery_dt = Date(1, 12, 2026)
+    future = BondFuture("TEST", delivery_dt, delivery_dt, 100_000, 0.06)
+    clean_price = 99.0
+    full_price = clean_price + repo_bond.accrued_interest(settle_dt)
+    holding_years = (delivery_dt - settle_dt) / 360.0
+    reinvestment_years = (delivery_dt - coupon_dt) / 360.0
+    coupon = 3.0  # six-percent semiannual coupon per 100 face
+
+    # Financing the purchase equals the delivery invoice plus the reinvested coupon.
+    invoice = full_price * (1.0 + repo_rate * holding_years) - coupon * (
+        1.0 + repo_rate * reinvestment_years
+    )
+    futures_price = (
+        invoice - repo_bond.accrued_interest(delivery_dt)
+    ) / future.conversion_factor(repo_bond)
+    implied = future.implied_repo_rate(repo_bond, settle_dt, clean_price, futures_price)
+
+    assert implied == pytest.approx(repo_rate, abs=1e-12, rel=0.0)
