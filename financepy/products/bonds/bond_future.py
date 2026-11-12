@@ -336,7 +336,8 @@ class BondFuture:
         for dt, amt in zip(bond.cpn_dts[1:], bond.flow_amounts[1:]):
             if settle_dt < dt <= delivery_dt:
                 fv_cpns += amt * bond.par
-                weighted_days_sum += (dt - settle_dt) * amt * bond.par
+                # Coupons reduce financing from receipt until delivery.
+                weighted_days_sum += (delivery_dt - dt) * amt * bond.par
 
         if fv_cpns > 0:
             avg_coupon_days = weighted_days_sum / fv_cpns
