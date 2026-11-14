@@ -1,6 +1,9 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import pytest
+
 from financepy.utils.date import Date
+from financepy.utils.error import FinError
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.utils.calendar import CalendarTypes
@@ -84,4 +87,8 @@ def test_fin_fx_forward():
     assert round(fwd_value["EUR"], 4) == -1.9375
 
 
-# test_fin_fx_forward()
+@pytest.mark.parametrize("strike", [0.0, -1.0, float("nan"), float("inf")])
+@pytest.mark.parametrize("notional_ccy", ["EUR", "USD"])
+def test_fx_forward_rejects_non_positive_or_non_finite_strikes(strike, notional_ccy):
+    with pytest.raises(FinError, match="Strike FX rate must be positive and finite"):
+        FXForward(Date(13, 2, 2019), strike, "EURUSD", 100.0, notional_ccy, "EUR")
