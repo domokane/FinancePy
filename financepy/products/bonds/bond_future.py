@@ -5,6 +5,7 @@
 from ...products.bonds.bond import Bond
 from ...utils.date import Date
 from ...utils.day_count import DayCount, DayCountTypes
+from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 
 # TODO: Examine other exchange conventions.
@@ -376,7 +377,15 @@ class BondFuture:
         -------
         Bond
             The bond identified as Cheapest to Deliver.
+
+        Raises
+        ------
+        FinError
+            If the numbers of bonds and clean prices differ.
         """
+
+        if len(bonds) != len(bond_clean_prices):
+            raise FinError("CTD requires the same number of bonds and clean prices.")
 
         ctd_bond = None
         ctd_net = float("inf")

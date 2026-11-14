@@ -1,7 +1,10 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import pytest
+
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
+from financepy.utils.error import FinError
 from financepy.utils.frequency import FrequencyTypes
 from financepy.products.bonds.bond import Bond
 from financepy.products.bonds.bond_future import BondFuture
@@ -187,3 +190,15 @@ def test_future_bond_ctd():
             )
         ]
     )
+
+
+@pytest.mark.parametrize("bond_count, prices", [(2, [99.0]), (1, [99.0, 100.0])])
+def test_future_bond_ctd_rejects_unpaired_bonds_and_prices(bond_count, prices):
+    contract = BondFuture("TYZ7", Date(1, 12, 2017), Date(28, 12, 2017), 100000, 0.06)
+    basket = [
+        Bond(issue_dt, Date(15, 8, 2027), 0.0225, freq, basis),
+        Bond(issue_dt, Date(15, 5, 2027), 0.02375, freq, basis),
+    ]
+
+    with pytest.raises(FinError, match="same number of bonds and clean prices"):
+        contract.ctd(basket[:bond_count], prices, 125.265625)
