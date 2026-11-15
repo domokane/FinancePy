@@ -78,6 +78,24 @@ def test_tenor_add(tenor1, tenor2, result):
     assert t1 + t2 == res
 
 
+@pytest.mark.parametrize('tenor1,tenor2,result',
+                         [
+                             ('1Y', '6M', '18M'),
+                             ('1W', '1D', '8D'),
+                             ('2Y', '1W', '97W'),
+                         ])
+
+########################################################################################
+
+
+def test_tenor_add_mixed_units_keeps_integer_periods(tenor1, tenor2, result):
+
+    total = Tenor(tenor1) + Tenor(tenor2)
+    assert isinstance(total.num_periods, int)
+    assert f'{total}' == result
+    assert Tenor(f'{total}') == total
+
+
 ########################################################################################
 
 # if __name__ == '__main__':
