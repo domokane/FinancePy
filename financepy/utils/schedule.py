@@ -202,6 +202,10 @@ class Schedule:
             while next_dt < self.termination_dt:
                 tot_num_months = num_months * len(unadjusted_schedule_dts)
                 next_dt = self.effective_dt.add_months(tot_num_months)
+
+                if self.end_of_month is True:
+                    next_dt = next_dt.eom()
+
                 if next_dt < self.termination_dt:
                     unadjusted_schedule_dts.append(next_dt)
 
