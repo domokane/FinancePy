@@ -91,6 +91,9 @@ class FXForward:
 
         check_currency_pair(currency_pair)
 
+        if not np.isfinite(strike_fx_rate) or strike_fx_rate <= 0.0:
+            raise FinError("Strike FX rate must be positive and finite.")
+
         if not np.isfinite(notional) or notional <= 0.0:
             raise FinError("Notional must be positive and finite.")
 

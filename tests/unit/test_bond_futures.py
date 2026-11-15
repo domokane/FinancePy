@@ -7,6 +7,7 @@ from financepy.products.bonds.bond_future import BondFuture
 from financepy.utils.calendar import BusDayAdjustTypes, CalendarTypes
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
+from financepy.utils.error import FinError
 from financepy.utils.frequency import FrequencyTypes
 
 freq = FrequencyTypes.SEMI_ANNUAL
