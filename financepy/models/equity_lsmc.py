@@ -7,7 +7,6 @@ from enum import Enum, auto
 import numpy as np
 
 from ..utils.global_types import OptionTypes
-from ..utils.polyfit import fit_poly, eval_polynomial
 from ..models.finite_difference import option_payoff
 
 # This is a first implementation of American Monte Carlo using the method of
@@ -28,13 +27,10 @@ class BoundaryFitTypes(Enum):
     POLYNOMIAL = auto()
 
 
-# TODO: FIX NUMBA
-# @njit(float64(float64, float64, float64, float64, int64, int64, float64, int64,
-#              float64, float64, int64, int64, int64), fastmath=True, cache=False)
-# @jit
-
 ########################################################################################
-
+# Many functions are not numba compatible so no benefit
+# @njit(cache=True, fastmath=True)
+########################################################################################
 
 def equity_lsmc(
     spot_price,
@@ -49,8 +45,7 @@ def equity_lsmc(
     poly_degree,
     fit_type_value,
     use_sobol,
-    seed,
-    ########################################################################################
+    seed,  # Unused
 ):
 
     np.random.seed(seed)
@@ -109,34 +104,38 @@ def equity_lsmc(
         itm = exercise_matrix[it] > 0.0
 
         if np.sum(itm) <= poly_degree:
-            cont_value = value_matrix[it + 1] * df
+            value_matrix[it] = value_matrix[it + 1] * df
+            continue
+
         else:
             x = st[it][itm]
             y = value_matrix[it + 1][itm] * df
 
-            if fit_type_value == BoundaryFitTypes.HERMITE_E.value:
-                regression = np.polynomial.hermite_e.hermefit(x, y, poly_degree)
-                cont_value = np.polynomial.hermite_e.hermeval(st[it], regression)
-            elif fit_type_value == BoundaryFitTypes.LAGUERRE.value:
-                regression = np.polynomial.laguerre.lagfit(x, y, poly_degree)
-                cont_value = np.polynomial.laguerre.lagval(st[it], regression)
-            elif fit_type_value == BoundaryFitTypes.HERMITE.value:
-                regression = np.polynomial.hermite.hermfit(x, y, poly_degree)
-                cont_value = np.polynomial.hermite.hermval(st[it], regression)
-            elif fit_type_value == BoundaryFitTypes.LEGENDRE.value:
-                regression = np.polynomial.legendre.legfit(x, y, poly_degree)
-                cont_value = np.polynomial.legendre.legval(st[it], regression)
-            elif fit_type_value == BoundaryFitTypes.CHEBYCHEV.value:
-                regression = np.polynomial.chebyshev.chebfit(x, y, poly_degree)
-                cont_value = np.polynomial.chebyshev.chebval(st[it], regression)
-            elif fit_type_value == BoundaryFitTypes.POLYNOMIAL.value:
-                regression = fit_poly(x, y, poly_degree)
-                cont_value = eval_polynomial(regression, st[it])
-            else:
-                raise ValueError(f"Unknown _fit_type: {fit_type_value}")
-            cont_value[cont_value < 0] = 0
+        if fit_type_value == BoundaryFitTypes.HERMITE_E.value:
+            regression = np.polynomial.HermiteE.fit(x, y, poly_degree)
 
-        exercise_now = exercise_matrix[it] > cont_value
+        elif fit_type_value == BoundaryFitTypes.LAGUERRE.value:
+            regression = np.polynomial.Laguerre.fit(x, y, poly_degree)
+
+        elif fit_type_value == BoundaryFitTypes.HERMITE.value:
+            regression = np.polynomial.Hermite.fit(x, y, poly_degree)
+
+        elif fit_type_value == BoundaryFitTypes.LEGENDRE.value:
+            regression = np.polynomial.Legendre.fit(x, y, poly_degree)
+
+        elif fit_type_value == BoundaryFitTypes.CHEBYCHEV.value:
+            regression = np.polynomial.Chebyshev.fit(x, y, poly_degree)
+
+        elif fit_type_value == BoundaryFitTypes.POLYNOMIAL.value:
+            regression = np.polynomial.Polynomial.fit(x, y, poly_degree)
+
+        else:
+            raise ValueError(f"Unknown fit type: {fit_type_value}")
+
+        cont_value = np.maximum(regression(st[it]), 0.0)
+
+        exercise_now = itm & (exercise_matrix[it] > cont_value)
+
         stopping[it] = np.where(exercise_now, 1.0, 0.0)
 
         value_matrix[it] = np.where(
@@ -152,6 +151,7 @@ def equity_lsmc(
     }
 
     for i in range(0, num_paths):
+
         if is_american:
             exercise_times = np.where(stopping[:, i] > 0.0)[0]
 
@@ -168,5 +168,8 @@ def equity_lsmc(
         )
 
     value = np.mean(values)
+
+    if is_american:
+        value = max(value, exercise_matrix[0, 0])
 
     return value

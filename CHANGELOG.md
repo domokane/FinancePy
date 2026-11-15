@@ -10,6 +10,7 @@
 - Removed CDSForward product as it can be done by CDS
 - Make sure Date constructor handes y,m,d as integers
 - Updated Golden regression tests folder
+- Tidied up equity_lsmc.py to remove Laguerre warning
 
 2 Nov 2026
 - Widespread removal of _ in printing of objects
