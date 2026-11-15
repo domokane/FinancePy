@@ -1169,6 +1169,8 @@ class Bond:
         px_pv = 0.0
         n_flows = len(self.cpn_dts)
         cpn_amount = self.cpn / self.freq
+        flows = []
+        flow_pmt_dts = []
 
         # 3. Iterate through all potential flows
         for i in range(n_flows):
@@ -1177,8 +1179,6 @@ class Bond:
 
             # Only consider flows where the coupon date is in the future
             if cpn_dt > settle_dt:
-
-                df = discount_curve.df(pmt_dt)
 
                 # Check for ex-dividend status on the next immediate coupon
                 # This is only relevant for the first future coupon encountered
@@ -1194,10 +1194,18 @@ class Bond:
                 if i == n_flows - 1:
                     flow += 1.0  # Normalized to par=1.0 for now
 
-                px_pv += flow * df
+                flows.append(flow)
+                flow_pmt_dts.append(pmt_dt)
 
-        # 4. Re-base to settlement date
-        df_settle = discount_curve.df(settle_dt)
+        # 4. Discount all the future flows with one call to the curve. The
+        # settlement date goes last so the same call gives its discount factor
+        dfs = discount_curve.df(flow_pmt_dts + [settle_dt]).tolist()
+        df_settle = dfs.pop()
+
+        for flow, df in zip(flows, dfs):
+            px_pv += flow * df
+
+        # 5. Re-base to settlement date
         dirty_price = (px_pv / df_settle) * self.par
         return dirty_price
 
