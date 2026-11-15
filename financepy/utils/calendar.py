@@ -3081,10 +3081,15 @@ class Calendar:
         if not MIN_CALENDAR_YEAR <= y <= MAX_CALENDAR_YEAR:
             self.easter_monday(y)  # raises the year-range error
 
-        if m == 12:
-            # Xmas bank holidays, plus the additional closing days for the
-            # Year 2000 and euro cash changeovers
-            return d in (25, 26) or (d == 31 and y in (1999, 2001))
+        if m == 12 and d == 25:  # Xmas bank holiday
+            return True
+
+        if m == 12 and d == 26:  # Xmas bank holiday
+            return True
+
+        # Additional closing days for the Year 2000 and euro cash changeovers
+        if m == 12 and d == 31 and y in (1999, 2001):
+            return True
 
         if m == 3 or m == 4:
             # Easter Monday falls between Mar 24 and Apr 26 and Good Friday
