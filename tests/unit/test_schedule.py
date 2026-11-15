@@ -245,3 +245,22 @@ def test_forward_schedule_preserves_weekend_effective_date():
         Date(20, 7, 2020),
         termination_dt,
     ]
+
+
+def test_forward_schedule_end_of_month():
+    schedule = Schedule(
+        Date(28, 2, 2025),
+        Date(31, 5, 2025),
+        FrequencyTypes.MONTHLY,
+        CalendarTypes.NONE,
+        BusDayAdjustTypes.NONE,
+        DateGenRuleTypes.FORWARD,
+        end_of_month=True,
+    )
+
+    assert schedule.schedule_dts() == [
+        Date(28, 2, 2025),
+        Date(31, 3, 2025),
+        Date(30, 4, 2025),
+        Date(31, 5, 2025),
+    ]

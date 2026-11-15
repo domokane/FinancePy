@@ -14,3 +14,4 @@ if EAGER_IMPORTS:
     from .fx_vanilla_option import *
     from .fx_variance_swap import *
     from .fx_one_touch_option import *
+    from .fx_power_option import *

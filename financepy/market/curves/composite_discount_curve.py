@@ -55,15 +55,22 @@ class CompositeDiscountCurve(DiscountCurve):
 
     def df_t(self, t: Union[float, np.ndarray]):
         """
-        Return discount factors given a single or vector of dates.
+        Return discount factors given a single or vector of times.
         ParentRate = Sum of children rates => Parent DF = product of
-        children dfs
+        children dfs. A scalar time returns a float, as for the other
+        discount curves; an array of times returns an array.
         """
 
-        dfs = np.ones_like(np.atleast_1d(t), dtype=float)
+        times = np.atleast_1d(np.asarray(t, dtype=float))
+        scalar_input = np.ndim(t) == 0
+
+        dfs = np.ones_like(times, dtype=float)
         for c in self._children:
-            dfc = c.df_t(t)
+            dfc = c.df_t(times)
             dfs *= dfc
+
+        if scalar_input:
+            return float(dfs[0])
 
         return dfs
 

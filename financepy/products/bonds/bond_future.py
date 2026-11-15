@@ -5,6 +5,7 @@
 from ...products.bonds.bond import Bond
 from ...utils.date import Date
 from ...utils.day_count import DayCount, DayCountTypes
+from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 
 # TODO: Examine other exchange conventions.
@@ -336,7 +337,8 @@ class BondFuture:
         for dt, amt in zip(bond.cpn_dts[1:], bond.flow_amounts[1:]):
             if settle_dt < dt <= delivery_dt:
                 fv_cpns += amt * bond.par
-                weighted_days_sum += (dt - settle_dt) * amt * bond.par
+                # Coupons reduce financing from receipt until delivery.
+                weighted_days_sum += (delivery_dt - dt) * amt * bond.par
 
         if fv_cpns > 0:
             avg_coupon_days = weighted_days_sum / fv_cpns
@@ -376,7 +378,15 @@ class BondFuture:
         -------
         Bond
             The bond identified as Cheapest to Deliver.
+
+        Raises
+        ------
+        FinError
+            If the numbers of bonds and clean prices differ.
         """
+
+        if len(bonds) != len(bond_clean_prices):
+            raise FinError("CTD requires the same number of bonds and clean prices.")
 
         ctd_bond = None
         ctd_net = float("inf")

@@ -246,6 +246,63 @@ def test_italy_st_francis_national_holiday_from_2026():
     assert cal.is_business_day(Date(4, 10, 2024))
 
 
+@pytest.mark.parametrize(
+    "cal_type", [CalendarTypes.UNITED_KINGDOM, CalendarTypes.LONDON]
+)
+def test_uk_one_off_bank_holidays(cal_type):
+    cal = Calendar(cal_type)
+
+    # Royal weddings in 1981 and 2011 and the Millennium in 1999
+    for dt in [Date(29, 7, 1981), Date(31, 12, 1999), Date(29, 4, 2011)]:
+        assert cal.is_holiday(dt), dt
+        assert not cal.is_business_day(dt), dt
+
+    # 2 May 2011 was the early May bank holiday
+    assert cal.adjust(Date(29, 4, 2011), BusDayAdjustTypes.FOLLOWING) == Date(3, 5, 2011)
+    assert cal.is_business_day(Date(31, 12, 2010))
+
+
+@pytest.mark.parametrize(
+    "cal_type",
+    [
+        CalendarTypes.AUSTRALIA,
+        CalendarTypes.SYDNEY,
+        CalendarTypes.AUSTRALIA_RITS,
+        CalendarTypes.AUD_FX_SETTLEMENT,
+    ],
+)
+def test_australia_national_day_of_mourning_2022(cal_type):
+    cal = Calendar(cal_type)
+
+    assert cal.is_holiday(Date(22, 9, 2022))
+    assert cal.adjust(Date(22, 9, 2022), BusDayAdjustTypes.FOLLOWING) == Date(23, 9, 2022)
+
+    # One-off holiday
+    assert cal.is_business_day(Date(22, 9, 2023))
+
+
+def test_nz_queen_elizabeth_ii_memorial_day_2022():
+    cal = Calendar(CalendarTypes.NEW_ZEALAND)
+
+    assert cal.is_holiday(Date(26, 9, 2022))
+    assert cal.adjust(Date(26, 9, 2022), BusDayAdjustTypes.FOLLOWING) == Date(27, 9, 2022)
+
+    # One-off holiday
+    assert cal.is_business_day(Date(26, 9, 2023))
+
+
+def test_target_additional_closing_days():
+    cal = Calendar(CalendarTypes.TARGET)
+
+    # Year 2000 changeover and euro cash changeover
+    for dt in [Date(31, 12, 1999), Date(31, 12, 2001)]:
+        assert cal.is_holiday(dt), dt
+        assert not cal.is_business_day(dt), dt
+
+    assert cal.is_business_day(Date(31, 12, 2002))
+    assert cal.is_business_day(Date(31, 12, 2026))
+
+
 def test_modified_following_does_not_cross_month():
     cal = Calendar(CalendarTypes.WEEKEND)
 

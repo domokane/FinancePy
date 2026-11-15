@@ -187,7 +187,7 @@ class Tenor:
 
         res = Tenor()
         res.set_units(new_units)
-        res.set_num_periods(self._num_periods * self._units.value / new_units.value)
+        res.set_num_periods(self._num_periods * self._units.value // new_units.value)
         return res
 
     ####################################################################################
@@ -219,6 +219,8 @@ class Tenor:
             True or False depending if teh two tenors are equal
         """
 
+        if not isinstance(other, Tenor):
+            return NotImplemented
         return self._units == other._units and self._num_periods == other._num_periods
 
     ####################################################################################

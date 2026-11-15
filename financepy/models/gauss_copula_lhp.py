@@ -290,9 +290,27 @@ def prob_l_greater_than_k(
     r: float,
     beta: float
 ) -> float:
+    """Probability that the large homogeneous portfolio loss exceeds k, for a
+    default probability p, recovery rate r and one-factor correlation beta.
+    This is one minus the loss distribution function portfolio_cdf_lhp."""
 
-    c = normpdf(p)
+    if abs(beta) > 1.0:
+        raise FinError("Beta > 100%")
+
+    if abs(beta) < 1e-10:
+        beta = 1e-10
+
+    if p == 0.0:
+        return 0.0
+
+    if k <= 0.0:
+        return 1.0
+
+    if k >= (1.0 - r):
+        return 0.0
+
+    c = norminvcdf(p)
     arga = k / (1.0 - r)
-    a = (1.0 / beta) * (c - np.sqrt(1.0 - beta * beta) * normpdf(arga))
-    prob = 1.0 - normcdf(a)
+    a = (1.0 / beta) * (c - np.sqrt(1.0 - beta * beta) * norminvcdf(arga))
+    prob = normcdf(a)
     return prob
