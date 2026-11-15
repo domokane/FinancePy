@@ -21,6 +21,8 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.model import Model
 
+from ...utils.valuation_log import log_value, log_table, log_row
+
 ########################################################################################
 # TODO: Make it possible to specify start and end of American Callable/Puttable
 ########################################################################################

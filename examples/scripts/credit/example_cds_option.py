@@ -43,7 +43,6 @@ from helpers import build_issuer_curve
 print("\n" + "=" * 78)
 print("1. CDS OPTION")
 print("=" * 78)
-set_plot_style()
 
 
 # ============================================================================

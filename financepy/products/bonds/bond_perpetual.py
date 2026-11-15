@@ -21,6 +21,7 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.error import FinError
 from ...utils.frequency import FrequencyTypes, annual_frequency
 from ...utils.helpers import check_argument_types, label_to_string
+from ...utils.valuation_log import log_value, log_table, log_row
 
 
 def _f(ytm, *args):
@@ -461,7 +462,7 @@ class BondPerpetual(Product):
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("ACCRUAL DAY COUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS DAY ADJUST", self.bd_type)
+        s += label_to_string("BUS DAY RULE", self.bd_type)
         s += label_to_string("EX DIVIDEND DAYS", self.ex_div_days)
         return s
 

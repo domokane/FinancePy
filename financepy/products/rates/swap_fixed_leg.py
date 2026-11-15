@@ -354,8 +354,8 @@ class SwapFixedLeg:
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS DAY ADJUST", self.bd_type)
-        s += label_to_string("DATE GEN", self.dg_type)
+        s += label_to_string("BUS DAY RULE", self.bd_type)
+        s += label_to_string("DATE GEN RULE", self.dg_type)
         return s
 
     ########################################################################################

@@ -20,6 +20,7 @@ from ...models.black_scholes import BlackScholes
 from ...utils.helpers import check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.model import Model
+from ...utils.valuation_log import log_value, log_table, log_row
 
 
 def _standardized_distance(numerator, denominator):

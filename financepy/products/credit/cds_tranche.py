@@ -273,18 +273,18 @@ class CDSTranche:
         prot_leg_pv = self.cds_contract.prot_leg_pv(
             value_dt, tranche_curve, curve_recovery
         )
-        risky_pv01 = self.cds_contract.rpv01(value_dt, tranche_curve)[CLEAN]
+        rpv01 = self.cds_contract.rpv01(value_dt, tranche_curve)[CLEAN]
 
-        mtm = self.notional * (prot_leg_pv - upfront - risky_pv01 * running_cpn)
+        mtm = self.notional * (prot_leg_pv - upfront - rpv01 * running_cpn)
 
         if not self.long_protect:
             mtm *= -1.0
 
         tranche_output = np.zeros(4)
         tranche_output[0] = mtm
-        tranche_output[1] = risky_pv01 * self.notional * running_cpn
+        tranche_output[1] = rpv01 * self.notional * running_cpn
         tranche_output[2] = prot_leg_pv * self.notional
-        tranche_output[3] = prot_leg_pv / risky_pv01
+        tranche_output[3] = prot_leg_pv / rpv01
 
         return tranche_output
 

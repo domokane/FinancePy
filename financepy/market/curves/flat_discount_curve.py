@@ -12,6 +12,8 @@ from ...utils.helpers import check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import times_from_dates
 
+from ...utils.valuation_log import log_value, log_table, log_row, log_section
+
 ###############################################################################
 
 
@@ -57,7 +59,7 @@ class FlatDiscountCurve(DiscountCurve):
         self._interp_type = None
 
         # Set up an annual grid of times and discount factors for insight
-        years = np.linspace(0.0, 5.0, 6)
+        years = np.linspace(0.0, 1.0, 2)
         self._df_dates = self.anchor_dt.add_years(years)
         self._times = times_from_dates(self.anchor_dt,
                                        self._df_dates,
@@ -94,6 +96,32 @@ class FlatDiscountCurve(DiscountCurve):
             curve_dc_type=self.curve_dc_type,
         )
         return disc_curve
+
+    ###########################################################################
+
+    def log_curve(self):
+        """Log the flat discount curve and its discount factors."""
+
+        log_section("Flat Discount Curve")
+
+        log_value(
+            "Object Type", type(self).__name__,
+            "Value Date", self.anchor_dt,
+            "Flat Zero Rate", f"{self.flat_zero_rate:.2%}",
+            "Frequency Type", self.freq_type,
+            "Curve Day Count", self.curve_dc_type,
+            level=1,
+        )
+
+        log_table(
+            "Date",
+            "Time (Years)",
+            "Discount Factor",
+            level=3,
+        )
+
+        for dt, t, df in zip(self._df_dates, self._times, self._dfs):
+            log_row(dt, t, df)
 
     ###########################################################################
 

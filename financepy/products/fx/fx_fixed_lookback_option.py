@@ -17,6 +17,7 @@ from ...utils.global_types import OptionTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import option_years
 from ...utils.check_values import check_curve_dt
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo

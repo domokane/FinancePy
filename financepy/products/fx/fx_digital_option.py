@@ -9,7 +9,6 @@ import numpy as np
 
 from ...utils.math import normcdf_vect  # normcdf_prime_vect
 
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.error import FinError
 from ...utils.helpers import option_years
 
@@ -22,6 +21,7 @@ from ...utils.check_values import check_curve_dt
 from ...models.black_scholes import BlackScholes
 from ...models.model import Model
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.valuation_log import log_value, log_table, log_row
 
 
 def _standardized_distance(numerator, denominator):

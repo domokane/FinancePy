@@ -20,6 +20,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...products.rates.ibor_deposit import IborDeposit
 from ...products.rates.ibor_fra import IborFRA
 from ...products.rates.ibor_swap import IborSwap
+from ...utils.valuation_log import log_table, log_row, log_section
 
 SWAP_TOL = 1e-6
 FAST = True
@@ -225,15 +226,15 @@ class IborSingleCurve(DiscountCurve):
     ####################################################################################
 
     def build_curve(self, **kwargs):
-        """
-        Build curve based on interpolation.
+        """Build curve based on interpolation."""
 
-        Not all interpolators are suitable for the bootstrap/1d solver, only those
-        that are local,
-        where the value of df[i] does not affect discount factors for t<=t[i-1]
-        """
+        # Always refresh cached calibration instrument cash flows.
+        if FAST:
+            self._precompute_swap_flows()
 
-        if Interpolator.suitable_for_bootstrap(self._interp_type):
+        if Interpolator.suitable_for_bootstrap(
+            self._interp_type
+        ):
             self._build_curve_using_1d_solver(**kwargs)
         else:
             self._build_curve_using_least_squares(**kwargs)
@@ -476,6 +477,7 @@ class IborSingleCurve(DiscountCurve):
         self._times = np.append(self._times, 0.0)
         self._dfs = np.append(self._dfs, df_mat)
         self.fit(self._times, self._dfs)
+        self._df_dates = [self.anchor_dt]
 
         for depo in self.used_deposits:
 
@@ -487,6 +489,9 @@ class IborSingleCurve(DiscountCurve):
                 depo.maturity_dt,
                 self.curve_dc_type,
             )
+
+            self._df_dates.append(depo.maturity_dt)
+
             self._times = np.append(self._times, t_mat)
             self._dfs = np.append(self._dfs, df_mat)
             self.fit(self._times, self._dfs)
@@ -506,6 +511,8 @@ class IborSingleCurve(DiscountCurve):
                 fra.maturity_dt,
                 self.curve_dc_type,
             )
+
+            self._df_dates.append(fra.maturity_dt)
 
             # if both dates are after the previous FRA/FUT then need to
             # solve for 2 discount factors simultaneously using root search
@@ -539,6 +546,8 @@ class IborSingleCurve(DiscountCurve):
                 maturity_dt,
                 self.curve_dc_type,
             )
+
+            self._df_dates.append(maturity_dt)
 
             if FAST:
 
@@ -623,6 +632,8 @@ class IborSingleCurve(DiscountCurve):
         bootstrap_first = True
         self.is_built = True
 
+        self._df_dates = [self.anchor_dt]
+
         if bootstrap_first:
             orig_check_refit_flag = self.check_refit_flag
             self.check_refit_flag = False
@@ -641,14 +652,17 @@ class IborSingleCurve(DiscountCurve):
 
             for depo in self.used_deposits:
                 t_mat = times_from_dates(self.anchor_dt, depo.maturity_dt, self.curve_dc_type)
+                self._df_dates.append(depo.maturity_dt)
                 grid_times.append(t_mat)
 
             for fra in self.used_fras:
                 t_mat = times_from_dates(self.anchor_dt, fra.maturity_dt, self.curve_dc_type)
+                self._df_dates.append(fra.maturity_dt)
                 grid_times.append(t_mat)
 
             for swap in self.used_swaps:
                 t_mat = times_from_dates(self.anchor_dt, swap.maturity_dt, self.curve_dc_type)
+                self._df_dates.append(swap.maturity_dt)
                 grid_times.append(t_mat)
 
             self._times = np.array(grid_times)
@@ -932,6 +946,40 @@ class IborSingleCurve(DiscountCurve):
             s += swap.__repr__()
 
         return s
+
+    ####################################################################################
+
+    def log_curve(self, level=3):
+        """Print out the details of the Ibor curve."""
+
+        log_section("Ibor Single Curve")
+
+        log_table(
+            "Type",
+            "Start Date",
+            "End Date",
+            "Rate (%)",
+            level=2,
+        )
+
+        for depo in self.used_deposits:
+            log_row("DEPOSITS", depo.start_dt, depo.maturity_dt, depo.deposit_rate*100)
+
+        for fra in self.used_fras:
+            log_row("FRAS", fra.start_dt, fra.maturity_dt, fra.fra_rate*100)
+
+        for swap in self.used_swaps:
+            log_row("SWAPS", swap.effective_dt, swap.maturity_dt, swap.fixed_leg.cpn*100)
+
+        log_table(
+            "Date",
+            "Time (Years)",
+            "Discount Factor",
+            level=3,
+        )
+
+        for dt, t, df in zip(self._df_dates, self._times, self._dfs):
+            log_row(dt, t, df)
 
     ####################################################################################
 

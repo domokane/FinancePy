@@ -11,6 +11,7 @@ from ...utils.check_values import check_curve_dt
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.check_values import check_currency_pair
 from ...utils.fx_conventions import fx_spot_date
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ########################################################################################
 

@@ -19,6 +19,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.global_types import OptionTypes
 from ...models.model import Model
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo

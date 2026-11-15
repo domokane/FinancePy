@@ -13,6 +13,7 @@ from ...utils.day_count import DayCount, DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.check_values import check_curve_dt
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ########################################################################################
 
@@ -144,8 +145,8 @@ class InflationSwap:
         s += label_to_string("FRA RATE", self.fra_rate)
         s += label_to_string("NOTIONAL", self.notional)
         s += label_to_string("PAY FIXED RATE", self.pay_fixed_rate)
-        s += label_to_string("DC TYPE", self.accrual_dc_type)
-        s += label_to_string("BUS DAY ADJUST", self.bd_type)
+        s += label_to_string("DAY COUNT", self.accrual_dc_type)
+        s += label_to_string("BUS DAY RULE", self.bd_type)
         s += label_to_string("CALENDAR", self.cal_type)
         return s
 

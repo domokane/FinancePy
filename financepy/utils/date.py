@@ -205,8 +205,13 @@ class Date:
 
     ####################################################################################
 
-    def __init__(self, d, m, y, hh=0, mm=0, ss=0) -> None:
+    def __init__(self, d: int, m: int, y: int, hh=0, mm=0, ss=0) -> None:
         # validation checks (as you already had)
+
+        d = int(d)
+        m = int(m)
+        y = int(y)
+
         if 1900 <= d <= 2100 and 1 <= y <= 31:
             raise FinError("Date arguments must be in order Date(day, month, year)")
 

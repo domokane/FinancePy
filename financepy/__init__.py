@@ -2,7 +2,7 @@ __version__ = "1.1.2"
 
 CR = "\n"
 S =  "#############################################################" + CR
-S += "#  FINANCEPY Version 1.1.2 - Built on 26 Oct 2026 at 17:41  #" + CR
+S += "#  FINANCEPY Version 1.1.2 - Built on 06 Nov 2026 at 14:37  #" + CR
 S += "#  This software is distributed FREE AND WITHOUT WARRANTY   #" + CR
 S += "#  Report issues at https://github.com/domokane/FinancePy   #" + CR
 S += "#############################################################"

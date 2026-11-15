@@ -9,10 +9,11 @@ from financepy.utils.global_vars import ONE_MILLION
 from financepy.utils.date import Date
 from financepy.utils.day_count import DayCountTypes
 from financepy.utils.frequency import FrequencyTypes
+from financepy.utils.bond_market import BondMarkets
+from financepy.utils.bond_market import get_bond_market_conventions
+
 from financepy.products.bonds.bond import YTMCalcType, Bond
 from financepy.products.bonds.bond_zero import BondZero
-from financepy.products.bonds.bond_market import BondMarkets
-from financepy.products.bonds.bond_market import get_bond_market_conventions
 
 TOL = 3
 

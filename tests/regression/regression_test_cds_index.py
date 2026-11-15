@@ -9,15 +9,12 @@ from financepy.utils.frequency import FrequencyTypes
 from financepy.market.curves.cds_curve import CDSCurve
 from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.products.rates.ibor_swap import IborSwap
-from financepy.utils.global_vars import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION, DIRTY, CLEAN
 from financepy.products.credit.cds import CDS
 
 from FinTestCases import FinTestCases, global_test_case_mode
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
-
-DIRTY = 0
-CLEAN = 1
 
 # TO DO
 

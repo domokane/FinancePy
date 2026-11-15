@@ -347,7 +347,7 @@ class FixedFixedCrossCurrencySwap:
         value_dt,  # This should be the settlement date
         discount_curve,
         index_curve,
-        first_fixing_rate:float=None,
+        first_fixing_rate: float = None,
         principal=0.0,
     ):
         """Value the floating leg with payments from an index curve and
@@ -417,7 +417,7 @@ class FixedFixedCrossCurrencySwap:
         prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
 
-        for next_dt in self._adjusted_float_dts[start_index + 1 :]:
+        for next_dt in self._adjusted_float_dts[start_index + 1:]:
             alpha = basis.year_frac(prev_dt, next_dt)[0]
             df2_index = index_curve.df(next_dt)
             # The accrual factors cancel
@@ -588,7 +588,7 @@ class FixedFixedCrossCurrencySwap:
         s += label_to_string("FIXED DAY COUNT", self._fixed_dc_type)
         s += label_to_string("FLOAT DAY COUNT", self._float_dc_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST", self._bd_type)
+        s += label_to_string("BUS DAY RULE", self._bd_type)
         s += label_to_string("DATE GEN TYPE", self._dg_type)
         return s
 

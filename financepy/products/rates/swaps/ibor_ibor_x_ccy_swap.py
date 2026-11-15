@@ -15,6 +15,7 @@ from ....utils import Schedule
 from ....utils import label_to_string, check_argument_types
 from ....utils import ONE_MILLION
 from ....utils import SwapTypes
+from ....utils.valuation_log import log_value, log_table, log_row
 
 ##########################################################################
 
@@ -584,8 +585,8 @@ class IborIborXCcySwap:
         s += label_to_string("FIXED DAY COUNT", self.fixed_dc_type)
         s += label_to_string("FLOAT DAY COUNT", self.float_dc_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS DAY ADJUST", self.bd_type)
-        s += label_to_string("DATE GEN TYPE", self.dg_type)
+        s += label_to_string("BUS DAY RULE", self.bd_type)
+        s += label_to_string("DATE GEN RULE", self.dg_type)
         return s
 
     ####################################################################################

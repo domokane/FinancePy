@@ -15,6 +15,7 @@ from ...utils.calendar import CalendarTypes
 from ...utils.day_count import DayCountTypes
 from ...utils.helpers import label_to_string, check_argument_types
 from ..bonds.bond import Bond, YTMCalcType
+from ...utils.valuation_log import log_value
 
 ########################################################################################
 

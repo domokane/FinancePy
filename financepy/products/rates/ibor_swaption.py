@@ -41,6 +41,8 @@ from ...utils.global_types import ExerciseTypes
 from ...utils.check_values import check_curve_dt
 from ...models.model import Model
 
+from ...utils.valuation_log import log_value, log_table, log_row
+
 ########################################################################################
 
 

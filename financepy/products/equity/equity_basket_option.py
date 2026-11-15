@@ -14,7 +14,6 @@ from ...models.gbm_process_simulator import get_assets_paths
 from ...utils.error import FinError
 from ...utils.global_types import OptionTypes
 from ...utils.helpers import label_to_string, check_argument_types
-from ...utils.helpers import _func_name
 from ...utils.date import Date
 from ...utils.helpers import option_years
 
@@ -22,6 +21,7 @@ from ...market.curves.discount_curve import DiscountCurve
 
 from ...utils.math import normcdf
 from ...utils.check_values import check_curve_dt
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ########################################################################################
 

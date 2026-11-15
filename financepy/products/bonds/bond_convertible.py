@@ -26,6 +26,8 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...models.bond_convertible_bs_tree import value_convertible
 from ...utils.check_values import check_curve_dt
 
+from ...utils.valuation_log import log_value, log_table, log_row
+
 ########################################################################################
 
 

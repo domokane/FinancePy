@@ -19,6 +19,7 @@ from ...utils.check_values import check_stock_price
 from ...utils.check_values import check_strike_price
 from ...utils.helpers import option_years
 from ...models.model import Model
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ########################################################################################
 

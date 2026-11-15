@@ -212,8 +212,15 @@ def test_fast_approximation_is_consistent_with_fixed_recovery(market):
         recovery_rate=FIXED_RECOVERY,
     )
     assert len(fixed_results) == 7
-    # PV, RPV01, credit DV01 and IR DV01 agree; recovery DV01 must differ.
-    assert_close(fixed_results[:6], standard_results[:6], rtol=1e-9)
+
+    # PV and RPV01 must agree to numerical precision.
+    assert_close(fixed_results[:4], standard_results[:4], rtol=1e-9)
+
+    # DV01s use different finite-difference schemes.
+    assert_close(fixed_results[4:6], standard_results[4:6], rtol=1e-3)
+
+    # Recovery DV01 must differ.
+    assert not np.isclose(fixed_results[6], standard_results[6])
 
     bumped = fixed.value_fast_approx(
         value_dt, rate, spread,

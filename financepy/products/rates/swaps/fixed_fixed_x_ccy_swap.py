@@ -578,7 +578,7 @@ class FixedFixedXCcySwap:
         s += label_to_string("FIXED DAY COUNT", self._fixed_dc_type)
         s += label_to_string("FLOAT DAY COUNT", self._float_dc_type)
         s += label_to_string("CALENDAR", self._cal_type)
-        s += label_to_string("BUS DAY ADJUST", self._bd_type)
+        s += label_to_string("BUS DAY RULE", self._bd_type)
         s += label_to_string("DATE GEN RULE", self._dg_type)
         return s
 

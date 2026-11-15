@@ -2,12 +2,8 @@
 
 from .helpers import build_ibor_curve, build_issuer_curve
 from financepy.utils.date import Date
-from financepy.utils.global_vars import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION, DIRTY, CLEAN
 from financepy.products.credit.cds import CDS
-
-
-DIRTY = 0
-CLEAN = 1
 
 
 # We treat an index as a CDS contract with a flat CDS curve

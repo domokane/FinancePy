@@ -16,6 +16,7 @@ from ...utils.global_types import OptionTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.helpers import option_years
 from ...utils.check_values import check_curve_dt
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ##########################################################################
 # TODO: Attempt control variate adjustment to monte carlo
@@ -147,8 +148,8 @@ class FXFloatLookbackOption(FXOption):
         foreign_curve: DiscountCurve,
         volatility: float,
         stock_min_max,
-        num_paths: int=10000,
-        num_steps_per_year: int=252,
+        num_paths: int = 10000,
+        num_steps_per_year: int = 252,
         seed=4242,
     ):
         """Value FX floating lookback option using Monte Carlo"""

@@ -18,6 +18,8 @@ from ...models.black import Black, implied_volatility
 from ...utils.check_values import check_curve_dt
 from ...utils.helpers import option_years
 
+from ...utils.valuation_log import log_value, log_table, log_row
+
 
 class EquityIndexOption:
     """Class for managing plain vanilla European/American

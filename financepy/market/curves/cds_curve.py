@@ -8,7 +8,6 @@ from scipy import optimize
 from ...utils.date import Date
 from ...utils.day_count import DayCountTypes
 from ...utils.error import FinError
-from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...market.curves.discount_curve import DiscountCurve
 from ...market.curves.interpolator import _uinterpolate, InterpTypes
 from ...utils.helpers import input_time, table_to_string, times_from_dates
@@ -17,12 +16,14 @@ from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import label_to_string
 from ...utils.global_vars import CLEAN
 
+from ...utils.valuation_log import log_value, log_table, log_row, log_section
 # from numba import njit, float64
+from ...utils.valuation_log import suppress_logging
 
 ########################################################################################
 
 
-def f(q, *args):
+def _f(q, *args):
     """Function that returns zero when the survival probability that gives a
     zero value of the CDS has been determined."""
 
@@ -35,7 +36,10 @@ def f(q, *args):
 
     # This is important - we calibrate a curve that makes the clean PV of the
     # CDS equal to zero and so we select the second element of the value tuple
-    obj_fn = cds.value(value_dt, curve, recovery_rate)[CLEAN]
+
+    with suppress_logging():
+        obj_fn = cds.value(value_dt, curve, recovery_rate)[CLEAN]
+
     return obj_fn
 
 
@@ -64,7 +68,10 @@ class CDSCurve:
         check_argument_types(getattr(self, _func_name(), None), locals())
 
         if anchor_dt != libor_curve.anchor_dt:
-            raise FinError("Ibor curve does not have same anchor date as Issuer curve.")
+            raise FinError(
+                f"Anchor date mismatch: Issuer curve = {anchor_dt}, "
+                f"Ibor curve = {libor_curve.anchor_dt}."
+            )
 
         self.anchor_dt = anchor_dt
         self.cds_contracts = cds_contracts
@@ -159,10 +166,16 @@ class CDSCurve:
             n = len(t)
             qs = np.zeros(n)
             for i in range(0, n):
-                qs[i] = _uinterpolate(t[i], self._times, self._qs, self.interp_method.value)
+                qs[i] = _uinterpolate(t[i],
+                                      self._times,
+                                      self._qs,
+                                      self.interp_method.value)
             return qs
         elif np.isscalar(t):
-            q = _uinterpolate(float(t), self._times, self._qs, self.interp_method.value)
+            q = _uinterpolate(float(t),
+                              self._times,
+                              self._qs,
+                              self.interp_method.value)
             return q
 
         raise FinError("Unknown time type")
@@ -215,7 +228,7 @@ class CDSCurve:
             self._qs = np.append(self._qs, q)
 
             q_star = optimize.newton(
-                f,
+                _f,
                 x0=q,
                 fprime=None,
                 args=argtuple,
@@ -262,6 +275,58 @@ class CDSCurve:
             zero_rate = (dfq ** (-1.0 / (f * t)) - 1) * f
 
         return zero_rate
+
+    ###########################################################################
+
+    def log_curve(self):
+        """Log CDS calibration inputs and the calibrated survival curve."""
+
+        log_section("CDS Curve")
+
+        log_value(
+            "Object Type", type(self).__name__,
+            "Value Date", self.anchor_dt,
+            "Recovery Rate", f"{self.recovery_rate:.2%}",
+            "Interpolation Type", self.interp_method,
+            "Curve Day Count", self.dc_type,
+            level=2,
+        )
+
+        # CDS contracts used to calibrate the curve
+        log_table(
+            "CDS Maturity",
+            "CDS Spread (bp)",
+            level=2,
+        )
+
+        for cds in self.cds_contracts:
+            log_row(
+                cds.maturity_dt,
+                cds.running_cpn * 10000.0,
+            )
+
+        # Calibrated survival probability curve
+        log_table(
+            "Date",
+            "Time",
+            "Surv Prob",
+            level=3,
+        )
+
+        # Anchor point
+        log_row(
+            self.anchor_dt,
+            self._times[0],
+            self._qs[0],
+        )
+
+        # Calibrated CDS maturity nodes
+        for i, cds in enumerate(self.cds_contracts):
+            log_row(
+                cds.maturity_dt,
+                self._times[i + 1],
+                self._qs[i + 1],
+            )
 
     ###########################################################################
 

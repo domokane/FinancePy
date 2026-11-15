@@ -21,6 +21,7 @@ from ...utils.helpers import option_years
 from ...utils.check_values import check_curve_dt
 
 from ...models.bs_equity_chooser import equity_chooser_value
+from ...utils.valuation_log import log_value, log_table, log_row
 
 DEBUG_MODE = False
 

@@ -1,6 +1,5 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
-import os
 from typing import Union
 
 import numpy as np
@@ -20,6 +19,8 @@ from ...utils.helpers import times_from_dates
 from ...utils.helpers import label_to_string
 
 import matplotlib.pyplot as plt
+
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ########################################################################################
 
@@ -821,6 +822,28 @@ class DiscountCurve:
             plt.savefig(filename, bbox_inches="tight", pad_inches=0.02)
 
         plt.show()
+
+    ###########################################################################
+
+    def log_curve(self, level=2):
+
+        log_value(
+            "Object Type", type(self).__name__,
+            "Value Date", self.anchor_dt,
+            "Interpolation Type", self._interp_type,
+            "Curve Day Count", self.curve_dc_type,
+            level=2,
+        )
+
+        log_table(
+            "Date",
+            "Time (Years)",
+            "Discount Factor",
+            level=3,
+        )
+
+        for dt, t, df in zip(self._df_dates, self._times, self._dfs):
+            log_row(dt, t, df)
 
     ###########################################################################
 

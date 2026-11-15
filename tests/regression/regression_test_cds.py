@@ -16,17 +16,14 @@ from financepy.utils.calendar import CalendarTypes
 from financepy.utils.calendar import DateGenRuleTypes
 from financepy.utils.calendar import BusDayAdjustTypes
 from financepy.utils.global_vars import G_DAYS_IN_YEAR
+from financepy.utils.global_vars import ONE_MILLION, DIRTY, CLEAN
 from financepy.market.curves.cds_curve import CDSCurve
 from financepy.market.curves.ibor_single_curve import IborSingleCurve
 from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.utils.global_vars import ONE_MILLION
 from financepy.products.credit.cds import CDS
-
-DIRTY = 0
-CLEAN = 1
 
 
 test_cases = FinTestCases(__file__, global_test_case_mode)
@@ -415,7 +412,7 @@ def test_dirty_price_cds():
     prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("prot_PV", prot_pv)
 
-    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve)
     test_cases.print("PREMIUM_PV", prem_pv)
 
     dirty_rpv01, clean_rpv01 = cds_contract.rpv01(value_dt, issuer_curve)
@@ -623,7 +620,7 @@ def test_dirty_price_cds_model_check():
     prot_pv = cds_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("prot_PV", prot_pv)
 
-    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+    prem_pv = cds_contract.premium_leg_pv(value_dt, issuer_curve)
     test_cases.print("PREMIUM_PV", prem_pv)
 
     rpv01 = cds_contract.rpv01(value_dt, issuer_curve)

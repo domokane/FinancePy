@@ -1,0 +1,18 @@
+EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_cds_forward 
+Row#  11  ERROR -  1  DIFFERENCE(S) IN ROW  11 
+Row#  11  HEADER:  ==> ['HEADER', 'PROTECTION LEG', 'PV'] 
+Row#  11  GOLDEN : ==> RESULTS,Forward CDS,43951.34092536 
+Row#  11  COMPARE: ==> RESULTS,Forward CDS,43951.34145542 
+ 
+Row#  12  ERROR -  1  DIFFERENCE(S) IN ROW  12 
+Row#  12  HEADER:  ==> ['HEADER', 'PROTECTION LEG', 'PV'] 
+Row#  12  GOLDEN : ==> RESULTS,Ordinary CDS,43951.34092536 
+Row#  12  COMPARE: ==> RESULTS,Ordinary CDS,43951.34145542 
+ 
+Row#  25  ERROR -  2  DIFFERENCE(S) IN ROW  25 
+Row#  25  HEADER:  ==> ['HEADER', 'POSITION', 'DIRTY PV', 'CLEAN PV'] 
+Row#  25  GOLDEN : ==> RESULTS,Buyer,21972.82176299,21972.82176299 
+Row#  25  COMPARE: ==> RESULTS,Buyer,21972.82202800,21972.82202800 
+ 
+Analysis of  regression_test_cds_forward  completed with  4  errors and  0  warnings. 
+NUM LINES: 27 ====> ERRORS: 4  WARNINGS: 0 

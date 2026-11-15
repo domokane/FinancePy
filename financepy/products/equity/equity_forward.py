@@ -10,6 +10,7 @@ from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
 from ...market.curves.discount_curve import DiscountCurve
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ########################################################################################
 # ADD START DATE TO CLASS ?

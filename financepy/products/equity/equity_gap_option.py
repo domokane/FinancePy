@@ -8,20 +8,16 @@ import numpy as np
 
 from ...utils.date import Date
 from ...utils.error import FinError
-from ...utils.global_types import BarrierTypes
 from ...utils.helpers import label_to_string, check_argument_types
-from ...models.process_simulator import GBMNumericalSchemeTypes
-from ...models.process_simulator import ProcessTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...products.equity.equity_option import EquityOption
-from ...models.bs_barrier_option import barrier_option_value
-from ...models.bs_barrier_option_mc import value_barrier_option_mc
 from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
 from ...utils.check_values import check_strike_price
 from ...utils.helpers import option_years
 from ...models.model import Model
 from ...utils.global_types import OptionTypes
+from ...utils.valuation_log import log_value, log_table, log_row
 
 # TODO: SOME REDESIGN ON THE MONTE CARLO PROCESS IS PROBABLY NEEDED
 

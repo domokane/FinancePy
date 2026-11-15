@@ -24,12 +24,9 @@ from financepy.market.curves.discount_curve import DiscountCurve
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.market.curves.interpolator import InterpTypes
-from financepy.utils.global_vars import ONE_MILLION
+from financepy.utils.global_vars import ONE_MILLION, DIRTY, CLEAN
 from financepy.products.credit.cds import CDS
 from financepy.products.credit.cds_fixed_recovery import CDSFixedRecovery
-
-DIRTY = 0
-CLEAN = 1
 
 CURVE_RECOVERY = 0.40
 FIXED_RECOVERY = 0.20

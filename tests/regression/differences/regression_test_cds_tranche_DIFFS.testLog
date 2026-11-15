@@ -1,9 +1,13 @@
 EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_cds_tranche 
-Row#  34  WARNING: Calculation time has changed by 101.47  percent. 
-Row#  35  WARNING: Calculation time has changed by 79.81  percent. 
-Row#  36  WARNING: Calculation time has changed by 71.62  percent. 
-Row#  37  WARNING: Calculation time has changed by 85.84  percent. 
-Row#  38  WARNING: Calculation time has changed by 92.97  percent. 
-Row#  39  WARNING: Calculation time has changed by 86.98  percent. 
-Analysis of  regression_test_cds_tranche  completed with  0  errors and  56  warnings. 
-NUM LINES: 76 ====> ERRORS: 0  WARNINGS: 56 
+Row#  73  ERROR -  1  DIFFERENCE(S) IN ROW  73 
+Row#  73  HEADER:  ==> ['HEADER', 'METHOD', 'TIME', 'NumPoints', 'k_1', 'k_2', 'Sprd'] 
+Row#  73  GOLDEN : ==> RESULTS,DefaultLossDbnAlgoTypes.LHP,0.00473714,40,0.22000000,0.60000000,0.33775061 
+Row#  73  COMPARE: ==> RESULTS,DefaultLossDbnAlgoTypes.LHP,0.00471568,40,0.22000000,0.60000000,0.33754955 
+ 
+Row#  74  ERROR -  1  DIFFERENCE(S) IN ROW  74 
+Row#  74  HEADER:  ==> ['HEADER', 'METHOD', 'TIME', 'NumPoints', 'k_1', 'k_2', 'Sprd'] 
+Row#  74  GOLDEN : ==> RESULTS,DefaultLossDbnAlgoTypes.LHP,0.00473332,40,0.00000000,0.60000000,57.22028051 
+Row#  74  COMPARE: ==> RESULTS,DefaultLossDbnAlgoTypes.LHP,0.00473452,40,0.00000000,0.60000000,57.22015259 
+ 
+Analysis of  regression_test_cds_tranche  completed with  2  errors and  56  warnings. 
+NUM LINES: 76 ====> ERRORS: 2  WARNINGS: 56 

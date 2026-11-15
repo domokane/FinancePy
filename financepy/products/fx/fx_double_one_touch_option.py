@@ -19,6 +19,7 @@ from ...models.bs_double_touch_option import barrier_pay_at_expiry_double_hit
 from ...models.bs_double_touch_option import p_double_touch_bb_parallel
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.model import Model
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ########################################################################################
 # TODO: Implement Sobol random numbers

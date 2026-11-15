@@ -18,6 +18,7 @@ from ...utils.check_values import check_curve_dt
 from ...utils.check_values import check_stock_price
 from ...utils.helpers import option_years
 from ...models.model import Model
+from ...utils.valuation_log import log_value, log_table, log_row
 
 from ...utils.math import normcdf_vect
 from ...models.bs_equity_one_touch import barrier_pay_one_at_hit_pv_down

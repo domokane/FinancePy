@@ -1,4 +1,16 @@
 ## CHANGE LOG
+15 Nov 2026
+- Fixed IR_DV01 bug in CDS class
+- Added comprehensive logging framework called valuation_log
+- Added logging to various CDS functions
+- Renamed some cds_model functions
+- Added treatment of some small r+lambda edge cases in cds_model
+- Moved bond_market to utils folder
+- Shortened risky_pv01 to rpv01
+- Removed CDSForward product as it can be done by CDS
+- Make sure Date constructor handes y,m,d as integers
+- Updated Golden regression tests folder
+
 2 Nov 2026
 - Widespread removal of _ in printing of objects
 - Added default_times.py to models

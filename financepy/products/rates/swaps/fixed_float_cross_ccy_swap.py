@@ -135,9 +135,15 @@ class FixedFloatCrossCurrencySwap:
         """Value the interest rate swap on a value date given a single Ibor
         discount curve."""
 
-        fixed_leg_value = self.fixed_leg_value(value_dt, discount_curve, principal)
+        fixed_leg_value = self.fixed_leg_value(value_dt,
+                                               discount_curve,
+                                               principal)
 
-        float_leg_value = self.float_leg_value(value_dt, discount_curve, index_curve, first_fixing_rate, principal)
+        float_leg_value = self.float_leg_value(value_dt,
+                                               discount_curve,
+                                               index_curve,
+                                               first_fixing_rate,
+                                               principal)
 
         value = fixed_leg_value - float_leg_value
 
@@ -415,7 +421,7 @@ class FixedFloatCrossCurrencySwap:
         prev_dt = next_dt
         df1_index = index_curve.df(prev_dt)
 
-        for next_dt in self._adjusted_float_dts[start_index + 1 :]:
+        for next_dt in self._adjusted_float_dts[start_index + 1:]:
             alpha = basis.year_frac(prev_dt, next_dt)[0]
             df2_index = index_curve.df(next_dt)
             # The accrual factors cancel

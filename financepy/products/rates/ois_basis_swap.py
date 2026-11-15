@@ -15,6 +15,7 @@ from ...utils.global_vars import ONE_MILLION
 from ...utils.global_types import SwapTypes
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.check_values import check_curve_dt
+from ...utils.valuation_log import log_value, log_table, log_row
 
 from .swap_float_leg import SwapFloatLeg
 

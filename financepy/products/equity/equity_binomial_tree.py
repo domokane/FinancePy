@@ -14,6 +14,7 @@ from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.math import heaviside
 from ...market.curves.discount_curve import DiscountCurve
 from ...utils.date import Date
+from ...utils.valuation_log import log_value, log_table, log_row
 
 ########################################################################################
 

@@ -15,6 +15,8 @@ from ...utils.global_types import OptionTypes, ExerciseTypes
 from ...products.bonds.bond import Bond
 from ...models.model import Model
 from ...utils.helpers import option_years
+from ...utils.valuation_log import log_value, log_table, log_row
+
 
 ########################################################################################
 # TODO: Add BDT model to valuation

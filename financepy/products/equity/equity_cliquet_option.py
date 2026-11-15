@@ -21,6 +21,7 @@ from ...utils.schedule import Schedule
 from ...utils.check_values import check_curve_dt
 from ...utils.stats import std_err
 from ...utils.mc_result import MCResult
+from ...utils.valuation_log import log_value, log_table, log_row
 
 from ...products.equity.equity_option import EquityOption
 from ...market.curves.flat_discount_curve import DiscountCurve
@@ -628,7 +629,7 @@ class EquityCliquetOption(EquityOption):
         if self.global_cap is not None:
             s += label_to_string("GLOBAL CAP", self.global_cap)
         s += label_to_string("CALENDAR TYPE", self.cal_type)
-        s += label_to_string("BUS DAY ADJUST", self.bd_type)
+        s += label_to_string("BUS DAY RULE", self.bd_type)
         s += label_to_string("DATE GEN RULE", self.dg_type, "")
         return s
 

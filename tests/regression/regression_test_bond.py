@@ -18,8 +18,8 @@ from financepy.utils.global_vars import ONE_MILLION
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.products.rates.ibor_deposit import IborDeposit
 from financepy.market.curves.ibor_single_curve import IborSingleCurve
-from financepy.products.bonds.bond_market import get_bond_market_conventions
-from financepy.products.bonds.bond_market import BondMarkets
+from financepy.utils.bond_market import get_bond_market_conventions
+from financepy.utils.bond_market import BondMarkets
 from financepy.products.bonds.bond import YTMCalcType, Bond, CouponType
 from financepy.utils.global_types import SwapTypes
 from financepy.market.curves.interpolator import InterpTypes

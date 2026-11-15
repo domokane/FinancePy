@@ -34,6 +34,8 @@ from ...utils.global_types import CapFloorTypes, OptionTypes
 from ...utils.check_values import check_curve_dt
 from ...market.curves.discount_curve import DiscountCurve
 from ...models.model import Model
+from ...utils.valuation_log import log_value, log_table, log_row
+
 
 ##########################################################################
 

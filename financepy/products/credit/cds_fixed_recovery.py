@@ -16,18 +16,12 @@ from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_vars import ONE_MILLION
 from ...utils.helpers import label_to_string, table_to_string
 from ...utils.global_vars import DIRTY
+from ...utils.valuation_log import log_value, log_table, log_row
 
 from ...market.curves.cds_curve import CDSCurve
-from .cds import CDS, GLOB_NUM_STEPS_PER_YEAR
+from .cds import CDS, GLOB_NUM_STEPS_PER_YEAR, ONE_PCT, ONE_BP
+from .cds import STANDARD_RECOVERY_RATE, KAPPA
 
-USE_FLAT_HAZARD_RATE_INTEGRAL = True
-STANDARD_RECOVERY_RATE = 0.40
-ONE_BP = 0.0001
-ONE_PCT = 0.01
-
-# Premium accrues on an Act/360 basis while time is measured in
-# calendar years, hence the 365/360 adjustment to the clean RPV01.
-KAPPA = 365.0 / 360.0
 
 ########################################################################################
 # TODO: Perform protection leg pv analytically using fact that hazard rate and
@@ -397,7 +391,7 @@ class CDSFixedRecovery(CDS):
         s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS DAY ADJUST", self.bd_type)
+        s += label_to_string("BUS DAY RULE", self.bd_type)
         s += label_to_string("DATE GEN RULE", self.dg_type)
 
         header = "PAYMENT_DT, YEAR_FRAC, ACCRUAL_START, ACCRUAL_END, PAYMENT"

@@ -148,22 +148,22 @@ class CDSBasket:
 
         clean_rpv01 = dirty_rpv01 - accrued
 
-        risky_pv01 = np.array([dirty_rpv01, clean_rpv01])
+        rpv01 = np.array([dirty_rpv01, clean_rpv01])
 
         if clean_rpv01 <= 0.0:
             raise FinError("Cannot compute basket spread: risky PV01 is non-positive."
                            )
-        mtm = self.notional * (prot_leg_pv - self.running_cpn * risky_pv01)
+        value = self.notional * (prot_leg_pv - self.running_cpn * rpv01)
 
         if not self.long_protect:
-            mtm = mtm * -1.0
+            value = value * -1.0
 
         basket_output = np.zeros(5)
-        basket_output[DIRTY] = mtm[DIRTY]
-        basket_output[CLEAN] = mtm[CLEAN]
-        basket_output[2] = risky_pv01[DIRTY] * self.notional * self.running_cpn
+        basket_output[DIRTY] = value[DIRTY]
+        basket_output[CLEAN] = value[CLEAN]
+        basket_output[2] = rpv01[DIRTY] * self.notional * self.running_cpn
         basket_output[3] = prot_leg_pv * self.notional
-        basket_output[4] = prot_leg_pv / risky_pv01[CLEAN]  # This is the fair spread
+        basket_output[4] = prot_leg_pv / rpv01[CLEAN]  # This is the fair spread
 
         return basket_output
 
@@ -523,7 +523,7 @@ class CDSBasket:
         cash flows"""
         s = label_to_string("OBJECT TYPE", type(self).__name__)
         s += label_to_string("STEP-IN DATE", self.step_in_dt)
-        s += label_to_string("MATURITY", self.maturity_dt)
+        s += label_to_string("TERMINATION DATE", self.maturity_dt)
         s += label_to_string("NUM CREDITS", self.num_credits)
         s += label_to_string("N-TO-DEFAULT", self.n_to_default)
         s += label_to_string("NOTIONAL", self.notional)
@@ -531,7 +531,7 @@ class CDSBasket:
         s += label_to_string("DAY COUNT", self.accrual_dc_type)
         s += label_to_string("FREQUENCY", self.freq_type)
         s += label_to_string("CALENDAR", self.cal_type)
-        s += label_to_string("BUS DAY ADJUST", self.bd_type)
+        s += label_to_string("BUS DAY RULE", self.bd_type)
         s += label_to_string("DATE GEN RULE", self.dg_type)
 
         #  header = "PAYMENT_DT, YEAR_FRAC, PAYMENT"

@@ -28,21 +28,10 @@ KAPPA = 365.0 / 360.0
 
 
 @njit(
-    float64[:](
-        float64,
-        float64,
-        float64[:],
-        float64[:],
-        float64[:],
-        float64[:],
-        float64[:],
-        float64[:],
-        int64,
-    ),
     fastmath=True,
     cache=True,
 )
-def risky_pv01_numba(
+def rpv01_numba(
     t_eff,
     accrual_factor_pcd_to_now,
     payment_times,
@@ -51,22 +40,12 @@ def risky_pv01_numba(
     np_ibor_values,
     np_surv_times,
     np_surv_values,
-    pv01_method,
+    rpv01_method
 ):
     """Fast calculation of the risky PV01 of a CDS using NUMBA.
     The output is a numpy array of the full and clean risky PV01."""
 
     method = InterpTypes.FLAT_FWD_RATES.value
-    debug = False
-
-    if debug:
-        print("===================")
-        print("t_eff", t_eff)
-        print("Acc", accrual_factor_pcd_to_now)
-        print("Payments", payment_times)
-        print("Alphas", year_fracs)
-        print("QTimes", np_surv_times)
-        print("QValues", np_surv_values)
 
     cpn_accd_indicator = 1
 
@@ -78,7 +57,7 @@ def risky_pv01_numba(
 
     # The first cpn is a special case which needs to be handled carefully
     # taking into account what cpn has already accrued and what has not
-    qeff = _uinterpolate(t_eff, np_surv_times, np_surv_values, method)
+    q_eff = _uinterpolate(t_eff, np_surv_times, np_surv_values, method)
     q1 = _uinterpolate(t_ncd, np_surv_times, np_surv_values, method)
     z1 = _uinterpolate(t_ncd, np_ibor_times, np_ibor_values, method)
 
@@ -87,19 +66,29 @@ def risky_pv01_numba(
     # payment_times so index 0 is the current period.
     accrual_factor_ncd = year_fracs[0]
 
-    # this is the part of the cpn accrued from previous cpn date to now
-    # accrual_factor_pcd_to_now = day_count.year_frac(pcd,teff)
-    # reference credit survives to the premium payment date
+    # Probability of default between effective date and first coupon payment
+    dq = q_eff - q1
+
     dirty_rpv01 = q1 * z1 * accrual_factor_ncd
 
-    # cpn accrued from previous cpn to today paid in full at default
-    # before cpn payment
-    dq = qeff - q1
-    dirty_rpv01 += z1 * dq * accrual_factor_pcd_to_now * cpn_accd_indicator
+    dirty_rpv01 += (
+        z1 * dq * accrual_factor_pcd_to_now
+        * cpn_accd_indicator
+    )
 
-    # future accrued from now to cpn payment date assuming default roughly
-    # midway
-    dirty_rpv01 += 0.5 * z1 * dq * (accrual_factor_ncd - accrual_factor_pcd_to_now) * cpn_accd_indicator
+    dirty_rpv01 += (
+        0.5 * z1 * dq
+        * (accrual_factor_ncd - accrual_factor_pcd_to_now)
+        * cpn_accd_indicator
+    )
+
+    accrued_adjustment = accrual_factor_pcd_to_now
+
+    first_accrual_factor = accrual_factor_ncd
+
+    log_table = []
+
+    log_table.append([t_ncd, q1, z1, first_accrual_factor, dirty_rpv01])
 
     for it in range(1, len(payment_times)):
 
@@ -111,14 +100,10 @@ def risky_pv01_numba(
         # full cpn is paid at the end of the current period if survives
         dirty_rpv01 += q2 * z2 * accrual_factor
 
-        #        print(it, t2, z2, q2, accrual_factor, full_rpv01)
-
-        #######################################################################
-
         if cpn_accd_indicator == 1:
 
             if USE_FLAT_HAZARD_RATE_INTEGRAL:
-                # This needs to be updated to handle small h+r
+                # TODO This needs to be updated to handle small h+r
                 tau = accrual_factor
                 h12 = -np.log(q2 / q1) / tau
                 r12 = -np.log(z2 / z1) / tau
@@ -128,34 +113,27 @@ def risky_pv01_numba(
             else:
                 d_dirty_rpv01 = 0.50 * (q1 - q2) * z2 * accrual_factor
 
-            dirty_rpv01 = dirty_rpv01 + d_dirty_rpv01
+            dirty_rpv01 += d_dirty_rpv01
+
+        log_table.append([t2, q2, z2, accrual_factor, dirty_rpv01])
 
         q1 = q2
         z1 = z2
 
-    clean_rpv01 = dirty_rpv01 - accrual_factor_pcd_to_now
+    clean_rpv01 = dirty_rpv01 - accrued_adjustment
 
     v = np.array([0.0, 0.0])
     v[DIRTY] = dirty_rpv01
     v[CLEAN] = clean_rpv01
-    return v
 
+    log_table = np.array(log_table)
+
+    return v, log_table
 
 ########################################################################################
 
 
 @njit(
-    float64(
-        float64,
-        float64,
-        float64[:],
-        float64[:],
-        float64[:],
-        float64[:],
-        float64,
-        int64,
-        int64,
-    ),
     fastmath=True,
     cache=True,
 )
@@ -173,12 +151,22 @@ def prot_leg_pv_numba(
     """Fast calculation of the CDS protection leg PV using NUMBA to speed up
     the numerical integration over time."""
 
+    method = InterpTypes.FLAT_FWD_RATES.value
+
     if t_eff < 0.0:
         raise FinError("Error: Protection leg starts in past: t_eff < 0")
 
-    method = InterpTypes.FLAT_FWD_RATES.value
-    dt = 1.0 / num_steps_per_year
-    num_steps = int((t_mat - t_eff) * num_steps_per_year + 0.50)
+    if t_mat <= t_eff:
+        return 0.0
+
+    if num_steps_per_year <= 0:
+        raise ValueError("num_steps_per_year must be positive")
+
+    num_steps = max(
+        1,
+        int((t_mat - t_eff) * num_steps_per_year + 0.50),
+    )
+
     dt = (t_mat - t_eff) / num_steps
 
     t = t_eff
@@ -208,8 +196,23 @@ def prot_leg_pv_numba(
             h12 = -(log_q2 - log_q1) / dt
             r12 = -(log_z2 - log_z1) / dt
 
-            exp_term = np.exp(-(r12 + h12) * dt)
-            dprot_pv = h12 * (1.0 - exp_term) * q1 * z1 / (abs(h12 + r12) + small)
+#            exp_term = np.exp(-(r12 + h12) * dt)
+#            dprot_pv = h12 * (1.0 - exp_term) * q1 * z1 / (abs(h12 + r12) + small)
+
+            ##################################################################
+            alpha = h12 + r12
+            x = alpha * dt
+
+            if abs(x) < 1e-8:
+                integral = dt * (
+                    1.0 - x / 2.0 + x * x / 6.0
+                )
+            else:
+                integral = -np.expm1(-x) / alpha
+
+            dprot_pv = h12 * q1 * z1 * integral
+            ##################################################################
+
             prot_pv += dprot_pv
 
             q1, z1 = q2, z2

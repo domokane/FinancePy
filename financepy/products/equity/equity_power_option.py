@@ -23,6 +23,7 @@ from ...models.model import Model
 from ...models.black_scholes import BlackScholes
 from ...models.bs_power_option import power_option_value
 from ...models.bs_power_option import power_option_delta
+from ...utils.valuation_log import log_value, log_table, log_row
 
 from .equity_option import EquityOption
 
