@@ -2195,9 +2195,8 @@ class Calendar:
         if m == 1 and d == 1:
             return True
 
-        # Friday observation when Jan 1 falls Saturday
-        if m == 12 and d == 31 and weekday == Date.FRI:
-            return True
+        # No Friday observation when Jan 1 falls on a Saturday. SIFMA only
+        # recommends an early close on 31 December (e.g. 2010, 2021, 2027)
 
         # Monday observation when Jan 1 falls Sunday
         if m == 1 and d == 2 and weekday == Date.MON:

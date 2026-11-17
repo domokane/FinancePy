@@ -182,6 +182,21 @@ def test_us_observed_independence_day_2010():
     assert cal.adjust(Date(4, 7, 2010), BusDayAdjustTypes.FOLLOWING) == Date(6, 7, 2010)
 
 
+def test_us_government_securities_new_year_on_saturday():
+    cal = Calendar(CalendarTypes.US_GOVERNMENT_SECURITIES)
+
+    # When 1 January is a Saturday SIFMA only recommends an early close on
+    # the Friday before, so 31 December is still a business day
+    for dt in [Date(31, 12, 2010), Date(31, 12, 2021), Date(31, 12, 2027)]:
+        assert not cal.is_holiday(dt), dt
+        assert cal.is_business_day(dt), dt
+
+    # 1 January itself stays a holiday when it falls on a weekday
+    assert cal.is_holiday(Date(1, 1, 2026))
+    assert cal.adjust(Date(30, 12, 2021), BusDayAdjustTypes.FOLLOWING) == Date(30, 12, 2021)
+    assert cal.add_business_days(Date(30, 12, 2021), 1) == Date(31, 12, 2021)
+
+
 @pytest.mark.parametrize(
     "cal_type", [CalendarTypes.UNITED_KINGDOM, CalendarTypes.LONDON]
 )
