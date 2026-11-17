@@ -283,6 +283,14 @@ class ValuationLog:
         return "\n".join(lines).strip()
 
 
+def logging_enabled(level=1):
+    """Return True if logging is active at the requested level."""
+
+    logger = _active_log.get()
+
+    return logger is not None and level <= logger.verbosity
+
+
 def log_section(title, level=1):
     """Start a semantic report section, such as 'Forward CDS Valuation'."""
 

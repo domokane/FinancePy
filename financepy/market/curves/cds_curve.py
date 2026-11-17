@@ -15,6 +15,7 @@ from ...utils.frequency import annual_frequency, FrequencyTypes
 from ...utils.helpers import check_argument_types, _func_name
 from ...utils.helpers import label_to_string
 from ...utils.global_vars import CLEAN
+from ...utils.global_types import CDSModelTypes
 
 from ...utils.valuation_log import log_value, log_table, log_row, log_section
 # from numba import njit, float64
@@ -31,6 +32,8 @@ def _f(q, *args):
     value_dt = args[1]
     cds = args[2]
     recovery_rate = args[3]
+    settle_dt = args[4]
+    pay_accrued_on_default = args[5]
 
     curve.set_last_q(q)
 
@@ -38,9 +41,13 @@ def _f(q, *args):
     # CDS equal to zero and so we select the second element of the value tuple
 
     with suppress_logging():
-        obj_fn = cds.value(value_dt, curve, recovery_rate)[CLEAN]
+        v = cds.value(value_dt,
+                      curve,
+                      recovery_rate,
+                      settle_dt,
+                      pay_accrued_on_default)
 
-    return obj_fn
+    return v[CLEAN]
 
 
 ########################################################################################
@@ -60,6 +67,9 @@ class CDSCurve:
         recovery_rate: float,
         dc_type: DayCountTypes = DayCountTypes.ACT_365F,
         interp_method: InterpTypes = InterpTypes.FLAT_FWD_RATES,
+        cds_model: CDSModelTypes = CDSModelTypes.OKANE_TURNBULL,
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True,
     ) -> None:
         """Construct a credit curve from a sequence of maturity-ordered CDS
         contracts and a Ibor curve using the same recovery rate and the
@@ -81,11 +91,19 @@ class CDSCurve:
         self.dc_type = dc_type
         self.built_ok = False
 
+        self.cds_model = cds_model
+        self.settle_dt = settle_dt
+        self.pay_accrued_on_default = pay_accrued_on_default
+
         self._times = []
         self._qs = []
 
         if len(self.cds_contracts) > 0:
-            self.build_curve()
+
+            with suppress_logging():
+
+                self.build_curve()
+
         else:
             pass  # In some cases we allow None to be passed
 
@@ -214,22 +232,41 @@ class CDSCurve:
 
             maturity_dt = self.cds_contracts[i].maturity_dt
 
+            settle_dt = self.cds_contracts[i].get_settle_dt(self.anchor_dt)
+
             argtuple = (
                 self,
                 self.anchor_dt,
                 self.cds_contracts[i],
                 self.recovery_rate,
+                settle_dt,
+                self.pay_accrued_on_default
             )
 
             t_mat = times_from_dates(self.anchor_dt, maturity_dt, self.dc_type)
-            q = self._qs[i]
+
+            # Estimate the initial hazard rate using the credit triangle.
+
+            kappa = 365.0 / 360.0
+
+            s_par = self.cds_contracts[i].running_cpn
+
+            hazard_guess = kappa * s_par / (1.0 - self.recovery_rate)
+
+            # Extrapolate the survival probability to the new maturity.
+
+            dt = t_mat - self._times[-1]
+
+            q_guess = self._qs[-1] * np.exp(-hazard_guess * dt)
+
+            # Append the new curve node.
 
             self._times = np.append(self._times, t_mat)
-            self._qs = np.append(self._qs, q)
+            self._qs = np.append(self._qs, q_guess)
 
             q_star = optimize.newton(
                 _f,
-                x0=q,
+                x0=q_guess,
                 fprime=None,
                 args=argtuple,
                 tol=1e-7,
@@ -284,8 +321,7 @@ class CDSCurve:
         log_section("CDS Curve")
 
         log_value(
-            "Object Type", type(self).__name__,
-            "Value Date", self.anchor_dt,
+            "Anchor Date", self.anchor_dt,
             "Recovery Rate", f"{self.recovery_rate:.2%}",
             "Interpolation Type", self.interp_method,
             "Curve Day Count", self.dc_type,

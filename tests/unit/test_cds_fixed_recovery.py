@@ -199,34 +199,101 @@ def test_curve_recovery_dv01_holds_fixed_recovery_constant(market):
 
 
 def test_fast_approximation_is_consistent_with_fixed_recovery(market):
+
     value_dt, _, _, _ = market
+
     fixed, standard = make_contracts(market)
+
     rate, spread = 0.03, 0.012
 
     fixed_results = fixed.value_fast_approx(
-        value_dt, rate, spread, curve_recovery=CURVE_RECOVERY
+        value_dt,
+        rate,
+        spread,
+        curve_recovery=CURVE_RECOVERY,
     )
+
     standard_results = standard.value_fast_approx(
-        value_dt, rate, spread,
+        value_dt,
+        rate,
+        spread,
         curve_recovery=CURVE_RECOVERY,
         recovery_rate=FIXED_RECOVERY,
     )
+
     assert len(fixed_results) == 7
+    assert len(standard_results) == 7
 
-    # PV and RPV01 must agree to numerical precision.
-    assert_close(fixed_results[:4], standard_results[:4], rtol=1e-9)
+    # PV, RPV01, spread DV01 and IR DV01 must agree
+    # because both contracts use the same numerical kernel.
 
-    # DV01s use different finite-difference schemes.
-    assert_close(fixed_results[4:6], standard_results[4:6], rtol=1e-3)
+    assert_close(
+        fixed_results[:6],
+        standard_results[:6],
+        rtol=1e-9,
+    )
 
-    # Recovery DV01 must differ.
-    assert not np.isclose(fixed_results[6], standard_results[6])
+    # Recovery DV01 must differ because contractual recovery
+    # is held fixed for the fixed-recovery CDS.
 
-    bumped = fixed.value_fast_approx(
-        value_dt, rate, spread,
+    assert not np.isclose(
+        fixed_results[6],
+        standard_results[6],
+    )
+
+    # Independently verify fixed-recovery DV01 using
+    # central finite differences.
+
+    fixed_up = fixed.value_fast_approx(
+        value_dt,
+        rate,
+        spread,
         curve_recovery=CURVE_RECOVERY + ONE_PCT,
     )
-    assert_close(fixed_results[6], bumped[0] - fixed_results[0])
+
+    fixed_dn = fixed.value_fast_approx(
+        value_dt,
+        rate,
+        spread,
+        curve_recovery=CURVE_RECOVERY - ONE_PCT,
+    )
+
+    expected_fixed_dv01 = (fixed_up[0] - fixed_dn[0]) / 2.0
+
+    assert_close(
+        fixed_results[6],
+        expected_fixed_dv01,
+        rtol=1e-9,
+    )
+
+    # Independently verify standard CDS recovery DV01.
+    # Both curve and contractual recovery rates are bumped.
+
+    standard_up = standard.value_fast_approx(
+        value_dt,
+        rate,
+        spread,
+        curve_recovery=CURVE_RECOVERY + ONE_PCT,
+        recovery_rate=FIXED_RECOVERY + ONE_PCT,
+    )
+
+    standard_dn = standard.value_fast_approx(
+        value_dt,
+        rate,
+        spread,
+        curve_recovery=CURVE_RECOVERY - ONE_PCT,
+        recovery_rate=FIXED_RECOVERY - ONE_PCT,
+    )
+
+    expected_standard_dv01 = (
+        standard_up[0] - standard_dn[0]
+    ) / 2.0
+
+    assert_close(
+        standard_results[6],
+        expected_standard_dv01,
+        rtol=1e-9,
+    )
 
 
 def test_fast_approximation_supports_zero_coupon(market):

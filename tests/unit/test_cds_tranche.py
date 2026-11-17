@@ -58,19 +58,19 @@ def test_homogeneous():
 
     intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, tranche_maturity, issuer_curves) * 10000.0
 
-    assert round(intrinsic_spd, 3) == 23.977
+    assert round(intrinsic_spd, 3) == 23.978
 
     method = DefaultLossDbnAlgoTypes.RECURSION
     v = tranche1.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 3) == 582.693
+    assert round(v[3] * 10000, 3) == 582.7
 
     method = DefaultLossDbnAlgoTypes.ADJUSTED_BINOMIAL
     v = tranche3.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 3) == 29.95
+    assert round(v[3] * 10000, 3) == 29.936
 
     method = DefaultLossDbnAlgoTypes.GAUSSIAN
     v = tranche5.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 3) == 4.575
+    assert round(v[3] * 10000, 3) == 4.571
 
     method = DefaultLossDbnAlgoTypes.LHP
     v = tranche7.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
@@ -88,20 +88,20 @@ def test_heterogeneous():
 
     intrinsic_spd = cds_index.intrinsic_spread(value_dt, step_in_dt, tranche_maturity, issuer_curves) * 10000.0
 
-    assert round(intrinsic_spd, 4) == 34.332
+    assert round(intrinsic_spd, 4) == 34.3331
 
     method = DefaultLossDbnAlgoTypes.RECURSION
     v = tranche1.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 3) == 868.773
+    assert round(v[3] * 10000, 3) == 868.747
 
     method = DefaultLossDbnAlgoTypes.ADJUSTED_BINOMIAL
     v = tranche2.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 2) == 173.37
+    assert round(v[3] * 10000, 2) == 173.33
 
     method = DefaultLossDbnAlgoTypes.GAUSSIAN
     v = tranche4.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 4) == 16.1496
+    assert round(v[3] * 10000, 4) == 16.1383
 
     method = DefaultLossDbnAlgoTypes.LHP
     v = tranche6.value_bc(value_dt, issuer_curves, upfront, spd, corr1, corr2, num_points, method)
-    assert round(v[3] * 10000, 3) == 0.338
+    assert round(v[3] * 10000, 3) == 0.337

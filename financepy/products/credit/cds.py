@@ -2,47 +2,38 @@
 # Copyright (C) 2018-2026 Dominic O'Kane
 ##############################################################################
 
+from ...utils.date import Date
+from ...utils.valuation_log import log_amount, log_percentage, log_bps, log_float, log_int, log_date
+from ...utils.valuation_log import log_value, log_table, log_row, log_section, suppress_logging, logging_enabled
+from ...market.curves.cds_curve import CDSCurve
+from ...utils.helpers import check_argument_types
+from ...utils.check_values import check_curve_dt
+from ...utils.helpers import label_to_string, table_to_string
+from ...utils.global_vars import ONE_MILLION
+from ...utils.global_vars import CLEAN, DIRTY
+from ...utils.global_vars import G_DAYS_IN_YEAR
+from ...utils.global_types import CDSModelTypes
+from ...utils.frequency import annual_frequency, FrequencyTypes
+from ...utils.day_count import DayCount, DayCountTypes
+from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
+from ...utils.calendar import Calendar, CalendarTypes
+from ...utils.error import FinError
 from typing import Union
+
+from ...models.cds_fast_model import cds_fast_value
+from ...models.cds_okane_turnbull_model import prot_leg_pv_ot_numba
+from ...models.cds_okane_turnbull_model import rpv01_ot_numba
+from ...models.cds_isda_model import prot_leg_pv_isda_numba
+from ...models.cds_isda_model import rpv01_isda_numba
 
 from copy import deepcopy
 import numpy as np
 
-from ...utils.date import Date
-from ...utils.error import FinError
-from ...utils.calendar import Calendar, CalendarTypes
-from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
-from ...utils.day_count import DayCount, DayCountTypes
-from ...utils.frequency import annual_frequency, FrequencyTypes
-from ...utils.global_vars import G_DAYS_IN_YEAR
-from ...utils.global_vars import CLEAN, DIRTY
-from ...utils.global_vars import ONE_MILLION
-from ...utils.helpers import label_to_string, table_to_string
-from ...utils.check_values import check_curve_dt
 
-from ...utils.helpers import check_argument_types
-from ...models.cds_model import rpv01_numba
-from ...models.cds_model import prot_leg_pv_numba
-from ...market.curves.cds_curve import CDSCurve
-
-from ...utils.valuation_log import log_value, log_table, log_row, log_date, log_section, suppress_logging
-from ...utils.valuation_log import log_amount, log_percentage, log_bps, log_bool, log_float, log_int
-
-
-USE_FLAT_HAZARD_RATE_INTEGRAL = True
 STANDARD_RECOVERY_RATE = 0.40
-GLOB_NUM_STEPS_PER_YEAR = 25
 ONE_BP = 0.0001
 ONE_PCT = 0.01
 
-# Premium accrues on an Act/360 basis while time is measured in
-# calendar years, hence the 365.25/360 adjustment to the clean RPV01.
-KAPPA = 365.25 / 360.0
-
-########################################################################################
-# TODO: Perform protection leg pv analytically using fact that hazard rate and
-#       interest rates are flat between their combined node points. Right now I
-#       do not find the protection leg PV calculations to be a bottleneck,
-#       especially given the speedup benefits of using NUMBA.
 ########################################################################################
 
 
@@ -77,8 +68,10 @@ class CDS:
             maturity_dt = step_in_dt.add_tenor(maturity_dt_or_tenor)
             maturity_dt = maturity_dt.next_cds_date()
 
-        if step_in_dt > maturity_dt:
-            raise FinError("Step in date after maturity date")
+        if step_in_dt >= maturity_dt:
+            raise FinError(
+                "Step-in date must precede maturity date."
+            )
 
         self.step_in_dt = step_in_dt
         self.maturity_dt = maturity_dt
@@ -92,6 +85,9 @@ class CDS:
         self.bd_type = bd_type
         self.accrue_from_step_in_dt = accrue_from_step_in_dt
 
+        self._rpv01_cache_dt = None
+        self._rpv01_cache = None
+
         self._generate_adjusted_cds_payment_dts()
         self._calc_flows()
 
@@ -99,6 +95,9 @@ class CDS:
 
     def _generate_adjusted_cds_payment_dts(self):
         """Generate CDS payment dates which have been holiday adjusted."""
+
+        self._rpv01_cache_dt = None
+        self._rpv01_cache = None
 
         frequency = annual_frequency(self.freq_type)
         calendar = Calendar(self.cal_type)
@@ -181,6 +180,10 @@ class CDS:
 
     def _calc_flows(self):
         """Calculate cash flow amounts on premium leg."""
+
+        self._rpv01_cache_dt = None
+        self._rpv01_cache = None
+
         day_count = DayCount(self.accrual_dc_type)
 
         self.accrual_factors = []
@@ -209,23 +212,105 @@ class CDS:
 
     ###########################################################################
 
+    def _prepare_rpv01(self, value_dt: Date):
+        """Prepare valuation-date-dependent premium leg inputs.
+
+        These inputs are independent of the discount curve,
+        survival curve, recovery rate and pricing model.
+        """
+
+        if (self._rpv01_cache_dt is not None and self._rpv01_cache_dt == value_dt):
+            return self._rpv01_cache
+
+        step_in_dt = self._get_step_in_dt(value_dt)
+
+        pcd, start_index = self.get_pcd(step_in_dt)
+
+        payment_dts = []
+        payment_times = []
+        accrual_start_times = []
+        accrual_end_times = []
+        year_fracs = []
+
+        for i in range(start_index, len(self.payment_dts)):
+
+            dt = self.payment_dts[i]
+
+            if dt > value_dt:
+
+                start_dt = self.accrual_start_dts[i]
+
+                if self.accrue_from_step_in_dt:
+                    start_dt = max(start_dt, self.step_in_dt)
+
+                payment_dts.append(dt)
+
+                payment_times.append(
+                    (dt - value_dt) / G_DAYS_IN_YEAR
+                )
+
+                accrual_start_times.append(
+                    (start_dt - value_dt) / G_DAYS_IN_YEAR
+                )
+
+                accrual_end_times.append(
+                    (self.accrual_end_dts[i] - value_dt + 1)
+                    / G_DAYS_IN_YEAR
+                )
+
+                year_fracs.append(self.accrual_factors[i])
+
+        accrual_start_dt = pcd
+
+        if self.accrue_from_step_in_dt:
+            accrual_start_dt = max(pcd, self.step_in_dt)
+
+        day_count = DayCount(self.accrual_dc_type)
+
+        accrued_fraction = day_count.year_frac(
+            accrual_start_dt,
+            step_in_dt,
+        )[0]
+
+        self._rpv01_cache = (
+            step_in_dt,
+            pcd,
+            accrual_start_dt,
+            accrued_fraction,
+            payment_dts,
+            np.array(payment_times),
+            np.array(accrual_start_times),
+            np.array(accrual_end_times),
+            np.array(year_fracs),
+        )
+
+        self._rpv01_cache_dt = value_dt
+
+        return self._rpv01_cache
+
+    ###########################################################################
+
     def value(
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
         recovery_rate: float,
-        pv01_method: int = 0,
-        prot_method: int = 0,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True
     ):
-        """Valuation of a CDS contract on a specific valuation date given
-        an issuer curve and a contract recovery rate."""
+        """Valuation of a CDS contract on a specific valuation date
+        given an issuer curve and a contract recovery rate."""
 
         check_curve_dt(value_dt, issuer_curve)
 
+        settle_dt = self.get_settle_dt(value_dt, settle_dt)
+
         log_section("Valuation Details")
 
-        rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)
+        rpv01 = self.rpv01(value_dt,
+                           issuer_curve,
+                           settle_dt,
+                           pay_accrued_on_default)
 
         dirty_rpv01 = rpv01[DIRTY]
         clean_rpv01 = rpv01[CLEAN]
@@ -237,23 +322,19 @@ class CDS:
             value_dt,
             issuer_curve,
             recovery_rate,
-            num_steps_per_year,
-            prot_method,
         )
 
         log_percentage("Recovery Rate", recovery_rate, 2)
         log_amount("Protection PV", prot_pv, 3)
 
-        fwd_df = 1.0
-
         omega = +1 if self.long_protect else -1
 
-        dirty_pv = fwd_df * omega * (
+        dirty_pv = omega * (
             prot_pv
             - self.running_cpn * dirty_rpv01 * self.notional
         )
 
-        clean_pv = fwd_df * omega * (
+        clean_pv = omega * (
             prot_pv
             - self.running_cpn * clean_rpv01 * self.notional
         )
@@ -270,12 +351,13 @@ class CDS:
         value_dt: Date,
         issuer_curve: CDSCurve,
         recovery_rate: float,
-        pv01_method=0,
-        prot_method=0,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True
     ):
         """Calculation of the change in the value of the CDS contract for a
         one basis point change in the level of the CDS curve."""
+
+        settle_dt = self.get_settle_dt(value_dt, settle_dt)
 
         with suppress_logging():
 
@@ -283,17 +365,14 @@ class CDS:
                 value_dt,
                 issuer_curve,
                 recovery_rate,
-                pv01_method,
-                prot_method,
-                num_steps_per_year,
+                settle_dt,
+                pay_accrued_on_default
             )
-
-        bump = 0.0001  # 1 basis point
 
         # we create a deep copy to avoid state issues
         bumped_issuer_curve = deepcopy(issuer_curve)
         for cds in bumped_issuer_curve.cds_contracts:
-            cds.running_cpn += bump
+            cds.running_cpn += ONE_BP
 
         bumped_issuer_curve.build_curve()
 
@@ -303,9 +382,8 @@ class CDS:
                 value_dt,
                 bumped_issuer_curve,
                 recovery_rate,
-                pv01_method,
-                prot_method,
-                num_steps_per_year,
+                settle_dt,
+                pay_accrued_on_default
             )
 
         credit_dv01 = v1[DIRTY] - v0[DIRTY]
@@ -321,12 +399,13 @@ class CDS:
         value_dt: Date,
         issuer_curve: CDSCurve,
         recovery_rate: float,
-        pv01_method: int = 0,
-        prot_method: int = 0,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True
     ):
         """Calculation of the interest DV01 based on a simple bump of
         the discount factors and reconstruction of the CDS curve."""
+
+        settle_dt = self.get_settle_dt(value_dt, settle_dt)
 
         with suppress_logging():
 
@@ -334,9 +413,8 @@ class CDS:
                 value_dt,
                 issuer_curve,
                 recovery_rate,
-                pv01_method,
-                prot_method,
-                num_steps_per_year,
+                settle_dt,
+                pay_accrued_on_default
             )
 
         # we create a deep copy to avoid state issues
@@ -359,9 +437,8 @@ class CDS:
                 value_dt,
                 bumped_issuer_curve,
                 recovery_rate,
-                pv01_method,
-                prot_method,
-                num_steps_per_year,
+                settle_dt,
+                pay_accrued_on_default
             )
 
         interest_dv01 = v1[DIRTY] - v0[DIRTY]
@@ -377,9 +454,8 @@ class CDS:
         value_dt: Date,
         issuer_curve: CDSCurve,
         recovery_rate: float,
-        pv01_method: int = 0,
-        prot_method: int = 0,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True
     ):
         """PV change when contract and curve recovery both increase by 1%.
 
@@ -390,7 +466,9 @@ class CDS:
             - PV(curve recovery, contract recovery)
         """
 
-        bump = ONE_PCT  # 0.01
+        settle_dt = self.get_settle_dt(value_dt, settle_dt)
+
+        bump = ONE_PCT
 
         if not 0.0 <= recovery_rate < 1.0:
             raise FinError("Contract recovery rate must lie in [0.0, 1.0).")
@@ -421,9 +499,8 @@ class CDS:
                 value_dt,
                 issuer_curve,
                 recovery_rate,
-                pv01_method,
-                prot_method,
-                num_steps_per_year,
+                settle_dt,
+                pay_accrued_on_default
             )
 
         # Bump the recovery used to calibrate the survival curve.
@@ -444,9 +521,8 @@ class CDS:
                 value_dt,
                 bumped_issuer_curve,
                 recovery_rate + bump,
-                pv01_method,
-                prot_method,
-                num_steps_per_year,
+                settle_dt,
+                pay_accrued_on_default
             )
 
         recovery_dv01 = value_bumped[DIRTY] - value_base[DIRTY]
@@ -460,16 +536,16 @@ class CDS:
     def upfront(
         self,
         value_dt: Date,
-        settle_dt: Date,
         issuer_curve: CDSCurve,
         recovery_rate: float,
-        pv01_method=0,
-        prot_method=0,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True
     ):
         """Return clean percentage PV expressed on T+3 settlement date."""
 
         discount_curve = issuer_curve.libor_curve
+
+        settle_dt = self.get_settle_dt(value_dt, settle_dt)
 
         if settle_dt < discount_curve.anchor_dt:
             raise FinError(
@@ -484,9 +560,8 @@ class CDS:
                 value_dt,
                 issuer_curve,
                 recovery_rate,
-                pv01_method,
-                prot_method,
-                num_steps_per_year,
+                settle_dt,
+                pay_accrued_on_default
             )
 
         settlement_df = discount_curve.df(settle_dt)
@@ -510,16 +585,16 @@ class CDS:
     def cash_settlement_amount(
         self,
         value_dt: Date,
-        settle_dt: Date,
         issuer_curve: CDSCurve,
         recovery_rate: float,
-        pv01_method=0,
-        prot_method=0,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True
     ):
         """Return dirty amount paid on the T+3 settlement date."""
 
         discount_curve = issuer_curve.libor_curve
+
+        settle_dt = self.get_settle_dt(value_dt, settle_dt)
 
         if settle_dt < discount_curve.anchor_dt:
             raise FinError(
@@ -534,9 +609,8 @@ class CDS:
                 value_dt,
                 issuer_curve,
                 recovery_rate,
-                pv01_method,
-                prot_method,
-                num_steps_per_year,
+                settle_dt,
+                pay_accrued_on_default
             )
 
         settlement_df = discount_curve.df(settle_dt)
@@ -549,11 +623,11 @@ class CDS:
                 f"df={settlement_df}"
             )
 
-        csa_pv = values[DIRTY] / settlement_df
+        csa = values[DIRTY] / settlement_df
 
-        log_amount("Cash Settlement Amount", csa_pv, 2)
+        log_amount("Cash Settlement Amount", csa, 2)
 
-        return csa_pv
+        return csa
 
     ###########################################################################
 
@@ -562,14 +636,18 @@ class CDS:
         value_dt: Date,
         issuer_curve: CDSCurve,
         recovery_rate: float,
-        pv01_method=0,
-        prot_method=0,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True
     ):
         """Value of the CDS contract excluding accrued interest."""
         check_curve_dt(value_dt, issuer_curve)
 
-        rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)
+        settle_dt = self.get_settle_dt(value_dt, settle_dt)
+
+        rpv01 = self.rpv01(value_dt,
+                           issuer_curve,
+                           settle_dt,
+                           pay_accrued_on_default)
 
         clean_rpv01 = rpv01[CLEAN]
 
@@ -577,15 +655,13 @@ class CDS:
             value_dt,
             issuer_curve,
             recovery_rate,
-            num_steps_per_year,
-            prot_method,
         )
 
-        fwd_df = 1.0
+        settlement_df = issuer_curve.libor_curve.df(settle_dt)
 
-        clean_pv = fwd_df * (prot_pv - self.running_cpn * clean_rpv01 * self.notional)
+        clean_pv = prot_pv - self.running_cpn * clean_rpv01 * self.notional
 
-        clean_price = (self.notional - clean_pv) / self.notional * 100.0
+        clean_price = 100.0 * (1.0 - clean_pv / self.notional / settlement_df)
 
         log_float("Clean Price", clean_price, level=2)
 
@@ -593,18 +669,18 @@ class CDS:
 
     ###########################################################################
 
-    def accrued_days(self, settle_dt: Date):
-        """Number of days between the previous coupon and the currrent step
-        in date."""
+    def accrued_days(self, value_dt: Date):
+        """Number of accrued premium days from the start of the
+        current accrual period to the pricing step-in date."""
 
-        # I assume accrued runs to the effective date
-        pcd, _ = self.get_pcd(settle_dt)
-        eff_dt = max(settle_dt, self.step_in_dt)
+        step_in_dt = self._get_step_in_dt(value_dt)
+
+        pcd, _ = self.get_pcd(step_in_dt)
 
         if self.accrue_from_step_in_dt:
             pcd = max(pcd, self.step_in_dt)
 
-        accrued_days = eff_dt - pcd
+        accrued_days = step_in_dt - pcd
 
         log_int("Accrued Days", accrued_days, 2)
 
@@ -612,25 +688,16 @@ class CDS:
 
     ###########################################################################
 
-    def accrued_interest(self, settle_dt: Date):
-        """Calculate the amount of accrued interest that has accrued from the
-        previous cpn date (PCD) to the step_in_dt of the CDS contract."""
+    def accrued_interest(self, value_dt: Date):
+        """Calculate the accrued premium rebate amount."""
 
-        if self.accrue_from_step_in_dt and settle_dt <= self.step_in_dt:
-            return 0.0
+        accrual_fraction = self._get_accrual_fraction(value_dt)
 
-        day_count = DayCount(self.accrual_dc_type)
-
-        pcd, _ = self.get_pcd(settle_dt)
-
-        eff_dt = max(settle_dt, self.step_in_dt)
-
-        if self.accrue_from_step_in_dt:
-            pcd = max(pcd, self.step_in_dt)
-
-        accrual_factor = day_count.year_frac(pcd, eff_dt)[0]
-
-        accrued_interest = accrual_factor * self.notional * self.running_cpn
+        accrued_interest = (
+            accrual_fraction
+            * self.notional
+            * self.running_cpn
+        )
 
         log_amount("Accrued Interest", accrued_interest, 2)
 
@@ -642,36 +709,48 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
-        recovery_rate: float = STANDARD_RECOVERY_RATE,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
-        prot_method=0,
+        recovery_rate: float = STANDARD_RECOVERY_RATE
     ):
+
+        cds_model = self._get_cds_model(issuer_curve)
+
         """Calculates the protection leg PV of the CDS by calling into the
         fast NUMBA code that has been defined above."""
         check_curve_dt(value_dt, issuer_curve)
 
-        t_eff = (self.step_in_dt - value_dt) / G_DAYS_IN_YEAR
-
-        # An existing contract may have protection which as of now started in the past
-        # We need to ensure that looking forward the protection starts immediately
-        if t_eff < 0.0:
-            t_eff = 0.0
-
+        eff_dt = self._get_eff_dt(value_dt, cds_model)
+        t_eff = (eff_dt - value_dt) / G_DAYS_IN_YEAR
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
         libor_curve = issuer_curve.libor_curve
 
-        v = prot_leg_pv_numba(
-            t_eff,
-            t_mat,
-            libor_curve._times,
-            libor_curve._dfs,
-            issuer_curve._times,
-            issuer_curve._qs,
-            recovery_rate,
-            num_steps_per_year,
-            prot_method,
-        )
+        if cds_model == CDSModelTypes.OKANE_TURNBULL:
+
+            v = prot_leg_pv_ot_numba(
+                t_eff,
+                t_mat,
+                libor_curve._times,
+                libor_curve._dfs,
+                issuer_curve._times,
+                issuer_curve._qs,
+                recovery_rate,
+            )
+
+        elif cds_model == CDSModelTypes.ISDA:
+
+            v = prot_leg_pv_isda_numba(
+                t_eff,
+                t_mat,
+                libor_curve._times,
+                libor_curve._dfs,
+                issuer_curve._times,
+                issuer_curve._qs,
+                recovery_rate,
+            )
+
+        else:
+
+            raise FinError(f"Unknown CDS model: {cds_model}")
 
         return v * self.notional
 
@@ -693,8 +772,6 @@ class CDS:
                 pcd = acc_start_dt
                 start_index = start_index + 1
 
-        #        print("Value date:", value_dt, "PCD:", pcd, "Start Index", start_index)
-
         return pcd, start_index
 
     ###########################################################################
@@ -703,106 +780,144 @@ class CDS:
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
-        rpv01_method: int = 0,
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True,
     ):
         """Calculate the clean and dirty risky PV01 of a CDS."""
 
         check_curve_dt(value_dt, issuer_curve)
 
+        cds_model = issuer_curve.cds_model
+
         libor_curve = issuer_curve.libor_curve
-        day_count = DayCount(self.accrual_dc_type)
 
-        # Protection cannot start before the valuation date.
-        eff_dt = max(self.step_in_dt, value_dt)
-        t_eff = (eff_dt - value_dt) / G_DAYS_IN_YEAR
+        settle_dt = self.get_settle_dt(value_dt, settle_dt)
 
-        # Find the coupon period containing the effective date.
-        pcd, start_index = self.get_pcd(eff_dt)
+        settlement_df = libor_curve.df(settle_dt)
 
-        # Select future payment dates and keep accrual factors aligned.
-        payment_dts = []
-        payment_times = []
-        year_fracs = []
+        if not np.isfinite(settlement_df) or settlement_df <= 0.0:
+            raise FinError(
+                "Settlement discount factor must be finite and positive."
+            )
 
-        for i in range(start_index, len(self.payment_dts)):
+        log_date("Settlement Date", settle_dt, level=3)
+        log_float("Settlement DF", settlement_df, 6, 3)
 
-            dt = self.payment_dts[i]
+        # Retrieve the cached numerical schedule.
 
-            if dt > value_dt:
-                payment_dts.append(dt)
-                payment_times.append((dt - value_dt) / G_DAYS_IN_YEAR)
-                year_fracs.append(self.accrual_factors[i])
+        (
+            step_in_dt,
+            pcd,
+            accrual_start_dt,
+            accrual_factor_pcd_to_now,
+            payment_dts,
+            payment_times,
+            accrual_start_times,
+            accrual_end_times,
+            year_fracs,
+        ) = self._prepare_rpv01(value_dt)
 
         if len(payment_dts) == 0:
-            return np.array([0.0, 0.0])
+            return np.zeros(2)
 
-        payment_times = np.array(payment_times)
-        year_fracs = np.array(year_fracs)
+        # Determine the effective time required by the kernel.
 
-        # Determine the contractual start of premium accrual.
-        accrual_start_dt = pcd
+        eff_dt = self._get_eff_dt(value_dt, cds_model)
 
-        if self.accrue_from_step_in_dt:
-            accrual_start_dt = max(pcd, self.step_in_dt)
+        t_eff = (eff_dt - value_dt) / G_DAYS_IN_YEAR
 
-        # Premium already accrued up to the effective date.
-        accrual_factor_pcd_to_now = day_count.year_frac(
-            accrual_start_dt,
-            eff_dt,
-        )[0]
-
+        log_value("CDS Model", cds_model.name, level=3)
         log_value("Previous Coupon Date", pcd, level=3)
         log_value("Accrual Start Date", accrual_start_dt, level=3)
-        log_value("Effective Date", eff_dt, level=3)
+        log_value("Pricing Step-in Date", step_in_dt, level=3)
+        log_value("Kernel Effective Date", eff_dt, level=3)
 
         log_value(
-            "Accrual Factor to Effective Date",
+            "Accrual Factor to Step-in Date",
             accrual_factor_pcd_to_now,
             level=3,
         )
 
-        # Calculate the risky PV01 using the actual coupon accrual factors.
-        value_rpv01, table = rpv01_numba(
-            t_eff,
-            accrual_factor_pcd_to_now,
-            payment_times,
-            year_fracs,
-            libor_curve._times,
-            libor_curve._dfs,
-            issuer_curve._times,
-            issuer_curve._qs,
-            rpv01_method
-        )
+        # Calculate the risky PV01 using the selected model.
 
-        log_table(
-            "Payment Date",
-            "T",
-            "Q",
-            "Z",
-            "Acc Factor",
-            "Cumulative RPV01",
-            level=4,
-        )
+        if cds_model == CDSModelTypes.OKANE_TURNBULL:
 
-        for i, row in enumerate(table):
-            log_row(
-                payment_dts[i],
-                row[0],
-                row[1],
-                row[2],
-                row[3],
-                row[4],
+            value_rpv01, table = rpv01_ot_numba(
+                t_eff,
+                accrual_factor_pcd_to_now,
+                payment_times,
+                year_fracs,
+                libor_curve._times,
+                libor_curve._dfs,
+                issuer_curve._times,
+                issuer_curve._qs,
+                accrual_start_times,
+                accrual_end_times,
+                settlement_df,
+                pay_accrued_on_default,
             )
 
+        elif cds_model == CDSModelTypes.ISDA:
+
+            value_rpv01, table = rpv01_isda_numba(
+                t_eff,
+                accrual_factor_pcd_to_now,
+                payment_times,
+                year_fracs,
+                libor_curve._times,
+                libor_curve._dfs,
+                issuer_curve._times,
+                issuer_curve._qs,
+                accrual_start_times,
+                accrual_end_times,
+                settlement_df,
+                pay_accrued_on_default,
+            )
+
+        else:
+
+            raise FinError(f"Unknown CDS model: {cds_model}")
+
+        # Want to skip this loop entirely if logging is not on
+        if logging_enabled(level=4):
+
+            log_table(
+                "Payment Date",
+                "T",
+                "Q",
+                "Z",
+                "Acc Factor",
+                "Cumulative RPV01",
+                level=4,
+            )
+
+            for i, row in enumerate(table):
+
+                log_row(
+                    payment_dts[i],
+                    row[0],
+                    row[1],
+                    row[2],
+                    row[3],
+                    row[4],
+                )
+
         return value_rpv01
+
     ###########################################################################
 
-    def premium_leg_pv(self, value_dt: Date,
+    def premium_leg_pv(self,
+                       value_dt: Date,
                        issuer_curve: CDSCurve,
-                       pv01_method=0):
+                       settle_dt: Date | None = None,
+                       pay_accrued_on_default: bool = True):
         """Value of the premium leg of a CDS."""
 
-        dirty_rpv01 = self.rpv01(value_dt, issuer_curve, pv01_method)[DIRTY]
+        dirty_rpv01 = self.rpv01(value_dt,
+                                 issuer_curve,
+                                 settle_dt,
+                                 pay_accrued_on_default)[DIRTY]
+
         v = dirty_rpv01 * self.notional * self.running_cpn
         return v
 
@@ -813,35 +928,38 @@ class CDS:
         value_dt: Date,
         issuer_curve: CDSCurve,
         recovery_rate: float = STANDARD_RECOVERY_RATE,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
-        pv01_method=0,
-        prot_method=0,
-        all_values=False
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True,
+        all_values: bool = False
     ):
         """Breakeven CDS cpn that would make the value of the CDS contract
         equal to zero."""
 
+        settle_dt = self.get_settle_dt(value_dt, settle_dt)
+
         clean_rpv01 = self.rpv01(value_dt,
                                  issuer_curve,
-                                 pv01_method)[CLEAN]
+                                 settle_dt,
+                                 pay_accrued_on_default)[CLEAN]
 
         prot_pv = self.prot_leg_pv(
             value_dt,
             issuer_curve,
             recovery_rate,
-            num_steps_per_year,
-            prot_method,
         )
+
+        if clean_rpv01 <= 0.0:
+            raise FinError("Clean RPV01 <= 0.0")
 
         # By convention this is calculated using the clean RPV01
         spd = prot_pv / clean_rpv01 / self.notional
 
         log_bps("Par CDS Spread", spd, level=2)
 
-        if all_values == False:
-            return spd
-        else:
+        if all_values:
             return spd, clean_rpv01, prot_pv
+        else:
+            return spd
 
     ###########################################################################
 
@@ -858,11 +976,15 @@ class CDS:
         """Fast approximate CDS valuation using flat hazard and discount curves.
 
         The hazard rate is implied from the flat CDS spread via the credit
-        triangle ``h = spread / (1 - curve_recovery)`` and both survival
-        and discounting are treated as flat exponentials. The premium leg
-        ignores the actual coupon schedule; accrual-on-default is captured
-        only heuristically through the 365/360 clean-RPV01 adjustment. All
-        PVs are in currency units of the contract notional.
+        triangle ``h = (365/360) * spread / (1 - curve_recovery)`` and both survival
+        and discounting are treated as flat exponentials. 
+
+        The premium leg is approximated using continuous premium
+        payments with an ACT/360 day-count adjustment. Accrued
+        premium on default is not modelled separately.
+
+        The accrued premium rebate is assumed to be exchanged
+        on the valuation date rather than the cash settlement date.
 
         For contracts with accrue_from_step_in_dt=True, accrued
         premium is zero before the step-in date and begins
@@ -888,23 +1010,24 @@ class CDS:
                 array-like, strictly positive.
 
         Returns:
-            A tuple ``(full_pv, clean_pv, spread_dv01, ir_dv01, recovery01)``:
-                full_pv: Clean PV plus accrued interest.
-                clean_pv: PV excluding accrued interest.
-                credit01: PV change for a 1 bp increase in the CDS spread.
-                ir01: PV change for a 1 bp increase in the interest rate.
-                recovery01: PV change for a 1 percentage-point increase in
-                    the contractual recovery.
+            A tuple containing:
 
-            Elements are floats if every input was scalar, otherwise ndarrays
-            with the broadcast shape of the inputs. The sensitivities are
-            one-sided (upward) finite differences, rescaled to the stated
-            units whatever bump sizes are supplied. Recovery01 bumps the
-            recovery assumption everywhere it enters: the hazard rate is
-            re-implied from the unchanged quoted spread under the bumped
-            curve recovery, and the contractual loss uses the bumped
-            contract recovery. It is therefore small and vanishes for an
-            at-market contract.
+                dirty_pv: Dirty CDS value in currency units.
+                clean_pv: Clean CDS value in currency units.
+                rpv01_dirty: Dirty risky PV01 per unit notional.
+                rpv01_clean: Clean risky PV01 per unit notional.
+                spread_dv01: Spread sensitivity per basis point.
+                ir_dv01: Interest rate sensitivity per basis point.
+                rec_dv01: Recovery sensitivity per percentage point.
+
+            Elements are floats if all inputs are scalar, otherwise
+            ndarrays with the common broadcast shape.
+
+            Sensitivities are calculated using central finite
+            differences and rescaled to the conventional risk units.
+
+            Recovery sensitivity bumps both the curve and contractual
+            recovery rates while holding the market CDS spread fixed.
 
         Raises:
             FinError: If any input is invalid, the inputs cannot be
@@ -921,6 +1044,7 @@ class CDS:
         rec_bump = np.asarray(recovery_bump_size, dtype=float)
 
         inputs = (rate, spread, curve_rec, contract_rec, bump, rec_bump)
+
         scalar_output = all(arr.ndim == 0 for arr in inputs)
 
         try:
@@ -933,6 +1057,12 @@ class CDS:
 
         if np.any(contract_rec < 0.0) or np.any(contract_rec > 1.0):
             raise FinError("Contract recovery rate must lie in [0.0, 1.0].")
+
+        if np.any(curve_rec - rec_bump < 0.0):
+            raise FinError("Bumped curve recovery cannot be negative.")
+
+        if np.any(contract_rec - rec_bump < 0.0):
+            raise FinError("Bumped contract recovery cannot be negative.")
 
         if np.any(bump <= 0.0):
             raise FinError("Bump size must be positive.")
@@ -949,6 +1079,10 @@ class CDS:
         if np.any(spread < 0.0):
             raise FinError("CDS spread cannot be negative.")
 
+        for arr in inputs:
+            if not np.all(np.isfinite(arr)):
+                raise FinError("Inputs must be finite.")
+
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
         if t_mat <= 0.0:
@@ -957,7 +1091,9 @@ class CDS:
                 "valuation date."
             )
 
-        t_eff = max((self.step_in_dt - value_dt) / G_DAYS_IN_YEAR, 0.0)
+        eff_dt = self._get_eff_dt(value_dt, CDSModelTypes.OKANE_TURNBULL)
+
+        t_eff = (eff_dt - value_dt) / G_DAYS_IN_YEAR
 
         if t_mat <= t_eff:
             raise FinError(
@@ -969,112 +1105,116 @@ class CDS:
         else:
             direction = -1.0
 
-        pcd, _ = self.get_pcd(value_dt)
-        eff_dt = max(value_dt, self.step_in_dt)
+        delta = self._get_accrual_fraction(value_dt)
 
-        day_count = DayCount(self.accrual_dc_type)
-
-        if self.accrue_from_step_in_dt:
-            accrue_start_dt = max(pcd, self.step_in_dt)
-            delta = day_count.year_frac(
-                accrue_start_dt, value_dt
-            )[0] if value_dt > accrue_start_dt else 0.0
-        else:
-            delta = day_count.year_frac(pcd, eff_dt)[0]
-
-        horizon = t_mat - t_eff
-
-        def _dirty_and_clean_pv(
-            spread_, rate_: float, curve_recovery_: float, contract_recovery_: float
-        ):
-            """Dirty and clean PV under flat spread/rate/recovery inputs.
-
-            All arguments broadcast; returns arrays of the broadcast shape.
-            """
-            hazard_rate = KAPPA * spread_ / (1.0 - curve_recovery_)
-            decay_rate = rate_ + hazard_rate
-
-            # Risky annuity: integral of exp(-decay_rate * t) over
-            # [t_eff, t_mat]. Written with expm1 so it is stable as
-            # decay_rate -> 0, where it tends to the horizon length. The
-            # zero-decay elements are masked out of the division and
-            # replaced with the exact limit.
-            x = decay_rate * horizon
-            is_zero = x == 0.0
-            safe_decay = np.where(is_zero, 1.0, decay_rate)
-            annuity_per_df = np.where(is_zero, horizon, -np.expm1(-x) / safe_decay)
-
-            risky_annuity = np.exp(-decay_rate * t_eff) * annuity_per_df
-
-            rpv01_dirty = risky_annuity * KAPPA + delta
-            rpv01_clean = risky_annuity * KAPPA
-
-            protection_pv = (
-                hazard_rate * (1.0 - contract_recovery_) * risky_annuity * self.notional
-            )
-
-            premium_pv_dirty = self.running_cpn * rpv01_dirty * self.notional
-            premium_pv_clean = self.running_cpn * rpv01_clean * self.notional
-
-            dirty_pv = direction * (protection_pv - premium_pv_dirty)
-            clean_pv = direction * (protection_pv - premium_pv_clean)
-
-            return dirty_pv, clean_pv, rpv01_dirty, rpv01_clean
-
-        dirty_pv, clean_pv, rpv01_dirty, rpv01_clean = _dirty_and_clean_pv(
-            spread, rate, curve_rec, contract_rec
-        )
-
-        dirty_pv_spread_up, _, _, _ = _dirty_and_clean_pv(
-            spread + bump, rate, curve_rec, contract_rec
-        )
-
-        dirty_pv_spread_dn, _, _, _ = _dirty_and_clean_pv(
-            spread - bump, rate, curve_rec, contract_rec
-        )
-
-        dirty_pv_rate_up, _, _, _ = _dirty_and_clean_pv(
-            spread, rate + bump, curve_rec, contract_rec
-        )
-
-        dirty_pv_rate_dn, _, _, _ = _dirty_and_clean_pv(
-            spread, rate - bump, curve_rec, contract_rec
-        )
-
-        # The recovery bump moves the recovery assumption everywhere it
-        # enters: the hazard rate is re-implied from the (unchanged) quoted
-        # spread under the bumped curve recovery, and the contractual loss
-        # uses the bumped contract recovery. Bumping the contractual
-        # recovery alone while holding the implied hazard fixed would mix
-        # two inconsistent recovery assumptions in one valuation.
-        dirty_pv_recovery_up, _, _, _ = _dirty_and_clean_pv(
-            spread, rate, curve_rec + rec_bump, contract_rec + rec_bump
-        )
-
-        dirty_pv_recovery_dn, _, _, _ = _dirty_and_clean_pv(
-            spread, rate, curve_rec - rec_bump, contract_rec - rec_bump
-        )
-
-        # One-sided differences, rescaled to the conventional units so the
-        # reported figures stay "per 1 bp" / "per 1 pp" for any bump size.
-        spread_dv01 = (dirty_pv_spread_up - dirty_pv_spread_dn) * (ONE_BP / bump) / 2
-        ir_dv01 = (dirty_pv_rate_up - dirty_pv_rate_dn) * (ONE_BP / bump) / 2
-        rec_dv01 = (dirty_pv_recovery_up - dirty_pv_recovery_dn) * (ONE_PCT / rec_bump) / 2
-
-        results = (
-            dirty_pv,
-            clean_pv,
-            rpv01_dirty,
-            rpv01_clean,
-            spread_dv01,
-            ir_dv01,
-            rec_dv01,
+        out = cds_fast_value(
+            self.running_cpn,
+            spread,
+            t_eff,
+            t_mat,
+            delta,
+            rate,
+            curve_rec,
+            contract_rec,
+            self.notional,
+            direction,
+            bump,
+            rec_bump,
         )
 
         if scalar_output:
-            return tuple(float(arr) for arr in results)
+            return tuple(float(x) for x in out)
 
-        return tuple(np.broadcast_to(arr, out_shape).copy() for arr in results)
+        return tuple(
+            np.broadcast_to(x, out_shape).copy()
+            for x in out
+        )
+
+    ###########################################################################
+
+    def _get_accrual_fraction(self, value_dt: Date):
+        """Calculate the contractual accrued premium fraction."""
+
+        step_in_dt = self._get_step_in_dt(value_dt)
+
+        pcd, _ = self.get_pcd(step_in_dt)
+
+        if self.accrue_from_step_in_dt:
+            pcd = max(pcd, self.step_in_dt)
+
+        day_count = DayCount(self.accrual_dc_type)
+
+        accrual_fraction = day_count.year_frac(
+            pcd,
+            step_in_dt,
+        )[0]
+
+        return accrual_fraction
+
+    ###########################################################################
+
+    def get_settle_dt(
+        self,
+        value_dt: Date,
+        settle_dt: Date | None = None,
+    ):
+        """Determine the cash settlement date."""
+
+        if settle_dt is None:
+
+            calendar = Calendar(self.cal_type)
+            settle_dt = calendar.add_business_days(value_dt, 3)
+
+        if settle_dt < value_dt:
+            raise FinError("Settlement date cannot precede valuation date.")
+
+        return settle_dt
+
+    ###########################################################################
+
+    def _get_eff_dt(
+        self,
+        value_dt: Date,
+        cds_model: CDSModelTypes = None,
+    ):
+        """Determine the date argument required by the numerical kernel.
+        Both models use the same pricing step-in date, but the ISDA
+        model applies the one-day protection adjustment internally.
+        """
+
+        step_in_dt = self._get_step_in_dt(value_dt)
+
+        if cds_model == CDSModelTypes.OKANE_TURNBULL:
+
+            return max(value_dt, step_in_dt.add_days(-1))
+
+        if cds_model == CDSModelTypes.ISDA:
+
+            return step_in_dt
+
+        raise FinError(f"Unknown CDS model: {cds_model}")
+
+    ###########################################################################
+
+    def _get_step_in_dt(self, value_dt: Date):
+        """Determine the pricing step-in date."""
+
+        if self.step_in_dt > value_dt:
+            return self.step_in_dt
+
+        return value_dt.add_days(1)
+
+    ###########################################################################
+
+    def _get_cds_model(
+        self,
+        issuer_curve: CDSCurve,
+    ):
+        """Resolve the pricing model and check calibration consistency."""
+
+        cds_model = issuer_curve.cds_model
+
+        return cds_model
 
     ###########################################################################
 
@@ -1093,7 +1233,8 @@ class CDS:
                 acc_factor = self.accrual_factors[it]
                 flow = self.flows[it]
                 z = issuer_curve.df(dt)
-                q = issuer_curve.survival_prob(dt)
+                obs_dt = self.accrual_end_dts[it]
+                q = issuer_curve.survival_prob(obs_dt)
                 print(
                     "%15s %10.6f %12.2f %12.6f %12.6f %12.2f"
                     % (dt, acc_factor, flow, z, q, flow * z * q)

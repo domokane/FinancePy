@@ -1,4 +1,114 @@
 ## CHANGE LOG
+17 Nov 2026
+- Added the ISDA Standard CDS pricing model alongside the existing
+  O'Kane–Turnbull pricing model.
+- Added explicit cash settlement date handling, with a default of T+3
+  business days.
+- Added support for accruing premium from the contractual step-in date.
+- Added the option to disable accrued premium on default.
+
+### CDS Valuation Improvements
+
+- Revised CDS step-in, effective protection and accrual date conventions.
+- Separated payment dates from accrual start and end dates.
+- Corrected the treatment of the final accrual period, including the
+  maturity date.
+- Standardised clean and dirty PV and risky PV01 conventions.
+- Corrected the discounting of the accrued premium rebate to the cash
+  settlement date.
+- Improved consistency between CDS valuation, par spread, upfront,
+  clean price and cash settlement calculations.
+- Updated the O'Kane–Turnbull model to use the revised CDS date and
+  accrual conventions.
+
+### Credit Curve Calibration
+
+- Moved the CDS pricing model selection into CDSCurve to ensure that
+  calibration and subsequent valuation use the same pricing model.
+- Changed CDS curve calibration to target zero clean PV rather than
+  zero dirty PV.
+- Improved the initial survival probability guess using the credit
+  triangle approximation.
+- Generalised the initial survival probability guess to support
+  multi-node survival curves.
+- Ensured that credit, interest rate and recovery sensitivities
+  preserve the selected pricing model during curve recalibration.
+
+### Fast CDS Approximation
+
+- Introduced a shared analytical CDS pricing kernel based on flat
+  hazard rates and continuously compounded discount rates.
+- Added NumPy broadcasting support for vectorised CDS valuations.
+- Improved numerical stability for small hazard and discount rates.
+- Separated curve recovery from contractual protection recovery.
+- Implemented central finite-difference calculations for spread,
+  interest rate and recovery sensitivities.
+- Standardised the fast approximation output to include dirty PV,
+  clean PV, dirty RPV01, clean RPV01, spread DV01, interest rate
+  DV01 and recovery DV01.
+
+### Fixed-Recovery CDS
+
+- Integrated fixed-recovery CDS valuation with the revised standard
+  CDS pricing framework.
+- Introduced a shared fast approximation kernel for standard and
+  fixed-recovery CDS contracts.
+- Added distinct recovery sensitivity calculations that hold
+  contractual fixed recovery unchanged when bumping curve recovery.
+
+### Performance Improvements
+
+- Eliminated unnecessary Date object construction when calculating
+  accrual end times.
+- Cached valuation-date-dependent CDS premium leg schedules and
+  numerical integration inputs.
+- Added cache invalidation when contractual schedules or accrual
+  factors are regenerated.
+- Avoided unnecessary detailed valuation logging when logging
+  is inactive.
+- Optimised pricing step-in date calculations to avoid redundant
+  Date object construction.
+- Reduced survival curve calibration objective evaluations by 40.5%
+  through an improved initial survival probability guess.
+- Reduced CDS pricing-grid execution time by 59.1%, from 15.158
+  seconds to 6.199 seconds.
+- Reduced CDS curve bootstrap cumulative execution time by 75.5%.
+- Reduced RPV01 cumulative execution time by 83.8%.
+
+### Regression Testing and Validation
+
+- Added end-to-end regression testing against the official ISDA
+  USD SOFR CDS pricing grid dated 26 April 2021.
+- Added original ISDA market rate and pricing grid CSV fixtures.
+- Constructed the SOFR discount curve directly from the 19 original
+  market OIS quotes using FinancePy.
+- Validated all 3,582 survival curve calibrations and 7,164 CDS
+  pricing scenarios.
+- Passed all 35,820 external numerical comparisons covering upfront,
+  cash settlement, clean price, accrued days and accrued premium.
+- Achieved a maximum upfront pricing error of approximately
+  USD 0.000135 on USD 10 million notional.
+- Integrated the ISDA pricing grid into the FinTestCases regression
+  testing framework, with individual output rows for each CDS.
+- Added detailed CSV reports containing reference values, calculated
+  values and pricing errors.
+- Updated CDS regression tests for the revised clean and dirty
+  valuation conventions and public method signatures.
+
+### Breaking API Changes
+
+- Removed the CDS pricing model argument from individual CDS valuation
+  methods. The pricing model is now specified when constructing CDSCurve.
+- Revised CDS valuation method signatures to support explicit cash
+  settlement dates and accrued premium on default controls.
+- Removed the redundant recovery rate argument from premium_leg_pv().
+- CDS accrued_days() and accrued_interest() now take the valuation
+  date rather than the pricing step-in date.
+- Revised the return values of value_fast_approx() to include both
+  clean and dirty risky PV01 and all three risk sensitivities.
+- CDS curve calibration instruments now have zero clean PV rather
+  than zero dirty PV.
+
 15 Nov 2026
 - Fixed IR_DV01 bug in CDS class
 - Added comprehensive logging framework called valuation_log

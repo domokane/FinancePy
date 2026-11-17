@@ -1,13 +1,3 @@
 EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_cds_index 
-Row#  8  ERROR -  1  DIFFERENCE(S) IN ROW  8 
-Row#  8  HEADER:  ==> ['HEADER', 'LABEL', 'VALUE'] 
-Row#  8  GOLDEN : ==> RESULTS,PROTECTION LEG PV,188167.57574068 
-Row#  8  COMPARE: ==> RESULTS,PROTECTION LEG PV,188167.57629575 
- 
-Row#  9  ERROR -  1  DIFFERENCE(S) IN ROW  9 
-Row#  9  HEADER:  ==> ['HEADER', 'LABEL', 'VALUE'] 
-Row#  9  GOLDEN : ==> RESULTS,PREMIUM LEG PV,161146.31585797 
-Row#  9  COMPARE: ==> RESULTS,PREMIUM LEG PV,161146.31631695 
- 
-Analysis of  regression_test_cds_index  completed with  2  errors and  0  warnings. 
-NUM LINES: 12 ====> ERRORS: 2  WARNINGS: 0 
+Analysis of  regression_test_cds_index  completed with  0  errors and  0  warnings. 
+NUM LINES: 12 ====> ERRORS: 0  WARNINGS: 0 

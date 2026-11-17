@@ -1,5 +1,6 @@
 # Copyright (C) 2018, 2019, 2020 Dominic O'Kane
 
+import numpy as np
 from financepy.products.credit.cds import CDS
 from financepy.products.rates.ibor_swap import IborSwap
 from financepy.market.curves.cds_curve import CDSCurve
@@ -15,9 +16,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 ########################################################################################
-
-
-import numpy as np
 
 
 def test_fin_cds_curve():
@@ -64,15 +62,42 @@ def test_fin_cds_curve():
     assert round(issuer_curve._times[5], 4) == 5.0027
     assert round(issuer_curve._times[9], 4) == 9.0055
     assert round(issuer_curve._qs[0], 4) == 1.0
-    assert round(issuer_curve._qs[5], 4) == 0.9249
-    assert round(issuer_curve._qs[9], 4) == 0.8072
+    assert round(issuer_curve._qs[5], 4) == 0.925
+    assert round(issuer_curve._qs[9], 4) == 0.8073
 
     for i in [1, 5, 10]:
+
         maturity_dt = curve_dt.add_months(12 * i)
-        cds = CDS(curve_dt, maturity_dt, 0.005 + 0.001 * (i - 1))
-        dirty_pv, clean_pv = cds.value(curve_dt, issuer_curve, recovery_rate)
-        assert abs(dirty_pv) < 1e-5
+
+        cds = CDS(
+            curve_dt, maturity_dt, 0.005 + 0.001 * (i - 1)
+        )
+
+        dirty_pv, clean_pv = cds.value(
+            curve_dt, issuer_curve, recovery_rate
+        )
+
+        settle_dt = cds.get_settle_dt(curve_dt)
+        settlement_df = issuer_curve.libor_curve.df(settle_dt)
+
+        accrued_interest = cds.accrued_interest(curve_dt)
+
+        # Market CDS must reprice to zero clean PV.
+
         assert abs(clean_pv) < 1e-5
+
+        # Check the relationship between clean and dirty PV.
+
+        assert abs(
+            clean_pv - dirty_pv
+            - accrued_interest * settlement_df
+        ) < 1e-5
+
+        # Market CDS dirty PV equals minus discounted accrued premium.
+
+        assert abs(
+            dirty_pv + accrued_interest * settlement_df
+        ) < 1e-5
 
     # Test scalar Date evaluation and day-count consistency
     d1 = curve_dt.add_months(6)

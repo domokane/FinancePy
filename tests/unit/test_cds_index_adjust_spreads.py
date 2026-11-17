@@ -124,8 +124,8 @@ def test_cds_index_adjust_spreads():
 
     assert round(intrinsic_spd_3yr, 3) == 19.679
     assert round(intrinsic_spd_5yr, 3) == 35.538
-    assert round(intrinsic_spd_7yr, 3) == 49.008
-    assert round(intrinsic_spd_10yr, 3) == 61.407
+    assert round(intrinsic_spd_7yr, 3) == 49.009
+    assert round(intrinsic_spd_10yr, 3) == 61.409
 
 
 def test_cds_index_spread_adjust_intrinsic_reprices_index():

@@ -26,6 +26,13 @@ class PaymentTimingTypes(Enum):
     MATURITY = 2
 
 
+class CDSModelTypes(Enum):
+    """Pricing models for full curve-based CDS valuation."""
+
+    OKANE_TURNBULL = 0
+    ISDA = 1
+
+
 class VolFuncTypes(Enum):
 
     CLARK = 0

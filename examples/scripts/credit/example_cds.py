@@ -308,7 +308,6 @@ protection_leg_pv = cds_contract.prot_leg_pv(
 premium_leg_pv = cds_contract.premium_leg_pv(
     value_dt,
     issuer_curve,
-    cds_recovery,
 )
 
 dirty_rpv01, clean_rpv01 = cds_contract.rpv01(

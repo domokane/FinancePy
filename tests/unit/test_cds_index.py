@@ -32,27 +32,27 @@ def test_cds_index():
         cds_index_contract.par_spread(value_dt, issuer_curve, cds_recovery)
         * 10000.0
     )
-    assert round(spd, 4) == 48.3753
+    assert round(spd, 4) == 48.3752
 
     v = cds_index_contract.value(value_dt, issuer_curve, cds_recovery)
-    assert round(v[DIRTY], 1) == 27022.3
-    assert round(v[CLEAN], 1) == 32577.8
+    assert round(v[DIRTY], 1) == 26893.4
+    assert round(v[CLEAN], 1) == 32556.2
 
     p = cds_index_contract.clean_price(value_dt, issuer_curve, cds_recovery)
     assert round(p, 3) == 99.674
 
     accrued_days = cds_index_contract.accrued_days(value_dt)
-    assert accrued_days == 50.0
+    assert accrued_days == 51.0
 
     accrued_interest = cds_index_contract.accrued_interest(value_dt)
-    assert round(accrued_interest, 3) == 5555.556
+    assert round(accrued_interest, 3) == 5666.667
 
     prot_pv = cds_index_contract.prot_leg_pv(
         value_dt, issuer_curve, cds_recovery
     )
-    assert round(prot_pv, 3) == 188168.574
+    assert round(prot_pv, 3) == 188044.919
 
     prem_pv = cds_index_contract.premium_leg_pv(
         value_dt, issuer_curve)
 
-    assert round(prem_pv, 3) == 161146.302
+    assert round(prem_pv, 3) == 161151.553

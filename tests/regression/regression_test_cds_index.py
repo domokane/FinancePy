@@ -125,7 +125,7 @@ def test_value_cds_index():
     prot_pv = cds_index_contract.prot_leg_pv(value_dt, issuer_curve, cds_recovery)
     test_cases.print("PROTECTION LEG PV", prot_pv)
 
-    prem_pv = cds_index_contract.premium_leg_pv(value_dt, issuer_curve, cds_recovery)
+    prem_pv = cds_index_contract.premium_leg_pv(value_dt, issuer_curve)
     test_cases.print("PREMIUM LEG PV", prem_pv)
 
     dirty_rpv01, clean_rpv01 = cds_index_contract.rpv01(value_dt, issuer_curve)

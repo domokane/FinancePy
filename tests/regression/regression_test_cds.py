@@ -658,31 +658,6 @@ def test_dirty_price_cds_model_check():
 ########################################################################################
 
 
-def test_dirty_price_cds_convergence():
-
-    _, issuer_curve = build_full_issuer_curve1(0.0, 0.0)
-
-    # This is the 10 year contract at an off market cpn
-    maturity_dt = Date(20, 6, 2029)
-    cds_cpn = 0.0150
-    notional = ONE_MILLION
-    long_protection = False
-    trade_dt = Date(9, 8, 2019)
-    value_dt = trade_dt.add_days(1)
-
-    cds_contract = CDS(value_dt, maturity_dt, cds_cpn, notional, long_protection)
-
-    cds_recovery = 0.40
-
-    test_cases.header("NumSteps", "Value")
-    for n in [10, 50, 100, 500, 1000]:
-        v_dirty = cds_contract.value(value_dt, issuer_curve, cds_recovery, 0, 1, n)[DIRTY]
-        test_cases.print(n, v_dirty)
-
-
-########################################################################################
-
-
 def test_cds_date_generation():
 
     # This is the 10 year contract at an off market cpn
@@ -721,7 +696,6 @@ test_cds_curve_build_timing()
 test_dirty_price_cds_model_check()
 test_cds_date_generation()
 test_dirty_price_cds()
-test_dirty_price_cds_convergence()
 test_cds_curve_repricing()
 test_cds_fast_approximation()
 

@@ -105,8 +105,7 @@ class FlatDiscountCurve(DiscountCurve):
         log_section("Flat Discount Curve")
 
         log_value(
-            "Object Type", type(self).__name__,
-            "Value Date", self.anchor_dt,
+            "Anchor Date", self.anchor_dt,
             "Flat Zero Rate", f"{self.flat_zero_rate:.2%}",
             "Frequency Type", self.freq_type,
             "Curve Day Count", self.curve_dc_type,

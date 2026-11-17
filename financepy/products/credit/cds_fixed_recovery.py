@@ -12,15 +12,17 @@ from ...utils.calendar import CalendarTypes
 from ...utils.calendar import BusDayAdjustTypes, DateGenRuleTypes
 from ...utils.day_count import DayCountTypes, DayCount
 from ...utils.frequency import FrequencyTypes
+from ...utils.global_types import CDSModelTypes
 from ...utils.global_vars import G_DAYS_IN_YEAR
 from ...utils.global_vars import ONE_MILLION
 from ...utils.helpers import label_to_string, table_to_string
 from ...utils.global_vars import DIRTY
 from ...utils.valuation_log import log_value, log_table, log_row
+from ...models.cds_fast_model import cds_fast_value
 
 from ...market.curves.cds_curve import CDSCurve
-from .cds import CDS, GLOB_NUM_STEPS_PER_YEAR, ONE_PCT, ONE_BP
-from .cds import STANDARD_RECOVERY_RATE, KAPPA
+from .cds import CDS, ONE_PCT, ONE_BP
+from .cds import STANDARD_RECOVERY_RATE
 
 
 ########################################################################################
@@ -74,8 +76,6 @@ class CDSFixedRecovery(CDS):
         value_dt: Date,
         issuer_curve: CDSCurve,
         recovery_rate: float = None,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
-        prot_method=0,
     ):
 
         if recovery_rate is not None and recovery_rate != self.fixed_recovery:
@@ -85,8 +85,6 @@ class CDSFixedRecovery(CDS):
             value_dt,
             issuer_curve,
             self.fixed_recovery,
-            num_steps_per_year,
-            prot_method,
         )
 
     ###########################################################################
@@ -96,9 +94,8 @@ class CDSFixedRecovery(CDS):
         value_dt: Date,
         issuer_curve: CDSCurve,
         recovery_rate: float = None,
-        pv01_method=0,
-        prot_method=0,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
+        settle_dt: Date | None = None,
+        pay_accrued_on_default: bool = True
     ):
 
         if recovery_rate is not None and recovery_rate != self.fixed_recovery:
@@ -108,9 +105,8 @@ class CDSFixedRecovery(CDS):
             value_dt,
             issuer_curve,
             self.fixed_recovery,
-            pv01_method,
-            prot_method,
-            num_steps_per_year,
+            settle_dt,
+            pay_accrued_on_default
         )
 
     ###########################################################################
@@ -119,9 +115,6 @@ class CDSFixedRecovery(CDS):
         self,
         value_dt: Date,
         issuer_curve: CDSCurve,
-        pv01_method: int = 0,
-        prot_method: int = 0,
-        num_steps_per_year: int = GLOB_NUM_STEPS_PER_YEAR,
     ):
         """PV change for a 1% increase in the issuer curve recovery assumption.
 
@@ -152,9 +145,6 @@ class CDSFixedRecovery(CDS):
         value_base = self.value(
             value_dt,
             issuer_curve,
-            pv01_method=pv01_method,
-            prot_method=prot_method,
-            num_steps_per_year=num_steps_per_year,
         )
 
         bumped_issuer_curve = deepcopy(issuer_curve)
@@ -164,9 +154,6 @@ class CDSFixedRecovery(CDS):
         value_bumped = self.value(
             value_dt,
             bumped_issuer_curve,
-            pv01_method=pv01_method,
-            prot_method=prot_method,
-            num_steps_per_year=num_steps_per_year,
         )
 
         return value_bumped[DIRTY] - value_base[DIRTY]
@@ -185,11 +172,19 @@ class CDSFixedRecovery(CDS):
         """Fast approximate CDS valuation using flat hazard and discount curves.
 
         The hazard rate is implied from the flat CDS spread via the credit
-        triangle ``h = spread / (1 - curve_recovery)`` and both survival
-        and discounting are treated as flat exponentials. The premium leg
-        ignores the actual coupon schedule; accrual-on-default is captured
-        only heuristically through the 365/360 clean-RPV01 adjustment. All
-        PVs are in currency units of the contract notional.
+        triangle ``h = (365/360) * spread / (1 - curve_recovery)`` and both survival
+        and discounting are treated as flat exponentials. 
+
+        The premium leg is approximated using continuous premium
+        payments with an ACT/360 day-count adjustment. Accrued
+        premium on default is not modelled separately.
+
+        The accrued premium rebate is assumed to be exchanged
+        on the valuation date rather than the cash settlement date.
+
+        For contracts with accrue_from_step_in_dt=True, accrued
+        premium is zero before the step-in date and begins
+        accumulating from that date.
 
         Args:
             value_dt: Valuation date (a ``Date``). Scalar only.
@@ -211,23 +206,24 @@ class CDSFixedRecovery(CDS):
                 array-like, strictly positive.
 
         Returns:
-            A tuple ``(full_pv, clean_pv, spread_dv01, ir_dv01, recovery01)``:
-                full_pv: Clean PV plus accrued interest.
-                clean_pv: PV excluding accrued interest.
-                credit01: PV change for a 1 bp increase in the CDS spread.
-                ir01: PV change for a 1 bp increase in the interest rate.
-                recovery01: PV change for a 1 percentage-point increase in
-                    the contractual recovery.
+            A tuple containing:
 
-            Elements are floats if every input was scalar, otherwise ndarrays
-            with the broadcast shape of the inputs. The sensitivities are
-            one-sided (upward) finite differences, rescaled to the stated
-            units whatever bump sizes are supplied. Recovery01 bumps the
-            recovery assumption everywhere it enters: the hazard rate is
-            re-implied from the unchanged quoted spread under the bumped
-            curve recovery, and the contractual loss uses the bumped
-            contract recovery. It is therefore small and vanishes for an
-            at-market contract.
+                dirty_pv: Dirty CDS value in currency units.
+                clean_pv: Clean CDS value in currency units.
+                rpv01_dirty: Dirty risky PV01 per unit notional.
+                rpv01_clean: Clean risky PV01 per unit notional.
+                spread_dv01: Spread sensitivity per basis point.
+                ir_dv01: Interest rate sensitivity per basis point.
+                rec_dv01: Recovery sensitivity per percentage point.
+
+            Elements are floats if all inputs are scalar, otherwise
+            ndarrays with the common broadcast shape.
+
+            Sensitivities are calculated using central finite
+            differences and rescaled to the conventional risk units.
+
+            Recovery sensitivity bumps both the curve and contractual
+            recovery rates while holding the market CDS spread fixed.
 
         Raises:
             FinError: If any input is invalid, the inputs cannot be
@@ -244,6 +240,7 @@ class CDSFixedRecovery(CDS):
         rec_bump = np.asarray(recovery_bump_size, dtype=float)
 
         inputs = (rate, spread, curve_rec, contract_rec, bump, rec_bump)
+
         scalar_output = all(arr.ndim == 0 for arr in inputs)
 
         try:
@@ -257,17 +254,30 @@ class CDSFixedRecovery(CDS):
         if np.any(contract_rec < 0.0) or np.any(contract_rec > 1.0):
             raise FinError("Contract recovery rate must lie in [0.0, 1.0].")
 
+        if np.any(curve_rec - rec_bump < 0.0):
+            raise FinError("Bumped curve recovery cannot be negative.")
+
+        if np.any(contract_rec - rec_bump < 0.0):
+            raise FinError("Bumped contract recovery cannot be negative.")
+
         if np.any(bump <= 0.0):
             raise FinError("Bump size must be positive.")
 
         if np.any(rec_bump <= 0.0):
             raise FinError("Recovery bump size must be positive.")
 
+        if np.any(contract_rec + rec_bump > 1.0):
+            raise FinError("Bumped contract recovery rate cannot exceed 1.0.")
+
         if np.any(curve_rec + rec_bump >= 1.0):
             raise FinError("Bumped curve recovery must be less than 1.0.")
 
         if np.any(spread < 0.0):
             raise FinError("CDS spread cannot be negative.")
+
+        for arr in inputs:
+            if not np.all(np.isfinite(arr)):
+                raise FinError("Inputs must be finite.")
 
         t_mat = (self.maturity_dt - value_dt) / G_DAYS_IN_YEAR
 
@@ -277,7 +287,9 @@ class CDSFixedRecovery(CDS):
                 "valuation date."
             )
 
-        t_eff = max((self.step_in_dt - value_dt) / G_DAYS_IN_YEAR, 0.0)
+        eff_dt = self._get_eff_dt(value_dt, CDSModelTypes.OKANE_TURNBULL)
+
+        t_eff = (eff_dt - value_dt) / G_DAYS_IN_YEAR
 
         if t_mat <= t_eff:
             raise FinError(
@@ -289,92 +301,31 @@ class CDSFixedRecovery(CDS):
         else:
             direction = -1.0
 
-        pcd, _ = self.get_pcd(value_dt)
-        eff_dt = max(value_dt, self.step_in_dt)
+        delta = self._get_accrual_fraction(value_dt)
 
-        day_count = DayCount(self.accrual_dc_type)
-        delta = day_count.year_frac(pcd, eff_dt)[0]
-
-        horizon = t_mat - t_eff
-
-        def _dirty_and_clean_pv(
-            spread_, rate_: float, curve_recovery_: float, contract_recovery_: float
-        ):
-            """Dirty and clean PV under flat spread/rate/recovery inputs.
-
-            All arguments broadcast; returns arrays of the broadcast shape.
-            """
-            hazard_rate = KAPPA * spread_ / (1.0 - curve_recovery_)
-            decay_rate = rate_ + hazard_rate
-
-            # Risky annuity: integral of exp(-decay_rate * t) over
-            # [t_eff, t_mat]. Written with expm1 so it is stable as
-            # decay_rate -> 0, where it tends to the horizon length. The
-            # zero-decay elements are masked out of the division and
-            # replaced with the exact limit.
-            x = decay_rate * horizon
-            is_zero = x == 0.0
-            safe_decay = np.where(is_zero, 1.0, decay_rate)
-            annuity_per_df = np.where(is_zero, horizon, -np.expm1(-x) / safe_decay)
-
-            risky_annuity = np.exp(-decay_rate * t_eff) * annuity_per_df
-
-            rpv01_dirty = risky_annuity * KAPPA + delta
-            rpv01_clean = risky_annuity * KAPPA
-
-            protection_pv = (
-                hazard_rate * (1.0 - contract_recovery_) * risky_annuity * self.notional
-            )
-
-            premium_pv_dirty = self.running_cpn * rpv01_dirty * self.notional
-            premium_pv_clean = self.running_cpn * rpv01_clean * self.notional
-
-            dirty_pv = direction * (protection_pv - premium_pv_dirty)
-            clean_pv = direction * (protection_pv - premium_pv_clean)
-
-            return dirty_pv, clean_pv, rpv01_dirty, rpv01_clean
-
-        dirty_pv, clean_pv, rpv01_dirty, rpv01_clean = _dirty_and_clean_pv(
-            spread, rate, curve_rec, contract_rec
-        )
-
-        dirty_pv_spread_up, _, _, _ = _dirty_and_clean_pv(
-            spread + bump, rate, curve_rec, contract_rec
-        )
-
-        dirty_pv_rate_up, _, _, _ = _dirty_and_clean_pv(
-            spread, rate + bump, curve_rec, contract_rec
-        )
-
-        # Bump the recovery assumption used to imply the hazard rate.
-        # The contractual fixed recovery remains unchanged.
-        dirty_pv_recovery_up, _, _, _ = _dirty_and_clean_pv(
+        out = cds_fast_value(
+            self.running_cpn,
             spread,
+            t_eff,
+            t_mat,
+            delta,
             rate,
-            curve_rec + rec_bump,
+            curve_rec,
             contract_rec,
-        )
-
-        # One-sided differences, rescaled to the conventional units so the
-        # reported figures stay "per 1 bp" / "per 1 pp" for any bump size.
-        spread_dv01 = (dirty_pv_spread_up - dirty_pv) * (ONE_BP / bump)
-        ir_dv01 = (dirty_pv_rate_up - dirty_pv) * (ONE_BP / bump)
-        rec_dv01 = (dirty_pv_recovery_up - dirty_pv) * (ONE_PCT / rec_bump)
-
-        results = (
-            dirty_pv,
-            clean_pv,
-            rpv01_dirty,
-            rpv01_clean,
-            spread_dv01,
-            ir_dv01,
-            rec_dv01,
+            self.notional,
+            direction,
+            bump,
+            rec_bump,
+            True
         )
 
         if scalar_output:
-            return tuple(float(arr) for arr in results)
+            return tuple(float(x) for x in out)
 
-        return tuple(np.broadcast_to(arr, out_shape).copy() for arr in results)
+        return tuple(
+            np.broadcast_to(x, out_shape).copy()
+            for x in out
+        )
 
     ###########################################################################
 

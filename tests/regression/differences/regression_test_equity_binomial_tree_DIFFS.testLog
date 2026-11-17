@@ -1,3 +1,5 @@
 EXAMINING CHANGES IN NEW OUTPUT AND GOLDEN FOR Module: regression_test_equity_binomial_tree 
+Row#  5  WARNING: Calculation time has changed by 55.82  percent. 
+Row#  10  WARNING: Calculation time has changed by 58.84  percent. 
 Analysis of  regression_test_equity_binomial_tree  completed with  0  errors and  12  warnings. 
 NUM LINES: 25 ====> ERRORS: 0  WARNINGS: 12 

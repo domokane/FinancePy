@@ -20,7 +20,7 @@ from ...market.curves.discount_curve import DiscountCurve
 from ...products.rates.ibor_deposit import IborDeposit
 from ...products.rates.ibor_fra import IborFRA
 from ...products.rates.ibor_swap import IborSwap
-from ...utils.valuation_log import log_table, log_row, log_section
+from ...utils.valuation_log import log_table, log_row, log_section, log_value
 
 SWAP_TOL = 1e-6
 FAST = True
@@ -953,6 +953,12 @@ class IborSingleCurve(DiscountCurve):
         """Print out the details of the Ibor curve."""
 
         log_section("Ibor Single Curve")
+
+        log_value(
+            "Anchor Date", self.anchor_dt,
+            "Curve Day Count", self.curve_dc_type,
+            level=1,
+        )
 
         log_table(
             "Type",

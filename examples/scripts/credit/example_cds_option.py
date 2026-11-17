@@ -301,7 +301,6 @@ print(f"{'Forward Protection Leg PV':<35}: " f"{forward_prot_pv:14.8f}")
 forward_prem_pv = forward_cds.premium_leg_pv(
     value_dt,
     issuer_curve,
-    cds_recovery,
 )
 
 print(f"{'Forward Premium Leg PV':<35}: " f"{forward_prem_pv:14.8f}")
