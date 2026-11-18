@@ -137,7 +137,7 @@ class EquityPowerOption(EquityOption):
     def delta(
         self,
         value_dt: Date,
-        stock_price: float,
+        stock_price: float | np.ndarray,
         discount_curve: DiscountCurve,
         dividend_curve: DiscountCurve,
         model: Model,

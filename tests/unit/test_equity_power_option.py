@@ -103,3 +103,33 @@ def test_zero_volatility_delta_is_deterministic_away_from_kink(kind):
     )
     expected = n * spot**(n-1) if kind == OptionTypes.EUROPEAN_CALL else 0.0
     assert analytic == pytest.approx(expected, abs=1e-8)
+
+
+@pytest.mark.parametrize("method", ["value", "delta"])
+@pytest.mark.parametrize("kind", [OptionTypes.EUROPEAN_CALL, OptionTypes.EUROPEAN_PUT])
+@pytest.mark.parametrize("vector_input", ["spot", "strike", "expiry"])
+def test_equity_power_vector_inputs_match_scalar_products(method, kind, vector_input):
+    today = Date(1, 1, 2026)
+    expiries = [Date(1, 7, 2026), Date(1, 1, 2027), Date(1, 7, 2027)]
+    spots = np.array([8.0, 10.0, 12.0])
+    strikes = np.array([90.0, 100.0, 110.0])
+    discount = FlatDiscountCurve(today, 0.045)
+    dividend = FlatDiscountCurve(today, 0.015)
+    model = BlackScholes(0.25)
+    expiry = expiries if vector_input == "expiry" else expiries[0]
+    strike = strikes if vector_input == "strike" else 100.0
+    spot = spots if vector_input == "spot" else 10.0
+    product = EquityPowerOption(expiry, strike, kind, 2.0, num_options=3.0)
+    actual = getattr(product, method)(today, spot, discount, dividend, model)
+    expected = []
+    for i in range(3):
+        scalar_product = EquityPowerOption(
+            expiries[i] if vector_input == "expiry" else expiry,
+            float(strikes[i]) if vector_input == "strike" else strike,
+            kind, 2.0, num_options=3.0,
+        )
+        expected.append(getattr(scalar_product, method)(
+            today, float(spots[i]) if vector_input == "spot" else spot,
+            discount, dividend, model,
+        ))
+    np.testing.assert_allclose(actual, expected, rtol=1e-12)

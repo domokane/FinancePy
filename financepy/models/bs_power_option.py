@@ -1,7 +1,7 @@
 # Copyright (C) 2020 Dominic O'Kane, G Poorna Prudhvi
 
 import numpy as np
-from numba import njit
+from numba import vectorize
 
 from ..utils.global_types import OptionTypes
 from ..utils.global_vars import G_SMALL
@@ -10,7 +10,7 @@ from ..utils.math import normcdf
 ########################################################################################
 
 
-@njit(fastmath=True, cache=True)
+@vectorize(fastmath=True, cache=True)
 def power_option_value(
     s: float,
     t: float,
@@ -80,7 +80,7 @@ def power_option_value(
     )
 
 
-@njit(fastmath=True, cache=True)
+@vectorize(fastmath=True, cache=True)
 def power_option_delta(
     s: float,
     t: float,
