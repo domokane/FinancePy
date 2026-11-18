@@ -2090,8 +2090,8 @@ class Calendar:
         if m == 1 and d == 2 and weekday == Date.MON:  # NYD
             return True
 
-        if m == 1 and d == 3 and weekday == Date.MON:  # NYD
-            return True
+        # No Monday 3 January holiday. Under US federal rules a holiday on a
+        # Saturday is observed on the Friday before (31 December, below).
 
         if m == 1 and d >= 15 and d < 22 and weekday == Date.MON:  # MLK
             return True

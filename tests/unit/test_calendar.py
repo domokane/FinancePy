@@ -197,6 +197,20 @@ def test_us_government_securities_new_year_on_saturday():
     assert cal.add_business_days(Date(30, 12, 2021), 1) == Date(31, 12, 2021)
 
 
+def test_us_new_year_on_saturday():
+    cal = Calendar(CalendarTypes.UNITED_STATES)
+
+    # When 1 January is a Saturday the holiday is observed on Friday
+    # 31 December, and Monday 3 January is a normal business day
+    for year in [2011, 2022, 2028]:
+        assert cal.is_holiday(Date(31, 12, year - 1)), year
+        assert cal.is_business_day(Date(3, 1, year)), year
+
+    # When 1 January is a Sunday it is still observed on Monday 2 January
+    assert cal.is_holiday(Date(2, 1, 2023))
+    assert cal.add_business_days(Date(30, 12, 2021), 1) == Date(3, 1, 2022)
+
+
 @pytest.mark.parametrize(
     "cal_type", [CalendarTypes.UNITED_KINGDOM, CalendarTypes.LONDON]
 )
