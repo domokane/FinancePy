@@ -260,6 +260,34 @@ def test_toronto_new_year_on_saturday_observed_on_monday():
     for y in [2011, 2022, 2028]:
         assert cal.is_holiday(Date(3, 1, y)), y
 
+
+def test_canada_boxing_day_observed():
+    cal = Calendar(CalendarTypes.CANADA)
+
+    # 26 December falls on a Saturday, so Boxing Day is observed on
+    # Monday 28 December
+    for y in [2015, 2020, 2026]:
+        assert cal.is_holiday(Date(28, 12, y)), y
+        assert cal.is_business_day(Date(29, 12, y)), y
+
+    # 25 December falls on a Sunday, so Christmas is observed on Monday
+    # 26 December and Boxing Day on Tuesday 27 December
+    for y in [2016, 2022]:
+        assert cal.is_holiday(Date(26, 12, y)), y
+        assert cal.is_holiday(Date(27, 12, y)), y
+        assert cal.is_business_day(Date(28, 12, y)), y
+
+    # 25 December falls on a Saturday, so both are observed on Monday
+    # 27 and Tuesday 28 December
+    for y in [2021, 2027]:
+        assert cal.is_holiday(Date(27, 12, y)), y
+        assert cal.is_holiday(Date(28, 12, y)), y
+        assert cal.is_business_day(Date(29, 12, y)), y
+
+    assert cal.add_business_days(Date(23, 12, 2022), 1) == Date(28, 12, 2022)
+    assert cal.add_business_days(Date(24, 12, 2026), 1) == Date(29, 12, 2026)
+
+
 def test_italy_st_francis_national_holiday_from_2026():
     cal = Calendar(CalendarTypes.ITALY)
 
