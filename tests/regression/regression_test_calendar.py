@@ -302,6 +302,7 @@ def test_canada():
     assert not cal.is_business_day(Date(7, 9, 2026))  # Labour Day
     assert not cal.is_business_day(Date(12, 10, 2026))  # Thanksgiving
     assert not cal.is_business_day(Date(25, 12, 2026))
+    assert not cal.is_business_day(Date(28, 12, 2026))  # Boxing Day observed
 
 
 def test_france():

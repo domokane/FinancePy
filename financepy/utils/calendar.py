@@ -2703,10 +2703,13 @@ class Calendar:
         if m == 12 and d == 26:  # Boxing holiday
             return True
 
-        if m == 12 and d == 27 and weekday == Date.MON:  # Boxing holiday
+        # Boxing Day moves to Tuesday 27 December when Christmas is observed
+        # on Monday 26 December, and to Monday or Tuesday 28 December when
+        # 26 December falls on a Saturday or Sunday
+        if m == 12 and d == 27 and weekday == Date.TUE:  # Boxing holiday
             return True
 
-        if m == 12 and d == 28 and weekday == Date.TUE:  # Boxing holiday
+        if m == 12 and d == 28 and weekday in (Date.MON, Date.TUE):  # Boxing holiday
             return True
 
         return False
