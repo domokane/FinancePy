@@ -836,6 +836,10 @@ class Calendar:
         if m == 1 and d == 1:  # new years day
             return True
 
+        # New Year's Day on a Saturday or Sunday is observed on the Monday
+        if m == 1 and d in (2, 3) and weekday == Date.MON:
+            return True
+
         if m == 1 and d == 26:  # Australia day
             return True
 
@@ -878,7 +882,9 @@ class Calendar:
         if m == 12 and d == 26 and weekday == Date.MON:  # Xmas
             return True
 
-        if m == 12 and d == 27 and weekday == Date.MON:  # Xmas
+        # Christmas on a Saturday is observed on Monday 27 December, and
+        # Christmas on a Sunday on Tuesday 27 December (after Boxing Day)
+        if m == 12 and d == 27 and weekday in (Date.MON, Date.TUE):  # Xmas
             return True
 
         if m == 12 and d == 26:  # Boxing day
@@ -887,7 +893,9 @@ class Calendar:
         if m == 12 and d == 27 and weekday == Date.MON:  # Boxing
             return True
 
-        if m == 12 and d == 28 and weekday == Date.MON:  # Boxing
+        # Boxing Day on a Saturday is observed on Monday 28 December, and
+        # on a Sunday (Christmas on Saturday) on Tuesday 28 December
+        if m == 12 and d == 28 and weekday in (Date.MON, Date.TUE):  # Boxing
             return True
 
         return False

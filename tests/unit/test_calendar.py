@@ -319,6 +319,51 @@ def test_uk_one_off_bank_holidays(cal_type):
     assert cal.is_business_day(Date(31, 12, 2010))
 
 
+def test_australia_new_year_observed():
+    cal = Calendar(CalendarTypes.AUSTRALIA)
+
+    # 1 January falls on a Saturday, so New Year's Day is observed on
+    # Monday 3 January
+    for y in [2022, 2028, 2033]:
+        assert cal.is_holiday(Date(3, 1, y)), y
+        assert cal.is_business_day(Date(4, 1, y)), y
+
+    # 1 January falls on a Sunday, so New Year's Day is observed on
+    # Monday 2 January
+    for y in [2012, 2017, 2023]:
+        assert cal.is_holiday(Date(2, 1, y)), y
+        assert cal.is_business_day(Date(3, 1, y)), y
+
+    assert cal.add_business_days(Date(30, 12, 2022), 1) == Date(3, 1, 2023)
+
+
+def test_australia_christmas_and_boxing_day_observed():
+    cal = Calendar(CalendarTypes.AUSTRALIA)
+
+    # 25 December falls on a Sunday, so Boxing Day is Monday 26 December
+    # and Christmas is observed on Tuesday 27 December
+    for y in [2016, 2022, 2033]:
+        assert cal.is_holiday(Date(26, 12, y)), y
+        assert cal.is_holiday(Date(27, 12, y)), y
+        assert cal.is_business_day(Date(28, 12, y)), y
+
+    # 25 December falls on a Saturday, so Christmas is observed on Monday
+    # 27 December and Boxing Day on Tuesday 28 December
+    for y in [2021, 2027, 2032]:
+        assert cal.is_holiday(Date(27, 12, y)), y
+        assert cal.is_holiday(Date(28, 12, y)), y
+        assert cal.is_business_day(Date(29, 12, y)), y
+
+    # 26 December falls on a Saturday, so Boxing Day is observed on
+    # Monday 28 December (unchanged)
+    for y in [2015, 2020, 2026]:
+        assert cal.is_holiday(Date(28, 12, y)), y
+        assert cal.is_business_day(Date(29, 12, y)), y
+
+    assert cal.add_business_days(Date(23, 12, 2022), 1) == Date(28, 12, 2022)
+    assert cal.add_business_days(Date(24, 12, 2021), 1) == Date(29, 12, 2021)
+
+
 @pytest.mark.parametrize(
     "cal_type",
     [
