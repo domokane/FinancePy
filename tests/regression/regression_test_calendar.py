@@ -289,6 +289,9 @@ def test_australia():
     assert not cal.is_business_day(Date(6, 4, 2026))  # Easter Monday
     assert not cal.is_business_day(Date(25, 4, 2026))  # ANZAC
     assert not cal.is_business_day(Date(25, 12, 2026))
+    assert not cal.is_business_day(Date(28, 12, 2026))  # Boxing Day observed
+    assert not cal.is_business_day(Date(28, 12, 2027))  # Boxing Day observed
+    assert not cal.is_business_day(Date(3, 1, 2028))  # New Year's Day observed
 
 
 def test_canada():
