@@ -273,7 +273,7 @@ def _value_american(
         )
 
     if algo_type is BlackScholesAlgorithmTypes.LEISEN_REIMER:
-        return _value_leisen_reimer_tree(
+        return _value_leisen_reimer(
             spot_price,
             time_to_expiry,
             strike_price,

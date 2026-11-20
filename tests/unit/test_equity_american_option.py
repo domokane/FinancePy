@@ -99,3 +99,30 @@ def test_american_call():
     )
 
     assert round(value, 3) == 8.056
+
+
+########################################################################################
+
+
+@pytest.mark.parametrize(
+    "opt_type, expected",
+    [
+        (OptionTypes.AMERICAN_CALL, 8.056),
+        (OptionTypes.AMERICAN_PUT, 7.254),
+    ],
+)
+def test_american_leisen_reimer(opt_type, expected):
+    """The Leisen-Reimer tree can be selected for American exercise."""
+
+    option = EquityAmericanOption(expiry_dt, strike_price, opt_type)
+
+    value = option.value(
+        value_dt,
+        stock_price,
+        discount_curve,
+        dividend_curve,
+        model,
+        algo_type=BlackScholesAlgorithmTypes.LEISEN_REIMER,
+    )
+
+    assert round(value, 3) == expected
