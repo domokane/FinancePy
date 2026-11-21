@@ -67,13 +67,14 @@ def p_fast(t, t_mat, r_t, delta, pt, ptd, p_mat, _sigma, _a):
     if abs(_a) < SMALL:
         _a = SMALL
 
-    bt_t = (1.0 - np.exp(-_a * (t_mat - t))) / _a
-    bt_delta = (1.0 - np.exp(-_a * delta)) / _a
+    # Keep the Ho-Lee limit accurate even for tiny a * delta.
+    bt_t = -np.expm1(-_a * (t_mat - t)) / _a
+    bt_delta = -np.expm1(-_a * delta) / _a
 
     term1 = np.log(p_mat / pt) - (bt_t / bt_delta) * np.log(ptd / pt)
 
     term2 = (
-        (_sigma**2) * (1 - np.exp(-2 * _a * t)) * bt_t * (bt_t - bt_delta) / (4 * _a)
+        (_sigma**2) * (-np.expm1(-2 * _a * t)) * bt_t * (bt_t - bt_delta) / (4 * _a)
     )
 
     log_ahat = term1 - term2
@@ -975,8 +976,8 @@ class HWTree:
         if abs(a) < SMALL:
             a = SMALL
 
-        sigmap = (sigma / a) * (1.0 - np.exp(-a * (t_mat - t_exp)))
-        sigmap = sigmap * np.sqrt((1.0 - np.exp(-2.0 * a * t_exp)) / 2.0 / a)
+        sigmap = -(sigma / a) * np.expm1(-a * (t_mat - t_exp))
+        sigmap = sigmap * np.sqrt(-np.expm1(-2.0 * a * t_exp) / (2.0 * a))
 
         if abs(sigmap) < SMALL:
             sigmap = SMALL

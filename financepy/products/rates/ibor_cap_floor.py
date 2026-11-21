@@ -11,6 +11,8 @@ from typing import Union
 
 from enum import Enum
 
+import numpy as np
+
 from ...utils.date import Date
 from ...utils.calendar import Calendar
 from ...utils.calendar import CalendarTypes
@@ -33,6 +35,7 @@ from ...models.hw_tree import HWTree
 from ...utils.global_types import CapFloorTypes, OptionTypes
 from ...utils.check_values import check_curve_dt
 from ...market.curves.discount_curve import DiscountCurve
+from ...market.curves.interpolator import InterpTypes
 from ...models.model import Model
 from ...utils.valuation_log import log_value, log_table, log_row
 
@@ -287,8 +290,17 @@ class IborCapFloor:
             notional_adj = 1.0 + self.strike_rate * alpha
             face_amount = 1.0
 
-            df_times = libor_curve._times
-            df_values = libor_curve._dfs
+            if getattr(libor_curve, "_interp_type", None) == InterpTypes.FLAT_FWD_RATES:
+                df_times, df_values = libor_curve._times, libor_curve._dfs
+            else:
+                # The ZCB pricer interpolates flat-forward; make both
+                # required discounts from the supplied curve knots.
+                if t_exp > 0.0:
+                    df_times = np.array([0.0, t_exp, t_mat])
+                    df_values = np.array([1.0, libor_curve.df(caplet_start_dt), df])
+                else:
+                    df_times = np.array([0.0, t_mat])
+                    df_values = np.array([1.0, df])
 
             v = model.option_on_zcb(t_exp, t_mat, strike_price, face_amount, df_times, df_values)
 
