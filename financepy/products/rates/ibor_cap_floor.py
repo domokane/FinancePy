@@ -28,6 +28,7 @@ from ...models.black import Black
 from ...models.black_shifted import BlackShifted
 from ...models.bachelier import Bachelier
 from ...models.sabr import SABR
+from ...models.sabr_normal import NormalSABR
 from ...models.sabr_shifted import SABRShifted
 from ...models.hw_tree import HWTree
 from ...utils.global_types import CapFloorTypes, OptionTypes
@@ -131,14 +132,15 @@ class IborCapFloor:
 
     def value(self, value_dt: Date, libor_curve: DiscountCurve, model: Model):
         """Value the cap or floor using the chosen model which specifies
-        the volatility of the Ibor rate to the cap start date."""
+        the volatility of the Ibor rate to the cap start date. Bachelier and
+        NormalSABR permit negative strikes."""
 
         check_curve_dt(value_dt, libor_curve)
 
         num_options = len(self.caplet_floorlet_dates)
         strike_rate = self.strike_rate
 
-        if strike_rate < 0.0:
+        if strike_rate < 0.0 and not isinstance(model, (Bachelier, NormalSABR)):
             raise FinError("Strike < 0.0")
 
         if num_options <= 1:
@@ -237,7 +239,7 @@ class IborCapFloor:
         k = self.strike_rate
         df = libor_curve.df(caplet_end_dt)
 
-        if k == 0.0:
+        if k == 0.0 and not isinstance(model, (Bachelier, NormalSABR)):
             k = 1e-10
 
         caplet_floorlet_value = 0.0
@@ -256,7 +258,7 @@ class IborCapFloor:
             elif self.opt_type == CapFloorTypes.FLOOR:
                 caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
-        elif isinstance(model, Bachelier):
+        elif isinstance(model, (Bachelier, NormalSABR)):
 
             if self.opt_type == CapFloorTypes.CAP:
                 caplet_floorlet_value = model.value(fwd, k, t_exp, df, OptionTypes.EUROPEAN_CALL)
