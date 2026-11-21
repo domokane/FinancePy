@@ -26,9 +26,11 @@ from ...market.curves.discount_curve import DiscountCurve
 
 from ...products.rates.ibor_swap import IborSwap
 
+from ...models.bachelier import Bachelier
 from ...models.black import Black
 from ...models.black_shifted import BlackShifted
 from ...models.sabr import SABR
+from ...models.sabr_normal import NormalSABR
 from ...models.sabr_shifted import SABRShifted
 from ...models.hw_tree import HWTree
 from ...models.bk_tree import BKTree
@@ -110,10 +112,9 @@ class IborSwaption:
               discount_curve: DiscountCurve,
               model: Model):
         """Valuation of a Ibor European-style swaption using a choice of
-        models on a specified valuation date. Models include FinModelBlack,
-        FinModelBlackShifted, SABR, SABRShifted, FinModelHW,
-        FinModelBK and FinModelBDT. The last two involved a tree-based
-        valuation."""
+        models on a specified valuation date. Models include Black, BlackShifted,
+        Bachelier, SABR, SABRShifted, NormalSABR, HWTree, BKTree and BDTTree.
+        Bachelier and NormalSABR permit negative forwards and strikes."""
 
         float_spread = 0.0
 
@@ -205,7 +206,7 @@ class IborSwaption:
             elif self.fixed_leg_type == SwapTypes.RECEIVE:
                 swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_PUT)
 
-        elif isinstance(model, SABR):
+        elif isinstance(model, (SABR, Bachelier, NormalSABR)):
 
             if self.fixed_leg_type == SwapTypes.PAY:
                 swaption_price = model.value(s, k, t_exp, df, OptionTypes.EUROPEAN_CALL)

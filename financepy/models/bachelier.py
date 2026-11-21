@@ -55,7 +55,8 @@ class Bachelier:
         v = self.volatility
         root_t = np.sqrt(np.maximum(t, 0.0))
         std = v * root_t
-        d = np.where(std > 0.0, (f - k) / std, 0.0)
+        # Use a safe denominator: np.where evaluates both branches.
+        d = (f - k) / np.where(std > 0.0, std, 1.0)
 
         if call_or_put == OptionTypes.EUROPEAN_CALL:
             values = df * ((f - k) * norm.cdf(d) + std * norm.pdf(d))

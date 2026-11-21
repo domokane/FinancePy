@@ -3,7 +3,9 @@ from __future__ import annotations
 import numpy as np
 from scipy.optimize import least_squares
 
+from .bachelier import Bachelier
 from ..utils.error import FinError
+from ..utils.global_types import OptionTypes
 
 
 def normal_sabr_vol(forward, strike, expiry, alpha, rho, nu):
@@ -41,6 +43,27 @@ class NormalSABR:
         return normal_sabr_vol(
             forward, strike, expiry, self.alpha, self.rho, self.nu
         )
+
+    def value(
+        self,
+        forward: float,
+        strike: float,
+        expiry: float,
+        df: float,
+        call_or_put: OptionTypes,
+    ) -> float:
+        """Price a scalar European call or put using the SABR normal vol.
+
+        Rates may be negative. Expiry is in years, and df discounts the
+        payoff. This uses the implied-volatility approximation, not an exact
+        numerical solution of the SABR model.
+        """
+        vol = self.normal_vol(forward, strike, expiry)
+        if not np.isfinite(vol) or vol <= 0.0:
+            raise FinError("Normal SABR approximation must give a positive volatility.")
+        if not np.isfinite(df):
+            raise FinError("Discount factor must be finite.")
+        return float(Bachelier(vol).value(forward, strike, expiry, df, call_or_put))
 
     @classmethod
     def calibrate(cls, forward, strikes, normal_vols, expiry,
