@@ -23,6 +23,7 @@ from ...utils.error import FinError
 from ...utils.helpers import label_to_string, check_argument_types
 from ...utils.date import Date
 from ...market.curves.discount_curve import DiscountCurve
+from ...market.curves.interpolator import InterpTypes
 
 from ...products.rates.ibor_swap import IborSwap
 
@@ -158,6 +159,7 @@ class IborSwaption:
         # For the tree models we need to generate a vector of the cpns
         #######################################################################
 
+        cpn_dates = [self.exercise_dt]
         cpn_times = [t_exp]
         cpn_flows = [0.0]
 
@@ -173,14 +175,12 @@ class IborSwaption:
             if flow_dt > self.exercise_dt:
                 cpn_time = (flow_dt - value_dt) / G_DAYS_IN_YEAR
                 cpn_flow = swap.fixed_leg.payments[i_flow] / self.notional
+                cpn_dates.append(flow_dt)
                 cpn_times.append(cpn_time)
                 cpn_flows.append(cpn_flow)
 
         cpn_times = np.array(cpn_times)
         cpn_flows = np.array(cpn_flows)
-
-        df_times = discount_curve._times
-        df_values = discount_curve._dfs
 
         if np.any(cpn_times < 0.0):
             raise FinError("No cpn times can be before the value date.")
@@ -221,6 +221,20 @@ class IborSwaption:
 
         elif isinstance(model, HWTree):
 
+            if (
+                getattr(discount_curve, "_interp_type", None) == InterpTypes.FLAT_FWD_RATES
+                and discount_curve.curve_dc_type == DayCountTypes.ACT_365F
+            ):
+                df_times, df_values = discount_curve._times, discount_curve._dfs
+            else:
+                # The analytic HW routine interpolates flat-forward. Make
+                # the supplied curve's actual exercise and coupon DFs knots
+                # in the model's ACT/365F clock.
+                df_times, df_dates = cpn_times, cpn_dates
+                if t_exp > 0.0:
+                    df_times = np.r_[0.0, cpn_times]
+                    df_dates = [value_dt, *cpn_dates]
+                df_values = discount_curve.df(df_dates)
             swaption_px = model.european_bond_option_jamshidian(
                 t_exp,
                 strike_price,
@@ -243,7 +257,7 @@ class IborSwaption:
 
         elif isinstance(model, BKTree):
 
-            model.build_tree(t_mat, df_times, df_values)
+            model.build_tree(t_mat, discount_curve._times, discount_curve._dfs)
             swaption_px = model.bermudan_swaption(
                 t_exp,
                 t_mat,
@@ -263,7 +277,7 @@ class IborSwaption:
 
         elif isinstance(model, BDTTree):
 
-            model.build_tree(t_mat, df_times, df_values)
+            model.build_tree(t_mat, discount_curve._times, discount_curve._dfs)
             swaption_px = model.bermudan_swaption(
                 t_exp,
                 t_mat,
